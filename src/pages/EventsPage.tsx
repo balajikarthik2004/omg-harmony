@@ -29,12 +29,10 @@ const EventsPage: React.FC = () => {
     description: '',
     date: '',
     time: '',
-    location: templeProfile.location,
     organizer: templeProfile.organizer,
     status: 'Planned',
     poojaType: '',
-    offerings: '',
-    specialPooja: '',
+    resourceNeeded: '',
     prasadam: '',
     attendees: 0,
     festivalName: '',
@@ -56,12 +54,10 @@ const EventsPage: React.FC = () => {
       description: '',
       date: selectedDate || todayStr,
       time: '06:00',
-      location: templeProfile.location,
       organizer: templeProfile.organizer,
       status: 'Planned',
       poojaType: '',
-      offerings: '',
-      specialPooja: '',
+      resourceNeeded: '',
       prasadam: '',
       attendees: 0,
       festivalName: '',
@@ -76,12 +72,10 @@ const EventsPage: React.FC = () => {
       description: item.description,
       date: item.date,
       time: item.time,
-      location: item.location,
       organizer: item.organizer,
       status: item.status,
       poojaType: item.poojaType,
-      offerings: item.offerings,
-      specialPooja: item.specialPooja,
+      resourceNeeded: item.resourceNeeded,
       prasadam: item.prasadam,
       attendees: item.attendees,
       festivalName: item.festivalName,
@@ -303,10 +297,23 @@ const EventsPage: React.FC = () => {
                 </Button>
               </div>
 
-              <div className="flex gap-1.5 bg-muted/60 p-1 rounded-lg mb-5 border border-border/50">
-                <button onClick={() => setFilter('all')} className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${filter === 'all' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}>All</button>
-                <button onClick={() => setFilter('festivals')} className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${filter === 'festivals' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}>Festivals</button>
-                <button onClick={() => setFilter('daily')} className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${filter === 'daily' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}>Daily Pooja</button>
+              <div className="flex gap-2 w-full mb-5">
+                {[
+                  { key: 'all' as const, label: 'All', color: 'bg-blue-600 border-blue-700' },
+                  { key: 'festivals' as const, label: 'Festivals', color: 'bg-orange-600 border-orange-700' },
+                  { key: 'daily' as const, label: 'Daily Pooja', color: 'bg-emerald-600 border-emerald-700' },
+                ].map(item => (
+                  <button
+                    key={item.key}
+                    onClick={() => setFilter(item.key)}
+                    className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-xl border-2 transition-all duration-200 shadow-sm
+                      ${filter === item.key 
+                        ? `${item.color} text-white shadow-md scale-[1.03]` 
+                        : 'bg-background border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground hover:bg-muted/40'}`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
               </div>
 
               <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin">
@@ -378,10 +385,10 @@ const EventsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"><MapPin className="h-4 w-4 text-emerald-600" /></div>
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"><Package className="h-4 w-4 text-emerald-600" /></div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Location</p>
-                    <p className="text-sm font-medium text-foreground">{detailEvent.location}</p>
+                    <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Resources Needed</p>
+                    <p className="text-sm font-medium text-foreground">{detailEvent.resourceNeeded || 'None'}</p>
                   </div>
                 </div>
 
@@ -429,7 +436,6 @@ const EventsPage: React.FC = () => {
               <label className="text-sm font-medium text-foreground">Time</label>
               <input type="time" value={form.time} onChange={e => setField('time', e.target.value)} className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none" />
             </div>
-            <FormField label="Location/Temple" value={form.location} onChange={v => setField('location', v)} />
             <FormField label="Organizer Name" value={form.organizer} onChange={v => setField('organizer', v)} />
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Status</label>
@@ -446,8 +452,9 @@ const EventsPage: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Pooja Type" value={form.poojaType} onChange={v => setField('poojaType', v)} placeholder="E.g. Abhishekam" />
             <FormField label="Prasadam Planned" value={form.prasadam} onChange={v => setField('prasadam', v)} placeholder="E.g. Puliyodarai" />
-            <FormField label="Offerings / Seva" value={form.offerings} onChange={v => setField('offerings', v)} />
-            <FormField label="Special Action" value={form.specialPooja} onChange={v => setField('specialPooja', v)} />
+            <div className="col-span-2">
+              <FormField label="Resource Needed" value={form.resourceNeeded} onChange={v => setField('resourceNeeded', v)} placeholder="E.g. 5kg Milk, 2kg Flowers" />
+            </div>
           </div>
 
           <div className="flex gap-3 pt-4 border-t border-border/60">

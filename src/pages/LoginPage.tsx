@@ -59,11 +59,11 @@ const LoginPage: React.FC = () => {
         <div className="relative z-10 flex flex-col justify-between p-10 w-full">
           {/* Top: Logo */}
           <div className="animate-fade-in">
-            <img src={logo} alt="OMG Temple" className="h-12 brightness-0 invert opacity-90" />
+            <img src={logo} alt="OMG Temple" className="h-14" />
           </div>
 
           {/* Bottom: Welcome copy */}
-          <div className="animate-fade-in max-w-md space-y-4" style={{ animationDelay: '0.2s' }}>
+          {/* <div className="animate-fade-in max-w-md space-y-4" style={{ animationDelay: '0.2s' }}>
             <h2 className="text-3xl font-display font-bold text-white/95 leading-tight">
               Managing Sacred Spaces,<br />
               <span className="text-white/70">Effortlessly.</span>
@@ -72,7 +72,7 @@ const LoginPage: React.FC = () => {
               Streamline temple operations with our comprehensive management platform — 
               from devotee records to financial tracking, all in one place.
             </p>
-            {/* Feature badges */}
+            // Feature badges 
             <div className="flex gap-3 pt-2">
               {['Operations', 'Finance', 'Reports'].map((tag) => (
                 <span
@@ -83,7 +83,7 @@ const LoginPage: React.FC = () => {
                 </span>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -106,7 +106,7 @@ const LoginPage: React.FC = () => {
                 Welcome back
               </h1>
               <p className="text-muted-foreground mt-1.5 text-sm">
-                Sign in to continue to your dashboard
+               Sign in to get started
               </p>
             </div>
 
@@ -184,16 +184,16 @@ const LoginPage: React.FC = () => {
             </div>
 
             {/* Footer note */}
-            <p className="text-center text-xs text-muted-foreground/70">
+            {/* <p className="text-center text-xs text-muted-foreground/70">
               Protected by enterprise-grade encryption
-            </p>
+            </p> */}
           </div>
 
           {/* Bottom branding for desktop */}
           <div className="hidden lg:flex items-center justify-center mt-6 gap-1.5">
             <span className="text-xs text-muted-foreground/50">Powered by</span>
             <span className="text-xs font-display font-semibold text-muted-foreground/70">
-              OMG Temple ERP
+              OMG Temple Governance System
             </span>
           </div>
         </div>

@@ -277,11 +277,10 @@ const DonationsPage: React.FC = () => {
             <button
               key={option.key}
               onClick={() => setReportPeriod(option.key as ReportPeriod)}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border ${
-                reportPeriod === option.key
+              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border ${reportPeriod === option.key
                   ? 'bg-emerald-100 text-emerald-800 border-emerald-200 shadow-sm scale-105'
                   : 'bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/80 hover:text-foreground'
-              }`}
+                }`}
             >
               {option.label}
             </button>
@@ -326,63 +325,64 @@ const DonationsPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-5">
         <div className="section-panel shadow-sm xl:col-span-3">
           <div className="section-panel-header gap-3 border-b border-border/60 pb-3">
-             <h2 className="text-sm font-semibold flex items-center gap-2"><Filter className="w-4 h-4 text-emerald-600" /> Donation Master Ledger</h2>
-             <div className="relative flex-1 max-w-sm ml-auto">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-               <input
-                 className="w-full h-10 pl-9 pr-3 text-sm border border-input rounded-lg bg-background/60 hover:border-border transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm"
-                 placeholder="Search ref code, donor, category..."
-                 value={search}
-                 onChange={e => setSearch(e.target.value)}
-               />
-             </div>
+            <h2 className="text-sm font-semibold flex items-center gap-2"><Filter className="w-4 h-4 text-emerald-600" /> Donation Master Ledger</h2>
+            <div className="relative flex-1 max-w-sm ml-auto">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                className="w-full h-10 pl-9 pr-3 text-sm border border-input rounded-lg bg-background/60 hover:border-border transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm"
+                placeholder="Search ref code, donor, category..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
           </div>
-          
+
           <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/40">
                 <tr className="border-b border-border">
-                  <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Donation Ref</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Donor Details</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Channel</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Associated Category</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Payment Info</th>
-                  <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Amount Received</th>
-                  <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Receipt/Actions</th>
+                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[8%] text-xs">Ref ID</th>
+                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Donor Name</th>
+                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[8%] text-xs">Channel</th>
+                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Category</th>
+                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Payment Information</th>
+                  <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[10%] text-emerald-800 text-xs">Total Amount</th>
+                  <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-background">
                 {filtered.length === 0 ? <tr><td colSpan={7} className="p-10 text-center text-muted-foreground border-b border-border">No donations found. Check active filters.</td></tr> : filtered.map(item => (
                   <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                    <td className="p-4 align-top">
-                       <p className="font-bold text-foreground">{item.donationCode}</p>
-                       <p className="text-[10px] text-muted-foreground font-mono mt-0.5" title="Transaction ID">{item.transactionRef}</p>
+                    <td className="py-4 px-3 align-top">
+                      <p className="font-bold text-foreground text-xs">{item.donationCode}</p>
                     </td>
-                    <td className="p-4 align-top">
-                      <p className="font-bold text-foreground max-w-[150px] truncate" title={item.donorName}>{item.donorName}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{item.receiptNumber}</p>
+                    <td className="py-4 px-3 align-top">
+                      <p className="font-bold text-foreground truncate w-full" title={item.donorName}>{item.donorName}</p>
                     </td>
-                    <td className="p-4 align-top">
-                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold ${item.channel === 'Online' ? 'bg-blue-50 text-blue-700' : item.channel === 'Hundi' ? 'bg-muted text-muted-foreground' : 'bg-emerald-50 text-emerald-700'}`}>{item.channel}</span>
-                    </td>
-                    <td className="p-4 align-top">
-                       <span className="px-2.5 py-1 rounded bg-accent/10 border border-accent/20 text-accent text-[10px] font-bold tracking-wide uppercase">{item.category}</span>
-                    </td>
-                    <td className="p-4 align-top whitespace-nowrap">
-                       <div className="flex items-center gap-1.5 mb-1">
-                          <span className="font-bold text-foreground text-xs">{item.paymentMethod}</span>
-                          {item.channel === 'Online' && <span className="text-[10px] bg-muted/60 border border-border/60 px-1.5 py-0.5 rounded font-semibold text-muted-foreground">{item.gateway}</span>}
+                    <td className="py-4 px-3 align-top">
+                       <div className="flex items-center gap-1.5">
+                         <div className={`w-1.5 h-1.5 rounded-full ${item.channel === 'Online' ? 'bg-blue-500' : item.channel === 'Hundi' ? 'bg-muted-foreground' : 'bg-emerald-500'}`} />
+                         <span className="text-[11px] font-bold text-foreground/80">{item.channel}</span>
                        </div>
-                       <p className="text-[11px] font-medium text-muted-foreground">{formatDateDDMMYYYY(item.date)}</p>
                     </td>
-                    <td className="p-4 align-top text-right font-display font-bold text-foreground text-lg tracking-tight pt-3 text-emerald-700">{money(item.amount)}</td>
-                    <td className="p-4 align-top text-right">
+                    <td className="py-4 px-3 align-top">
+                      <span className="text-accent text-[11px] font-bold tracking-wider uppercase italic">{item.category}</span>
+                    </td>
+                    <td className="py-4 px-3 align-top whitespace-nowrap">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="font-bold text-foreground text-[10px] font-mono">{item.paymentMethod}</span>
+                        {item.channel === 'Online' && <span className="text-[9px] bg-muted/60 border border-border/60 px-1 py-0.5 rounded font-semibold text-muted-foreground">{item.gateway}</span>}
+                      </div>
+                      <p className="text-[10px] font-medium text-muted-foreground">{formatDateDDMMYYYY(item.date)}</p>
+                    </td>
+                    <td className="py-4 px-3 align-top text-right font-display font-bold text-foreground text-lg tracking-tight pt-3 text-emerald-700 whitespace-nowrap">{money(item.amount)}</td>
+                    <td className="py-4 px-3 align-top text-right">
                       <div className="flex justify-end gap-1.5">
-                        <Button variant="ghost" size="icon" onClick={() => { setSelectedReceipt(item); setReceiptOpen(true); }} className="hover:bg-emerald-50 hover:text-emerald-700 shadow-sm border border-border/50 bg-background" title="View Digital Receipt">
-                          <ReceiptText className="h-4 w-4" />
+                        <Button variant="ghost" size="icon" onClick={() => { setSelectedReceipt(item); setReceiptOpen(true); }} className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-700 shadow-sm border border-border/50 bg-background" title="View Digital Receipt">
+                          <ReceiptText className="h-3.5 w-3.5" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(item)} title="Edit Record"><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Record"><Trash2 className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(item)} title="Edit Record"><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Record"><Trash2 className="h-3.5 w-3.5" /></Button>
                       </div>
                     </td>
                   </tr>
@@ -408,7 +408,7 @@ const DonationsPage: React.FC = () => {
                       <span className="font-bold text-emerald-700">{money(total)}</span>
                     </div>
                     <div className="w-full h-1.5 bg-muted/60 border border-border/40 rounded-full overflow-hidden">
-                       <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <p className="text-[9px] text-muted-foreground font-bold text-right tracking-wider">{pct.toFixed(1)}%</p>
                   </div>
@@ -443,47 +443,47 @@ const DonationsPage: React.FC = () => {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Manage Donation Entry' : 'Record New Donation'}>
         <div className="space-y-5 px-1 pb-4 max-h-[85vh] overflow-y-auto">
           <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-1.5">
-               <label className="text-sm font-medium text-foreground">Collection Channel</label>
-               <select value={form.channel} onChange={e => handleChannelChange(e.target.value as DonationChannel)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm">
-                 {channelOptions.map(option => <option key={option} value={option}>{option}</option>)}
-               </select>
-             </div>
-             <div className="space-y-1.5">
-               <label className="text-sm font-medium text-foreground">Designated Category</label>
-               <select value={form.category} onChange={e => setFormField('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm">
-                 {categoryOptions.map(option => <option key={option} value={option}>{option}</option>)}
-               </select>
-             </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Collection Channel</label>
+              <select value={form.channel} onChange={e => handleChannelChange(e.target.value as DonationChannel)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm">
+                {channelOptions.map(option => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Designated Category</label>
+              <select value={form.category} onChange={e => setFormField('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm">
+                {categoryOptions.map(option => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-4">
-             <FormField label="Donor Full Name" value={form.donorName} onChange={v => setFormField('donorName', v)} placeholder={form.channel === 'Hundi' ? 'Hundi - Anonymous' : 'Enter donor name'} />
-             <div className="space-y-1.5">
-               <label className="text-sm font-medium text-foreground">Donation Amount (₹)</label>
-               <input type="number" value={String(form.amount)} onChange={e => setFormField('amount', Number(e.target.value))} className="w-full h-10 rounded-lg border border-input bg-emerald-50/50 hover:border-emerald-200 px-3 transition-all focus:border-emerald-500 font-display font-bold text-xl outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm" />
-             </div>
+            <FormField label="Donor Full Name" value={form.donorName} onChange={v => setFormField('donorName', v)} placeholder={form.channel === 'Hundi' ? 'Hundi - Anonymous' : 'Enter donor name'} />
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Donation Amount (₹)</label>
+              <input type="number" value={String(form.amount)} onChange={e => setFormField('amount', Number(e.target.value))} className="w-full h-10 rounded-lg border border-input bg-emerald-50/50 hover:border-emerald-200 px-3 transition-all focus:border-emerald-500 font-display font-bold text-xl outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-sm" />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 opacity-90">
-             <FormField label="Phone Number" value={form.phone} onChange={v => setFormField('phone', v)} placeholder="+91" disabled={form.channel === 'Hundi'} />
-             <FormField label="Email Address" value={form.email} onChange={v => setFormField('email', v)} type="email" placeholder="example@email.com" disabled={form.channel === 'Hundi'} />
+            <FormField label="Phone Number" value={form.phone} onChange={v => setFormField('phone', v)} placeholder="+91" disabled={form.channel === 'Hundi'} />
+            <FormField label="Email Address" value={form.email} onChange={v => setFormField('email', v)} type="email" placeholder="example@email.com" disabled={form.channel === 'Hundi'} />
           </div>
 
           <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-4">
-             <div className="space-y-1.5">
-               <label className="text-sm font-medium text-foreground">Mode of Payment</label>
-               <select value={form.paymentMethod} onChange={e => handleMethodChange(e.target.value as PaymentMethod)} disabled={form.channel === 'Hundi'} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm">
-                 {(form.channel === 'Online' ? ['UPI', 'Card'] : ['Cash']).map(option => <option key={option} value={option}>{option}</option>)}
-               </select>
-             </div>
-             <FormField label="Receipt Date" value={form.date} onChange={v => setFormField('date', v)} type="date" />
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-foreground">Mode of Payment</label>
+              <select value={form.paymentMethod} onChange={e => handleMethodChange(e.target.value as PaymentMethod)} disabled={form.channel === 'Hundi'} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm">
+                {(form.channel === 'Online' ? ['UPI', 'Card'] : ['Cash']).map(option => <option key={option} value={option}>{option}</option>)}
+              </select>
+            </div>
+            <FormField label="Receipt Date" value={form.date} onChange={v => setFormField('date', v)} type="date" />
           </div>
 
           {form.channel === 'Online' && (
             <div className="rounded-2xl border border-border bg-gradient-to-b from-sky-50/40 to-background p-5 space-y-4 shadow-sm mt-2 relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 pointer-events-none" />
-              
+
               <div className="flex items-center justify-between relative z-10">
                 <div>
                   <p className="text-sm font-bold text-foreground">Secure Payment Processing</p>
@@ -513,9 +513,9 @@ const DonationsPage: React.FC = () => {
                       <div className="absolute inset-0 bg-gradient-to-tr from-transparent flex items-center justify-center border-2 border-primary border-t-transparent border-r-transparent animate-spin rounded-xl" style={{ animationDuration: '3s' }} />
                     </div>
                     <div className="text-xs text-muted-foreground space-y-2">
-                       <p className="font-semibold text-foreground">Scan via any UPI App</p>
-                       <p className="px-2 py-1.5 bg-muted/40 border border-border/50 rounded-md font-mono text-[10px] text-foreground font-semibold inline-block">tepmle_hash@{form.gateway.toLowerCase()}</p>
-                       <p className="text-[10px] italic pt-1">Awaiting scanner confirmation...</p>
+                      <p className="font-semibold text-foreground">Scan via any UPI App</p>
+                      <p className="px-2 py-1.5 bg-muted/40 border border-border/50 rounded-md font-mono text-[10px] text-foreground font-semibold inline-block">tepmle_hash@{form.gateway.toLowerCase()}</p>
+                      <p className="text-[10px] italic pt-1">Awaiting scanner confirmation...</p>
                     </div>
                   </div>
                 </div>
@@ -528,8 +528,8 @@ const DonationsPage: React.FC = () => {
                   <div className="space-y-3 text-xs font-mono">
                     <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground tracking-widest border-dashed">XXXX XXXX XXXX XXXX</div>
                     <div className="grid grid-cols-2 gap-3">
-                       <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground border-dashed">MM / YY</div>
-                       <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground border-dashed">CVV</div>
+                      <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground border-dashed">MM / YY</div>
+                      <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground border-dashed">CVV</div>
                     </div>
                   </div>
                 </div>
@@ -551,68 +551,68 @@ const DonationsPage: React.FC = () => {
 
       <Modal open={receiptOpen} onClose={() => setReceiptOpen(false)} title="Official Tax Receipt">
         {selectedReceipt && (
-           <div className="space-y-5 animate-fade-in px-1 pb-1">
-             <div className="rounded-2xl border-2 border-border p-6 bg-card relative overflow-hidden shadow-[inset_0_4px_24px_-8px_rgba(0,0,0,0.05)] pt-7 bg-gradient-to-b from-emerald-50/30 to-background">
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none" />
-                 
-                 <div className="flex flex-col items-center justify-center border-b border-border/60 pb-6 mb-6">
-                    <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3 border border-emerald-200">
-                       <ShieldCheck className="w-6 h-6 text-emerald-600" />
-                    </div>
-                    <h3 className="font-display font-bold text-2xl text-foreground">Temple Harmony Trust</h3>
-                    <p className="text-[11px] text-muted-foreground font-medium mt-1">Reg No: THT-8832-IN · Official Acknowledgement</p>
-                 </div>
-                 
-                 <div className="flex items-center justify-between mb-6 bg-muted/40 p-3 rounded-lg border border-border/60">
-                   <div>
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Receipt Number</p>
-                      <p className="font-mono font-bold text-lg text-foreground tracking-wider">{selectedReceipt.receiptNumber}</p>
-                   </div>
-                   <div className="text-right">
-                      <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Issued Date</p>
-                      <p className="font-bold text-foreground text-sm">{formatDateDDMMYYYY(selectedReceipt.date)}</p>
-                   </div>
-                 </div>
-                 
-                 <div className="grid grid-cols-2 gap-y-5 gap-x-6 text-sm mb-6">
-                   <div className="col-span-2">
-                      <p className="text-[11px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Received with thanks from</p>
-                      <p className="font-bold text-lg text-foreground">{selectedReceipt.donorName}</p>
-                      {selectedReceipt.phone && <p className="text-xs text-muted-foreground font-medium mt-0.5">{selectedReceipt.phone} {selectedReceipt.email && `· ${selectedReceipt.email}`}</p>}
-                   </div>
-                   <div>
-                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Fund Category</p>
-                     <span className="px-2.5 py-1 bg-accent/10 border border-accent/20 rounded font-bold text-accent text-[11px] uppercase tracking-wide inline-block">{selectedReceipt.category}</span>
-                   </div>
-                   <div className="text-right">
-                     <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Payment Mode</p>
-                     <p className="font-bold text-foreground text-xs uppercase tracking-wider bg-muted/60 border border-border/60 inline-block px-2.5 py-1 rounded">{selectedReceipt.channel} · {selectedReceipt.paymentMethod}</p>
-                   </div>
-                   
-                   {selectedReceipt.transactionRef !== '-' && (
-                     <div className="col-span-2 pt-2">
-                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Transaction Reference</p>
-                       <p className="font-mono text-[11px] px-2 py-1 bg-blue-50/50 border border-blue-100 rounded inline-block font-semibold text-blue-800">{selectedReceipt.transactionRef}</p>
-                     </div>
-                   )}
-                 </div>
-                 
-                 <div className="pt-5 border-t border-dashed border-border/80 flex items-center justify-between bg-emerald-50/80 p-4 rounded-xl border-emerald-100/50 shadow-sm">
-                    <div>
-                       <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800/70 mb-0.5">Sum of Rupees</p>
-                       <StatusBadge status={selectedReceipt.paymentStatus} />
-                    </div>
-                    <p className="text-3xl font-display font-bold text-emerald-700 tracking-tight">{money(selectedReceipt.amount)}</p>
-                 </div>
-                 
-                 <p className="text-[10px] italic text-center text-muted-foreground mt-6 font-medium px-4">Donations made to the temple are eligible for tax deduction under Section 80G. May the divine blessings be upon abundance.</p>
-             </div>
-             
-             <div className="flex gap-3 pt-3">
-                 <Button variant="outline" className="flex-1 h-12 text-[13px] font-bold tracking-wide" onClick={() => setReceiptOpen(false)}>Close Window</Button>
-                 <Button className="flex-1 h-12 shadow-lg bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-wider text-[13px]" onClick={() => window.print()}><ReceiptText className="w-4 h-4 mr-2" />Print Document</Button>
-             </div>
-           </div>
+          <div className="space-y-5 animate-fade-in px-1 pb-1">
+            <div className="rounded-2xl border-2 border-border p-6 bg-card relative overflow-hidden shadow-[inset_0_4px_24px_-8px_rgba(0,0,0,0.05)] pt-7 bg-gradient-to-b from-emerald-50/30 to-background">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none" />
+
+              <div className="flex flex-col items-center justify-center border-b border-border/60 pb-6 mb-6">
+                <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3 border border-emerald-200">
+                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                </div>
+                <h3 className="font-display font-bold text-2xl text-foreground">Temple Harmony Trust</h3>
+                <p className="text-[11px] text-muted-foreground font-medium mt-1">Reg No: THT-8832-IN · Official Acknowledgement</p>
+              </div>
+
+              <div className="flex items-center justify-between mb-6 bg-muted/40 p-3 rounded-lg border border-border/60">
+                <div>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Receipt Number</p>
+                  <p className="font-mono font-bold text-lg text-foreground tracking-wider">{selectedReceipt.receiptNumber}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Issued Date</p>
+                  <p className="font-bold text-foreground text-sm">{formatDateDDMMYYYY(selectedReceipt.date)}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-y-5 gap-x-6 text-sm mb-6">
+                <div className="col-span-2">
+                  <p className="text-[11px] text-muted-foreground uppercase tracking-widest font-bold mb-1">Received with thanks from</p>
+                  <p className="font-bold text-lg text-foreground">{selectedReceipt.donorName}</p>
+                  {selectedReceipt.phone && <p className="text-xs text-muted-foreground font-medium mt-0.5">{selectedReceipt.phone} {selectedReceipt.email && `· ${selectedReceipt.email}`}</p>}
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Fund Category</p>
+                  <span className="px-2.5 py-1 bg-accent/10 border border-accent/20 rounded font-bold text-accent text-[11px] uppercase tracking-wide inline-block">{selectedReceipt.category}</span>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Payment Mode</p>
+                  <p className="font-bold text-foreground text-xs uppercase tracking-wider bg-muted/60 border border-border/60 inline-block px-2.5 py-1 rounded">{selectedReceipt.channel} · {selectedReceipt.paymentMethod}</p>
+                </div>
+
+                {selectedReceipt.transactionRef !== '-' && (
+                  <div className="col-span-2 pt-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-bold mb-1">Transaction Reference</p>
+                    <p className="font-mono text-[11px] px-2 py-1 bg-blue-50/50 border border-blue-100 rounded inline-block font-semibold text-blue-800">{selectedReceipt.transactionRef}</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-5 border-t border-dashed border-border/80 flex items-center justify-between bg-emerald-50/80 p-4 rounded-xl border-emerald-100/50 shadow-sm">
+                <div>
+                  <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800/70 mb-0.5">Sum of Rupees</p>
+                  <StatusBadge status={selectedReceipt.paymentStatus} />
+                </div>
+                <p className="text-3xl font-display font-bold text-emerald-700 tracking-tight">{money(selectedReceipt.amount)}</p>
+              </div>
+
+              <p className="text-[10px] italic text-center text-muted-foreground mt-6 font-medium px-4">Donations made to the temple are eligible for tax deduction under Section 80G. May the divine blessings be upon abundance.</p>
+            </div>
+
+            <div className="flex gap-3 pt-3">
+              <Button variant="outline" className="flex-1 h-12 text-[13px] font-bold tracking-wide" onClick={() => setReceiptOpen(false)}>Close Window</Button>
+              <Button className="flex-1 h-12 shadow-lg bg-foreground text-background hover:bg-foreground/90 font-bold uppercase tracking-wider text-[13px]" onClick={() => window.print()}><ReceiptText className="w-4 h-4 mr-2" />Print Document</Button>
+            </div>
+          </div>
         )}
       </Modal>
 

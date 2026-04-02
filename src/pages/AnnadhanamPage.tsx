@@ -428,18 +428,21 @@ const AnnadhanamPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-card/50 backdrop-blur-sm rounded-xl border border-border p-1.5 flex flex-wrap gap-1 w-full md:w-max shadow-sm relative z-20">
-        {([
-          { key: 'planner' as Tab, label: 'Meal Planner', icon: Calendar },
-          { key: 'distribution' as Tab, label: 'Distribution Logs', icon: Users },
-          { key: 'inventory' as Tab, label: 'Ingredients Inventory', icon: Package },
+      <div className="flex flex-wrap gap-3 w-full md:w-auto relative z-20">
+        {( [
+          { key: 'planner' as Tab, label: 'Meal Plan', icon: Calendar, color: 'bg-orange-600 border-orange-700' },
+          { key: 'distribution' as Tab, label: 'Distribution', icon: Users, color: 'bg-emerald-600 border-emerald-700' },
+          { key: 'inventory' as Tab, label: 'Inventory', icon: Package, color: 'bg-red-600 border-red-700' },
         ]).map(sec => (
           <button
             key={sec.key}
             onClick={() => setTab(sec.key)}
-            className={`flex items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-all duration-200 flex-1 md:flex-none ${tab === sec.key ? 'bg-background shadow-sm border border-border/80 text-foreground scale-[1.02]' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/60'}`}
+            className={`flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 border-2 shadow-sm
+              ${tab === sec.key 
+                ? `${sec.color} text-white shadow-lg scale-[1.03]` 
+                : 'bg-background border-border text-muted-foreground hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground'}`}
           >
-            <sec.icon className="h-4 w-4" />
+            <sec.icon className={`h-4 w-4 ${tab === sec.key ? 'text-white' : ''}`} />
             {sec.label}
           </button>
         ))}
@@ -447,12 +450,12 @@ const AnnadhanamPage: React.FC = () => {
 
       {['planner', 'distribution'].includes(tab) && (
         <div className="flex items-center justify-between flex-wrap gap-3 animate-slide-up">
-           <div className="flex items-center gap-2 text-xs bg-muted/30 p-1.5 rounded-lg border border-border/50">
-             <span className="px-3 py-1 font-semibold text-foreground">
-               {dateFilterActive ? `Date Filter: ${formatDateDDMMYYYY(selectedDate)}` : 'Showing All Dates'}
-             </span>
-             {dateFilterActive && <Button variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-foreground bg-background border border-border" onClick={clearDateFilter}>Clear Filter</Button>}
-           </div>
+          <div className="flex items-center gap-2 text-xs bg-muted/30 p-1.5 rounded-lg border border-border/50">
+            <span className="px-3 py-1 font-semibold text-foreground">
+              {dateFilterActive ? `Date Filter: ${formatDateDDMMYYYY(selectedDate)}` : 'Showing All Dates'}
+            </span>
+            {dateFilterActive && <Button variant="ghost" size="sm" className="h-6 text-xs text-muted-foreground hover:text-foreground bg-background border border-border" onClick={clearDateFilter}>Clear Filter</Button>}
+          </div>
         </div>
       )}
 
@@ -504,14 +507,14 @@ const AnnadhanamPage: React.FC = () => {
                           </td>
                           <td className="p-4">
                             <div className="flex flex-col gap-1 text-[11px]">
-                               {plan.menu.slice(0, 2).map((m, i) => <span key={i} className="bg-muted/60 px-2 py-0.5 rounded text-foreground font-medium border border-border/50">{m.name} <span className="text-muted-foreground ml-1">({m.qty})</span></span>)}
-                               {plan.menu.length > 2 && <span className="text-xs text-muted-foreground font-medium pl-1">+{plan.menu.length - 2} more</span>}
+                              {plan.menu.slice(0, 2).map((m, i) => <span key={i} className="bg-muted/60 px-2 py-0.5 rounded text-foreground font-medium border border-border/50">{m.name} <span className="text-muted-foreground ml-1">({m.qty})</span></span>)}
+                              {plan.menu.length > 2 && <span className="text-xs text-muted-foreground font-medium pl-1">+{plan.menu.length - 2} more</span>}
                             </div>
                           </td>
                           <td className="p-4 font-bold text-amber-700 text-lg flex items-center gap-1.5 pt-5"><Users className="w-4 h-4" />{plan.expectedCount}</td>
                           <td className="p-4">
-                             <p className="font-semibold text-sm">{plan.organizer || '-'}</p>
-                             {plan.sponsor && <p className="text-[10px] uppercase font-bold text-emerald-600 mt-1">Sponsor: {plan.sponsor}</p>}
+                            <p className="font-semibold text-sm">{plan.organizer || '-'}</p>
+                            {plan.sponsor && <p className="text-[10px] uppercase font-bold text-emerald-600 mt-1">Sponsor: {plan.sponsor}</p>}
                           </td>
                           <td className="p-4"><StatusBadge status={plan.status} /></td>
                           <td className="p-4 text-right">
@@ -566,16 +569,16 @@ const AnnadhanamPage: React.FC = () => {
                           <p className="text-[11px] text-muted-foreground mt-0.5"><Calendar className="w-3 h-3 inline mr-1" />{formatDateDDMMYYYY(log.date)}</p>
                         </td>
                         <td className="p-4">
-                           <div className="text-[11px] font-medium text-muted-foreground flex flex-col gap-1">
-                             <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-emerald-600" /> Start: {log.startTime}</span>
-                             {log.endTime && <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-600" /> End: {log.endTime}</span>}
-                           </div>
+                          <div className="text-[11px] font-medium text-muted-foreground flex flex-col gap-1">
+                            <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-emerald-600" /> Start: {log.startTime}</span>
+                            {log.endTime && <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-amber-600" /> End: {log.endTime}</span>}
+                          </div>
                         </td>
                         <td className="p-4 text-center">
-                           <div className="inline-flex items-end gap-1.5">
-                              <span className="text-2xl font-bold text-emerald-700">{log.servedCount}</span>
-                              <span className="text-xs text-muted-foreground font-medium pb-1">/ {log.expectedCount} planned</span>
-                           </div>
+                          <div className="inline-flex items-end gap-1.5">
+                            <span className="text-2xl font-bold text-emerald-700">{log.servedCount}</span>
+                            <span className="text-xs text-muted-foreground font-medium pb-1">/ {log.expectedCount} planned</span>
+                          </div>
                         </td>
                         <td className="p-4 text-center">
                           <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-md text-[11px] font-bold border shadow-sm ${tone}`}>
@@ -605,7 +608,7 @@ const AnnadhanamPage: React.FC = () => {
             {lowStockCount > 0 && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 flex items-center gap-3 shadow-sm animate-pulse-slow">
                 <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
-                   <Bell className="w-5 h-5 text-red-600" />
+                  <Bell className="w-5 h-5 text-red-600" />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-red-900">Inventory Alert</h3>
@@ -615,51 +618,51 @@ const AnnadhanamPage: React.FC = () => {
             )}
 
             <div className="flex flex-col lg:flex-row gap-6">
-               <div className="lg:w-64 shrink-0 flex flex-col gap-3">
-                  <div className="section-panel p-5 bg-gradient-to-b from-sky-50/50 to-background flex-1">
-                     <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Total Ingredients</p>
-                     <p className="text-4xl font-display font-bold text-foreground mb-6">{stock.items.length}</p>
-                     
-                     <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Categories Mapped</p>
-                     <p className="text-2xl font-bold text-foreground mb-6">{inventoryCategoryCount}</p>
-                     
-                     <div className="space-y-4 border-t border-border/80 pt-5 text-sm">
-                        <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Healthy Stock</span> <span className="font-bold text-emerald-600">{stock.items.length - lowStockCount}</span></div>
-                        <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Low / Critical</span> <span className="font-bold text-red-600">{lowStockCount}</span></div>
-                     </div>
-                  </div>
-               </div>
+              <div className="lg:w-64 shrink-0 flex flex-col gap-3">
+                <div className="section-panel p-5 bg-gradient-to-b from-sky-50/50 to-background flex-1">
+                  <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Total Ingredients</p>
+                  <p className="text-4xl font-display font-bold text-foreground mb-6">{stock.items.length}</p>
 
-               <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                 {stock.items.map(item => {
-                   const level = stockLevel(item);
-                   const isCrit = level === 'critical';
-                   const levelColor = isCrit ? 'text-red-700 bg-red-100 border-red-200 ring-2 ring-red-500/20' : level === 'low' ? 'text-amber-800 bg-amber-100 border-amber-300' : 'text-emerald-800 bg-emerald-50 border-emerald-200 border-dashed';
-                   return (
-                     <div key={item.id} className="rounded-xl border border-border/60 bg-background shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col items-start relative overflow-hidden group">
-                       {isCrit && <div className="absolute top-0 right-0 w-12 h-12 bg-red-500/5 -z-0 rounded-bl-full" />}
-                       
-                       <div className="w-full flex items-start justify-between mb-4 z-10 relative">
-                         <div>
-                           <p className="font-bold text-lg leading-tight text-foreground">{item.name}</p>
-                           <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider mt-1">{item.category}</p>
-                         </div>
-                         <span className={`text-[9px] px-2.5 py-1 rounded-sm font-bold tracking-widest border ${levelColor}`}>{level.toUpperCase()}</span>
-                       </div>
-                       
-                       <div className="flex items-end gap-1.5 mt-auto mb-4 w-full z-10 relative">
-                         <p className="text-3xl font-display font-bold text-foreground">{item.currentStock}</p>
-                         <p className="text-sm font-semibold text-muted-foreground pb-1">{item.unit}</p>
-                       </div>
-                       
-                       <div className="w-full grid grid-cols-2 gap-2 text-[11px] bg-muted/40 p-2.5 rounded-lg border border-border/50 z-10 relative font-medium">
-                         <div className="flex flex-col"><span className="text-muted-foreground">Min Threshold</span><span className="text-foreground font-semibold">{item.minThreshold} {item.unit}</span></div>
-                         <div className="flex flex-col"><span className="text-muted-foreground">Avg Daily Use</span><span className="text-foreground font-semibold">{item.dailyUsage} {item.unit}</span></div>
-                       </div>
-                     </div>
-                   );
-                 })}
-               </div>
+                  <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Categories Mapped</p>
+                  <p className="text-2xl font-bold text-foreground mb-6">{inventoryCategoryCount}</p>
+
+                  <div className="space-y-4 border-t border-border/80 pt-5 text-sm">
+                    <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Healthy Stock</span> <span className="font-bold text-emerald-600">{stock.items.length - lowStockCount}</span></div>
+                    <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Low / Critical</span> <span className="font-bold text-red-600">{lowStockCount}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {stock.items.map(item => {
+                  const level = stockLevel(item);
+                  const isCrit = level === 'critical';
+                  const levelColor = isCrit ? 'text-red-700 bg-red-100 border-red-200 ring-2 ring-red-500/20' : level === 'low' ? 'text-amber-800 bg-amber-100 border-amber-300' : 'text-emerald-800 bg-emerald-50 border-emerald-200 border-dashed';
+                  return (
+                    <div key={item.id} className="rounded-xl border border-border/60 bg-background shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col items-start relative overflow-hidden group">
+                      {isCrit && <div className="absolute top-0 right-0 w-12 h-12 bg-red-500/5 -z-0 rounded-bl-full" />}
+
+                      <div className="w-full flex items-start justify-between mb-4 z-10 relative">
+                        <div>
+                          <p className="font-bold text-lg leading-tight text-foreground">{item.name}</p>
+                          <p className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider mt-1">{item.category}</p>
+                        </div>
+                        <span className={`text-[9px] px-2.5 py-1 rounded-sm font-bold tracking-widest border ${levelColor}`}>{level.toUpperCase()}</span>
+                      </div>
+
+                      <div className="flex items-end gap-1.5 mt-auto mb-4 w-full z-10 relative">
+                        <p className="text-3xl font-display font-bold text-foreground">{item.currentStock}</p>
+                        <p className="text-sm font-semibold text-muted-foreground pb-1">{item.unit}</p>
+                      </div>
+
+                      <div className="w-full grid grid-cols-2 gap-2 text-[11px] bg-muted/40 p-2.5 rounded-lg border border-border/50 z-10 relative font-medium">
+                        <div className="flex flex-col"><span className="text-muted-foreground">Min Threshold</span><span className="text-foreground font-semibold">{item.minThreshold} {item.unit}</span></div>
+                        <div className="flex flex-col"><span className="text-muted-foreground">Avg Daily Use</span><span className="text-foreground font-semibold">{item.dailyUsage} {item.unit}</span></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
@@ -685,8 +688,8 @@ const AnnadhanamPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-4">
-             <FormField label="Organizer / Lead Person" value={mealForm.organizer} onChange={v => setMField('organizer', v)} placeholder="e.g. Temple Committee" />
-             <FormField label="Sponsor Details (Optional)" value={mealForm.sponsor || ''} onChange={v => setMField('sponsor', v)} placeholder="e.g. The Rao Family" />
+            <FormField label="Organizer / Lead Person" value={mealForm.organizer} onChange={v => setMField('organizer', v)} placeholder="e.g. Temple Committee" />
+            <FormField label="Sponsor Details (Optional)" value={mealForm.sponsor || ''} onChange={v => setMField('sponsor', v)} placeholder="e.g. The Rao Family" />
           </div>
 
           <div className="border border-border/80 rounded-xl bg-muted/10 p-4">
@@ -737,9 +740,9 @@ const AnnadhanamPage: React.FC = () => {
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Select Source Meal Plan</label>
             <select className="w-full h-11 rounded-lg border border-input bg-background/60 px-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none font-medium text-foreground group shadow-sm transition-all hover:border-border" value={distForm.mealPlanId} onChange={e => {
-                const selected = meals.items.find(item => item.id === e.target.value);
-                setDistForm(prev => ({ ...prev, mealPlanId: e.target.value, mealType: selected?.mealType || prev.mealType, expectedCount: selected?.expectedCount || prev.expectedCount, date: selected?.date || prev.date }));
-              }}>
+              const selected = meals.items.find(item => item.id === e.target.value);
+              setDistForm(prev => ({ ...prev, mealPlanId: e.target.value, mealType: selected?.mealType || prev.mealType, expectedCount: selected?.expectedCount || prev.expectedCount, date: selected?.date || prev.date }));
+            }}>
               <option value="" disabled>Select a plan to log against...</option>
               {meals.items.map(item => <option key={item.id} value={item.id}>{item.id} - {item.mealType} ({formatDateDDMMYYYY(item.date)}) - {item.expectedCount} planned</option>)}
             </select>
@@ -753,7 +756,7 @@ const AnnadhanamPage: React.FC = () => {
                 <option value="Pending">Pending</option><option value="Served">Fully Served</option><option value="Partial">Partial Served</option><option value="Cancelled">Cancelled</option>
               </select>
             </div>
-            
+
             <FormField label="Start Time" value={distForm.startTime} onChange={v => setDField('startTime', v)} placeholder="e.g. 12:00 PM" />
             <FormField label="End Time" value={distForm.endTime} onChange={v => setDField('endTime', v)} placeholder="e.g. 02:30 PM" />
             <FormField label="Lead Volunteer" value={distForm.volunteer} onChange={v => setDField('volunteer', v)} placeholder="e.g. Ravi & Team" />

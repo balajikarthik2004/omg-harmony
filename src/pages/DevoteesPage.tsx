@@ -191,7 +191,7 @@ const DevoteesPage: React.FC = () => {
     <div className=" max-w-[1500px] mx-auto animate-fade-in pb-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 pb-5">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Devotees Database</h1>
+          <h1 className="text-2xl font-bold text-foreground">Devotees</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage devotee records, analyze donation trends, and coordinate engagements.</p>
         </div>
         <div className="flex gap-3">
@@ -205,7 +205,7 @@ const DevoteesPage: React.FC = () => {
           <p className="text-2xl font-bold mt-2 text-foreground">{totalDevotees.toLocaleString()}</p>
         </div>
         <div className="stat-card">
-          <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Active accounts</p>
+          <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Active Members</p>
           <p className="text-2xl font-bold mt-2 text-blue-600">{activeDevotees.toLocaleString()}</p>
         </div>
         <div className="stat-card">
@@ -341,7 +341,7 @@ const DevoteesPage: React.FC = () => {
               <div className="grid grid-cols-3 gap-3 mt-8">
                 <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
                   <div className="absolute top-0 w-full h-[3px] bg-emerald-500" />
-                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Total Given</p>
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Total Donations</p>
                   <p className="text-xl font-bold text-emerald-600 font-display">{fmtAmt(selectedDevotee?.totalDonations ?? 0)}</p>
                 </div>
                 <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
@@ -358,16 +358,16 @@ const DevoteesPage: React.FC = () => {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex p-3 bg-muted/30 border-b border-border gap-2 shrink-0">
+            <div className="flex p-4 px-6 border-b border-border/60 gap-3 shrink-0 bg-background">
               {([ { key: 'info', label: 'Info' }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'notify', label: 'Message' } ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 py-2.5 px-2 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === tab.key ? 'bg-background border border-border/80 text-foreground shadow-sm shadow-blue-500/5' : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'}`}
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-2 text-sm font-bold rounded-xl transition-all border-2 active:scale-[0.98] ${activeTab === tab.key ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 transform scale-105' : 'bg-background text-muted-foreground border-input hover:border-primary/40 hover:bg-muted/30 hover:text-foreground'}`}
                 >
-                  {tab.label}
+                  <span className="truncate">{tab.label}</span>
                   {typeof tab.count === 'number' && (
-                    <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${activeTab === tab.key ? 'bg-primary/10 text-primary' : 'bg-background border border-border text-muted-foreground'}`}>{tab.count}</span>
+                    <span className={`flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-md text-[11px] font-extrabold ${activeTab === tab.key ? 'bg-background/25 text-white' : 'bg-muted border border-border text-muted-foreground'}`}>{tab.count}</span>
                   )}
                 </button>
               ))}

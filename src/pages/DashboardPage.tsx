@@ -17,7 +17,7 @@ const kpis = [
   { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-rose-600', bg: 'bg-rose-50 border-rose-100', trend: '+12% from yesterday' },
   { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-100', trend: '4 pending approval' },
   { label: 'Total Devotees', value: '2,847', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100', trend: '+45 this week' },
-  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-100', trend: 'Target: ₹15L' },
+  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-100', trend: '' },
 ];
 
 const secondaryKpis = [
@@ -108,7 +108,8 @@ const DashboardPage: React.FC = () => {
                 <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000)}k`} dx={-10} />
                 <Tooltip 
-                  formatter={(v: number) => `₹${v.toLocaleString()}`}
+                  formatter={(v: number) => [`₹${v.toLocaleString('en-IN')}`, 'Amount']}
+                  separator=": "
                   contentStyle={{ borderRadius: '12px', border: '1px solid hsl(40, 12%, 85%)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '13px', padding: '10px 14px' }}
                 />
                 <Line 

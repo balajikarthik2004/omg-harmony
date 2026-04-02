@@ -368,73 +368,64 @@ const ProcurementPage: React.FC = () => {
           <table className="min-w-full text-sm">
             <thead className="bg-muted/40">
               <tr className="border-b border-border">
-                <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Order Ref</th>
-                <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Vendor Info</th>
-                <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Settlement</th>
-                <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Authorization Status</th>
-                <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Manifest Line Items</th>
-                <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Controls</th>
+                <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[10%] text-xs">Order ID</th>
+                <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs">Vendor & Requested By</th>
+                <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[12%] text-xs">Total Amount</th>
+                <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[13%] text-xs">Status</th>
+                <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[45%] text-xs">Ordered Items</th>
+                <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-background">
               {filteredItems.length === 0 ? <tr><td colSpan={6} className="p-12 text-center text-muted-foreground border-b border-border">No procurement records align with your active filters.</td></tr> : filteredItems.map(proc => (
                 <tr key={proc.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
-                  <td className="p-4 whitespace-nowrap">
-                    <p className="font-bold text-foreground font-display text-base tracking-tight">{proc.poNumber}</p>
-                    <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1 uppercase tracking-widest font-bold"><Calendar className="w-3 h-3 opacity-70" /> {proc.date}</p>
+                  <td className="py-4 px-3 whitespace-nowrap">
+                    <p className="font-bold text-foreground font-mono tracking-tighter text-sm">{proc.poNumber}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5 flex items-center gap-1 font-medium">{proc.date}</p>
                   </td>
-                  <td className="p-4">
-                    <p className="font-bold text-foreground truncate max-w-[200px]">{proc.vendor}</p>
-                    {isAdmin && <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-1 max-w-[200px] truncate bg-muted/60 inline-flex px-1.5 py-0.5 rounded border border-border/40">Originator: {proc.submittedByName}</p>}
+                  <td className="py-4 px-3">
+                    <p className="font-bold text-foreground truncate max-w-[180px] text-xs" title={proc.vendor}>{proc.vendor}</p>
+                    {isAdmin && <p className="text-[9px] font-medium text-muted-foreground mt-0.5 truncate max-w-[180px]">By: {proc.submittedByName}</p>}
                   </td>
-                  <td className="p-4 text-right whitespace-nowrap">
-                    <p className="text-lg font-bold text-emerald-700 font-display tracking-tight">₹{proc.amount.toLocaleString('en-IN')}</p>
+                  <td className="py-4 px-3 text-right whitespace-nowrap">
+                    <p className="text-base font-bold text-emerald-700 font-display tracking-tight">₹{proc.amount.toLocaleString('en-IN')}</p>
                   </td>
-                  <td className="p-4 w-48">
+                  <td className="py-4 px-3">
                     <StatusBadge status={proc.status} />
                     {proc.status === 'Rejected' && proc.rejectionReason && (
-                      <div className="text-[10px] font-bold tracking-wide leading-relaxed text-destructive mt-2 p-1.5 bg-destructive/10 rounded border border-destructive/20 max-w-[200px]" title={proc.rejectionReason}>
-                         {proc.rejectionReason}
-                      </div>
+                      <p className="text-[9px] font-medium text-destructive mt-1 truncate max-w-[100px]" title={proc.rejectionReason}>{proc.rejectionReason}</p>
                     )}
                   </td>
-                  <td className="p-4">
-                    <div className="flex flex-col gap-1.5 max-w-[280px]">
-                      {proc.items.slice(0, 2).map((item, idx) => (
-                        <div key={idx} className="text-[11px] bg-muted/30 px-2 py-1 rounded truncate border border-border shadow-sm flex justify-between items-center group-hover:bg-background transition-colors">
-                          <span className="font-semibold text-foreground tracking-wide">{item.name}</span>
-                          <span className="text-muted-foreground font-medium ml-2 shrink-0">{item.quantity} × <span className="font-semibold">₹{item.price}</span></span>
-                        </div>
+                  <td className="py-4 px-3">
+                    <div className="flex flex-wrap gap-1.5 max-w-[350px]">
+                      {proc.items.slice(0, 3).map((item, idx) => (
+                        <span key={idx} className="text-[9px] bg-muted/40 px-2 py-0.5 rounded border border-border/50 text-foreground font-medium shrink-0 flex items-center gap-1">
+                          {item.name} <span className="text-muted-foreground opacity-60">Qty:{item.quantity}</span>
+                        </span>
                       ))}
-                      {proc.items.length > 2 && <p className="text-[10px] text-primary font-bold pl-1 tracking-wider uppercase">+{proc.items.length - 2} auxiliary items...</p>}
+                      {proc.items.length > 3 && <span className="text-[9px] text-primary font-bold px-1 py-0.5 underline">+{proc.items.length - 3} more</span>}
                     </div>
                   </td>
-                  <td className="p-4 text-right whitespace-nowrap align-top">
-                    <div className="flex gap-1.5 justify-end">
-                      <Button variant="ghost" size="icon" onClick={() => openView(proc)} title="Preview Dossier">
-                        <Eye className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                  <td className="py-4 px-3 text-right whitespace-nowrap">
+                    <div className="flex gap-1 justify-center">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openView(proc)} title="View Details">
+                        <Eye className="h-4 w-4 text-muted-foreground" />
                       </Button>
                       
                       {isAdmin && proc.status === 'Pending' && (
                         <>
-                          <Button variant="ghost" size="icon" onClick={() => handleApprove(proc.id)} className="text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 hover:ring-1 ring-emerald-200" title="Grant Approval">
+                          <Button variant="ghost" size="icon" onClick={() => handleApprove(proc.id)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Approve">
                             <CheckCircle className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => openRejectModal(proc.id)} className="text-destructive hover:bg-destructive/10 hover:ring-1 ring-destructive/20 text-muted-foreground" title="Deny Approval">
+                          <Button variant="ghost" size="icon" onClick={() => openRejectModal(proc.id)} className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Reject">
                             <XCircle className="h-4 w-4" />
                           </Button>
                         </>
                       )}
                       
                       {(isManager ? (proc.submittedBy === currentUser.id && proc.status === 'Pending') : (isAdmin && proc.status === 'Pending')) && (
-                        <Button variant="ghost" size="icon" onClick={() => openEdit(proc)} title="Modify Order">
-                          <Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
-                        </Button>
-                      )}
-                      
-                      {isAdmin && proc.status === 'Pending' && (
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(proc.id)} title="Purge Record" className="hover:text-destructive hover:bg-destructive/10">
-                          <Trash2 className="h-4 w-4 text-muted-foreground" />
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(proc)} title="Edit">
+                          <Pencil className="h-4 w-4 text-muted-foreground" />
                         </Button>
                       )}
                     </div>
@@ -453,8 +444,24 @@ const ProcurementPage: React.FC = () => {
         title={viewId ? 'Procurement Dossier' : (editId ? 'Amend Purchase Order' : 'Initiate Procurement')}
       >
         <div className="grid grid-cols-2 gap-4 px-1 pb-2">
-          <FormField label="Order Designation No." value={form.poNumber} onChange={v => setFormFieldValue('poNumber', v)} required disabled={!!viewId} />
-          <FormField label="Registered Vendor / Supplier" value={form.vendor} onChange={v => setFormFieldValue('vendor', v)} required disabled={!!viewId} />
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Order Number</label>
+            <input value={form.poNumber} disabled className="w-full h-11 rounded-lg border border-input bg-muted/30 px-3 text-sm font-mono font-bold" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Registered Vendor / Supplier</label>
+            <select 
+              value={form.vendor} 
+              onChange={e => setFormFieldValue('vendor', e.target.value)} 
+              disabled={!!viewId}
+              className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-medium disabled:opacity-50"
+            >
+              <option value="">Select registered vendor</option>
+              {['Sri Pooja Supplies', 'Kitchen World', 'Electrical Corp', 'Flower Mandapam', 'General Provision Store', 'Temple Decor Art'].map(v => (
+                <option key={v} value={v}>{v}</option>
+              ))}
+            </select>
+          </div>
           
           <div className="col-span-2 border border-border/80 bg-muted/10 rounded-2xl p-4 shadow-sm mt-1">
             <div className="flex items-center justify-between mb-4 border-b border-border/60 pb-3">

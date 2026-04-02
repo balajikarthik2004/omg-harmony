@@ -229,13 +229,13 @@ const HrPage: React.FC = () => {
       <div className="page-header-banner bg-gradient-to-r from-violet-50/80 via-background to-sky-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-violet-600" /> HR & Volunteer Management</h1>
-          <p className="text-sm text-muted-foreground mt-1">Orchestrate priest networks, staff records, payroll matrices, and volunteer duties.</p>
+          <p className="text-sm text-muted-foreground mt-1">Manage temple staff details, schedules, payroll, and volunteers.</p>
         </div>
         <div className="relative max-w-sm w-full md:w-72 mt-3 md:mt-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             className="w-full pl-9 pr-4 h-10 rounded-lg border border-input bg-background/80 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 hover:border-border outline-none shadow-sm"
-            placeholder="Search human resources..."
+            placeholder="Search staff..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
@@ -250,7 +250,7 @@ const HrPage: React.FC = () => {
         </div>
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-orange-100 bg-orange-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-orange-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-orange-800 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Core Priests</p>
+          <p className="text-[11px] uppercase tracking-widest font-bold text-orange-800 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
           <p className="text-3xl font-display font-bold mt-2 text-orange-700 relative z-10">{totals.priests}</p>
         </div>
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
@@ -260,17 +260,17 @@ const HrPage: React.FC = () => {
         </div>
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Volunteer Fleet</p>
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Volunteers</p>
           <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{totals.assignedVolunteers}</p>
         </div>
       </div>
 
       <div className="bg-card/80 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
         {([
-          { key: 'staff' as HrSection, label: 'Staff Roster', icon: Briefcase },
-          { key: 'duties' as HrSection, label: 'Task Deployment', icon: CalendarDays },
+          { key: 'staff' as HrSection, label: 'Staff List', icon: Briefcase },
+          { key: 'duties' as HrSection, label: 'Duties', icon: CalendarDays },
           { key: 'volunteers' as HrSection, label: 'Volunteers', icon: Users },
-          { key: 'payroll' as HrSection, label: 'Payroll Distribution', icon: Wallet },
+          { key: 'payroll' as HrSection, label: 'Payroll', icon: Wallet },
         ]).map(sec => (
           <button
             key={sec.key}
@@ -287,23 +287,23 @@ const HrPage: React.FC = () => {
         {activeSection === 'staff' && (
           <section className="section-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-primary/5 to-transparent">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> Master Personnel Roster</h2>
-              <Button onClick={openAddStaff} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Onboard Personnel</Button>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> Staff Member List</h2>
+              <Button onClick={openAddStaff} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Staff</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-muted/40">
                   <tr className="border-b border-border">
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Employee Identity</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Rank & Department</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Induction Date</th>
-                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Gross Compensation</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">C. Status</th>
-                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Controls</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Employee Info</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Role & Dept</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Joined Date</th>
+                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Salary</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-background">
-                  {filteredStaff.length === 0 ? <tr><td colSpan={6} className="p-10 text-center font-medium text-muted-foreground border-b border-border">No staff found correlating to filters.</td></tr> : filteredStaff.map(item => (
+                  {filteredStaff.length === 0 ? <tr><td colSpan={6} className="p-10 text-center font-medium text-muted-foreground border-b border-border">No staff found matching search.</td></tr> : filteredStaff.map(item => (
                     <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -327,8 +327,8 @@ const HrPage: React.FC = () => {
                       <td className="p-4"><StatusBadge status={item.status} /></td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-1.5">
-                          <Button variant="ghost" size="icon" onClick={() => openEditStaff(item)} title="Modify Staff Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => setStaffDeleteId(item.id)} title="Eradicate Record" className="hover:text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => openEditStaff(item)} title="Edit Staff"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setStaffDeleteId(item.id)} title="Delete Staff" className="hover:text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
                         </div>
                       </td>
                     </tr>
@@ -342,31 +342,31 @@ const HrPage: React.FC = () => {
         {activeSection === 'payroll' && (
           <section className="section-panel bg-gradient-to-b from-background to-slate-50/50 shadow-sm border-l-4 border-slate-500">
              <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-slate-100/50 to-transparent">
-               <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Engine Pipeline</h2>
+               <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Management</h2>
              </div>
              <div className="p-6">
                 <div className="flex flex-col md:flex-row gap-6 mb-8 bg-background border border-border/70 p-6 rounded-2xl shadow-sm relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-bl-full pointer-events-none" />
                   <div className="flex-1 relative z-10">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Target Processing Vector</label>
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Select Month</label>
                     <div className="flex gap-3">
                       <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-slate-500/20 outline-none hover:border-border transition-all shadow-inner" />
-                      <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-slate-700 hover:bg-slate-800 text-white">Execute Payroll Generation</Button>
+                      <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-slate-700 hover:bg-slate-800 text-white">Generate Payroll</Button>
                     </div>
                   </div>
                   <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
-                    <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Calculated Dispersion Total</p>
+                    <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Salary for Month</p>
                     <p className="text-4xl font-display font-bold text-slate-800 mt-1">{money(payrollTotal)}</p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Disbursed Salary Manifests</h3>
+                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Disbursed Salaries</h3>
                   {payrollForMonth.length === 0 ? (
                     <div className="text-center py-16 bg-muted/20 border-2 border-dashed border-border rounded-2xl">
                       <Wallet className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
-                      <p className="text-base font-bold text-foreground">No payroll manifests available</p>
-                      <p className="text-sm font-medium text-muted-foreground mt-1">Select a processing vector and execute generation to populate.</p>
+                      <p className="text-base font-bold text-foreground">No payroll generated for this month</p>
+                      <p className="text-sm font-medium text-muted-foreground mt-1">Select a month and click "Generate Payroll" to populate.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -390,11 +390,11 @@ const HrPage: React.FC = () => {
                             
                             <div className="flex items-center justify-between pt-1">
                               <div>
-                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-0.5">Final Net Disbursement</p>
+                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-0.5">Net Pay</p>
                                 <p className="text-2xl font-display font-bold text-foreground tracking-tight">{money(entry.netPay)}</p>
                               </div>
                               {entry.payoutStatus === 'Unpaid' && (
-                                <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 shadow-sm font-bold" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Disburse Now</Button>
+                                <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 shadow-sm font-bold" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Now</Button>
                               )}
                             </div>
                           </div>
@@ -407,15 +407,14 @@ const HrPage: React.FC = () => {
           </section>
         )}
 
-        {/* Similar rich styling for Duties and Volunteers */}
         {activeSection === 'duties' && (
           <section className="section-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--amber))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-amber-50/50 to-transparent">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-600" /> Active Operations & Rosters</h2>
-              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Dispatch Duty</Button>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-600" /> Active Duties List</h2>
+              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-               {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No operational rosters registered currently.</p> : filteredDuties.map(item => (
+               {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No duties are currently set up.</p> : filteredDuties.map(item => (
                  <div key={item.id} className="rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden hover:-translate-y-1">
                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-500/10 to-transparent pointer-events-none" />
                    <div className="relative z-10 flex flex-col h-full">
@@ -436,8 +435,8 @@ const HrPage: React.FC = () => {
                      {item.notes && <div className="text-xs text-muted-foreground italic mb-5 border-l-2 border-amber-300 pl-2 py-0.5">"{item.notes}"</div>}
                      
                      <div className="flex gap-2 mt-auto pt-4 border-t border-border/60">
-                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold bg-muted/40 hover:bg-muted" onClick={() => openEditDuty(item)}><Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground group-hover:text-foreground" />Revise</Button>
-                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDutyDeleteId(item.id)}><Trash2 className="h-3.5 w-3.5 mr-2" />Eradicate</Button>
+                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold bg-muted/40 hover:bg-muted" onClick={() => openEditDuty(item)}><Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground group-hover:text-foreground" />Edit</Button>
+                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDutyDeleteId(item.id)}><Trash2 className="h-3.5 w-3.5 mr-2" />Delete</Button>
                      </div>
                    </div>
                  </div>
@@ -449,19 +448,19 @@ const HrPage: React.FC = () => {
         {activeSection === 'volunteers' && (
           <section className="section-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Community Volunteer Fleet</h2>
-              <Button onClick={openAddVolunteer} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Enlist Volunteer</Button>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Enlisted Volunteers</h2>
+              <Button onClick={openAddVolunteer} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-muted/40">
                   <tr className="border-b border-border">
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Core Identity</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Work Preferences</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Time Restrictions</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Linked Operation Target</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Cohort Status</th>
-                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Directives</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Volunteer Name</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Preferred Area</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Availability</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Assigned Duty</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Status</th>
+                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-background">
@@ -488,13 +487,13 @@ const HrPage: React.FC = () => {
                              <span className="font-bold">{duties.find(d => d.id === item.assignedDutyId)?.location}</span>
                              <span className="text-[9px] uppercase tracking-widest opacity-80 font-bold">{duties.find(d => d.id === item.assignedDutyId)?.dutyDate}</span>
                            </div>
-                        ) : <span className="text-muted-foreground italic font-medium px-2 py-1 bg-muted/40 rounded border border-border/40">Unutilized</span>}
+                        ) : <span className="text-muted-foreground italic font-medium px-2 py-1 bg-muted/40 rounded border border-border/40">Not Assigned</span>}
                       </td>
                       <td className="p-4"><StatusBadge status={item.status} /></td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-1.5">
-                          <Button variant="ghost" size="icon" onClick={() => openEditVolunteer(item)} title="Reconfigure Volunteer Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => setVolDeleteId(item.id)} className="hover:text-destructive hover:bg-destructive/10" title="Sever Enlistment"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => openEditVolunteer(item)} title="Edit Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setVolDeleteId(item.id)} className="hover:text-destructive hover:bg-destructive/10" title="Remove Record"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
                         </div>
                       </td>
                     </tr>
@@ -507,106 +506,106 @@ const HrPage: React.FC = () => {
       </div>
 
       {/* Staff Modal */}
-      <Modal open={staffModalOpen} onClose={() => setStaffModalOpen(false)} title={staffEditId ? 'Configure Personnel File' : 'Establish Personnel Profile'}>
+      <Modal open={staffModalOpen} onClose={() => setStaffModalOpen(false)} title={staffEditId ? 'Edit Staff File' : 'Add New Staff'}>
         <div className="grid grid-cols-2 gap-4 px-1 py-2">
-          <FormField label="Legal Name Alias" value={staffForm.name} onChange={v => setSField('name', v)} required />
+          <FormField label="Full Name" value={staffForm.name} onChange={v => setSField('name', v)} required />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Organizational Role</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Role</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value)}>
-                <option value="Priest">Sanctum Priest</option><option value="Staff">Support Staff</option>
+                <option value="Priest">Priest</option><option value="Staff">Support Staff</option>
              </select>
           </div>
-          <FormField label="Assigned Structural Node (Sector)" value={staffForm.department} onChange={v => setSField('department', v)} />
-          <FormField label="Induction Timestamp" value={staffForm.joinedDate} onChange={v => setSField('joinedDate', v)} type="date" />
-          <FormField label="Authorized Base Draw (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', v)} type="number" />
+          <FormField label="Department" value={staffForm.department} onChange={v => setSField('department', v)} />
+          <FormField label="Joining Date" value={staffForm.joinedDate} onChange={v => setSField('joinedDate', v)} type="date" />
+          <FormField label="Salary (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', v)} type="number" />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Contract Standing</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Status</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value)}>
-                <option value="Active">Authorized Active</option><option value="Inactive">Suspended / Inactive</option>
+                <option value="Active">Active</option><option value="Inactive">Inactive</option>
              </select>
           </div>
-          <FormField label="Telephonic Link" value={staffForm.phone} onChange={v => setSField('phone', v)} />
-          <FormField label="Digital Mail Relay" value={staffForm.email} onChange={v => setSField('email', v)} type="email" />
+          <FormField label="Phone Number" value={staffForm.phone} onChange={v => setSField('phone', v)} />
+          <FormField label="Email Address" value={staffForm.email} onChange={v => setSField('email', v)} type="email" />
           <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
-            <Button variant="outline" onClick={() => setStaffModalOpen(false)} className="flex-1 py-5">Abort Mod</Button>
-            <Button onClick={saveStaff} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Lock Archive Record</Button>
+            <Button variant="outline" onClick={() => setStaffModalOpen(false)} className="flex-1 py-5">Cancel</Button>
+            <Button onClick={saveStaff} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Save Details</Button>
           </div>
         </div>
       </Modal>
 
       {/* Duty Modal */}
-      <Modal open={dutyModalOpen} onClose={() => setDutyModalOpen(false)} title={dutyEditId ? 'Reassign Operational Trajectory' : 'Draft New Deployment'}>
+      <Modal open={dutyModalOpen} onClose={() => setDutyModalOpen(false)} title={dutyEditId ? 'Edit Duty Details' : 'Assign New Duty'}>
         <div className="grid grid-cols-2 gap-4 px-1 py-2">
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Target Operative / Priest</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Member</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.staffId} onChange={e => setDField('staffId', e.target.value)}>
                 {staff.filter(s => s.status === 'Active').map(s => <option key={s.id} value={s.id}>{s.name} ({s.role})</option>)}
              </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Operation Archetype</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Type</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.dutyType} onChange={e => setDField('dutyType', e.target.value)}>
                 {dutyTypeOptions.map(t => <option key={t} value={t}>{t}</option>)}
              </select>
           </div>
-          <FormField label="Execution Date Matrix" value={dutyForm.dutyDate} onChange={v => setDField('dutyDate', v)} type="date" />
+          <FormField label="Duty Date" value={dutyForm.dutyDate} onChange={v => setDField('dutyDate', v)} type="date" />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Window of Delivery</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Time Slot</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.slot} onChange={e => setDField('slot', e.target.value)}>
                  <option>05:00 AM - 09:00 AM</option><option>09:00 AM - 01:00 PM</option><option>01:00 PM - 05:00 PM</option><option>05:00 PM - 09:00 PM</option>
              </select>
           </div>
-          <FormField label="Geographic Node (Mandapam etc)" value={dutyForm.location} onChange={v => setDField('location', v)} />
+          <FormField label="Location" value={dutyForm.location} onChange={v => setDField('location', v)} />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Tracker Signal</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Status</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.status} onChange={e => setDField('status', e.target.value)}>
-                <option value="Scheduled">Queued / Scheduled</option><option value="Completed">Secured / Completed</option><option value="Cancelled">Aborted / Cancelled</option>
+                <option value="Scheduled">Scheduled</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
              </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Special Operating Memos</label>
-             <textarea className="w-full rounded-xl border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm" value={dutyForm.notes} onChange={e => setDField('notes', e.target.value)} placeholder="Elaborate specific requirements..." />
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Optional Notes</label>
+             <textarea className="w-full rounded-xl border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm" value={dutyForm.notes} onChange={e => setDField('notes', e.target.value)} placeholder="Type specific instructions..." />
           </div>
           <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
-            <Button variant="outline" onClick={() => setDutyModalOpen(false)} className="flex-1 py-5">Dismiss Modification</Button>
-            <Button onClick={saveDuty} className="flex-1 py-5 shadow-md bg-amber-600 hover:bg-amber-700 text-white font-bold">Inject Roster Entry</Button>
+            <Button variant="outline" onClick={() => setDutyModalOpen(false)} className="flex-1 py-5">Cancel</Button>
+            <Button onClick={saveDuty} className="flex-1 py-5 shadow-md bg-amber-600 hover:bg-amber-700 text-white font-bold">Save Duty</Button>
           </div>
         </div>
       </Modal>
 
       {/* Volunteer Modal */}
-      <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Reconfigure Fleet Member' : 'Enlist Civilian Asset'}>
+      <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Edit Volunteer Details' : 'Add New Volunteer'}>
         <div className="grid grid-cols-2 gap-4 px-1 py-2">
-          <FormField label="Civilian Designation" value={volForm.name} onChange={v => setVField('name', v)} required />
-          <FormField label="Comms Network Link" value={volForm.phone} onChange={v => setVField('phone', v)} />
+          <FormField label="Volunteer Name" value={volForm.name} onChange={v => setVField('name', v)} required />
+          <FormField label="Phone Number" value={volForm.phone} onChange={v => setVField('phone', v)} />
           <div className="col-span-2">
-            <FormField label="Digital Mail Address" value={volForm.email} onChange={v => setVField('email', v)} type="email" />
+            <FormField label="Email ID" value={volForm.email} onChange={v => setVField('email', v)} type="email" />
           </div>
-          <FormField label="Desired Utilization Arc" value={volForm.preferredArea} onChange={v => setVField('preferredArea', v)} placeholder="E.g. Crowd Control" />
-          <FormField label="Bandwidth Constraints" value={volForm.availability} onChange={v => setVField('availability', v)} placeholder="E.g. Weekends Morning" />
+          <FormField label="Preferred Work Area" value={volForm.preferredArea} onChange={v => setVField('preferredArea', v)} placeholder="E.g. Crowd Control" />
+          <FormField label="Availability" value={volForm.availability} onChange={v => setVField('availability', v)} placeholder="E.g. Weekends Morning" />
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Bind to Master Hub Operation</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Assign Role/Duty</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-semibold selection:bg-emerald-100" value={volForm.assignedDutyId} onChange={e => setVField('assignedDutyId', e.target.value)}>
-                <option value="">-- Float (Unbound) --</option>
+                <option value="">-- No Duty Selected --</option>
                 {duties.filter(d => d.status === 'Scheduled').map(d => <option key={d.id} value={d.id}>{d.location} ({d.dutyDate})</option>)}
              </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Fleet Active Status</label>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Account Status</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-bold" value={volForm.status} onChange={e => setVField('status', e.target.value)}>
-                <option value="Registered">Awaiting Deployment (Registered)</option><option value="Assigned">Live Deployment (Assigned)</option><option value="Inactive">Offline (Inactive)</option>
+                <option value="Registered">Registered</option><option value="Assigned">Assigned</option><option value="Inactive">Inactive</option>
              </select>
           </div>
           <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
-            <Button variant="outline" onClick={() => setVolModalOpen(false)} className="flex-1 py-5">Scrap Configuration</Button>
-            <Button onClick={saveVolunteer} className="flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Lock Enlistment</Button>
+            <Button variant="outline" onClick={() => setVolModalOpen(false)} className="flex-1 py-5">Cancel</Button>
+            <Button onClick={saveVolunteer} className="flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Save Record</Button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmDialog open={!!staffDeleteId} onClose={() => setStaffDeleteId(null)} onConfirm={() => staffDeleteId && removeStaff(staffDeleteId)} title="Terminate Personnel Link" message="Are you absolutely positive you want to eradicate this staff identity? History will be purged." />
-      <ConfirmDialog open={!!dutyDeleteId} onClose={() => setDutyDeleteId(null)} onConfirm={() => dutyDeleteId && removeDuty(dutyDeleteId)} title="Liquidate Roster Trajectory" message="Are you entirely sure you want to pull this operational directive from the queue?" />
-      <ConfirmDialog open={!!volDeleteId} onClose={() => setVolDeleteId(null)} onConfirm={() => volDeleteId && removeVolunteer(volDeleteId)} title="Scrap Enlistment" message="Are you totally sure you want to tear up this volunteer agreement indefinitely?" />
+      <ConfirmDialog open={!!staffDeleteId} onClose={() => setStaffDeleteId(null)} onConfirm={() => staffDeleteId && removeStaff(staffDeleteId)} title="Delete Staff Member" message="Are you certain you wish to delete this staff member? This action cannot be easily undone." />
+      <ConfirmDialog open={!!dutyDeleteId} onClose={() => setDutyDeleteId(null)} onConfirm={() => dutyDeleteId && removeDuty(dutyDeleteId)} title="Delete Duty Record" message="Do you want to permanently delete this assigned duty?" />
+      <ConfirmDialog open={!!volDeleteId} onClose={() => setVolDeleteId(null)} onConfirm={() => volDeleteId && removeVolunteer(volDeleteId)} title="Delete Volunteer Entry" message="Are you completely sure you want to remove this volunteer from the database?" />
     </div>
   );
 };

@@ -22,8 +22,7 @@ export type TempleEvent = {
   organizer: string;
   status: 'Planned' | 'Scheduled' | 'In Progress' | 'Completed';
   poojaType: string;
-  offerings: string;
-  specialPooja: string;
+  resourceNeeded: string;
   prasadam: string;
   attendees: number;
   festivalName: string;
@@ -42,19 +41,19 @@ const templeProfile: TempleProfile = {
 
 function buildInitialTempleEvents(): TempleEvent[] {
   const startDate = new Date('2026-04-01T00:00:00');
-  const eventTemplates: Array<{ name: string; poojaType: string; specialPooja: string; prasadam: string; offerings: string; festivalName?: string }> = [
-    { name: 'Morning Maha Abhishekam', poojaType: 'Abhishekam', specialPooja: 'Rudrabhishekam', prasadam: 'Sakkarai Pongal', offerings: 'Flowers, Bilva Leaves' },
-    { name: 'Ganapathi Homam Seva', poojaType: 'Ganapathi Homam', specialPooja: 'Maha Ganapathi Archana', prasadam: 'Modakam', offerings: 'Durva Grass, Coconut' },
-    { name: 'Navagraha Shanti Seva', poojaType: 'Navagraha Shanti', specialPooja: 'Navagraha Homam', prasadam: 'Lemon Rice', offerings: 'Sesame Oil, Grains' },
-    { name: 'Satyanarayana Pooja', poojaType: 'Satyanarayana Pooja', specialPooja: 'Vishnu Sahasranama Archana', prasadam: 'Kesari', offerings: 'Tulsi, Fruits' },
-    { name: 'Pradosham Seva', poojaType: 'Pradosham Pooja', specialPooja: 'Maha Deeparadhana', prasadam: 'Curd Rice', offerings: 'Ghee Deepam, Flowers', festivalName: 'Pradosham' },
-    { name: 'Lakshmi Kubera Pooja', poojaType: 'Lakshmi Pooja', specialPooja: 'Kubera Archana', prasadam: 'Sweet Pongal', offerings: 'Lotus, Kumkum' },
-    { name: 'Rudra Japam & Homam', poojaType: 'Rudra Japam', specialPooja: 'Rudra Homam, Rudrabhishekam', prasadam: 'Ven Pongal', offerings: 'Honey, Bilva' },
-    { name: 'Annadhanam Seva', poojaType: 'Annadhanam Pooja', specialPooja: 'Anna Purna Archana', prasadam: 'Full Meal', offerings: 'Rice, Dal, Vegetables' },
-    { name: 'Chandi Homam', poojaType: 'Chandi Homam', specialPooja: 'Durga Archana', prasadam: 'Kesari Bath', offerings: 'Red Flowers, Ghee' },
-    { name: 'Pournami Deepa Seva', poojaType: 'Deepa Aradhana', specialPooja: 'Chandra Pooja', prasadam: 'Panchamritam', offerings: 'Oil Lamps, Flowers', festivalName: 'Pournami' },
-    { name: 'Hanuman Jayanthi Utsavam', poojaType: 'Hanuman Pooja', specialPooja: 'Sundara Kanda Parayanam', prasadam: 'Vada Mala', offerings: 'Betel Leaves, Butter', festivalName: 'Hanuman Jayanthi' },
-    { name: 'Maha Shivaratri Special', poojaType: 'Maha Shivaratri Pooja', specialPooja: 'Lingodbhava Pooja, Rudrabhishekam', prasadam: 'Panakam', offerings: 'Milk, Bilva', festivalName: 'Maha Shivaratri' },
+  const eventTemplates: Array<{ name: string; poojaType: string; resourceNeeded: string; prasadam: string; festivalName?: string }> = [
+    { name: 'Morning Maha Abhishekam', poojaType: 'Abhishekam', resourceNeeded: 'Flowers, Bilva Leaves, Milk', prasadam: 'Sakkarai Pongal' },
+    { name: 'Ganapathi Homam Seva', poojaType: 'Ganapathi Homam', resourceNeeded: 'Coconut, Modakam, Ghee', prasadam: 'Modakam' },
+    { name: 'Navagraha Shanti Seva', poojaType: 'Navagraha Shanti', resourceNeeded: 'Sesame Oil, Grains', prasadam: 'Lemon Rice' },
+    { name: 'Satyanarayana Pooja', poojaType: 'Satyanarayana Pooja', resourceNeeded: 'Tulsi, Fruits, Flowers', prasadam: 'Kesari' },
+    { name: 'Pradosham Seva', poojaType: 'Pradosham Pooja', resourceNeeded: 'Ghee Deepam, Milk', prasadam: 'Curd Rice', festivalName: 'Pradosham' },
+    { name: 'Lakshmi Kubera Pooja', poojaType: 'Lakshmi Pooja', resourceNeeded: 'Lotus, Kumkum', prasadam: 'Sweet Pongal' },
+    { name: 'Rudra Japam & Homam', poojaType: 'Rudra Japam', resourceNeeded: 'Honey, Bilva, Firewood', prasadam: 'Ven Pongal' },
+    { name: 'Annadhanam Seva', poojaType: 'Annadhanam Pooja', resourceNeeded: 'Rice, Dal, Vegetables', prasadam: 'Full Meal' },
+    { name: 'Chandi Homam', poojaType: 'Chandi Homam', resourceNeeded: 'Red Flowers, Ghee', prasadam: 'Kesari Bath' },
+    { name: 'Pournami Deepa Seva', poojaType: 'Deepa Aradhana', resourceNeeded: 'Oil Lamps, Wicks', prasadam: 'Panchamritam', festivalName: 'Pournami' },
+    { name: 'Hanuman Jayanthi Utsavam', poojaType: 'Hanuman Pooja', resourceNeeded: 'Betel Leaves, Butter', prasadam: 'Vada Mala', festivalName: 'Hanuman Jayanthi' },
+    { name: 'Maha Shivaratri Special', poojaType: 'Maha Shivaratri Pooja', resourceNeeded: 'Milk, Bilva, Honey', prasadam: 'Panakam', festivalName: 'Maha Shivaratri' },
   ];
   const timeSlots = ['05:30', '06:15', '07:00', '08:30', '10:00', '11:30', '17:30', '18:15', '19:00'];
 
@@ -83,8 +82,7 @@ function buildInitialTempleEvents(): TempleEvent[] {
         organizer: templeProfile.organizer,
         status: isToday ? 'In Progress' : dayOffset <= 3 ? 'Scheduled' : 'Planned',
         poojaType: template.poojaType,
-        offerings: template.offerings,
-        specialPooja: template.specialPooja,
+        resourceNeeded: template.resourceNeeded,
         prasadam: template.prasadam,
         attendees: 120 + ((dayOffset * 35 + i * 25) % 420),
         festivalName: template.festivalName || '',
