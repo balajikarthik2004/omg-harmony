@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar, Search, Users, ShieldCheck, HeartHandshake, History, CreditCard, Clock, CheckCircle2 } from 'lucide-react';
 import { mockDevotees, mockDonations, mockBookings, mockEvents } from '@/data/mockData';
 import { useStore } from '@/hooks/useStore';
 import Modal from '@/components/Modal';
@@ -35,10 +35,10 @@ function fmtDate(dateStr?: string) {
 
 function bookingBadgeClass(status: string) {
   const map: Record<string, string> = {
-    Confirmed: 'bg-green-50 text-green-800',
-    Pending: 'bg-amber-50 text-amber-800',
-    Completed: 'bg-blue-50 text-blue-800',
-    Cancelled: 'bg-red-50 text-red-800',
+    Confirmed: 'bg-green-50 text-green-800 border-[0.5px] border-green-200',
+    Pending: 'bg-amber-50 text-amber-800 border-[0.5px] border-amber-200',
+    Completed: 'bg-blue-50 text-blue-800 border-[0.5px] border-blue-200',
+    Cancelled: 'bg-red-50 text-red-800 border-[0.5px] border-red-200',
   };
   return map[status] ?? 'bg-muted text-muted-foreground';
 }
@@ -67,7 +67,7 @@ function deriveDevoteeProfile(devotee: Devotee, donations: Donation[], bookings:
   const lastDonation = donations.slice().sort((a, b) => b.date.localeCompare(a.date))[0];
   const offeringSummary = lastDonation
     ? `${fmtAmt(lastDonation.amount)} on ${fmtDate(lastDonation.date)}`
-    : 'No recent offering';
+    : 'No recent offerings';
 
   return { dateOfBirth, memberSince: fmtDate(memberSince), preferredSeva, offeringSummary };
 }
@@ -118,9 +118,22 @@ const DevoteesPage: React.FC = () => {
     if (!q) return items;
     return items.filter(d =>
       d.name.toLowerCase().includes(q) ||
-      d.phone.replace(/\s/g, '').includes(q)
+      d.phone.replace(/\s/g, '').includes(q) ||
+      d.email.toLowerCase().includes(q)
     );
   }, [items, search]);
+
+  const totalDevotees = items.length;
+  const activeDevotees = items.filter(d => d.status === 'Active').length;
+  const recentVisits = items.filter(d => {
+    if (!d.lastVisit) return false;
+    const visitDate = new Date(d.lastVisit);
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    return visitDate >= thirtyDaysAgo;
+  }).length;
+  const majorDonors = items.filter(d => d.totalDonations > 50000).length;
+
 
   const openAdd = () => { setForm(emptyForm); setEditId(null); setModalOpen(true); };
   const openEdit = (e: React.MouseEvent, item: Devotee) => {
@@ -136,7 +149,7 @@ const DevoteesPage: React.FC = () => {
     setModalOpen(false);
   };
 
-  const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
+  const setFormField = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
 
   const openDrawer = (item: Devotee) => {
     setSelectedDevotee(item);
@@ -164,8 +177,7 @@ const DevoteesPage: React.FC = () => {
     if (!chs) return;
 
     const evNames = mockEvents.filter(e => selectedEvents.has(e.id)).map(e => e.name);
-    console.log('NOTIFY', { to: selectedDevotee, chs, notifSubject, notifMessage, events: evNames });
-    setNotifSent(`Sent via ${chs} to ${selectedDevotee?.name}${evNames.length ? ' for ' + evNames.join(', ') : ''}.`);
+    setNotifSent(`Notification sent via ${chs} to ${selectedDevotee?.name}.`);
     setNotifSubject('');
     setNotifMessage('');
     setSelectedEvents(new Set());
@@ -176,57 +188,93 @@ const DevoteesPage: React.FC = () => {
   const devoteeProfile = selectedDevotee ? deriveDevoteeProfile(selectedDevotee, devDonations, devBookings) : null;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold text-foreground">Devotees</h1>
-        <Button onClick={openAdd}><Plus className="h-4 w-4 mr-2" />Add Devotee</Button>
-      </div>
-
-      <div className="flex items-center gap-3 mb-3">
-        <div className="relative max-w-sm w-full">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-          <input
-            className="w-full pl-9 pr-4 py-2 border border-border rounded-md text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-            placeholder="Search by name or phone..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
+    <div className=" max-w-[1500px] mx-auto animate-fade-in pb-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 pb-5">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Devotees Database</h1>
+          <p className="text-sm text-muted-foreground mt-1">Manage devotee records, analyze donation trends, and coordinate engagements.</p>
         </div>
-        <span className="text-sm text-muted-foreground">{filtered.length} devotee{filtered.length !== 1 ? 's' : ''}</span>
+        <div className="flex gap-3">
+          <Button onClick={openAdd} className="shadow-sm"><Plus className="h-4 w-4 mr-2" />Add Devotee</Button>
+        </div>
       </div>
 
-      <div className="table-container rounded-xl border border-border/70 bg-background shadow-sm transition-shadow hover:shadow-md">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
+        <div className="stat-card">
+          <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Members</p>
+          <p className="text-2xl font-bold mt-2 text-foreground">{totalDevotees.toLocaleString()}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Active accounts</p>
+          <p className="text-2xl font-bold mt-2 text-blue-600">{activeDevotees.toLocaleString()}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><HeartHandshake className="w-3.5 h-3.5" /> Major Donors</p>
+          <p className="text-2xl font-bold mt-2 text-emerald-600">{majorDonors.toLocaleString()}</p>
+        </div>
+        <div className="stat-card">
+          <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Visited this Month</p>
+          <p className="text-2xl font-bold mt-2 text-indigo-600">{recentVisits.toLocaleString()}</p>
+        </div>
+      </div>
+
+      <div className="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden flex flex-col relative z-10 mt-4">
+        <div className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 bg-muted/10">
+          <div className="flex items-center gap-3">
+             <div className="relative max-w-sm w-full md:w-80">
+               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+               <input
+                 className="w-full pl-9 pr-4 h-9 rounded-md border border-input bg-background text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
+                 placeholder="Search by name, phone, email..."
+                 value={search}
+                 onChange={e => setSearch(e.target.value)}
+               />
+             </div>
+          </div>
+          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap bg-muted px-2.5 py-1 rounded-md border border-border/50 shadow-sm">{filtered.length} records</span>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-border bg-muted/50">
-                <th className="text-left p-4 font-medium text-muted-foreground">Name</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Phone</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Email</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">City</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Last Visit</th>
-                <th className="text-right p-4 font-medium text-muted-foreground">Actions</th>
+            <thead className="bg-muted/30">
+              <tr className="border-b border-border">
+                <th className="text-left p-4 font-semibold text-muted-foreground">Devotee Name</th>
+                <th className="text-left p-4 font-semibold text-muted-foreground">Contact Info</th>
+                <th className="text-left p-4 font-semibold text-muted-foreground">Location</th>
+                <th className="text-left p-4 font-semibold text-muted-foreground">Status</th>
+                <th className="text-left p-4 font-semibold text-muted-foreground">Last Visit Date</th>
+                <th className="text-right p-4 font-semibold text-muted-foreground">Actions</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="bg-background">
               {filtered.length === 0 ? (
-                <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No devotees match your search.</td></tr>
+                <tr><td colSpan={6} className="p-12 text-center text-muted-foreground font-medium">No results found for your search.</td></tr>
               ) : filtered.map(d => (
-                <tr key={d.id} className="border-b border-border cursor-pointer transition-all duration-200 hover:bg-amber-50/30" onClick={() => openDrawer(d)}>
-                  <td className="p-4 font-medium text-foreground">{d.name}</td>
-                  <td className="p-4 text-muted-foreground">{d.phone}</td>
-                  <td className="p-4 text-muted-foreground">{d.email}</td>
-                  <td className="p-4 text-muted-foreground">{d.city}</td>
+                <tr key={d.id} className="border-b border-border/60 cursor-pointer transition-colors hover:bg-muted/40 group" onClick={() => openDrawer(d)}>
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 border border-primary/20">
+                        {getInitials(d.name)}
+                      </div>
+                      <p className="font-semibold text-foreground group-hover:text-primary transition-colors">{d.name}</p>
+                    </div>
+                  </td>
+                  <td className="p-4 text-muted-foreground">
+                    <p className="font-semibold text-foreground text-xs">{d.phone}</p>
+                    <p className="text-[11px] font-medium text-muted-foreground mt-0.5">{d.email}</p>
+                  </td>
+                  <td className="p-4 text-muted-foreground text-xs">
+                     <span className="font-semibold">{d.city}</span>{d.state && `, ${d.state}`}
+                  </td>
                   <td className="p-4"><StatusBadge status={d.status} /></td>
-                  <td className="p-4 text-muted-foreground">{fmtDate(d.lastVisit)}</td>
+                  <td className="p-4 text-muted-foreground text-xs font-medium">
+                     <div className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 opacity-60" /> {fmtDate(d.lastVisit)}</div>
+                  </td>
                   <td className="p-4 text-right">
                     <div className="flex gap-1 justify-end" onClick={e => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="transition-all hover:-translate-y-0.5 hover:bg-amber-100/70" onClick={e => openEdit(e, d)}><Pencil className="h-4 w-4" /></Button>
-                      <Button variant="ghost" size="icon" className="transition-all hover:-translate-y-0.5 hover:bg-red-50" onClick={e => { e.stopPropagation(); setDeleteId(d.id); }}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-muted/80 hover:text-foreground text-muted-foreground" onClick={e => openEdit(e, d)}><Pencil className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive text-muted-foreground" onClick={e => { e.stopPropagation(); setDeleteId(d.id); }}>
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </td>
@@ -237,297 +285,264 @@ const DevoteesPage: React.FC = () => {
         </div>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Devotee' : 'Add Devotee'}>
-        <div className="grid grid-cols-2 gap-4">
-          <FormField label="Name" value={form.name} onChange={v => set('name', v)} required />
-          <FormField label="Phone" value={form.phone} onChange={v => set('phone', v)} />
-          <FormField label="Email" value={form.email} onChange={v => set('email', v)} type="email" />
-          <FormField label="Address" value={form.address} onChange={v => set('address', v)} />
-          <div className="col-span-2 grid grid-cols-2 gap-4">
-            <FormField label="City" value={form.city} onChange={v => set('city', v)} />
-            <FormField label="State" value={form.state} onChange={v => set('state', v)} />
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Devotee Details' : 'Add New Devotee'}>
+        <div className="space-y-4 px-1 py-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Full Name" value={form.name} onChange={v => setFormField('name', v)} required />
+            <FormField label="Phone Number" value={form.phone} onChange={v => setFormField('phone', v)} placeholder="+91" />
           </div>
-          <FormField label="Country" value={form.country} onChange={v => set('country', v)} />
-          <div className="col-span-2 flex gap-3 pt-2">
+          <FormField label="Email Address" value={form.email} onChange={v => setFormField('email', v)} type="email" placeholder="email@example.com" />
+          <FormField label="Street Address" value={form.address} onChange={v => setFormField('address', v)} placeholder="Plot, Street, Area" />
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="City" value={form.city} onChange={v => setFormField('city', v)} />
+            <FormField label="State" value={form.state} onChange={v => setFormField('state', v)} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+             <FormField label="Country" value={form.country} onChange={v => setFormField('country', v)} />
+             <div className="space-y-1.5">
+               <label className="text-xs font-semibold text-foreground">Status</label>
+               <select value={form.status} onChange={e => setFormField('status', e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                 <option>Active</option><option>Inactive</option>
+               </select>
+             </div>
+          </div>
+          <div className="flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1">Save</Button>
+            <Button onClick={handleSave} className="flex-1 shadow-sm">Save Details</Button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Delete Devotee" message="Are you sure you want to delete this devotee? This action cannot be undone." />
+      <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Delete Devotee Account" message="Are you sure you want to permanently delete this devotee account? Related history and logs might be retained for audit purposes." />
 
       {drawerOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setDrawerOpen(false)}>
-          <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px] transition-opacity" />
-
-          <div
-            className="relative h-full w-[560px] max-w-[97vw] bg-background border-l border-border/80 flex flex-col shadow-[0_28px_80px_rgba(15,23,42,0.34)]"
-            onClick={e => e.stopPropagation()}
-          >
-            <div className="border-b border-border bg-gradient-to-r from-amber-50/80 via-background to-rose-50/70">
-              <div className="flex items-center justify-between px-4 pt-3 pb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-amber-100 ring-2 ring-white flex items-center justify-center text-amber-800 font-semibold text-sm flex-shrink-0 shadow-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-end" onClick={() => setDrawerOpen(false)}>
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
+          <div className="relative h-[100vh] w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
+            
+            {/* Header / Profile Hero */}
+            <div className="px-6 py-8 border-b border-border/80 bg-gradient-to-b from-blue-50/50 to-background flex-shrink-0 relative">
+              <Button variant="ghost" size="icon" className="absolute top-4 right-4 h-9 w-9 rounded-full bg-background border border-border/60 hover:bg-muted text-muted-foreground shadow-sm" onClick={() => setDrawerOpen(false)}><X className="h-5 w-5" /></Button>
+              
+              <div className="flex items-center gap-5">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 border-4 border-white shadow-md flex items-center justify-center text-blue-700 font-display font-bold text-3xl shrink-0">
                     {selectedDevotee && getInitials(selectedDevotee.name)}
                   </div>
                   <div>
-                    <p className="font-semibold text-sm tracking-tight">{selectedDevotee?.name}</p>
-                    <p className="text-xs text-muted-foreground">{selectedDevotee?.city}, {selectedDevotee?.state} · {selectedDevotee?.status}</p>
+                    <h2 className="text-2xl font-bold font-display text-foreground leading-tight tracking-tight mb-1">{selectedDevotee?.name}</h2>
+                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {selectedDevotee?.city}, {selectedDevotee?.state}</p>
+                    <div className="flex gap-2 mt-3 items-center">
+                       <StatusBadge status={selectedDevotee?.status || 'Active'} />
+                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2 py-0.5 rounded border border-border bg-muted/40 text-center shadow-sm">ID #{selectedDevotee?.id.padStart(4, '0')}</span>
+                    </div>
                   </div>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-9 w-9 rounded-lg border border-slate-200/80 bg-white/85 text-slate-700 shadow-sm backdrop-blur-sm transition-all hover:bg-white hover:text-slate-900 hover:shadow-md active:scale-[0.98]"
-                  onClick={() => setDrawerOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
               </div>
 
-              <div className="grid grid-cols-3 gap-2 px-3 pb-3">
-                {[
-                  { label: 'Total Donated', value: fmtAmt(selectedDevotee?.totalDonations ?? 0), tone: 'text-emerald-700' },
-                  { label: 'Donations', value: devDonations.length, tone: '' },
-                  { label: 'Bookings', value: devBookings.length, tone: '' },
-                ].map(s => (
-                  <div key={s.label} className="px-3 py-2 rounded-lg border border-border/70 bg-background/95 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">{s.label}</p>
-                    <p className={`text-base font-semibold ${s.tone}`}>{s.value}</p>
-                  </div>
-                ))}
+              <div className="grid grid-cols-3 gap-3 mt-8">
+                <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                  <div className="absolute top-0 w-full h-[3px] bg-emerald-500" />
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Total Given</p>
+                  <p className="text-xl font-bold text-emerald-600 font-display">{fmtAmt(selectedDevotee?.totalDonations ?? 0)}</p>
+                </div>
+                <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                  <div className="absolute top-0 w-full h-[3px] bg-blue-500" />
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Donations</p>
+                  <p className="text-xl font-bold text-foreground font-display">{devDonations.length}</p>
+                </div>
+                <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                  <div className="absolute top-0 w-full h-[3px] bg-amber-500" />
+                  <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Bookings</p>
+                  <p className="text-xl font-bold text-foreground font-display">{devBookings.length}</p>
+                </div>
               </div>
             </div>
 
-            <div className="flex gap-1 p-2 border-b border-border bg-muted/20 flex-shrink-0">
-              {([
-                { key: 'info', label: 'Info' },
-                { key: 'donations', label: 'Donations', count: devDonations.length },
-                { key: 'bookings', label: 'Bookings', count: devBookings.length },
-                { key: 'notify', label: 'Notify' },
-              ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
+            {/* Navigation Tabs */}
+            <div className="flex p-3 bg-muted/30 border-b border-border gap-2 shrink-0">
+              {([ { key: 'info', label: 'Info' }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'notify', label: 'Message' } ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 px-3 py-2 text-xs rounded-md transition-colors whitespace-nowrap flex items-center justify-center gap-1.5 ${activeTab === tab.key ? 'bg-background text-foreground font-semibold shadow-sm border border-border/60' : 'text-muted-foreground hover:text-foreground hover:bg-background/70'}`}
+                  className={`flex-1 py-2.5 px-2 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2 ${activeTab === tab.key ? 'bg-background border border-border/80 text-foreground shadow-sm shadow-blue-500/5' : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'}`}
                 >
                   {tab.label}
                   {typeof tab.count === 'number' && (
-                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeTab === tab.key ? 'bg-muted text-foreground' : 'bg-muted/60 text-muted-foreground'}`}>
-                      {tab.count}
-                    </span>
+                    <span className={`px-2 py-0.5 rounded text-[11px] font-bold ${activeTab === tab.key ? 'bg-primary/10 text-primary' : 'bg-background border border-border text-muted-foreground'}`}>{tab.count}</span>
                   )}
                 </button>
               ))}
             </div>
 
-            <div className={`flex-1 overflow-y-auto ${activeTab === 'info' ? 'p-0' : 'p-5'}`}>
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto bg-card relative">
               {activeTab === 'info' && selectedDevotee && (
-                <div className="bg-background">
-                  <div className="px-4 py-4 border-b border-border bg-muted/20">
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Devotee Profile</p>
-                    <p className="text-sm text-foreground mt-1">Member ID #{selectedDevotee.id.padStart(4, '0')} · {selectedDevotee.country}</p>
-                  </div>
+                <div className="p-6 space-y-8 pb-10 animate-fade-in">
+                   {/* Contact Section */}
+                   <div className="space-y-4">
+                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Direct Contact</h3>
+                     <div className="grid gap-3">
+                       <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
+                          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100 group-hover:scale-110 transition-transform"><Phone className="w-4 h-4 text-blue-600" /></div>
+                          <div>
+                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Mobile Contact</p>
+                            <p className="text-sm font-bold mt-0.5 text-foreground">{selectedDevotee.phone}</p>
+                          </div>
+                       </div>
+                       <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
+                          <div className="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100 group-hover:scale-110 transition-transform"><Mail className="w-4 h-4 text-sky-600" /></div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Email Address</p>
+                            <p className="text-sm font-bold mt-0.5 truncate text-foreground">{selectedDevotee.email || 'N/A'}</p>
+                          </div>
+                       </div>
+                       <div className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
+                          <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100 mt-1 group-hover:scale-110 transition-transform"><MapPin className="w-4 h-4 text-amber-600" /></div>
+                          <div>
+                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Registered Address</p>
+                            <p className="text-sm font-medium mt-1 leading-relaxed text-foreground">{selectedDevotee.address || 'Address not listed'}</p>
+                            <p className="text-xs text-muted-foreground font-medium mt-1.5 bg-muted/50 px-2 py-0.5 rounded border border-border inline-block">{selectedDevotee.city}{selectedDevotee.state && `, ${selectedDevotee.state}`} {selectedDevotee.country && ` - ${selectedDevotee.country}`}</p>
+                          </div>
+                       </div>
+                     </div>
+                   </div>
 
-                  <div className="p-4 space-y-4">
-                    <div className="rounded-xl border border-border bg-background p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <div className="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center">
-                          <Phone className="h-3.5 w-3.5 text-emerald-700" />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Contact</p>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-muted/20 border border-border/70">
-                          <span className="text-xs text-muted-foreground">Phone</span>
-                          <span className="text-xs font-medium text-blue-700 truncate">{selectedDevotee.phone}</span>
-                        </div>
-                        <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-md bg-muted/20 border border-border/70">
-                          <span className="text-xs text-muted-foreground">Email</span>
-                          <span className="text-[11px] font-medium text-blue-700 truncate">{selectedDevotee.email}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="rounded-xl border border-border bg-background p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <div className="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center">
-                          <MapPin className="h-3.5 w-3.5 text-amber-700" />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Location</p>
-                      </div>
-                      <div className="flex items-start gap-3 px-3 py-2.5 rounded-md bg-muted/20 border border-border/70">
-                        <div className="w-7 h-7 rounded-md bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <MapPin className="h-3.5 w-3.5 text-amber-700" />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-xs font-medium break-words">{selectedDevotee.address || 'Address not available'}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5 break-words">{selectedDevotee.city}, {selectedDevotee.state}, {selectedDevotee.country}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="rounded-xl border border-border bg-background p-3 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-                      <div className="flex items-center gap-2 mb-2.5">
-                        <div className="w-6 h-6 rounded-md bg-teal-100 flex items-center justify-center">
-                          <Calendar className="h-3.5 w-3.5 text-teal-700" />
-                        </div>
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Personal </p>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between px-3 py-2 rounded-md bg-muted/20 border border-border/70">
-                          <span className="text-xs text-muted-foreground">Date of Birth</span>
-                          <span className="text-xs font-medium text-blue-700">{devoteeProfile?.dateOfBirth ?? 'N/A'}</span>
-                        </div>
-                        <div className="flex items-center justify-between px-3 py-2 rounded-md bg-muted/20 border border-border/70">
-                          <span className="text-xs text-muted-foreground">Member Since</span>
-                            <span className="text-xs font-medium">{devoteeProfile?.memberSince ?? 'N/A'}</span>
-                        </div>
-                        {/* <div className="flex items-center justify-between px-3 py-2 rounded-md bg-muted/20 border border-border/70 gap-3">
-                          <span className="text-xs text-muted-foreground">Preferred Seva</span>
-                          <span className="text-xs font-medium text-right">{devoteeProfile?.preferredSeva ?? 'N/A'}</span>
-                        </div>
-                        <div className="flex items-center justify-between px-3 py-2 rounded-md bg-muted/20 border border-border/70 gap-3">
-                          <span className="text-xs text-muted-foreground">Recent Offering</span>
-                          <span className="text-xs font-medium text-right text-emerald-700">{devoteeProfile?.offeringSummary ?? 'N/A'}</span>
-                        </div> */}
-                      </div>
-                    </div>
-                  </div>
+                   {/* Demographics Section */}
+                   <div className="space-y-4">
+                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Profile Meta</h3>
+                     <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
+                       <div className="flex justify-between items-center p-4 border-b border-border/40">
+                          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Date of Birth</span>
+                          <span className="text-sm font-bold text-foreground">{devoteeProfile?.dateOfBirth ?? 'N/A'}</span>
+                       </div>
+                       <div className="flex justify-between items-center p-4 border-b border-border/40">
+                          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Joint Date</span>
+                          <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{devoteeProfile?.memberSince ?? 'N/A'}</span>
+                       </div>
+                       <div className="flex justify-between items-center p-4">
+                          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><HeartHandshake className="w-4 h-4 text-primary" /> Preferred Seva</span>
+                          <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{devoteeProfile?.preferredSeva}</span>
+                       </div>
+                     </div>
+                   </div>
                 </div>
               )}
 
               {activeTab === 'donations' && (
-                <div>
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-3">Donation History</p>
-                  {devDonations.length === 0
-                    ? <p className="text-sm text-muted-foreground py-6 text-center">No donations recorded.</p>
-                    : devDonations.map(dn => (
-                      <div key={dn.id} className="rounded-xl border border-border p-3 mb-2.5 bg-background/80 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-emerald-200">
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-semibold">{dn.id}</p>
-                            <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-50 text-blue-800">{dn.category}</span>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-semibold">{fmtAmt(dn.amount)}</p>
-                            <p className="text-xs text-muted-foreground">{dn.paymentMethod}</p>
-                          </div>
+                <div className="p-6 space-y-4 animate-fade-in bg-muted/5 min-h-full">
+                  {devDonations.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4"><HeartHandshake className="w-8 h-8 text-muted-foreground/40" /></div>
+                      <p className="text-base font-bold text-foreground">No Donations Found</p>
+                      <p className="text-sm text-muted-foreground mt-1">There are no financial logs for this devotee.</p>
+                    </div>
+                  ) : devDonations.map(dn => (
+                    <div key={dn.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-emerald-300 transition-all hover:shadow-md relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent pointer-events-none" />
+                      <div className="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                           <p className="text-sm font-bold text-foreground">{dn.category}</p>
+                           <p className="text-xs font-mono font-semibold text-muted-foreground mt-1 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> ID: {dn.id}</p>
                         </div>
-                        <p className="text-[11px] text-muted-foreground mt-2">{fmtDate(dn.date)}</p>
+                        <p className="text-2xl font-bold font-display text-emerald-600">{fmtAmt(dn.amount)}</p>
                       </div>
-                    ))}
+                      <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/40 relative z-10">
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(dn.date)}</span>
+                        <span className="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">{dn.paymentMethod}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {activeTab === 'bookings' && (
-                <div>
-                  <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-3">Booking History</p>
-                  {devBookings.length === 0
-                    ? <p className="text-sm text-muted-foreground py-6 text-center">No bookings recorded.</p>
-                    : devBookings.map(bk => (
-                      <div key={bk.id} className="rounded-xl border border-border p-3 mb-2.5 bg-background/80 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-blue-200">
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-semibold">{bk.serviceName}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{fmtDate(bk.date)} · {bk.time}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">Payment: {bk.paymentStatus}</p>
-                          </div>
-                          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${bookingBadgeClass(bk.bookingStatus)}`}>{bk.bookingStatus}</span>
-                        </div>
+                <div className="p-6 space-y-4 animate-fade-in bg-muted/5 min-h-full">
+                  {devBookings.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4"><History className="w-8 h-8 text-muted-foreground/40" /></div>
+                      <p className="text-base font-bold text-foreground">No Services Booked</p>
+                      <p className="text-sm text-muted-foreground mt-1">There are no service bookings or history.</p>
+                    </div>
+                  ) : devBookings.map(bk => (
+                    <div key={bk.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-blue-300 transition-all hover:shadow-md relative overflow-hidden grid">
+                      <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500/20" />
+                      <div className="flex justify-between items-start mb-4 relative z-10 pl-2">
+                         <p className="text-sm font-bold text-foreground max-w-[70%] leading-relaxed">{bk.serviceName}</p>
+                         <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${bookingBadgeClass(bk.bookingStatus)}`}>{bk.bookingStatus}</span>
                       </div>
-                    ))}
+                      <div className="flex justify-between items-center mt-2 pt-4 border-t border-border/40 relative z-10 pl-2">
+                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(bk.date)}</span>
+                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-blue-500" />{bk.time}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
               {activeTab === 'notify' && selectedDevotee && (
-                <div className="space-y-4">
-                  <div className="rounded-xl border border-border bg-gradient-to-r from-sky-50/70 via-background to-emerald-50/70 p-3 transition-all duration-200 hover:shadow-sm">
-                    <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-1">Recipient</p>
-                    <p className="text-sm font-semibold text-foreground">{selectedDevotee.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{selectedDevotee.phone} · {selectedDevotee.email}</p>
-                  </div>
-
-                  <div className="rounded-xl border border-border bg-background p-3 space-y-3 transition-all duration-200 hover:shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Channel</p>
-                      <span className="text-[11px] text-muted-foreground">
-                        {Number(channels.sms) + Number(channels.email) + Number(channels.whatsapp)} selected
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {(['sms', 'email', 'whatsapp'] as const).map(ch => (
-                        <button
-                          key={ch}
-                          onClick={() => setChannels(p => ({ ...p, [ch]: !p[ch] }))}
-                          className={`flex flex-col items-center justify-center gap-1.5 py-2.5 text-[11px] border rounded-lg transition-all duration-200 hover:-translate-y-0.5 ${channels[ch] ? 'border-blue-300 bg-blue-50 text-blue-800 font-semibold hover:shadow-sm' : 'border-border text-muted-foreground hover:bg-muted/40 hover:shadow-sm'}`}
-                        >
-                          {ch === 'sms' ? <MessageSquare className="h-4 w-4" /> : ch === 'email' ? <Mail className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
-                          {ch.toUpperCase()}
+                <div className="p-6 space-y-6 pb-[100px] animate-fade-in">
+                   <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
+                     <h3 className="text-xs font-bold uppercase tracking-widest text-foreground pb-2">Delivery Channels</h3>
+                     <div className="grid grid-cols-3 gap-3">
+                        <button onClick={() => setChannels(p => ({ ...p, sms: !p.sms }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.sms ? 'bg-primary/5 text-primary border-primary/30 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                           <MessageSquare className="w-5 h-5" /> <span className="text-[10px]">SMS</span>
                         </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl border border-border bg-background p-3 transition-all duration-200 hover:shadow-sm">
-                    <div className="flex items-center justify-between mb-2">
-                      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">Link to Event (optional)</p>
-                      <span className="text-[11px] text-muted-foreground">{selectedEvents.size} linked</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {mockEvents.map(ev => (
-                        <button
-                          key={ev.id}
-                          onClick={() => toggleEvent(ev.id)}
-                          className={`px-3 py-1 rounded-full text-xs border transition-all duration-200 hover:-translate-y-0.5 ${selectedEvents.has(ev.id) ? 'bg-muted border-foreground/30 text-foreground font-medium hover:shadow-sm' : 'border-border text-muted-foreground hover:text-foreground hover:bg-muted/40 hover:shadow-sm'}`}
-                        >
-                          {ev.name}
-                          <span className="ml-1 text-[10px] opacity-60">{fmtDate(ev.date)}</span>
+                        <button onClick={() => setChannels(p => ({ ...p, email: !p.email }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.email ? 'bg-sky-50 text-sky-700 border-sky-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                           <Mail className="w-5 h-5" /> <span className="text-[10px]">EMAIL</span>
                         </button>
-                      ))}
-                    </div>
-                  </div>
+                        <button onClick={() => setChannels(p => ({ ...p, whatsapp: !p.whatsapp }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.whatsapp ? 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                           <MessageCircle className="w-5 h-5" /> <span className="text-[10px]">WHATSAPP</span>
+                        </button>
+                     </div>
+                   </div>
 
-                  <div className="rounded-xl border border-border bg-background p-3 space-y-3 transition-all duration-200 hover:shadow-sm">
-                    <div>
-                      <label className="text-xs text-muted-foreground block mb-1">Subject / Title</label>
-                      <input
-                        className="w-full border border-border rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-                        placeholder="e.g. You're invited: Maha Shivaratri 2026"
-                        value={notifSubject}
-                        onChange={e => setNotifSubject(e.target.value)}
-                      />
-                    </div>
+                   <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
+                     <div className="flex justify-between items-center pb-2">
+                       <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Attach Events</h3>
+                       <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded">Optional</span>
+                     </div>
+                     <div className="flex flex-wrap gap-2">
+                        {mockEvents.map(ev => (
+                          <button key={ev.id} onClick={() => toggleEvent(ev.id)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border ${selectedEvents.has(ev.id) ? 'bg-muted border-foreground/30 text-foreground shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]' : 'bg-background border-border text-muted-foreground hover:border-border/80 hover:bg-muted/30'}`}>
+                             {ev.name}
+                          </button>
+                        ))}
+                     </div>
+                   </div>
 
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-xs text-muted-foreground">Message</label>
-                        <span className="text-[11px] text-muted-foreground">{notifMessage.length} chars</span>
-                      </div>
-                      <textarea
-                        className="w-full border border-border rounded-md px-3 py-2 text-sm bg-background focus:outline-none focus:ring-1 focus:ring-ring resize-none min-h-[110px] font-sans"
-                        placeholder={`Write your message to ${selectedDevotee.name}...`}
-                        value={notifMessage}
-                        onChange={e => setNotifMessage(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <Button
-                    className="w-full h-10 transition-all duration-200 hover:-translate-y-0.5"
-                    onClick={sendNotification}
-                    disabled={!notifSubject.trim() || !notifMessage.trim() || (!channels.sms && !channels.email && !channels.whatsapp)}
-                  >
-                    Send Notification
-                  </Button>
-
-                  {notifSent && (
-                    <p className="text-xs text-green-700 bg-green-50 rounded-md px-3 py-2 text-center">{notifSent}</p>
-                  )}
+                   <div className="space-y-4">
+                     <h3 className="text-xs font-bold uppercase tracking-widest text-foreground px-1">Message Detail</h3>
+                     <div className="space-y-4">
+                       <div>
+                         <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-1.5 ml-1">Subject / Header</label>
+                         <input value={notifSubject} onChange={e => setNotifSubject(e.target.value)} className="w-full h-11 rounded-xl border border-input bg-background/50 hover:bg-background px-4 text-sm font-semibold transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm" placeholder="Subject line..." />
+                       </div>
+                       <div>
+                         <div className="flex items-center justify-between mb-1.5 px-1">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Notification Body</label>
+                            <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase bg-muted/60 border border-border/50 px-2 py-0.5 rounded shadow-sm">{notifMessage.length} characters</span>
+                         </div>
+                         <textarea value={notifMessage} onChange={e => setNotifMessage(e.target.value)} className="w-full rounded-xl border border-input bg-background/50 hover:bg-background p-4 text-sm min-h-[160px] resize-y transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm placeholder:text-muted-foreground/60 leading-relaxed font-medium" placeholder={`Type your message...`} />
+                       </div>
+                     </div>
+                     
+                     {notifSent && (
+                       <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
+                         <CheckCircle2 className="w-5 h-5 text-emerald-600" /> {notifSent}
+                       </div>
+                     )}
+                   </div>
                 </div>
               )}
             </div>
+
+            {/* Sticky Action Footer */}
+            {activeTab === 'notify' && (
+               <div className="absolute bottom-0 left-0 w-full p-5 bg-card/90 backdrop-blur-md border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                 <Button className="w-full h-12 text-sm font-bold rounded-xl shadow-lg border-b-4 border-black/10 active:border-b-0 active:translate-y-1 transition-all" onClick={sendNotification} disabled={!notifSubject.trim() || !notifMessage.trim() || (!channels.sms && !channels.email && !channels.whatsapp)}>
+                   Execute Dispatch ({Number(channels.sms) + Number(channels.email) + Number(channels.whatsapp)} Routes)
+                 </Button>
+               </div>
+            )}
           </div>
         </div>
       )}

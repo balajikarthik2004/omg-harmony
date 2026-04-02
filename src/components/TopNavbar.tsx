@@ -8,25 +8,29 @@ const TopNavbar: React.FC = () => {
   const today = new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
-    <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6 shrink-0">
-      <div className="relative w-72">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input placeholder="Search..." className="pl-9 bg-muted/50 border-0" />
+    <header className="h-16 bg-card/80 backdrop-blur-md border-b border-border/70 flex items-center justify-between px-6 shrink-0 sticky top-0 z-10">
+      <div className="relative w-72 group">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 transition-colors duration-200 group-focus-within:text-primary" />
+        <Input placeholder="Search..." className="pl-9 bg-muted/40 border-0 hover:bg-muted/60 focus:bg-background transition-all duration-200" />
       </div>
 
       <div className="flex items-center gap-5">
-        <span className="text-sm text-muted-foreground hidden md:block">{today}</span>
-        <button className="relative text-muted-foreground hover:text-foreground transition-colors">
+        <span className="text-sm text-muted-foreground/70 hidden md:block">{today}</span>
+        
+        <button className="relative text-muted-foreground/70 hover:text-foreground transition-all duration-200 hover:scale-105 p-2 rounded-lg hover:bg-muted/50">
           <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full text-[10px] text-primary-foreground flex items-center justify-center">3</span>
+          <span className="absolute top-1 right-1 w-4 h-4 bg-primary rounded-full text-[10px] text-primary-foreground flex items-center justify-center font-semibold shadow-sm">3</span>
         </button>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-accent text-accent-foreground flex items-center justify-center text-sm font-semibold">
+        
+        <div className="flex items-center gap-3 pl-3 border-l border-border/50">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold text-white shadow-sm" style={{
+            background: 'linear-gradient(135deg, hsl(233, 53%, 35%) 0%, hsl(270, 43%, 32%) 100%)',
+          }}>
             {user?.name?.charAt(0) || 'U'}
           </div>
           <div className="hidden md:block">
             <p className="text-sm font-medium text-foreground leading-tight">{user?.name}</p>
-            <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
+            <p className="text-xs text-muted-foreground/70 capitalize">{user?.role}</p>
           </div>
         </div>
       </div>

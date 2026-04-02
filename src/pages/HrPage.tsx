@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, CalendarDays, Users, Briefcase, Wallet } from 'lucide-react';
+import { Plus, Pencil, Trash2, CalendarDays, Users, Briefcase, Wallet, Search, Phone, Mail, FileText, BadgeIndianRupee } from 'lucide-react';
 import { useStore } from '@/hooks/useStore';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import StatusBadge from '@/components/StatusBadge';
+import FormField from '@/components/FormField';
 
 type StaffRole = 'Priest' | 'Staff';
 type StaffStatus = 'Active' | 'Inactive';
@@ -64,39 +65,9 @@ type PayrollEntry = {
 type HrSection = 'staff' | 'payroll' | 'duties' | 'volunteers';
 
 const initialStaff: StaffRecord[] = [
-  {
-    id: 'ST001',
-    name: 'Pandit Sharma',
-    role: 'Priest',
-    department: 'Main Sanctum',
-    joinedDate: '2020-01-10',
-    salary: 35000,
-    phone: '+91 9876543210',
-    email: 'sharma@temple.org',
-    status: 'Active',
-  },
-  {
-    id: 'ST002',
-    name: 'Suresh Kumar',
-    role: 'Staff',
-    department: 'Kitchen',
-    joinedDate: '2021-03-12',
-    salary: 22000,
-    phone: '+91 9876500011',
-    email: 'suresh@temple.org',
-    status: 'Active',
-  },
-  {
-    id: 'ST003',
-    name: 'Anita Menon',
-    role: 'Staff',
-    department: 'Administration',
-    joinedDate: '2022-08-01',
-    salary: 28000,
-    phone: '+91 9876500022',
-    email: 'anita@temple.org',
-    status: 'Active',
-  },
+  { id: 'ST001', name: 'Pandit Sharma', role: 'Priest', department: 'Main Sanctum', joinedDate: '2020-01-10', salary: 35000, phone: '+91 9876543210', email: 'sharma@temple.org', status: 'Active' },
+  { id: 'ST002', name: 'Suresh Kumar', role: 'Staff', department: 'Kitchen', joinedDate: '2021-03-12', salary: 22000, phone: '+91 9876500011', email: 'suresh@temple.org', status: 'Active' },
+  { id: 'ST003', name: 'Anita Menon', role: 'Staff', department: 'Administration', joinedDate: '2022-08-01', salary: 28000, phone: '+91 9876500022', email: 'anita@temple.org', status: 'Active' },
 ];
 
 const initialDuties: DutySchedule[] = [
@@ -106,98 +77,25 @@ const initialDuties: DutySchedule[] = [
 ];
 
 const dutyTypeOptions: DutyType[] = [
-  'Pooja Ritual',
-  'Annadanam Service',
-  'Temple Operations',
-  'Administration',
-  'Volunteer Coordination',
-  'Maintenance',
+  'Pooja Ritual', 'Annadanam Service', 'Temple Operations', 'Administration', 'Volunteer Coordination', 'Maintenance'
 ];
 
 const initialVolunteers: VolunteerRecord[] = [
-  {
-    id: 'VL001',
-    name: 'Meena Devi',
-    phone: '+91 9000011111',
-    email: 'meena@email.com',
-    preferredArea: 'Events Desk',
-    availability: 'Weekends',
-    assignedDutyId: 'DT003',
-    status: 'Assigned',
-  },
-  {
-    id: 'VL002',
-    name: 'Rahul Jain',
-    phone: '+91 9000011112',
-    email: 'rahul@email.com',
-    preferredArea: 'Crowd Management',
-    availability: 'Evenings',
-    assignedDutyId: '',
-    status: 'Registered',
-  },
+  { id: 'VL001', name: 'Meena Devi', phone: '+91 9000011111', email: 'meena@email.com', preferredArea: 'Events Desk', availability: 'Weekends', assignedDutyId: 'DT003', status: 'Assigned' },
+  { id: 'VL002', name: 'Rahul Jain', phone: '+91 9000011112', email: 'rahul@email.com', preferredArea: 'Crowd Management', availability: 'Evenings', assignedDutyId: '', status: 'Registered' },
 ];
 
 const initialPayroll: PayrollEntry[] = [
-  {
-    id: 'PY001',
-    staffId: 'ST001',
-    month: '2026-04',
-    basePay: 35000,
-    allowance: 3000,
-    deduction: 1000,
-    netPay: 37000,
-    payoutStatus: 'Unpaid',
-  },
-  {
-    id: 'PY002',
-    staffId: 'ST002',
-    month: '2026-04',
-    basePay: 22000,
-    allowance: 1500,
-    deduction: 500,
-    netPay: 23000,
-    payoutStatus: 'Paid',
-  },
+  { id: 'PY001', staffId: 'ST001', month: '2026-04', basePay: 35000, allowance: 3000, deduction: 1000, netPay: 37000, payoutStatus: 'Unpaid' },
+  { id: 'PY002', staffId: 'ST002', month: '2026-04', basePay: 22000, allowance: 1500, deduction: 500, netPay: 23000, payoutStatus: 'Paid' },
 ];
 
-const emptyStaffForm = {
-  name: '',
-  role: 'Staff' as StaffRole,
-  department: '',
-  joinedDate: '',
-  salary: 0,
-  phone: '',
-  email: '',
-  status: 'Active' as StaffStatus,
-};
+const emptyStaffForm = { name: '', role: 'Staff' as StaffRole, department: '', joinedDate: '', salary: 0, phone: '', email: '', status: 'Active' as StaffStatus };
+const emptyDutyForm = { staffId: '', dutyType: 'Temple Operations' as DutyType, dutyDate: '', slot: '05:00 AM - 09:00 AM', location: '', status: 'Scheduled' as DutyStatus, notes: '' };
+const emptyVolunteerForm = { name: '', phone: '', email: '', preferredArea: '', availability: '', assignedDutyId: '', status: 'Registered' as VolunteerStatus };
 
-const emptyDutyForm = {
-  staffId: '',
-  dutyType: 'Temple Operations' as DutyType,
-  dutyDate: '',
-  slot: '05:00 AM - 09:00 AM',
-  location: '',
-  status: 'Scheduled' as DutyStatus,
-  notes: '',
-};
-
-const emptyVolunteerForm = {
-  name: '',
-  phone: '',
-  email: '',
-  preferredArea: '',
-  availability: '',
-  assignedDutyId: '',
-  status: 'Registered' as VolunteerStatus,
-};
-
-function money(n: number) {
-  return `Rs ${n.toLocaleString('en-IN')}`;
-}
-
-function initials(name: string) {
-  return name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase();
-}
+function money(n: number) { return `₹${n.toLocaleString('en-IN')}`; }
+function initials(name: string) { return name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(); }
 
 const HrPage: React.FC = () => {
   const { items: staff, add: addStaff, update: updateStaff, remove: removeStaff } = useStore<StaffRecord>(initialStaff);
@@ -272,109 +170,39 @@ const HrPage: React.FC = () => {
     return { activeStaff, priests, scheduledDuties, assignedVolunteers };
   }, [filteredStaff, filteredDuties, filteredVolunteers]);
 
-  const openAddStaff = () => {
-    setStaffForm(emptyStaffForm);
-    setStaffEditId(null);
-    setStaffModalOpen(true);
-  };
-
-  const openEditStaff = (item: StaffRecord) => {
-    setStaffForm({
-      name: item.name,
-      role: item.role,
-      department: item.department,
-      joinedDate: item.joinedDate,
-      salary: item.salary,
-      phone: item.phone,
-      email: item.email,
-      status: item.status,
-    });
-    setStaffEditId(item.id);
-    setStaffModalOpen(true);
-  };
-
+  const openAddStaff = () => { setStaffForm(emptyStaffForm); setStaffEditId(null); setStaffModalOpen(true); };
+  const openEditStaff = (item: StaffRecord) => { setStaffForm({ ...item }); setStaffEditId(item.id); setStaffModalOpen(true); };
   const saveStaff = () => {
     if (!staffForm.name.trim() || !staffForm.department.trim()) return;
-    const payload: Omit<StaffRecord, 'id'> = {
-      ...staffForm,
-      salary: Number(staffForm.salary) || 0,
-    };
-
-    if (staffEditId) {
-      updateStaff(staffEditId, payload);
-    } else {
-      addStaff(payload);
-    }
+    const payload = { ...staffForm, salary: Number(staffForm.salary) || 0 };
+    if (staffEditId) updateStaff(staffEditId, payload);
+    else addStaff(payload);
     setStaffModalOpen(false);
   };
+  const setSField = <K extends keyof StaffRecord>(k: K, v: any) => setStaffForm(p => ({ ...p, [k]: v }));
 
-  const openAddDuty = () => {
-    setDutyForm({ ...emptyDutyForm, staffId: staff[0]?.id ?? '' });
-    setDutyEditId(null);
-    setDutyModalOpen(true);
-  };
-
-  const openEditDuty = (item: DutySchedule) => {
-    setDutyForm({
-      staffId: item.staffId,
-      dutyType: item.dutyType,
-      dutyDate: item.dutyDate,
-      slot: item.slot,
-      location: item.location,
-      status: item.status,
-      notes: item.notes,
-    });
-    setDutyEditId(item.id);
-    setDutyModalOpen(true);
-  };
-
+  const openAddDuty = () => { setDutyForm({ ...emptyDutyForm, staffId: staff[0]?.id ?? '' }); setDutyEditId(null); setDutyModalOpen(true); };
+  const openEditDuty = (item: DutySchedule) => { setDutyForm({ ...item }); setDutyEditId(item.id); setDutyModalOpen(true); };
   const saveDuty = () => {
     if (!dutyForm.staffId || !dutyForm.dutyDate || !dutyForm.location.trim()) return;
-    const payload: Omit<DutySchedule, 'id'> = { ...dutyForm };
-
-    if (dutyEditId) {
-      updateDuty(dutyEditId, payload);
-    } else {
-      addDuty(payload);
-    }
+    if (dutyEditId) updateDuty(dutyEditId, { ...dutyForm });
+    else addDuty({ ...dutyForm });
     setDutyModalOpen(false);
   };
+  const setDField = <K extends keyof DutySchedule>(k: K, v: any) => setDutyForm(p => ({ ...p, [k]: v }));
 
-  const openAddVolunteer = () => {
-    setVolForm(emptyVolunteerForm);
-    setVolEditId(null);
-    setVolModalOpen(true);
-  };
-
-  const openEditVolunteer = (item: VolunteerRecord) => {
-    setVolForm({
-      name: item.name,
-      phone: item.phone,
-      email: item.email,
-      preferredArea: item.preferredArea,
-      availability: item.availability,
-      assignedDutyId: item.assignedDutyId,
-      status: item.status,
-    });
-    setVolEditId(item.id);
-    setVolModalOpen(true);
-  };
-
+  const openAddVolunteer = () => { setVolForm(emptyVolunteerForm); setVolEditId(null); setVolModalOpen(true); };
+  const openEditVolunteer = (item: VolunteerRecord) => { setVolForm({ ...item }); setVolEditId(item.id); setVolModalOpen(true); };
   const saveVolunteer = () => {
     if (!volForm.name.trim()) return;
-    const payload: Omit<VolunteerRecord, 'id'> = { ...volForm };
-
-    if (volEditId) {
-      updateVolunteer(volEditId, payload);
-    } else {
-      addVolunteer(payload);
-    }
+    if (volEditId) updateVolunteer(volEditId, { ...volForm });
+    else addVolunteer({ ...volForm });
     setVolModalOpen(false);
   };
+  const setVField = <K extends keyof VolunteerRecord>(k: K, v: any) => setVolForm(p => ({ ...p, [k]: v }));
 
   const generatePayrollForMonth = () => {
     const existingStaffIds = new Set(payroll.filter(entry => entry.month === payrollMonth).map(entry => entry.staffId));
-
     const newEntries: PayrollEntry[] = staff
       .filter(item => item.status === 'Active' && !existingStaffIds.has(item.id))
       .map(item => {
@@ -391,408 +219,394 @@ const HrPage: React.FC = () => {
           payoutStatus: 'Unpaid',
         };
       });
-
-    if (newEntries.length > 0) {
-      setPayroll(prev => [...newEntries, ...prev]);
-    }
+    if (newEntries.length > 0) setPayroll(prev => [...newEntries, ...prev]);
   };
 
   const payrollTotal = payrollForMonth.reduce((sum, entry) => sum + entry.netPay, 0);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between gap-3 rounded-xl border border-border bg-gradient-to-r from-amber-50/50 via-background to-blue-50/50 px-4 py-3">
+    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner bg-gradient-to-r from-violet-50/80 via-background to-sky-50/80">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">HR & Volunteer Management</h1>
-          <p className="text-sm text-muted-foreground mt-1">Priest/staff records, duty schedules, payroll, and volunteer assignment in one workspace.</p>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-violet-600" /> HR & Volunteer Management</h1>
+          <p className="text-sm text-muted-foreground mt-1">Orchestrate priest networks, staff records, payroll matrices, and volunteer duties.</p>
         </div>
-        <input
-          className="w-full max-w-xs px-3 py-2 text-sm border border-border rounded-md bg-background"
-          placeholder="Search staff, duties, volunteers..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <div className="rounded-xl border border-border bg-background p-4 shadow-sm">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Active Staff</p>
-          <p className="text-2xl font-semibold mt-1">{totals.activeStaff}</p>
-        </div>
-        <div className="rounded-xl border border-border bg-background p-4 shadow-sm">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Priests</p>
-          <p className="text-2xl font-semibold mt-1">{totals.priests}</p>
-        </div>
-        <div className="rounded-xl border border-border bg-background p-4 shadow-sm">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Scheduled Duties</p>
-          <p className="text-2xl font-semibold mt-1">{totals.scheduledDuties}</p>
-        </div>
-        <div className="rounded-xl border border-border bg-background p-4 shadow-sm">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Assigned Volunteers</p>
-          <p className="text-2xl font-semibold mt-1">{totals.assignedVolunteers}</p>
+        <div className="relative max-w-sm w-full md:w-72 mt-3 md:mt-0">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <input
+            className="w-full pl-9 pr-4 h-10 rounded-lg border border-input bg-background/80 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 hover:border-border outline-none shadow-sm"
+            placeholder="Search human resources..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-background shadow-sm p-2">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          {([
-            { key: 'staff' as HrSection, label: 'Staff Records', icon: Briefcase },
-            { key: 'duties' as HrSection, label: 'Duty Schedules', icon: CalendarDays },
-            { key: 'volunteers' as HrSection, label: 'Volunteers', icon: Users },
-            { key: 'payroll' as HrSection, label: 'Payroll', icon: Wallet },
-          ]).map(sec => (
-            <button
-              key={sec.key}
-              onClick={() => setActiveSection(sec.key)}
-              className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors border ${activeSection === sec.key ? 'bg-muted border-foreground/20 text-foreground font-semibold' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'}`}
-            >
-              <sec.icon className="h-4 w-4" />
-              {sec.label}
-            </button>
-          ))}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/30 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Active Staff</p>
+          <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{totals.activeStaff}</p>
+        </div>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-orange-100 bg-orange-50/40">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-orange-100/50 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-orange-800 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Core Priests</p>
+          <p className="text-3xl font-display font-bold mt-2 text-orange-700 relative z-10">{totals.priests}</p>
+        </div>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800 flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Assigned Duties</p>
+          <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{totals.scheduledDuties}</p>
+        </div>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Volunteer Fleet</p>
+          <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{totals.assignedVolunteers}</p>
         </div>
       </div>
 
-      {activeSection === 'staff' && (
-        <section className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold">Priest & Staff Records</h2>
+      <div className="bg-card/80 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
+        {([
+          { key: 'staff' as HrSection, label: 'Staff Roster', icon: Briefcase },
+          { key: 'duties' as HrSection, label: 'Task Deployment', icon: CalendarDays },
+          { key: 'volunteers' as HrSection, label: 'Volunteers', icon: Users },
+          { key: 'payroll' as HrSection, label: 'Payroll Distribution', icon: Wallet },
+        ]).map(sec => (
+          <button
+            key={sec.key}
+            onClick={() => setActiveSection(sec.key)}
+            className={`flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 flex-1 md:flex-none ${activeSection === sec.key ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
+          >
+            <sec.icon className="h-4 w-4" />
+            {sec.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="animate-fade-in relative">
+        {activeSection === 'staff' && (
+          <section className="section-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-primary/5 to-transparent">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> Master Personnel Roster</h2>
+              <Button onClick={openAddStaff} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Onboard Personnel</Button>
             </div>
-            <Button size="sm" onClick={openAddStaff}><Plus className="h-4 w-4 mr-1" />Add Staff</Button>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left p-3 font-medium text-muted-foreground">Name</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Role</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Department</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Joined</th>
-                  <th className="text-right p-3 font-medium text-muted-foreground">Salary</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-right p-3 font-medium text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStaff.map(item => (
-                  <tr key={item.id} className="border-b border-border hover:bg-muted/20 transition-colors">
-                    <td className="p-3">
-                      <p className="font-medium">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.email || 'No email'}</p>
-                    </td>
-                    <td className="p-3 text-muted-foreground">{item.role}</td>
-                    <td className="p-3 text-muted-foreground">{item.department}</td>
-                    <td className="p-3 text-muted-foreground">{item.joinedDate}</td>
-                    <td className="p-3 text-right font-semibold">{money(item.salary)}</td>
-                    <td className="p-3"><StatusBadge status={item.status} /></td>
-                    <td className="p-3 text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => openEditStaff(item)}><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setStaffDeleteId(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                      </div>
-                    </td>
+            <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40">
+                  <tr className="border-b border-border">
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Employee Identity</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Rank & Department</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Induction Date</th>
+                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Gross Compensation</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">C. Status</th>
+                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Controls</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
+                </thead>
+                <tbody className="bg-background">
+                  {filteredStaff.length === 0 ? <tr><td colSpan={6} className="p-10 text-center font-medium text-muted-foreground border-b border-border">No staff found correlating to filters.</td></tr> : filteredStaff.map(item => (
+                    <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                             {initials(item.name)}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground text-sm tracking-wide">{item.name}</p>
+                            <div className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest uppercase text-muted-foreground mt-1">
+                              <span className="flex items-center gap-1 bg-muted/60 px-1.5 py-0.5 rounded border border-border/50"><Phone className="w-3 h-3 opacity-70" />{item.phone}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-muted-foreground">
+                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border ${item.role === 'Priest' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>{item.role}</span>
+                        <p className="text-xs font-semibold text-foreground/80">{item.department}</p>
+                      </td>
+                      <td className="p-4 text-muted-foreground text-xs font-medium">{item.joinedDate}</td>
+                      <td className="p-4 text-right font-display font-bold text-emerald-700 text-lg tracking-tight">{money(item.salary)}</td>
+                      <td className="p-4"><StatusBadge status={item.status} /></td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        <div className="flex justify-end gap-1.5">
+                          <Button variant="ghost" size="icon" onClick={() => openEditStaff(item)} title="Modify Staff Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setStaffDeleteId(item.id)} title="Eradicate Record" className="hover:text-destructive hover:bg-destructive/10"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div></div>
+          </section>
+        )}
 
-      {activeSection === 'payroll' && (
-        <section className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-            <h2 className="text-sm font-semibold">Payroll</h2>
-          </div>
-          <div className="p-4 space-y-3">
-            <div className="flex gap-2">
-              <input
-                type="month"
-                value={payrollMonth}
-                onChange={e => setPayrollMonth(e.target.value)}
-                className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
-              />
-              <Button size="sm" onClick={generatePayrollForMonth}>Generate</Button>
-            </div>
-
-            <div className="rounded-md border border-border p-3 bg-muted/10">
-              <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Payroll Total</p>
-              <p className="text-xl font-semibold mt-1">{money(payrollTotal)}</p>
-            </div>
-
-            <div className="space-y-2 max-h-[270px] overflow-y-auto pr-1">
-              {payrollForMonth.length === 0 ? (
-                <p className="text-sm text-muted-foreground py-6 text-center">No payroll entries for this month.</p>
-              ) : (
-                payrollForMonth.map(entry => {
-                  const member = staffById[entry.staffId];
-                  return (
-                    <div key={entry.id} className="rounded-md border border-border p-3 bg-background">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{member?.name ?? 'Staff Member'}</p>
-                        <StatusBadge status={entry.payoutStatus} />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1">{money(entry.basePay)} + {money(entry.allowance)} - {money(entry.deduction)}</p>
-                      <div className="flex items-center justify-between mt-2">
-                        <p className="text-sm font-semibold">Net: {money(entry.netPay)}</p>
-                        {entry.payoutStatus === 'Unpaid' && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}
-                          >
-                            Mark Paid
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {activeSection === 'duties' && (
-        <section className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold">Duty Schedules</h2>
-            </div>
-            <Button size="sm" onClick={openAddDuty}><Plus className="h-4 w-4 mr-1" />Assign Duty</Button>
-          </div>
-          <div className="p-4 space-y-2 max-h-[380px] overflow-y-auto">
-            {filteredDuties.map(item => (
-              <div key={item.id} className="rounded-lg border border-border p-3 bg-background">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold">{staffById[item.staffId]?.name ?? 'Unknown Staff'}</p>
-                    <span className="inline-flex mt-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">{item.dutyType}</span>
-                    <p className="text-xs text-muted-foreground mt-0.5">{item.dutyDate} · {item.slot}</p>
-                    <p className="text-xs text-muted-foreground">{item.location}</p>
-                  </div>
-                  <StatusBadge status={item.status} />
-                </div>
-                {item.notes && <p className="text-xs text-muted-foreground mt-2">{item.notes}</p>}
-                <div className="flex justify-end gap-1 mt-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditDuty(item)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" onClick={() => setDutyDeleteId(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {activeSection === 'volunteers' && (
-        <section className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-          <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold">Volunteer Registration & Assignment</h2>
-            </div>
-            <Button size="sm" onClick={openAddVolunteer}><Plus className="h-4 w-4 mr-1" />Register</Button>
-          </div>
-          <div className="p-4 space-y-2 max-h-[380px] overflow-y-auto">
-            {filteredVolunteers.map(item => (
-              <div key={item.id} className="rounded-lg border border-border p-3 bg-background">
-                <div className="flex items-start justify-between">
-                  <div className="flex gap-3">
-                    <div className="w-9 h-9 rounded-full bg-violet-100 text-violet-800 flex items-center justify-center text-xs font-semibold">
-                      {initials(item.name)}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{item.preferredArea} · {item.availability}</p>
-                      <p className="text-xs text-muted-foreground">{item.phone || 'No phone'}</p>
+        {activeSection === 'payroll' && (
+          <section className="section-panel bg-gradient-to-b from-background to-slate-50/50 shadow-sm border-l-4 border-slate-500">
+             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-slate-100/50 to-transparent">
+               <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Engine Pipeline</h2>
+             </div>
+             <div className="p-6">
+                <div className="flex flex-col md:flex-row gap-6 mb-8 bg-background border border-border/70 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-bl-full pointer-events-none" />
+                  <div className="flex-1 relative z-10">
+                    <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Target Processing Vector</label>
+                    <div className="flex gap-3">
+                      <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-slate-500/20 outline-none hover:border-border transition-all shadow-inner" />
+                      <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-slate-700 hover:bg-slate-800 text-white">Execute Payroll Generation</Button>
                     </div>
                   </div>
-                  <StatusBadge status={item.status} />
+                  <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
+                    <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Calculated Dispersion Total</p>
+                    <p className="text-4xl font-display font-bold text-slate-800 mt-1">{money(payrollTotal)}</p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Assigned Duty: {item.assignedDutyId ? duties.find(d => d.id === item.assignedDutyId)?.location ?? item.assignedDutyId : 'Not assigned'}
-                </p>
-                <div className="flex justify-end gap-1 mt-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditVolunteer(item)}><Pencil className="h-4 w-4" /></Button>
-                  <Button variant="ghost" size="icon" onClick={() => setVolDeleteId(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+
+                <div className="space-y-4">
+                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Disbursed Salary Manifests</h3>
+                  {payrollForMonth.length === 0 ? (
+                    <div className="text-center py-16 bg-muted/20 border-2 border-dashed border-border rounded-2xl">
+                      <Wallet className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
+                      <p className="text-base font-bold text-foreground">No payroll manifests available</p>
+                      <p className="text-sm font-medium text-muted-foreground mt-1">Select a processing vector and execute generation to populate.</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {payrollForMonth.map(entry => {
+                        const member = staffById[entry.staffId];
+                        return (
+                          <div key={entry.id} className="rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5">
+                            <div className="flex items-center justify-between mb-4 border-b border-border/50 pb-4">
+                              <div>
+                                <p className="text-base font-bold text-foreground tracking-tight">{member?.name ?? 'Unknown Staff'}</p>
+                                <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground mt-1 bg-muted/50 inline-flex px-1.5 py-0.5 rounded border border-border/50">{member?.role} · {member?.department}</p>
+                              </div>
+                              <StatusBadge status={entry.payoutStatus} />
+                            </div>
+                            
+                            <div className="space-y-2.5 mb-5 text-sm font-semibold bg-muted/20 p-4 rounded-xl border border-border/40 scale-[0.98] group-hover:scale-100 transition-transform origin-center">
+                              <div className="flex justify-between text-muted-foreground items-center"><span>Base Pay</span> <span className="text-foreground tracking-tight">{money(entry.basePay)}</span></div>
+                              <div className="flex justify-between text-emerald-700 items-center"><span>Allowances</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.allowance)}</span></div>
+                              {entry.deduction > 0 && <div className="flex justify-between text-rose-600 items-center"><span>Deductions</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.deduction)}</span></div>}
+                            </div>
+                            
+                            <div className="flex items-center justify-between pt-1">
+                              <div>
+                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-0.5">Final Net Disbursement</p>
+                                <p className="text-2xl font-display font-bold text-foreground tracking-tight">{money(entry.netPay)}</p>
+                              </div>
+                              {entry.payoutStatus === 'Unpaid' && (
+                                <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 shadow-sm font-bold" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Disburse Now</Button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+             </div>
+          </section>
+        )}
 
-      <Modal open={staffModalOpen} onClose={() => setStaffModalOpen(false)} title={staffEditId ? 'Edit Staff Record' : 'Add Staff Record'}>
-        <div className="grid grid-cols-2 gap-4">
+        {/* Similar rich styling for Duties and Volunteers */}
+        {activeSection === 'duties' && (
+          <section className="section-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--amber))' }}>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-amber-50/50 to-transparent">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-600" /> Active Operations & Rosters</h2>
+              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Dispatch Duty</Button>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+               {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No operational rosters registered currently.</p> : filteredDuties.map(item => (
+                 <div key={item.id} className="rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden hover:-translate-y-1">
+                   <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-500/10 to-transparent pointer-events-none" />
+                   <div className="relative z-10 flex flex-col h-full">
+                     <div className="flex justify-between items-start mb-4">
+                       <div className="flex gap-3">
+                         <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700 font-bold text-sm shrink-0 border border-amber-200 shadow-sm">{initials(staffById[item.staffId]?.name ?? 'US')}</div>
+                         <div>
+                           <p className="font-bold text-base leading-tight text-foreground tracking-tight">{staffById[item.staffId]?.name ?? 'Unknown Staff'}</p>
+                           <p className="text-[10px] uppercase tracking-widest text-amber-700 font-bold mt-1 bg-amber-50 inline-flex px-1.5 rounded">{item.dutyType}</p>
+                         </div>
+                       </div>
+                       <StatusBadge status={item.status} />
+                     </div>
+                     <div className="space-y-2 text-xs text-muted-foreground font-semibold bg-muted/30 p-3.5 rounded-xl border border-border/50 mb-4 flex-1">
+                        <div className="flex items-center gap-2"><CalendarDays className="w-3.5 h-3.5 text-primary/70" /> <span className="text-foreground">{item.dutyDate}</span> • {item.slot}</div>
+                        <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-emerald-600/70" /> <span className="text-foreground">{item.location}</span></div>
+                     </div>
+                     {item.notes && <div className="text-xs text-muted-foreground italic mb-5 border-l-2 border-amber-300 pl-2 py-0.5">"{item.notes}"</div>}
+                     
+                     <div className="flex gap-2 mt-auto pt-4 border-t border-border/60">
+                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold bg-muted/40 hover:bg-muted" onClick={() => openEditDuty(item)}><Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground group-hover:text-foreground" />Revise</Button>
+                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDutyDeleteId(item.id)}><Trash2 className="h-3.5 w-3.5 mr-2" />Eradicate</Button>
+                     </div>
+                   </div>
+                 </div>
+               ))}
+            </div>
+          </section>
+        )}
+
+        {activeSection === 'volunteers' && (
+          <section className="section-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Community Volunteer Fleet</h2>
+              <Button onClick={openAddVolunteer} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Enlist Volunteer</Button>
+            </div>
+            <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-muted/40">
+                  <tr className="border-b border-border">
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Core Identity</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Work Preferences</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Time Restrictions</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Linked Operation Target</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Cohort Status</th>
+                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Directives</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-background">
+                  {filteredVolunteers.length === 0 ? <tr><td colSpan={6} className="p-12 text-center text-muted-foreground font-medium border-b border-border">No volunteers in community database.</td></tr> : filteredVolunteers.map(item => (
+                    <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                             {initials(item.name)}
+                          </div>
+                          <div>
+                            <p className="font-bold text-foreground text-sm tracking-wide">{item.name}</p>
+                            <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground mt-1 flex gap-2">
+                               <span><Phone className="w-3 h-3 inline pb-0.5 opacity-70" /> {item.phone}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-sm font-bold text-foreground/80">{item.preferredArea}</td>
+                      <td className="p-4 text-muted-foreground text-xs font-semibold">{item.availability}</td>
+                      <td className="p-4 text-xs">
+                        {item.assignedDutyId ? (
+                           <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg inline-flex flex-col gap-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
+                             <span className="font-bold">{duties.find(d => d.id === item.assignedDutyId)?.location}</span>
+                             <span className="text-[9px] uppercase tracking-widest opacity-80 font-bold">{duties.find(d => d.id === item.assignedDutyId)?.dutyDate}</span>
+                           </div>
+                        ) : <span className="text-muted-foreground italic font-medium px-2 py-1 bg-muted/40 rounded border border-border/40">Unutilized</span>}
+                      </td>
+                      <td className="p-4"><StatusBadge status={item.status} /></td>
+                      <td className="p-4 text-right whitespace-nowrap">
+                        <div className="flex justify-end gap-1.5">
+                          <Button variant="ghost" size="icon" onClick={() => openEditVolunteer(item)} title="Reconfigure Volunteer Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setVolDeleteId(item.id)} className="hover:text-destructive hover:bg-destructive/10" title="Sever Enlistment"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div></div>
+          </section>
+        )}
+      </div>
+
+      {/* Staff Modal */}
+      <Modal open={staffModalOpen} onClose={() => setStaffModalOpen(false)} title={staffEditId ? 'Configure Personnel File' : 'Establish Personnel Profile'}>
+        <div className="grid grid-cols-2 gap-4 px-1 py-2">
+          <FormField label="Legal Name Alias" value={staffForm.name} onChange={v => setSField('name', v)} required />
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Name</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.name} onChange={e => setStaffForm(prev => ({ ...prev, name: e.target.value }))} />
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Organizational Role</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value)}>
+                <option value="Priest">Sanctum Priest</option><option value="Staff">Support Staff</option>
+             </select>
           </div>
+          <FormField label="Assigned Structural Node (Sector)" value={staffForm.department} onChange={v => setSField('department', v)} />
+          <FormField label="Induction Timestamp" value={staffForm.joinedDate} onChange={v => setSField('joinedDate', v)} type="date" />
+          <FormField label="Authorized Base Draw (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', v)} type="number" />
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Role</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.role} onChange={e => setStaffForm(prev => ({ ...prev, role: e.target.value as StaffRole }))}>
-              <option value="Priest">Priest</option>
-              <option value="Staff">Staff</option>
-            </select>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Contract Standing</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value)}>
+                <option value="Active">Authorized Active</option><option value="Inactive">Suspended / Inactive</option>
+             </select>
           </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Department</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.department} onChange={e => setStaffForm(prev => ({ ...prev, department: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Joined Date</label>
-            <input type="date" className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.joinedDate} onChange={e => setStaffForm(prev => ({ ...prev, joinedDate: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Monthly Salary</label>
-            <input type="number" className="w-full h-10 rounded-md border border-input px-3 text-sm" value={String(staffForm.salary)} onChange={e => setStaffForm(prev => ({ ...prev, salary: Number(e.target.value) }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Status</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.status} onChange={e => setStaffForm(prev => ({ ...prev, status: e.target.value as StaffStatus }))}>
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Phone</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.phone} onChange={e => setStaffForm(prev => ({ ...prev, phone: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Email</label>
-            <input type="email" className="w-full h-10 rounded-md border border-input px-3 text-sm" value={staffForm.email} onChange={e => setStaffForm(prev => ({ ...prev, email: e.target.value }))} />
-          </div>
-          <div className="col-span-2 flex gap-3 pt-2">
-            <Button variant="outline" onClick={() => setStaffModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button onClick={saveStaff} className="flex-1">Save</Button>
+          <FormField label="Telephonic Link" value={staffForm.phone} onChange={v => setSField('phone', v)} />
+          <FormField label="Digital Mail Relay" value={staffForm.email} onChange={v => setSField('email', v)} type="email" />
+          <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
+            <Button variant="outline" onClick={() => setStaffModalOpen(false)} className="flex-1 py-5">Abort Mod</Button>
+            <Button onClick={saveStaff} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Lock Archive Record</Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={dutyModalOpen} onClose={() => setDutyModalOpen(false)} title={dutyEditId ? 'Edit Duty Schedule' : 'Assign Duty'}>
-        <div className="grid grid-cols-2 gap-4">
+      {/* Duty Modal */}
+      <Modal open={dutyModalOpen} onClose={() => setDutyModalOpen(false)} title={dutyEditId ? 'Reassign Operational Trajectory' : 'Draft New Deployment'}>
+        <div className="grid grid-cols-2 gap-4 px-1 py-2">
           <div className="col-span-2 space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Staff/Priest</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={dutyForm.staffId} onChange={e => setDutyForm(prev => ({ ...prev, staffId: e.target.value }))}>
-              {staff.map(item => <option key={item.id} value={item.id}>{item.name} ({item.role})</option>)}
-            </select>
-          </div>
-          <div className="col-span-2 space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Duty Type</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={dutyForm.dutyType} onChange={e => setDutyForm(prev => ({ ...prev, dutyType: e.target.value as DutyType }))}>
-              {dutyTypeOptions.map(type => <option key={type} value={type}>{type}</option>)}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Duty Date</label>
-            <input type="date" className="w-full h-10 rounded-md border border-input px-3 text-sm" value={dutyForm.dutyDate} onChange={e => setDutyForm(prev => ({ ...prev, dutyDate: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Slot</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={dutyForm.slot} onChange={e => setDutyForm(prev => ({ ...prev, slot: e.target.value }))}>
-              <option>05:00 AM - 09:00 AM</option>
-              <option>09:00 AM - 01:00 PM</option>
-              <option>01:00 PM - 05:00 PM</option>
-              <option>05:00 PM - 09:00 PM</option>
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Location</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={dutyForm.location} onChange={e => setDutyForm(prev => ({ ...prev, location: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Status</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={dutyForm.status} onChange={e => setDutyForm(prev => ({ ...prev, status: e.target.value as DutyStatus }))}>
-              <option value="Scheduled">Scheduled</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-            </select>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Target Operative / Priest</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.staffId} onChange={e => setDField('staffId', e.target.value)}>
+                {staff.filter(s => s.status === 'Active').map(s => <option key={s.id} value={s.id}>{s.name} ({s.role})</option>)}
+             </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Notes</label>
-            <textarea className="w-full rounded-md border border-input px-3 py-2 text-sm min-h-[76px]" value={dutyForm.notes} onChange={e => setDutyForm(prev => ({ ...prev, notes: e.target.value }))} />
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Operation Archetype</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.dutyType} onChange={e => setDField('dutyType', e.target.value)}>
+                {dutyTypeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+             </select>
           </div>
-          <div className="col-span-2 flex gap-3 pt-2">
-            <Button variant="outline" onClick={() => setDutyModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button onClick={saveDuty} className="flex-1">Save</Button>
+          <FormField label="Execution Date Matrix" value={dutyForm.dutyDate} onChange={v => setDField('dutyDate', v)} type="date" />
+          <div className="space-y-1.5">
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Window of Delivery</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.slot} onChange={e => setDField('slot', e.target.value)}>
+                 <option>05:00 AM - 09:00 AM</option><option>09:00 AM - 01:00 PM</option><option>01:00 PM - 05:00 PM</option><option>05:00 PM - 09:00 PM</option>
+             </select>
+          </div>
+          <FormField label="Geographic Node (Mandapam etc)" value={dutyForm.location} onChange={v => setDField('location', v)} />
+          <div className="space-y-1.5">
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Tracker Signal</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.status} onChange={e => setDField('status', e.target.value)}>
+                <option value="Scheduled">Queued / Scheduled</option><option value="Completed">Secured / Completed</option><option value="Cancelled">Aborted / Cancelled</option>
+             </select>
+          </div>
+          <div className="col-span-2 space-y-1.5">
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Special Operating Memos</label>
+             <textarea className="w-full rounded-xl border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm" value={dutyForm.notes} onChange={e => setDField('notes', e.target.value)} placeholder="Elaborate specific requirements..." />
+          </div>
+          <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
+            <Button variant="outline" onClick={() => setDutyModalOpen(false)} className="flex-1 py-5">Dismiss Modification</Button>
+            <Button onClick={saveDuty} className="flex-1 py-5 shadow-md bg-amber-600 hover:bg-amber-700 text-white font-bold">Inject Roster Entry</Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Edit Volunteer' : 'Register Volunteer'}>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Name</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.name} onChange={e => setVolForm(prev => ({ ...prev, name: e.target.value }))} />
+      {/* Volunteer Modal */}
+      <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Reconfigure Fleet Member' : 'Enlist Civilian Asset'}>
+        <div className="grid grid-cols-2 gap-4 px-1 py-2">
+          <FormField label="Civilian Designation" value={volForm.name} onChange={v => setVField('name', v)} required />
+          <FormField label="Comms Network Link" value={volForm.phone} onChange={v => setVField('phone', v)} />
+          <div className="col-span-2">
+            <FormField label="Digital Mail Address" value={volForm.email} onChange={v => setVField('email', v)} type="email" />
           </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Phone</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.phone} onChange={e => setVolForm(prev => ({ ...prev, phone: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Email</label>
-            <input type="email" className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.email} onChange={e => setVolForm(prev => ({ ...prev, email: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Preferred Area</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.preferredArea} onChange={e => setVolForm(prev => ({ ...prev, preferredArea: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Availability</label>
-            <input className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.availability} onChange={e => setVolForm(prev => ({ ...prev, availability: e.target.value }))} />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Assign Duty</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.assignedDutyId} onChange={e => setVolForm(prev => ({ ...prev, assignedDutyId: e.target.value }))}>
-              <option value="">Not assigned</option>
-              {duties.map(item => (
-                <option key={item.id} value={item.id}>{item.dutyDate} · {item.location}</option>
-              ))}
-            </select>
+          <FormField label="Desired Utilization Arc" value={volForm.preferredArea} onChange={v => setVField('preferredArea', v)} placeholder="E.g. Crowd Control" />
+          <FormField label="Bandwidth Constraints" value={volForm.availability} onChange={v => setVField('availability', v)} placeholder="E.g. Weekends Morning" />
+          <div className="col-span-2 space-y-1.5">
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Bind to Master Hub Operation</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-semibold selection:bg-emerald-100" value={volForm.assignedDutyId} onChange={e => setVField('assignedDutyId', e.target.value)}>
+                <option value="">-- Float (Unbound) --</option>
+                {duties.filter(d => d.status === 'Scheduled').map(d => <option key={d.id} value={d.id}>{d.location} ({d.dutyDate})</option>)}
+             </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Status</label>
-            <select className="w-full h-10 rounded-md border border-input px-3 text-sm" value={volForm.status} onChange={e => setVolForm(prev => ({ ...prev, status: e.target.value as VolunteerStatus }))}>
-              <option value="Registered">Registered</option>
-              <option value="Assigned">Assigned</option>
-              <option value="Inactive">Inactive</option>
-            </select>
+             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Fleet Active Status</label>
+             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-bold" value={volForm.status} onChange={e => setVField('status', e.target.value)}>
+                <option value="Registered">Awaiting Deployment (Registered)</option><option value="Assigned">Live Deployment (Assigned)</option><option value="Inactive">Offline (Inactive)</option>
+             </select>
           </div>
-          <div className="col-span-2 flex gap-3 pt-2">
-            <Button variant="outline" onClick={() => setVolModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button onClick={saveVolunteer} className="flex-1">Save</Button>
+          <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
+            <Button variant="outline" onClick={() => setVolModalOpen(false)} className="flex-1 py-5">Scrap Configuration</Button>
+            <Button onClick={saveVolunteer} className="flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Lock Enlistment</Button>
           </div>
         </div>
       </Modal>
 
-      <ConfirmDialog
-        open={!!staffDeleteId}
-        onClose={() => setStaffDeleteId(null)}
-        onConfirm={() => staffDeleteId && removeStaff(staffDeleteId)}
-        title="Delete Staff Record"
-        message="Are you sure you want to delete this staff record?"
-      />
-
-      <ConfirmDialog
-        open={!!dutyDeleteId}
-        onClose={() => setDutyDeleteId(null)}
-        onConfirm={() => dutyDeleteId && removeDuty(dutyDeleteId)}
-        title="Delete Duty Schedule"
-        message="Are you sure you want to delete this schedule entry?"
-      />
-
-      <ConfirmDialog
-        open={!!volDeleteId}
-        onClose={() => setVolDeleteId(null)}
-        onConfirm={() => volDeleteId && removeVolunteer(volDeleteId)}
-        title="Delete Volunteer"
-        message="Are you sure you want to delete this volunteer record?"
-      />
+      <ConfirmDialog open={!!staffDeleteId} onClose={() => setStaffDeleteId(null)} onConfirm={() => staffDeleteId && removeStaff(staffDeleteId)} title="Terminate Personnel Link" message="Are you absolutely positive you want to eradicate this staff identity? History will be purged." />
+      <ConfirmDialog open={!!dutyDeleteId} onClose={() => setDutyDeleteId(null)} onConfirm={() => dutyDeleteId && removeDuty(dutyDeleteId)} title="Liquidate Roster Trajectory" message="Are you entirely sure you want to pull this operational directive from the queue?" />
+      <ConfirmDialog open={!!volDeleteId} onClose={() => setVolDeleteId(null)} onConfirm={() => volDeleteId && removeVolunteer(volDeleteId)} title="Scrap Enlistment" message="Are you totally sure you want to tear up this volunteer agreement indefinitely?" />
     </div>
   );
 };

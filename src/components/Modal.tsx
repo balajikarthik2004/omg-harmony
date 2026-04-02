@@ -15,12 +15,17 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="bg-card rounded-xl shadow-xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto"
+        className="bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto border border-border/50"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between p-6 border-b border-border/70">
           <h2 className="text-lg font-display font-semibold text-foreground">{title}</h2>
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="rounded-full hover:bg-muted/80 transition-all duration-200 hover:rotate-90"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>

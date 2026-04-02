@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, ReceiptText, CalendarDays, UserCog } from 'lucide-react';
+import { Plus, Pencil, Trash2, ReceiptText, CalendarDays, UserCog, Flower2, Search, CheckCircle2, Ticket, Filter } from 'lucide-react';
 import { mockBookings } from '@/data/mockData';
 import { formatDateDDMMYYYY } from '@/lib/utils';
 import { useStore } from '@/hooks/useStore';
@@ -8,6 +8,7 @@ import { useTempleEventsStore } from '@/hooks/useTempleEventsStore';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import StatusBadge from '@/components/StatusBadge';
+import FormField from '@/components/FormField';
 
 type PoojaType = string;
 type PoojaCategory = 'Daily Seva' | 'Special Seva' | 'Festival Seva';
@@ -87,7 +88,7 @@ const emptyForm: Omit<SevaBooking, 'id' | 'bookingCode' | 'receiptNumber'> = {
 type CatalogEntry = { name: PoojaType; category: PoojaCategory; duration: string; amount: number; desc: string };
 
 function money(n: number) {
-  return `Rs ${n.toLocaleString('en-IN')}`;
+  return `₹ ${n.toLocaleString('en-IN')}`;
 }
 
 function normalizePoojaName(name: string) {
@@ -112,10 +113,7 @@ function nextReceipt(records: SevaBooking[]) {
   return `ESP-${String(max + 1).padStart(4, '0')}`;
 }
 
-function getPoojaDetails(
-  name: PoojaType,
-  catalog: CatalogEntry[]
-) {
+function getPoojaDetails(name: PoojaType, catalog: CatalogEntry[]) {
   return catalog.find(item => item.name === name);
 }
 
@@ -134,7 +132,7 @@ function buildCatalogFromEvents(eventItems: Array<{ poojaType: string; specialPo
         category: event.festivalName ? 'Festival Seva' : 'Special Seva',
         duration: '60 mins',
         amount: 1500,
-        desc: `Synced from temple event: ${event.name}`,
+        desc: `Special offering setup for ${event.name}`,
       });
     });
   });
@@ -269,198 +267,215 @@ const PoojaSevaPage: React.FC = () => {
     setModalOpen(false);
   };
 
+  const setFormField = <K extends keyof Omit<SevaBooking, 'id' | 'bookingCode' | 'receiptNumber'>>(k: K, v: any) => {
+    setForm(p => ({ ...p, [k]: v }));
+    if (formError) setFormError('');
+  };
+
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto">
-      <div className="rounded-xl border border-border bg-gradient-to-r from-amber-50/60 via-background to-emerald-50/60 px-4 py-3 flex items-start justify-between gap-3">
+    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner bg-gradient-to-r from-pink-50/70 via-background to-amber-50/70">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Pooja & Seva Management</h1>
-          <p className="text-sm text-muted-foreground mt-1">Define pooja types, manage bookings, assign priests, and issue E-Seva Pass receipts.</p>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Flower2 className="w-5 h-5 text-pink-600" /> Pooja & Seva Management</h1>
+          <p className="text-sm text-muted-foreground mt-1">Configure pooja offerings, manage devotee bookings, assign priests, and issue digital E-Seva Passes.</p>
         </div>
-        <Button onClick={openAdd}><Plus className="h-4 w-4 mr-2" />Book Pooja</Button>
+        <Button onClick={openAdd} className="shadow-md bg-pink-600 hover:bg-pink-700 text-white"><Plus className="h-4 w-4 mr-2" />Book Pooja slot</Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-3">
-        <div className="rounded-xl border border-border bg-background shadow-sm p-4">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Total Bookings</p>
-          <p className="text-2xl font-semibold mt-1">{totals.total}</p>
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+        <div className="stat-card">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total Bookings</p>
+          <p className="text-2xl font-bold mt-1 text-foreground">{totals.total}</p>
         </div>
-        <div className="rounded-xl border border-border bg-background shadow-sm p-4">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Confirmed</p>
-          <p className="text-2xl font-semibold mt-1 text-emerald-700">{totals.confirmed}</p>
+        <div className="stat-card">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800">Confirmed Slots</p>
+          <p className="text-2xl font-bold mt-1 text-emerald-700">{totals.confirmed}</p>
         </div>
-        <div className="rounded-xl border border-border bg-background shadow-sm p-4">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Paid</p>
-          <p className="text-2xl font-semibold mt-1 text-blue-700">{totals.paid}</p>
+        <div className="stat-card">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-800">Paid Receipts</p>
+          <p className="text-2xl font-bold mt-1 text-blue-700">{totals.paid}</p>
         </div>
-        <div className="rounded-xl border border-border bg-background shadow-sm p-4">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Pending</p>
-          <p className="text-2xl font-semibold mt-1 text-amber-700">{totals.pending}</p>
+        <div className="stat-card">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-800">Pending Approvals</p>
+          <p className="text-2xl font-bold mt-1 text-amber-600">{totals.pending}</p>
         </div>
-        <div className="rounded-xl border border-border bg-background shadow-sm p-4">
-          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">Completed</p>
-          <p className="text-2xl font-semibold mt-1 text-emerald-700">{totals.completed}</p>
+        <div className="stat-card md:col-span-3 xl:col-span-1">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800">Completed Poojas</p>
+          <p className="text-2xl font-bold mt-1 text-emerald-700">{totals.completed}</p>
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between gap-3">
+      <section className="section-panel shadow-sm">
+        <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
           <div>
-            <h2 className="text-sm font-semibold">Date-wise Events & Poojas</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">Select a date to view event count and synced pooja list.</p>
+             <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> View Date-wise Events & Available Poojas</h2>
+             <p className="text-xs text-muted-foreground mt-1">Select any date to see the sync between general Events and specific Pooja setups.</p>
           </div>
           <input
             type="date"
             value={selectedServiceDate}
             onChange={e => setSelectedServiceDate(e.target.value)}
-            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+            className="h-10 ml-auto w-full sm:w-auto rounded-lg border border-input bg-background/60 shadow-sm px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all"
           />
         </div>
-        <div className="p-4 grid grid-cols-1 lg:grid-cols-4 gap-3">
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-[11px] text-muted-foreground">Selected Date</p>
-            <p className="text-sm font-semibold mt-1">{formatDateDDMMYYYY(selectedServiceDate)}</p>
+        <div className="p-4 grid grid-cols-2 lg:grid-cols-4 gap-3 bg-muted/10">
+          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
+            <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Selected Date</p>
+            <p className="text-lg font-bold mt-1 text-foreground">{formatDateDDMMYYYY(selectedServiceDate)}</p>
           </div>
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-[11px] text-muted-foreground">Events</p>
-            <p className="text-xl font-semibold mt-1">{eventsForSelectedDate.length}</p>
+          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
+            <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Active Events</p>
+            <p className="text-xl font-bold mt-1 text-primary">{eventsForSelectedDate.length}</p>
           </div>
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-[11px] text-muted-foreground">Pooja Types</p>
-            <p className="text-xl font-semibold mt-1">{dateWisePoojaCatalog.length}</p>
+          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
+             <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
+            <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Pooja Variants</p>
+            <p className="text-xl font-bold mt-1 text-primary">{dateWisePoojaCatalog.length}</p>
           </div>
-          <div className="rounded-lg border border-border bg-muted/20 p-3">
-            <p className="text-[11px] text-muted-foreground">Bookings On Date</p>
-            <p className="text-xl font-semibold mt-1">{items.filter(item => item.date === selectedServiceDate).length}</p>
+          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
+            <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Bookings on Date</p>
+            <p className="text-xl font-bold mt-1 text-primary">{items.filter(item => item.date === selectedServiceDate).length}</p>
           </div>
         </div>
         <div className="px-4 pb-4">
           {eventsForSelectedDate.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No events found for {formatDateDDMMYYYY(selectedServiceDate)}.</p>
+            <p className="text-sm text-muted-foreground italic px-2">No special events found for {formatDateDDMMYYYY(selectedServiceDate)}.</p>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-2">
               {eventsForSelectedDate.map(event => (
-                <div key={event.id} className="rounded-md border border-border px-3 py-2 bg-background">
-                  <p className="text-sm font-medium">{event.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{event.time} · {event.poojaType}</p>
+                <div key={event.id} className="rounded-lg border border-border/60 px-4 py-3 bg-background shadow-sm hover:shadow-md transition-shadow flex justify-between items-center">
+                   <div>
+                     <p className="text-sm font-bold text-foreground">{event.name}</p>
+                     <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{event.time} · {event.poojaType}</p>
+                   </div>
+                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <CalendarDays className="w-4 h-4 text-primary" />
+                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-        <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden xl:col-span-3">
-          <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold">Slot Booking & Priest Assignment</h2>
-            <input
-              className="w-full max-w-xs px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-1 focus:ring-ring"
-              placeholder="Search booking, devotee, pooja, priest..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 animate-slide-up">
+        {/* Main List Column */}
+        <div className="xl:col-span-3 space-y-4">
+           <section className="section-panel shadow-sm object-cover">
+             <div className="section-panel-header gap-3 flex-wrap border-b border-border/60 pb-3">
+               <h2 className="text-sm font-semibold flex items-center gap-2 whitespace-nowrap"><Filter className="w-4 h-4 text-primary" /> Filtered Bookings Explorer</h2>
+               <div className="flex-1 flex justify-end">
+                  <div className="relative w-full sm:max-w-xs">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input
+                      className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 hover:border-border transition-all outline-none shadow-sm"
+                      placeholder="Search bookings, devotees..."
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                    />
+                  </div>
+               </div>
+             </div>
+             
+             <div className="px-4 py-3 bg-muted/10 border-b border-border/60 flex flex-wrap gap-2">
+               {categorySummary.map(item => (
+                 <button
+                   key={item.category}
+                   onClick={() => setActiveCategory(item.category)}
+                   className={`px-4 py-1.5 flex items-center gap-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase border transition-all duration-200 ${activeCategory === item.category ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' : 'text-muted-foreground border-border bg-background hover:text-foreground hover:bg-muted/50'}`}
+                 >
+                   {item.category} <span className={`px-1.5 py-0.5 rounded-full text-[9px] ${activeCategory === item.category ? 'bg-background/20 text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{item.count}</span>
+                 </button>
+               ))}
+             </div>
 
-          <div className="px-4 py-2.5 border-b border-border bg-background flex flex-wrap gap-2">
-            {categorySummary.map(item => (
-              <button
-                key={item.category}
-                onClick={() => setActiveCategory(item.category)}
-                className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${activeCategory === item.category ? 'bg-muted text-foreground border-foreground/30 font-medium' : 'text-muted-foreground border-border hover:text-foreground hover:bg-muted/50'}`}
-              >
-                {item.category} ({item.count})
-              </button>
-            ))}
-          </div>
-
-          <div className="overflow-hidden">
-            <table className="w-full text-sm table-fixed">
-              <thead>
-                <tr className="border-b border-border bg-muted/30">
-                  <th className="text-left p-3 font-medium text-muted-foreground">Booking</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Devotee</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Pooja Details</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Schedule</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Priest</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
-                  <th className="text-right p-3 font-medium text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No bookings found.</td></tr>
-                ) : (
-                  filtered.map(item => (
-                    <tr key={item.id} className="border-b border-border hover:bg-muted/20 transition-colors">
-                      <td className="p-3 align-top">
-                        <p className="font-medium leading-tight">{item.bookingCode}</p>
-                      </td>
-                      <td className="p-3 align-top">
-                        <p className="leading-tight">{item.devoteeName}</p>
-                      </td>
-                      <td className="p-3 align-top">
-                        <p className="text-muted-foreground leading-tight">{item.poojaType}</p>
-                        <span className="inline-block text-[11px] px-2 py-0.5 rounded-full bg-muted text-foreground mt-1">
-                          {getPoojaDetails(item.poojaType, poojaCatalog)?.category || 'Daily Seva'}
-                        </span>
-                      </td>
-                      <td className="p-3 align-top">
-                        <p className="text-muted-foreground whitespace-nowrap leading-tight">{item.date}</p>
-                        <p className="text-[11px] text-muted-foreground mt-1 leading-tight">{item.slot}</p>
-                      </td>
-                      <td className="p-3 text-muted-foreground align-top">{item.priestName}</td>
-                      <td className="p-3 align-top">
-                        <div className="space-y-1.5">
-                          <StatusBadge status={item.paymentStatus} />
-                          <StatusBadge status={item.bookingStatus} />
-                        </div>
-                      </td>
-                      <td className="p-3 text-right">
-                        <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => setReceiptItem(item)}><ReceiptText className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => openEdit(item)}><Pencil className="h-4 w-4" /></Button>
-                          <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
+               <table className="w-full text-sm">
+                 <thead className="bg-muted/40">
+                   <tr className="border-b border-border">
+                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Receipt/Ref</th>
+                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Devotee</th>
+                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Pooja Detail</th>
+                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Schedule & Priest</th>
+                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Status Group</th>
+                     <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Actions</th>
+                   </tr>
+                 </thead>
+                 <tbody className="bg-background">
+                   {filtered.length === 0 ? <tr><td colSpan={6} className="p-10 text-center text-muted-foreground">No bookings found for the current filters.</td></tr> : filtered.map(item => (
+                     <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                       <td className="p-4 align-top">
+                         <p className="font-bold text-foreground">{item.bookingCode}</p>
+                         <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{item.receiptNumber}</p>
+                       </td>
+                       <td className="p-4 align-top">
+                         <p className="font-semibold text-foreground max-w-[150px] truncate" title={item.devoteeName}>{item.devoteeName}</p>
+                       </td>
+                       <td className="p-4 align-top">
+                         <p className="font-semibold text-primary max-w-[200px] truncate" title={item.poojaType}>{item.poojaType}</p>
+                         <span className="inline-block mt-1 text-[10px] px-2 py-0.5 rounded border border-border/60 bg-muted/50 text-foreground font-medium uppercase tracking-wider">
+                           {getPoojaDetails(item.poojaType, poojaCatalog)?.category || 'Daily Seva'}
+                         </span>
+                       </td>
+                       <td className="p-4 align-top whitespace-nowrap">
+                         <p className="text-[11px] font-bold text-foreground mb-0.5">{item.date}</p>
+                         <p className="text-[10px] text-muted-foreground bg-muted/40 px-1.5 py-0.5 rounded inline-block border border-border/50">{item.slot}</p>
+                         <p className="text-[11px] font-medium text-muted-foreground mt-1.5 flex items-center gap-1"><UserCog className="w-3 h-3" />{item.priestName}</p>
+                       </td>
+                       <td className="p-4 align-top">
+                         <div className="flex flex-col gap-1.5 w-max">
+                           <StatusBadge status={item.paymentStatus} />
+                           <StatusBadge status={item.bookingStatus} />
+                         </div>
+                       </td>
+                       <td className="p-4 text-right align-top">
+                         <div className="flex justify-end gap-1">
+                           <Button variant="ghost" size="icon" onClick={() => setReceiptItem(item)} className="text-amber-600 hover:bg-amber-50 hover:text-amber-700" title="Generate E-Seva Pass"><ReceiptText className="h-4 w-4" /></Button>
+                           <Button variant="ghost" size="icon" onClick={() => openEdit(item)} title="Edit Booking"><Pencil className="h-4 w-4 text-foreground" /></Button>
+                           <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="hover:text-destructive hover:bg-destructive/10" title="Delete Booking"><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                         </div>
+                       </td>
+                     </tr>
+                   ))}
+                 </tbody>
+               </table>
+             </div></div>
+           </section>
         </div>
 
+        {/* Sidebar Info */}
         <div className="space-y-4 xl:sticky xl:top-4 self-start">
-          <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center gap-2">
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold">Pooja Catalog</h2>
-              <span className="text-[11px] text-muted-foreground">({eventPoojaCatalog.length} from Events)</span>
+          <div className="section-panel shadow-sm">
+            <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-sky-50/50 to-background">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Flower2 className="w-4 h-4 text-primary" /> Global Catalog</h2>
+              <span className="text-[10px] py-0.5 px-2 bg-primary/10 text-primary rounded-full font-bold">{eventPoojaCatalog.length} derived</span>
             </div>
-            <div className="p-3 space-y-2 max-h-[320px] overflow-y-auto">
+            <div className="p-3 space-y-2 max-h-[350px] overflow-y-auto pr-1">
               {poojaCatalog.map(item => (
-                <div key={item.name} className="rounded-lg border border-border p-2.5 bg-background">
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold text-sm">{item.name}</p>
-                    <span className="text-[11px] font-semibold text-emerald-700">{money(item.amount)}</span>
+                <div key={item.name} className="rounded-lg border border-border/60 p-3 bg-background shadow-sm hover:border-primary/30 transition-colors">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="font-bold text-sm text-foreground truncate max-w-[150px]" title={item.name}>{item.name}</p>
+                    <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100">{money(item.amount)}</span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-1">{item.category} · {item.duration}</p>
+                  <p className="text-[10px] font-semibold text-primary uppercase tracking-wide">{item.category} <span className="text-muted-foreground font-medium lowercase">({item.duration})</span></p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-background shadow-sm overflow-hidden">
-            <div className="px-4 py-3 border-b border-border bg-muted/20 flex items-center gap-2">
-              <UserCog className="h-4 w-4 text-muted-foreground" />
-              <h2 className="text-sm font-semibold">Priest Pool</h2>
+          <div className="section-panel shadow-sm">
+            <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-amber-50/50 to-background">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><UserCog className="w-4 h-4 text-primary" /> Priest Duty Pool</h2>
             </div>
-            <div className="p-3 space-y-2 max-h-[300px] overflow-y-auto">
+            <div className="p-3 space-y-1.5 max-h-[300px] overflow-y-auto">
               {priestOptions.map((name, idx) => (
-                <div key={name} className="rounded-md border border-border px-3 py-2 text-sm flex items-center justify-between">
-                  <span>{name}</span>
-                  <span className={`text-xs ${idx % 3 === 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
-                    {idx % 3 === 0 ? 'On Pooja' : 'Available'}
+                <div key={name} className="rounded-lg border border-border/50 px-3 py-2 text-sm flex items-center justify-between bg-background">
+                  <span className="font-medium">{name}</span>
+                  <span className={`text-[10px] font-bold uppercase ${idx % 3 === 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                    {idx % 3 === 0 ? 'Busy' : 'Free'}
                   </span>
                 </div>
               ))}
@@ -469,161 +484,132 @@ const PoojaSevaPage: React.FC = () => {
         </div>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Booking' : 'Create Booking'}>
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Devotee Name</label>
-            <input
-              value={form.devoteeName}
-              onChange={e => {
-                setForm(prev => ({ ...prev, devoteeName: e.target.value }));
-                if (formError) setFormError('');
-              }}
-              className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
-            />
-          </div>
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Modify Booking Info' : 'Create New Pooja Booking'}>
+        <div className="space-y-4 px-1 pb-2">
+          {formError && (
+             <div className="rounded-lg border border-red-200 bg-red-50 p-3 flex items-center gap-2 animate-pulse-slow">
+                <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0" />
+                <p className="text-sm font-medium text-red-800">{formError}</p>
+             </div>
+          )}
+
+          <FormField label="Devotee Name" value={form.devoteeName} onChange={v => setFormField('devoteeName', v)} required placeholder="e.g. Ramesh Kumar" />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Pooja Type</label>
-              <select
-                value={form.poojaType}
-                onChange={e => setForm(prev => ({ ...prev, poojaType: e.target.value as PoojaType }))}
-                className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
-              >
-                {formDatePoojaCatalog.map(item => <option key={item.name} value={item.name}>{item.name}</option>)}
+              <label className="text-sm font-medium text-foreground">Select Pooja Package</label>
+              <select className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" value={form.poojaType} onChange={e => setFormField('poojaType', e.target.value as PoojaType)}>
+                {formDatePoojaCatalog.map(item => <option key={item.name} value={item.name}>{item.name} (₹{item.amount})</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Date</label>
-              <input
-                type="date"
-                value={form.date}
-                onChange={e => {
+              <label className="text-sm font-medium text-foreground">Service Date</label>
+              <input type="date" value={form.date} className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" onChange={e => {
                   const nextDate = e.target.value;
                   const nextDateCatalog = buildCatalogFromEvents(templeEvents.filter(event => event.date === nextDate));
                   const nextDefaultPooja = nextDateCatalog[0]?.name;
                   setForm(prev => ({ ...prev, date: nextDate, poojaType: nextDefaultPooja || prev.poojaType }));
                   if (formError) setFormError('');
                 }}
-                className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
               />
             </div>
           </div>
 
-          {formError && (
-            <p className="text-xs text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">{formError}</p>
-          )}
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Slot</label>
-              <select
-                value={form.slot}
-                onChange={e => setForm(prev => ({ ...prev, slot: e.target.value }))}
-                className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
-              >
+              <label className="text-sm font-medium text-foreground">Preferred Time Slot</label>
+              <select className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" value={form.slot} onChange={e => setFormField('slot', e.target.value)}>
                 {slotOptions.map(slot => <option key={slot} value={slot}>{slot}</option>)}
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Priest Assignment</label>
-              <select
-                value={form.priestName}
-                onChange={e => setForm(prev => ({ ...prev, priestName: e.target.value }))}
-                className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
-              >
+              <label className="text-sm font-medium text-foreground">Assign Purohit (Priest)</label>
+              <select className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" value={form.priestName} onChange={e => setFormField('priestName', e.target.value)}>
                 {priestOptions.map(name => <option key={name} value={name}>{name}</option>)}
               </select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 border-t border-border/60 pt-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Payment Status</label>
-              <select
-                value={form.paymentStatus}
-                onChange={e => setForm(prev => ({ ...prev, paymentStatus: e.target.value as SevaBooking['paymentStatus'] }))}
-                className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
-              >
-                <option value="Pending">Pending</option>
-                <option value="Paid">Paid</option>
-                <option value="Refunded">Refunded</option>
+              <label className="text-sm font-medium text-foreground">Fee Payment Status</label>
+              <select className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" value={form.paymentStatus} onChange={e => setFormField('paymentStatus', e.target.value as SevaBooking['paymentStatus'])}>
+                <option value="Pending">Pending / Unpaid</option><option value="Paid">Processed & Paid</option><option value="Refunded">Refunded / Reverted</option>
               </select>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-foreground">Booking Status</label>
-              <select
-                value={form.bookingStatus}
-                onChange={e => setForm(prev => ({ ...prev, bookingStatus: e.target.value as SevaBooking['bookingStatus'] }))}
-                className="w-full h-10 rounded-md border border-input px-3 text-sm bg-background"
-              >
-                <option value="Pending">Pending</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
+              <label className="text-sm font-medium text-foreground">Operational Status</label>
+              <select className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm" value={form.bookingStatus} onChange={e => setFormField('bookingStatus', e.target.value as SevaBooking['bookingStatus'])}>
+                <option value="Pending">Pending Schedule</option><option value="Confirmed">Confirmed by Officer</option><option value="Completed">Pooja Completed</option><option value="Cancelled">Service Cancelled</option>
               </select>
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-foreground">Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={e => setForm(prev => ({ ...prev, notes: e.target.value }))}
-              className="w-full rounded-md border border-input px-3 py-2 text-sm bg-background min-h-[80px]"
-            />
+            <label className="text-sm font-medium text-foreground">Instructions / Notes (Sankalpam details)</label>
+            <textarea className="w-full min-h-[80px] rounded-lg border border-input bg-background/60 hover:border-border p-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm resize-none placeholder:text-muted-foreground/60" placeholder="e.g. Include specific star details for archana..." value={form.notes} onChange={e => setFormField('notes', e.target.value)} />
           </div>
 
           {getPoojaDetails(form.poojaType, formDatePoojaCatalog) && (
-            <div className="rounded-md border border-border bg-muted/20 p-3 text-sm">
-              <p className="font-medium">Estimated Offerings</p>
-              <p className="text-muted-foreground mt-1">
-                {form.poojaType} · {getPoojaDetails(form.poojaType, formDatePoojaCatalog)?.duration} · {money(getPoojaDetails(form.poojaType, formDatePoojaCatalog)?.amount || 0)}
-              </p>
+            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 flex justify-between items-center shadow-sm">
+               <div>
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-primary mb-0.5">Calculated Est. Amount</p>
+                  <p className="font-semibold text-sm">{form.poojaType}</p>
+               </div>
+               <div className="text-right">
+                 <p className="text-2xl font-bold text-foreground font-display">{money(getPoojaDetails(form.poojaType, formDatePoojaCatalog)?.amount || 0)}</p>
+                 <p className="text-[11px] text-muted-foreground font-medium">approx {getPoojaDetails(form.poojaType, formDatePoojaCatalog)?.duration}</p>
+               </div>
             </div>
           )}
 
-          <div className="flex gap-3 pt-2">
-            <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1">Save Booking</Button>
+          <div className="flex gap-3 pt-5 border-t border-border/60">
+            <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Discard</Button>
+            <Button onClick={handleSave} className="flex-1 py-5 shadow-md">{editId ? 'Persist Changes' : 'Record Booking'}</Button>
           </div>
         </div>
       </Modal>
 
-      <Modal open={!!receiptItem} onClose={() => setReceiptItem(null)} title="E-Seva Pass (Online Receipt)">
+      <Modal open={!!receiptItem} onClose={() => setReceiptItem(null)} title="Official E-Seva Pass">
         {receiptItem && (
-          <div className="space-y-4">
-            <div className="rounded-lg border border-border p-4 bg-muted/20">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold">{receiptItem.receiptNumber}</p>
-                <StatusBadge status={receiptItem.paymentStatus} />
-              </div>
-              <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-                <p><span className="text-muted-foreground">Booking:</span> {receiptItem.bookingCode}</p>
-                <p><span className="text-muted-foreground">Devotee:</span> {receiptItem.devoteeName}</p>
-                <p><span className="text-muted-foreground">Pooja:</span> {receiptItem.poojaType}</p>
-                <p><span className="text-muted-foreground">Priest:</span> {receiptItem.priestName}</p>
-                <p><span className="text-muted-foreground">Date:</span> {receiptItem.date}</p>
-                <p><span className="text-muted-foreground">Slot:</span> {receiptItem.slot}</p>
-                <p className="col-span-2"><span className="text-muted-foreground">Amount:</span> {money(getPoojaDetails(receiptItem.poojaType, poojaCatalog)?.amount || 0)}</p>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <Button variant="outline" className="flex-1" onClick={() => setReceiptItem(null)}>Close</Button>
-              <Button className="flex-1" onClick={() => window.print()}>Print Pass</Button>
-            </div>
-          </div>
+           <div className="space-y-5 px-1 pb-1">
+             <div className="rounded-xl border-2 border-border p-6 bg-gradient-to-b from-card to-muted/20 relative overflow-hidden shadow-inner">
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0" />
+                 
+                 <div className="flex items-center justify-between border-b border-border/60 pb-4 mb-4 relative z-10">
+                   <div>
+                      <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Pass Number</p>
+                      <p className="text-xl font-display font-bold text-foreground">{receiptItem.receiptNumber}</p>
+                   </div>
+                   <StatusBadge status={receiptItem.paymentStatus} />
+                 </div>
+                 
+                 <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm relative z-10">
+                   <div><p className="text-[10px] uppercase font-bold text-muted-foreground mb-0.5">Booking Ref</p><p className="font-semibold">{receiptItem.bookingCode}</p></div>
+                   <div><p className="text-[10px] uppercase font-bold text-muted-foreground mb-0.5">Date of Seva</p><p className="font-semibold">{receiptItem.date}</p></div>
+                   <div className="col-span-2 bg-muted/40 p-3 rounded-lg border border-border/60">
+                      <p className="text-[10px] uppercase font-bold text-primary mb-1">Pooja Configuration</p>
+                      <p className="font-bold text-base text-foreground mb-0.5">{receiptItem.poojaType}</p>
+                      <p className="text-xs text-muted-foreground font-medium flex items-center gap-1.5"><Ticket className="w-3.5 h-3.5" /> For Devotee: <span className="text-foreground">{receiptItem.devoteeName}</span></p>
+                   </div>
+                   <div><p className="text-[10px] uppercase font-bold text-muted-foreground mb-0.5">Reporting Time</p><p className="font-semibold">{receiptItem.slot}</p></div>
+                   <div><p className="text-[10px] uppercase font-bold text-muted-foreground mb-0.5">Assigned Purohit</p><p className="font-semibold">{receiptItem.priestName}</p></div>
+                 </div>
+
+                 <div className="mt-5 pt-4 border-t-2 border-dashed border-border/80 flex justify-between items-center relative z-10">
+                     <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Authorized Access amount</p>
+                     <p className="text-2xl font-bold font-display text-emerald-700 bg-emerald-50 px-3 py-1 rounded-md border border-emerald-100">{money(getPoojaDetails(receiptItem.poojaType, poojaCatalog)?.amount || 0)}</p>
+                 </div>
+             </div>
+             <div className="flex gap-3 pt-2">
+                 <Button variant="outline" className="flex-1 h-11" onClick={() => setReceiptItem(null)}>Dismiss</Button>
+                 <Button className="flex-1 h-11 shadow-md bg-foreground text-background hover:bg-foreground/90" onClick={() => window.print()}><ReceiptText className="w-4 h-4 mr-2" />Print Terminal Pass</Button>
+             </div>
+           </div>
         )}
       </Modal>
 
-      <ConfirmDialog
-        open={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={() => deleteId && remove(deleteId)}
-        title="Delete Booking"
-        message="Are you sure you want to delete this booking?"
-      />
+      <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Scrap Booking" message="Are you extremely sure you want to permanently delete this booking record? Analytics will be affected." />
     </div>
   );
 };

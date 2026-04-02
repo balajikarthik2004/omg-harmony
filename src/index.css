@@ -68,30 +68,82 @@
   h1, h2, h3 {
     font-family: var(--font-display);
   }
+
+  /* Smooth scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(220, 10%, 80%);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(220, 10%, 65%);
+  }
 }
 
 @layer components {
+  /* ─── Enhanced ERP Card ─── */
   .erp-card {
-    @apply bg-card rounded-xl shadow-sm border border-border p-6 transition-shadow duration-200 hover:shadow-md;
+    @apply bg-card rounded-xl border border-border p-6 transition-all duration-300;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.04);
+  }
+  .erp-card:hover {
+    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.08), 0 2px 6px -2px rgba(0,0,0,0.04);
+    border-color: hsl(40, 12%, 85%);
   }
 
+  /* ─── Enhanced KPI Card ─── */
   .kpi-card {
-    @apply bg-card rounded-xl shadow-sm border border-border p-4 flex items-center gap-4 transition-all duration-200 hover:shadow-md hover:-translate-y-0.5;
+    @apply bg-card rounded-xl border border-border p-4 flex items-center gap-4 transition-all duration-300 cursor-default;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -4px rgba(0,0,0,0.08), 0 2px 6px -2px rgba(0,0,0,0.03);
+    border-color: hsl(40, 12%, 85%);
   }
 
   .kpi-icon {
-    @apply w-11 h-11 rounded-lg flex items-center justify-center shrink-0;
+    @apply w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300;
+  }
+  .kpi-card:hover .kpi-icon {
+    transform: scale(1.08);
   }
 
+  /* ─── Enhanced Table Container ─── */
   .table-container {
-    @apply bg-card rounded-xl shadow-sm border border-border overflow-hidden;
+    @apply bg-card rounded-xl border border-border overflow-hidden;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
   }
 
+  /* Enhanced table rows */
+  .table-container table tbody tr {
+    @apply transition-colors duration-200;
+  }
+  .table-container table tbody tr:hover {
+    background-color: hsla(40, 20%, 94%, 0.5);
+  }
+
+  /* ─── Enhanced Modal Overlay ─── */
   .modal-overlay {
-    @apply fixed inset-0 bg-foreground/40 backdrop-blur-sm z-50 flex items-center justify-center;
+    @apply fixed inset-0 z-50 flex items-center justify-center;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: overlay-fade 0.2s ease-out;
   }
 
-  /* Staggered fade-in for lists */
+  @keyframes overlay-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ─── Staggered fade-in for lists ─── */
   .animate-stagger > * {
     animation: stagger-fade 0.35s ease-out both;
   }
@@ -107,5 +159,151 @@
   @keyframes stagger-fade {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── Page Header Banner ─── */
+  .page-header-banner {
+    @apply rounded-xl border border-border px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3;
+    background: linear-gradient(135deg, hsla(40, 33%, 98%, 1) 0%, hsla(40, 20%, 96%, 1) 100%);
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.03);
+  }
+
+  /* ─── Stat Cards (used in Assets, Inventory, Campaign etc.) ─── */
+  .stat-card {
+    @apply rounded-xl border border-border bg-card p-4 transition-all duration-300;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+  }
+  .stat-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.06);
+    border-color: hsl(40, 12%, 85%);
+  }
+
+  /* ─── Info Panel (tips, alerts, etc.) ─── */
+  .info-panel {
+    @apply rounded-xl border border-border bg-card p-4 flex items-start gap-3 transition-all duration-200;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+  }
+  .info-panel:hover {
+    box-shadow: 0 2px 8px -2px rgba(0,0,0,0.06);
+  }
+
+  /* ─── Section Panel (with header bar) ─── */
+  .section-panel {
+    @apply rounded-xl border border-border bg-card overflow-hidden;
+    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+  }
+  .section-panel-header {
+    @apply px-4 py-3 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-2;
+    background: linear-gradient(180deg, hsla(40, 20%, 97%, 1) 0%, hsla(40, 20%, 95%, 0.5) 100%);
+  }
+
+  /* ─── Enhanced Select Inputs ─── */
+  select {
+    @apply transition-all duration-200;
+  }
+  select:focus {
+    border-color: hsl(1, 76%, 52%);
+    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
+    outline: none;
+  }
+
+  /* ─── Enhanced native inputs ─── */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
+    @apply transition-all duration-200;
+  }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus {
+    border-color: hsl(1, 76%, 52%);
+    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
+  }
+
+  textarea {
+    @apply transition-all duration-200;
+  }
+  textarea:focus {
+    border-color: hsl(1, 76%, 52%);
+    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
+    outline: none;
+  }
+
+  /* ─── Login page premium styles ─── */
+  .login-glass-card {
+    @apply bg-card/80 backdrop-blur-xl rounded-2xl border border-border/50 p-8 shadow-xl;
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.05),
+      0 10px 30px -5px rgba(0, 0, 0, 0.08),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .login-image-overlay {
+    background: linear-gradient(
+      135deg,
+      hsla(233, 53%, 28%, 0.85) 0%,
+      hsla(270, 43%, 32%, 0.7) 50%,
+      hsla(1, 76%, 52%, 0.5) 100%
+    );
+  }
+
+  .login-btn-premium {
+    @apply relative overflow-hidden font-semibold tracking-wide;
+    background: linear-gradient(135deg, hsl(1, 76%, 52%) 0%, hsl(1, 76%, 42%) 100%);
+    box-shadow: 0 4px 14px -2px hsla(1, 76%, 52%, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .login-btn-premium:hover {
+    box-shadow: 0 6px 20px -2px hsla(1, 76%, 52%, 0.55);
+    transform: translateY(-1px);
+    background: linear-gradient(135deg, hsl(1, 76%, 56%) 0%, hsl(1, 76%, 46%) 100%);
+  }
+
+  .login-btn-premium:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px -2px hsla(1, 76%, 52%, 0.4);
+  }
+
+  .login-btn-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 50%,
+      transparent 100%
+    );
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .login-input-enhanced {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .login-input-enhanced:focus {
+    border-color: hsl(1, 76%, 52%);
+    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .login-floating-orb {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.08;
+    filter: blur(40px);
+    pointer-events: none;
+  }
+
+  .login-divider {
+    @apply flex items-center gap-3 text-xs text-muted-foreground uppercase tracking-widest;
+  }
+
+  .login-divider::before,
+  .login-divider::after {
+    content: '';
+    @apply flex-1 h-px bg-border;
   }
 }
