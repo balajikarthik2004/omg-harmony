@@ -10,7 +10,35 @@ export const mockDevotees = [
   { id: '7', name: 'Harish Rao', phone: '+91 93456 78120', email: 'harish@email.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16' },
   { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha@email.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20' },
   { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin@email.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11' },
+  ...Array.from({ length: 21 }).map((_, i) => ({
+    id: String(i + 10),
+    name: ['Deepak Verma', 'Shelly George', 'Arun Prasath', 'Meera Krishnan', 'Suresh Mani', 'Ganesh Acharya', 'Vidya Sagar'][i % 7] + ' ' + String.fromCharCode(65 + i),
+    phone: `+91 9845${i % 10} ${Math.floor(10000 + Math.random() * 89999)}`,
+    email: `devotee${i + 10}@temple.org`,
+    address: `${i + 10}, Temple Street`,
+    city: 'City Name',
+    state: 'State',
+    country: 'India',
+    status: 'Active',
+    totalDonations: 30000 + (i * 5000),
+    lastVisit: '2026-03-20'
+  }))
 ];
+
+export const mockStaffMembers = Array.from({ length: 48 }).map((_, i) => ({
+  id: `S${String(i + 1).padStart(3, '0')}`,
+  name: `Staff Member ${i + 1}`,
+  role: i % 5 === 0 ? 'Manager' : i % 3 === 0 ? 'Admin' : 'Staff',
+  status: 'Active'
+}));
+
+export const mockComplaints = Array.from({ length: 32 }).map((_, i) => ({
+  id: `CMP-${String(i + 1).padStart(3, '0')}`,
+  subject: i % 3 === 0 ? 'Cleaning Required' : i % 2 === 0 ? 'Booking Issue' : 'Donation Receipt Missing',
+  devoteeName: 'Devotee ' + (i + 1),
+  status: i % 4 === 0 ? 'Open' : i % 2 === 0 ? 'Resolved' : 'Pending',
+  date: `2026-03-${String((i % 20) + 1).padStart(2, '0')}`
+}));
 
 export const mockServices = [
   { id: '1', name: 'Ganesh Pooja', description: 'Special Ganesh Chaturthi pooja', price: 1100, duration: '1 hour', status: 'Active' },
