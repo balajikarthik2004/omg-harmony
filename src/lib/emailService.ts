@@ -31,7 +31,7 @@ function escapeHtml(value: string) {
 function toHtmlParagraphs(text: string) {
   return text
     .split(/\n\s*\n/g)
-    .map((paragraph) => `<p style="margin:0 0 14px 0;line-height:1.65;color:#1f2937;font-size:15px;">${escapeHtml(paragraph).replace(/\n/g, "<br/>")}</p>`)
+    .map((paragraph) => `<p style="margin:0 0 16px 0;line-height:1.75;color:#1f2937;font-size:16px;">${escapeHtml(paragraph).replace(/\n/g, "<br/>")}</p>`)
     .join("");
 }
 

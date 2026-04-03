@@ -7,6 +7,7 @@ import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
+import { sendCampaignEmails } from '@/lib/emailService';
 
 const emptyForm = {
   name: '', phone: '', email: '', address: '',
@@ -90,6 +91,7 @@ const DevoteesPage: React.FC = () => {
   const [channels, setChannels] = useState({ sms: true, email: true, whatsapp: true });
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
   const [notifSent, setNotifSent] = useState('');
+  const [notifSending, setNotifSending] = useState(false);
 
   const selectedEventDetails = useMemo(
     () => mockEvents.filter(event => selectedEvents.has(event.id)),
@@ -104,10 +106,10 @@ const DevoteesPage: React.FC = () => {
       : `Temple Event Updates (${selectedEventDetails.length} Events)`;
 
     const eventLines = selectedEventDetails
-      .map(event => `- ${event.name} on ${fmtDate(event.date)}`)
+      .map(event => `- ${event.name} | Date: ${fmtDate(event.date)} | Time: ${event.time}`)
       .join('\n');
 
-    const message = `Dear ${selectedDevotee.name},\n\nYou are warmly invited to the following event${selectedEventDetails.length > 1 ? 's' : ''}:\n${eventLines}\n\nPlease join us and receive blessings.\n\n- Temple Harmony`;
+    const message = `Dear ${selectedDevotee.name},\n\nGreetings from Temple Harmony. We are pleased to invite you to the following upcoming temple event${selectedEventDetails.length > 1 ? 's' : ''}:\n\n${eventLines}\n\nYour participation and blessings are deeply valued. If you need any assistance with booking or timing, please contact the temple office.\n\nWith prayers and regards,\nTemple Harmony Communication Desk`;
 
     setNotifSubject(title);
     setNotifMessage(message);
@@ -171,16 +173,47 @@ const DevoteesPage: React.FC = () => {
     });
   };
 
-  const sendNotification = () => {
+  const sendNotification = async () => {
     if (!notifSubject.trim() || !notifMessage.trim()) return;
-    const chs = [channels.sms && 'SMS', channels.email && 'Email', channels.whatsapp && 'WhatsApp'].filter(Boolean).join(' & ');
-    if (!chs) return;
+    if (!selectedDevotee) return;
+    const enabledChannels = [channels.sms && 'SMS', channels.email && 'Email', channels.whatsapp && 'WhatsApp'].filter(Boolean);
+    if (enabledChannels.length === 0) return;
 
-    const evNames = mockEvents.filter(e => selectedEvents.has(e.id)).map(e => e.name);
-    setNotifSent(`Notification sent via ${chs} to ${selectedDevotee?.name}.`);
+    setNotifSending(true);
+    const channelSummaries: string[] = [];
+
+    if (channels.email) {
+      if (!selectedDevotee.email?.trim()) {
+        channelSummaries.push('Email skipped (no email address)');
+      } else {
+        try {
+          const result = await sendCampaignEmails({
+            subject: notifSubject.trim(),
+            message: notifMessage.trim(),
+            recipients: [{ name: selectedDevotee.name, email: selectedDevotee.email }],
+          });
+
+          if (result.sent > 0) {
+            channelSummaries.push(`Email sent (${result.sent}/${result.attempted || 1})`);
+          } else {
+            const reason = result.errors[0] || 'unknown reason';
+            channelSummaries.push(`Email failed (${reason})`);
+          }
+        } catch (error) {
+          channelSummaries.push(`Email failed (${error instanceof Error ? error.message : 'unexpected error'})`);
+        }
+      }
+    }
+
+    if (channels.sms) channelSummaries.push('SMS queued');
+    if (channels.whatsapp) channelSummaries.push('WhatsApp queued');
+
+    const summary = channelSummaries.length ? channelSummaries.join(' | ') : 'No channel dispatched';
+    setNotifSent(`Dispatch for ${selectedDevotee.name}: ${summary}`);
     setNotifSubject('');
     setNotifMessage('');
     setSelectedEvents(new Set());
+    setNotifSending(false);
   };
 
   const devDonations = selectedDevotee ? mockDonations.filter(d => d.donorName === selectedDevotee.name) : [];
@@ -521,7 +554,7 @@ const DevoteesPage: React.FC = () => {
                             <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Notification Body</label>
                             <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase bg-muted/60 border border-border/50 px-2 py-0.5 rounded shadow-sm">{notifMessage.length} characters</span>
                          </div>
-                         <textarea value={notifMessage} onChange={e => setNotifMessage(e.target.value)} className="w-full rounded-xl border border-input bg-background/50 hover:bg-background p-4 text-sm min-h-[160px] resize-y transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm placeholder:text-muted-foreground/60 leading-relaxed font-medium" placeholder={`Type your message...`} />
+                         <textarea value={notifMessage} onChange={e => setNotifMessage(e.target.value)} className="w-full rounded-xl border border-input bg-background/50 hover:bg-background p-5 text-base min-h-[220px] resize-y transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm placeholder:text-muted-foreground/60 leading-7 font-medium" placeholder={`Type your message...`} />
                        </div>
                      </div>
                      
@@ -538,8 +571,8 @@ const DevoteesPage: React.FC = () => {
             {/* Sticky Action Footer */}
             {activeTab === 'notify' && (
                <div className="absolute bottom-0 left-0 w-full p-5 bg-card/90 backdrop-blur-md border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                 <Button className="w-full h-12 text-sm font-bold rounded-xl shadow-lg border-b-4 border-black/10 active:border-b-0 active:translate-y-1 transition-all" onClick={sendNotification} disabled={!notifSubject.trim() || !notifMessage.trim() || (!channels.sms && !channels.email && !channels.whatsapp)}>
-                   Execute Dispatch ({Number(channels.sms) + Number(channels.email) + Number(channels.whatsapp)} Routes)
+                 <Button className="w-full h-12 text-sm font-bold rounded-xl shadow-lg border-b-4 border-black/10 active:border-b-0 active:translate-y-1 transition-all" onClick={sendNotification} disabled={notifSending || !notifSubject.trim() || !notifMessage.trim() || (!channels.sms && !channels.email && !channels.whatsapp)}>
+                   {notifSending ? 'Dispatching...' : `Execute Dispatch (${Number(channels.sms) + Number(channels.email) + Number(channels.whatsapp)} Routes)`}
                  </Button>
                </div>
             )}
