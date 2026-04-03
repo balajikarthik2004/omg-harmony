@@ -147,17 +147,17 @@ const DocumentPage: React.FC = () => {
   } as const;
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
+    <div className="docs-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner docs-header bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><FileDown className="w-5 h-5 text-blue-600" /> Document & Reports Center</h1>
           <p className="text-sm text-muted-foreground mt-1">Securely access, manage, and upload official temple documents.</p>
         </div>
-        <Button onClick={() => setUploadModalOpen(true)} className="shadow-md hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
+        <Button onClick={() => setUploadModalOpen(true)} className="docs-cta shadow-md hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
       </div>
 
-      <div className="section-panel shadow-sm">
-        <div className="section-panel-header gap-3 flex-wrap bg-gradient-to-r from-slate-50 to-background border-b border-border/60">
+      <div className="section-panel docs-main-panel shadow-sm">
+        <div className="section-panel-header docs-main-header gap-3 flex-wrap bg-gradient-to-r from-slate-50 to-background border-b border-border/60">
            <h2 className="text-sm font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-primary" /> Curated Repository</h2>
            <div className="relative w-full max-w-sm ml-auto">
              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -165,12 +165,12 @@ const DocumentPage: React.FC = () => {
                value={search}
                onChange={e => setSearch(e.target.value)}
                placeholder="Search by title or description..."
-               className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/80 shadow-sm text-sm transition-all focus:border-primary outline-none focus:ring-2 focus:ring-primary/20"
+               className="docs-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/80 shadow-sm text-sm transition-all focus:border-primary outline-none focus:ring-2 focus:ring-primary/20"
              />
            </div>
         </div>
 
-        <div className="p-6 bg-muted/10">
+        <div className="docs-grid-wrap p-6 bg-muted/10">
           <div className="grid grid-cols-1 xl:grid-cols-3 md:grid-cols-2 gap-5 animate-stagger">
             {filteredReports.map(r => {
               const colors = colorMap[r.color as keyof typeof colorMap];
@@ -178,7 +178,7 @@ const DocumentPage: React.FC = () => {
               <div
                 key={r.id}
                 onClick={() => handleCardClick(r)}
-                className={`group rounded-2xl border p-5 cursor-pointer flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-background ${
+                className={`docs-card group rounded-2xl border p-5 cursor-pointer flex flex-col justify-between transition-all duration-300 relative overflow-hidden bg-background ${
                   selected === r.id 
                     ? `${colors.border} shadow-md scale-[1.02] ring-1 ${colors.ring}` 
                     : `border-border/60 ${colors.hoverBorder} hover:shadow-md hover:-translate-y-1`
@@ -213,7 +213,7 @@ const DocumentPage: React.FC = () => {
             )})}
 
             {filteredReports.length === 0 && (
-              <div className="col-span-full py-16 text-center bg-card rounded-2xl border-2 border-border border-dashed shadow-sm">
+              <div className="docs-empty-state col-span-full py-16 text-center bg-card rounded-2xl border-2 border-border border-dashed shadow-sm">
                 <FileDown className="h-12 w-12 text-muted-foreground/30 mx-auto mb-4" />
                 <p className="text-foreground text-lg font-bold">No documents found</p>
                 <p className="text-muted-foreground text-sm font-medium mt-1">Try adjusting your search filters to find what you're looking for.</p>
@@ -225,10 +225,10 @@ const DocumentPage: React.FC = () => {
 
       {uploadModalOpen && (
         <div className="modal-overlay" onClick={() => { setUploadModalOpen(false); setUploadedFiles([]); setUploadProgress({}); }}>
-          <div className="bg-gradient-to-b from-card to-muted/20 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 animate-slide-up border border-border/50 flex flex-col max-h-[90vh] relative overflow-hidden" onClick={e => e.stopPropagation()}>
+          <div className="docs-upload-modal bg-gradient-to-b from-card to-muted/20 rounded-2xl shadow-2xl w-full max-w-2xl mx-4 animate-slide-up border border-border/50 flex flex-col max-h-[90vh] relative overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-bl-[100%] pointer-events-none" />
             
-            <div className="flex items-center justify-between p-6 border-b border-border/60 shrink-0 relative z-10 bg-background/50 backdrop-blur-sm">
+            <div className="docs-upload-head flex items-center justify-between p-6 border-b border-border/60 shrink-0 relative z-10 bg-background/50 backdrop-blur-sm">
               <div>
                  <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2"><Upload className="w-5 h-5 text-primary" /> Upload Documents</h2>
                  <p className="text-[11px] text-muted-foreground font-bold tracking-widest uppercase mt-1">Secure Media Pipeline</p>
@@ -243,9 +243,9 @@ const DocumentPage: React.FC = () => {
               </Button>
             </div>
 
-            <div className="p-6 space-y-6 overflow-y-auto relative z-10">
+            <div className="docs-upload-body p-6 space-y-6 overflow-y-auto relative z-10">
               <div
-                className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${
+                className={`docs-dropzone border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${
                   dragActive 
                     ? 'border-primary bg-primary/5 scale-[1.02] shadow-inner' 
                     : 'border-border/80 bg-background hover:border-primary/40 hover:bg-muted/20 shadow-sm'
@@ -261,19 +261,19 @@ const DocumentPage: React.FC = () => {
                   type="file" multiple accept=".pdf,application/pdf"
                   onChange={handleFileInput} className="hidden" id="file-upload"
                 />
-                <Button variant="outline" className="shadow-sm hover:shadow-md font-bold px-8 h-12" onClick={() => document.getElementById('file-upload')?.click()}>
+                <Button variant="outline" className="docs-browse-btn shadow-sm hover:shadow-md font-bold px-8 h-12" onClick={() => document.getElementById('file-upload')?.click()}>
                   Browse Files
                 </Button>
               </div>
 
               {uploadedFiles.length > 0 && (
-                <div className="space-y-4 animate-fade-in bg-background p-4 rounded-xl border border-border/60 shadow-sm">
+                <div className="docs-stage space-y-4 animate-fade-in bg-background p-4 rounded-xl border border-border/60 shadow-sm">
                   <div className="flex justify-between items-center px-1 border-b border-border/60 pb-2">
                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600" /> Staging Area ({uploadedFiles.length})</h3>
                   </div>
                   <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
                     {uploadedFiles.map((file, index) => (
-                      <div key={index} className="flex items-center gap-4 p-3.5 bg-muted/20 border border-border/40 rounded-xl hover:border-border transition-colors">
+                      <div key={index} className="docs-stage-item flex items-center gap-4 p-3.5 bg-muted/20 border border-border/40 rounded-xl hover:border-border transition-colors">
                         <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0 border border-red-100 shadow-sm">
                           <FileText className="h-5 w-5 text-red-600" />
                         </div>
@@ -308,7 +308,7 @@ const DocumentPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="info-panel bg-amber-50/50 border-amber-200">
+              <div className="info-panel docs-guidelines bg-amber-50/50 border-amber-200">
                 <div className="w-8 h-8 rounded-full bg-amber-100/80 flex items-center justify-center shrink-0 border border-amber-200"><AlertCircle className="h-4 w-4 text-amber-700" /></div>
                 <div className="text-xs text-amber-900/90 leading-relaxed space-y-1">
                   <p className="font-semibold text-amber-900">Deployment Guidelines</p>
@@ -319,10 +319,10 @@ const DocumentPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 border-t border-border/60 p-5 bg-background shrink-0 rounded-b-2xl relative z-10">
+            <div className="docs-upload-foot flex items-center justify-end gap-3 border-t border-border/60 p-5 bg-background shrink-0 rounded-b-2xl relative z-10">
               <Button variant="outline" className="h-11 px-6 font-bold" onClick={() => { setUploadModalOpen(false); setUploadedFiles([]); setUploadProgress({}); }}>Discard</Button>
               <Button 
-                className="h-11 px-6 font-bold shadow-md"
+                className="docs-sync-btn h-11 px-6 font-bold shadow-md"
                 disabled={uploadedFiles.length === 0 || Object.values(uploadProgress).some(p => p < 100)} 
                 onClick={() => { alert(`${uploadedFiles.length} files successfully securely uploaded!`); setUploadModalOpen(false); setUploadedFiles([]); setUploadProgress({}); }}
               >

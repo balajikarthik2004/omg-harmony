@@ -293,39 +293,39 @@ const PoojaSevaPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in relative">
-      <div className="page-header-banner bg-gradient-to-r from-pink-50/70 via-background to-amber-50/70">
+    <div className="pooja-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in relative">
+      <div className="page-header-banner poojs-header bg-gradient-to-r from-pink-50/70 via-background to-amber-50/70">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Flower2 className="w-5 h-5 text-pink-600" /> Pooja & Seva Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Configure pooja offerings, manage devotee bookings, assign priests, and issue digital Passes.</p>
         </div>
-        <Button onClick={openAdd} className="shadow-md bg-pink-600 hover:bg-pink-700 text-white"><Plus className="h-4 w-4 mr-2" />Book Pooja slot/users</Button>
+        <Button onClick={openAdd} className="pooja-cta shadow-md bg-pink-600 hover:bg-pink-700 text-white"><Plus className="h-4 w-4 mr-2" />Book Pooja slot/users</Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
-        <div className="stat-card">
+        <div className="stat-card pooja-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total Bookings</p>
           <p className="text-2xl font-bold mt-1 text-foreground">{totals.total}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card pooja-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800">Confirmed Slots</p>
           <p className="text-2xl font-bold mt-1 text-emerald-700">{totals.confirmed}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card pooja-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-800">Paid Receipts</p>
           <p className="text-2xl font-bold mt-1 text-blue-700">{totals.paid}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card pooja-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-800">Pending Approvals</p>
           <p className="text-2xl font-bold mt-1 text-amber-600">{totals.pending}</p>
         </div>
-        <div className="stat-card md:col-span-3 xl:col-span-1">
+        <div className="stat-card pooja-stat-card md:col-span-3 xl:col-span-1">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800">Completed Poojas</p>
           <p className="text-2xl font-bold mt-1 text-emerald-700">{totals.completed}</p>
         </div>
       </div>
 
-      <section className="section-panel shadow-sm">
+      <section className="section-panel pooja-date-panel shadow-sm">
         <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
           <div>
             <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> View Date-wise Events & Available Poojas</h2>
@@ -346,27 +346,27 @@ const PoojaSevaPage: React.FC = () => {
               type="date"
               value={selectedServiceDate}
               onChange={e => setSelectedServiceDate(e.target.value)}
-              className="h-10 w-full sm:w-auto rounded-lg border border-input bg-background/60 shadow-sm px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all font-semibold"
+              className="pooja-date-input h-10 w-full sm:w-auto rounded-lg border border-input bg-background/60 shadow-sm px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all font-semibold"
             />
           </div>
         </div>
         <div className="p-4 grid grid-cols-2 lg:grid-cols-4 gap-3 bg-muted/10">
-          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden group">
+          <div className="pooja-date-stat rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
             <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Date Context</p>
             <p className="text-lg font-bold mt-1 text-foreground">{selectedServiceDate ? formatDateDDMMYYYY(selectedServiceDate) : 'Showing All Timelines'}</p>
           </div>
-          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
+          <div className="pooja-date-stat rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
             <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Active Events</p>
             <p className="text-xl font-bold mt-1 text-primary">{eventsForSelectedDate.length}</p>
           </div>
-          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
+          <div className="pooja-date-stat rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
             <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Pooja Variants</p>
             <p className="text-xl font-bold mt-1 text-primary">{dateWisePoojaCatalog.length}</p>
           </div>
-          <div className="rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
+          <div className="pooja-date-stat rounded-xl border border-border/60 bg-background p-4 shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-10 h-10 bg-primary/5 rounded-bl-full" />
             <p className="text-[11px] font-bold tracking-wider text-muted-foreground uppercase">Bookings on Date</p>
             <p className="text-xl font-bold mt-1 text-primary">{items.filter(item => item.date === selectedServiceDate).length}</p>
@@ -378,7 +378,7 @@ const PoojaSevaPage: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 px-2">
               {eventsForSelectedDate.map(event => (
-                <div key={event.id} className="rounded-lg border border-border/60 px-4 py-3 bg-background shadow-sm hover:shadow-md transition-shadow flex justify-between items-center">
+                <div key={event.id} className="pooja-event-chip rounded-lg border border-border/60 px-4 py-3 bg-background shadow-sm hover:shadow-md transition-shadow flex justify-between items-center">
                   <div>
                     <p className="text-sm font-bold text-foreground">{event.name}</p>
                     <p className="text-[11px] text-muted-foreground font-medium mt-0.5">{event.time} · {event.poojaType}</p>
@@ -396,14 +396,14 @@ const PoojaSevaPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 animate-slide-up">
         {/* Main List Column */}
         <div className="xl:col-span-3 space-y-4">
-          <section className="section-panel shadow-sm">
+          <section className="section-panel pooja-main-panel shadow-sm">
             <div className="section-panel-header gap-3 flex-wrap border-b border-border/60 pb-3">
               <h2 className="text-sm font-semibold flex items-center gap-2 whitespace-nowrap"><Filter className="w-4 h-4 text-primary" /> Filtered Bookings Explorer</h2>
               <div className="flex-1 flex justify-end">
                 <div className="relative w-full sm:max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
-                    className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 hover:border-border transition-all outline-none shadow-sm"
+                    className="pooja-search-input h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 hover:border-border transition-all outline-none shadow-sm"
                     placeholder="Search bookings, devotees..."
                     value={search}
                     onChange={e => setSearch(e.target.value)}
@@ -417,7 +417,7 @@ const PoojaSevaPage: React.FC = () => {
                 <button
                   key={item.category}
                   onClick={() => setActiveCategory(item.category)}
-                  className={`px-4 py-1.5 flex items-center gap-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase border transition-all duration-200 ${activeCategory === item.category ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' : 'text-muted-foreground border-border bg-background hover:text-foreground hover:bg-muted/50'}`}
+                  className={`pooja-filter-chip px-4 py-1.5 flex items-center gap-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase border transition-all duration-200 ${activeCategory === item.category ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' : 'text-muted-foreground border-border bg-background hover:text-foreground hover:bg-muted/50'}`}
                 >
                   {item.category} <span className={`px-1.5 py-0.5 rounded-full text-[9px] ${activeCategory === item.category ? 'bg-background/20 text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{item.count}</span>
                 </button>
@@ -438,7 +438,7 @@ const PoojaSevaPage: React.FC = () => {
                 </thead>
                 <tbody className="bg-background">
                   {filtered.length === 0 ? <tr><td colSpan={6} className="p-10 text-center font-medium text-muted-foreground">No bookings found for the current filters.</td></tr> : filtered.map(item => (
-                    <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                    <tr key={item.id} className="pooja-row border-b border-border hover:bg-muted/30 transition-colors">
                       <td className="p-4 align-top">
                         <p className="font-bold text-foreground text-sm tracking-wide">{item.bookingCode}</p>
                       </td>
@@ -485,14 +485,14 @@ const PoojaSevaPage: React.FC = () => {
 
         {/* Sidebar Info */}
         <div className="space-y-4 xl:sticky xl:top-4 self-start">
-          <div className="section-panel shadow-sm">
+          <div className="section-panel pooja-side-panel shadow-sm">
             <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-sky-50/50 to-background">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Flower2 className="w-4 h-4 text-primary" /> Global Catalog</h2>
               <span className="text-[10px] py-0.5 px-2 bg-primary/10 text-primary rounded-full font-bold">{eventPoojaCatalog.length} derived</span>
             </div>
             <div className="p-3 space-y-2 max-h-[350px] overflow-y-auto pr-1">
               {poojaCatalog.map(item => (
-                <div key={item.name} className="rounded-lg border border-border/60 p-3 bg-background shadow-sm hover:border-primary/30 transition-colors">
+                <div key={item.name} className="pooja-catalog-item rounded-lg border border-border/60 p-3 bg-background shadow-sm hover:border-primary/30 transition-colors">
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-bold text-sm text-foreground truncate max-w-[150px]" title={item.name}>{item.name}</p>
                     <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100">{money(item.amount)}</span>
@@ -503,13 +503,13 @@ const PoojaSevaPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="section-panel shadow-sm">
+          <div className="section-panel pooja-side-panel shadow-sm">
             <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-amber-50/50 to-background">
               <h2 className="text-sm font-semibold flex items-center gap-2"><UserCog className="w-4 h-4 text-primary" /> Priest Duty Pool</h2>
             </div>
             <div className="p-3 space-y-1.5 max-h-[300px] overflow-y-auto">
               {priestOptions.map((name, idx) => (
-                <div key={name} className="rounded-lg border border-border/50 px-3 py-2 text-sm flex items-center justify-between bg-background">
+                <div key={name} className="pooja-priest-item rounded-lg border border-border/50 px-3 py-2 text-sm flex items-center justify-between bg-background">
                   <span className="font-medium">{name}</span>
                   <span className={`text-[10px] font-bold uppercase ${idx % 3 === 0 ? 'text-amber-600' : 'text-emerald-600'}`}>
                     {idx % 3 === 0 ? 'Busy' : 'Free'}
@@ -522,7 +522,7 @@ const PoojaSevaPage: React.FC = () => {
       </div>
 
       <Modal open={modalOpen && !isProcessingPayment} onClose={() => setModalOpen(false)} title={editId ? 'Modify Booking Info' : 'Create New Pooja Booking'}>
-        <div className="space-y-4 px-1 pb-2">
+        <div className="pooja-form-shell space-y-4 px-1 pb-2">
           {formError && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3 flex items-center gap-2 animate-pulse-slow">
               <CheckCircle2 className="w-4 h-4 text-red-600 shrink-0" />
@@ -624,7 +624,7 @@ const PoojaSevaPage: React.FC = () => {
 
       {/* Fake Payment Modal */}
       {isProcessingPayment && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div className="pooja-processing-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-card w-full max-w-sm rounded-3xl shadow-2xl p-8 flex flex-col items-center border border-border">
             <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-6" />
             <h2 className="text-xl font-display font-bold text-foreground mb-2">Processing Payment</h2>
@@ -636,7 +636,7 @@ const PoojaSevaPage: React.FC = () => {
       <Modal open={!!receiptItem} onClose={() => setReceiptItem(null)} title="Temple Booking Receipt">
         {receiptItem && (
           <div className="space-y-5 px-1 pb-1">
-            <div className="rounded-2xl border border-border p-6 bg-gradient-to-br from-card to-muted/30 relative overflow-hidden shadow-sm">
+            <div className="pooja-receipt-shell rounded-2xl border border-border p-6 bg-gradient-to-br from-card to-muted/30 relative overflow-hidden shadow-sm">
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-bl-[100px] -z-0 pointer-events-none" />
 
               <div className="flex items-center justify-between border-b border-border/60 pb-5 mb-5 relative z-10">

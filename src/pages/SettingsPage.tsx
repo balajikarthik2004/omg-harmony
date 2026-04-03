@@ -32,52 +32,52 @@ const SettingsPage: React.FC = () => {
    };
 
    return (
-      <div className="space-y-6 max-w-[1400px] mx-auto animate-fade-in">
-         <div className="page-header-banner bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
+      <div className="settings-premium space-y-6 max-w-[1400px] mx-auto animate-fade-in">
+         <div className="page-header-banner settings-header bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
             <div>
                <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-blue-600" /> Member Access & Roles</h1>
                <p className="text-sm text-muted-foreground mt-1">Manage staff entries, grant new access, and set permission levels for the temple ERP.</p>
             </div>
-            <Button onClick={() => setModalOpen(true)} className="shadow-md bg-blue-600 hover:bg-blue-700 text-white"><UserPlus className="h-4 w-4 mr-2" />Grant New Access</Button>
+            <Button onClick={() => setModalOpen(true)} className="settings-cta shadow-md bg-blue-600 hover:bg-blue-700 text-white"><UserPlus className="h-4 w-4 mr-2" />Grant New Access</Button>
          </div>
 
          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Profile Card */}
-            <section className="section-panel shadow-sm h-fit">
-               <div className="section-panel-header gap-3 border-b border-border/60 pb-3 bg-gradient-to-b from-blue-50/50 to-background">
+            <section className="section-panel settings-profile-panel shadow-sm h-fit">
+               <div className="section-panel-header settings-panel-header gap-3 border-b border-border/60 pb-3 bg-gradient-to-b from-blue-50/50 to-background">
                   <h2 className="text-sm font-semibold flex items-center gap-2"><BadgeCheck className="w-4 h-4 text-emerald-600" /> My Access Status</h2>
                </div>
                <div className="p-6 flex flex-col items-center">
-                  <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-4 border-background shadow-sm mb-4">
+                  <div className="settings-avatar w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-4 border-background shadow-sm mb-4">
                      <span className="text-2xl font-display font-bold text-blue-700">{user?.name.charAt(0)}</span>
                   </div>
                   <h3 className="text-lg font-bold text-foreground">{user?.name}</h3>
-                  <span className="mt-2 text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Full {user?.role} Access</span>
+                  <span className="settings-chip mt-2 text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Full {user?.role} Access</span>
                </div>
                <div className="p-4 pt-0">
-                  <Button variant="outline" onClick={logout} className="w-full text-xs font-bold border-rose-200 text-rose-600 hover:bg-rose-50 h-10">Logout of System</Button>
+                  <Button variant="outline" onClick={logout} className="settings-logout-btn w-full text-xs font-bold border-rose-200 text-rose-600 hover:bg-rose-50 h-10">Logout of System</Button>
                </div>
             </section>
 
             {/* Member List */}
-            <section className="lg:col-span-3 section-panel shadow-sm">
-               <div className="section-panel-header border-b border-border/60 pb-4 bg-muted/20">
+            <section className="lg:col-span-3 section-panel settings-members-panel shadow-sm">
+               <div className="section-panel-header settings-panel-header border-b border-border/60 pb-4 bg-muted/20">
                   <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-blue-600" /> Registered Staff & Members</h2>
                </div>
                <div className="overflow-x-auto">
                   <table className="w-full text-sm">
-                     <thead className="bg-muted/40 text-muted-foreground font-medium text-xs uppercase tracking-wider">
+                     <thead className="settings-table-head bg-muted/40 text-muted-foreground font-medium text-xs uppercase tracking-wider">
                         <tr>
                            <th className="text-left p-4">Member Name</th>
                            <th className="text-left p-4">Role / Permission</th>
                            <th className="text-left p-4">Joined Date</th>
-                           <th className="text-left p-4 text-center">Status</th>
+                           <th className="p-4 text-center">Status</th>
                            <th className="text-right p-4">Actions</th>
                         </tr>
                      </thead>
                      <tbody>
                         {members.map(m => (
-                           <tr key={m.id} className="border-b border-border/50 hover:bg-muted/20 transition-colors">
+                           <tr key={m.id} className="settings-row border-b border-border/50 hover:bg-muted/20 transition-colors">
                               <td className="p-4">
                                  <p className="font-bold text-foreground">{m.name}</p>
                                  <p className="text-[11px] text-muted-foreground flex items-center gap-1 mt-0.5"><Mail className="w-3 h-3" /> {m.email}</p>
@@ -112,31 +112,31 @@ const SettingsPage: React.FC = () => {
          </div>
 
          <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Grant New System Access">
-            <div className="space-y-4 px-1 py-1">
+            <div className="settings-form-shell space-y-4 px-1 py-1">
                <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Member Full Name</label>
-                  <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="Enter member name" />
+                  <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="settings-field w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="Enter member name" />
                </div>
                <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Email Address</label>
-                  <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="member@temple.org" />
+                  <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="settings-field w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="member@temple.org" />
                </div>
                <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Permission Level (Role)</label>
-                  <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} className="w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
+                  <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} className="settings-field w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
                      <option>Admin</option>
                      <option>Manager</option>
                      <option>Staff</option>
                      <option>Volunteer</option>
                   </select>
                </div>
-               <div className="pt-4 flex gap-3 text-sm italic text-muted-foreground bg-blue-50/50 p-3 rounded-lg border border-blue-100/50">
+               <div className="settings-note pt-4 flex gap-3 text-sm italic text-muted-foreground bg-blue-50/50 p-3 rounded-lg border border-blue-100/50">
                   <ShieldAlert className="w-5 h-5 text-blue-600 shrink-0" />
                   <p>New members will be sent a login invitation via email once you grant access.</p>
                </div>
                <div className="flex gap-3 pt-4 border-t mt-2">
                   <Button variant="outline" className="flex-1 h-11" onClick={() => setModalOpen(false)}>Cancel</Button>
-                  <Button onClick={handleAddMember} className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white shadow-md">Grant Access</Button>
+                  <Button onClick={handleAddMember} className="settings-cta flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white shadow-md">Grant Access</Button>
                </div>
             </div>
          </Modal>

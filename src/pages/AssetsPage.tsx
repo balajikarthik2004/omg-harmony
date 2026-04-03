@@ -55,40 +55,40 @@ const AssetsPage: React.FC = () => {
   }, [items, search]);
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-emerald-50/80 via-background to-teal-50/80">
+    <div className="assets-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner assets-header bg-gradient-to-r from-emerald-50/80 via-background to-teal-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Landmark className="w-5 h-5 text-emerald-600" /> Temple Assets & Property</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage buildings, land, valuable items, and check their maintenance.</p>
         </div>
-        <Button onClick={openAdd} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add New Asset</Button>
+        <Button onClick={openAdd} className="assets-cta shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add New Asset</Button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative">
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/30 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Building className="w-3.5 h-3.5" /> Total Assets</p>
           <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{items.length}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-blue-100 bg-blue-50/40">
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-blue-100 bg-blue-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-100/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-blue-800 flex items-center gap-1.5"><Gem className="w-3.5 h-3.5" /> Main Items</p>
           <p className="text-3xl font-display font-bold mt-2 text-blue-700 relative z-10">{strategicAssetsCount}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-teal-100 bg-teal-50/40">
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-teal-100 bg-teal-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-teal-100/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-teal-800 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5" /> Secured Assets</p>
           <p className="text-3xl font-display font-bold mt-2 text-teal-700 relative z-10">{protectedAssetsCount}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-rose-200 bg-rose-50/70 shadow-[0_4px_12px_-4px_rgba(244,63,94,0.3)]">
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-rose-200 bg-rose-50/70 shadow-[0_4px_12px_-4px_rgba(244,63,94,0.3)]">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-rose-200/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-rose-800 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Need Maintenance</p>
           <p className="text-3xl font-display font-bold mt-2 text-rose-700 relative z-10">{maintenanceDueCount}</p>
         </div>
       </div>
 
-      <div className="section-panel shadow-sm">
-        <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
+      <div className="section-panel assets-main-panel shadow-sm">
+        <div className="section-panel-header assets-main-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
           <h2 className="text-sm font-semibold flex items-center gap-2"><Landmark className="w-4 h-4 text-emerald-600" /> All Asset List</h2>
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -96,7 +96,7 @@ const AssetsPage: React.FC = () => {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search assets..."
-              className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/80 text-sm transition-all shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border"
+              className="assets-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/80 text-sm transition-all shadow-sm focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border"
             />
           </div>
         </div>
@@ -114,7 +114,7 @@ const AssetsPage: React.FC = () => {
           </thead>
           <tbody className="bg-background">
             {filteredItems.map(a => (
-              <tr key={a.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
+              <tr key={a.id} className="assets-row border-b border-border hover:bg-muted/30 transition-colors group">
                 <td className="p-4 font-bold text-foreground">
                    {a.name}
                 </td>
@@ -155,13 +155,13 @@ const AssetsPage: React.FC = () => {
         </div></div>
       </div>
 
-       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Asset' : 'Add New Asset'}>
-        <div className="space-y-5 px-1 py-2">
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Asset' : 'Add New Asset'}>
+       <div className="assets-form-shell space-y-5 px-1 py-2">
           <div className="grid grid-cols-2 gap-4">
              <FormField label="Asset Name" value={form.name} onChange={v => set('name', v)} required placeholder="E.g., Central Bronze Bell" />
              <div className="space-y-1.5">
                <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Category</label>
-               <input value={form.category} onChange={e => set('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-semibold" placeholder="E.g., Furniture, Vehicles" />
+               <input value={form.category} onChange={e => set('category', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-semibold" placeholder="E.g., Furniture, Vehicles" />
              </div>
           </div>
 
@@ -169,7 +169,7 @@ const AssetsPage: React.FC = () => {
              <FormField label="Date Bought" value={form.purchaseDate} onChange={v => set('purchaseDate', v)} type="date" />
              <div className="space-y-1.5">
                <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Current Condition</label>
-               <select value={form.condition} onChange={e => set('condition', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border shadow-sm font-semibold">
+               <select value={form.condition} onChange={e => set('condition', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border shadow-sm font-semibold">
                  <option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option>
                </select>
              </div>
@@ -177,19 +177,19 @@ const AssetsPage: React.FC = () => {
 
           <div className="space-y-1.5">
              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Maintenance Status</label>
-             <select value={form.maintenanceStatus} onChange={e => set('maintenanceStatus', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-emerald-50/50 hover:border-emerald-200 px-3 text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none shadow-sm font-bold">
+             <select value={form.maintenanceStatus} onChange={e => set('maintenanceStatus', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input bg-emerald-50/50 hover:border-emerald-200 px-3 text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none shadow-sm font-bold">
                 <option>Up to Date</option><option>Due Soon</option><option>Overdue</option>
              </select>
           </div>
 
           <div className="space-y-1.5 mt-2">
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Notes & Details</label>
-            <textarea value={form.notes} onChange={e => set('notes', e.target.value)} className="w-full rounded-lg border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border shadow-sm font-medium leading-relaxed" placeholder="Description, location, or serial numbers..." />
+            <textarea value={form.notes} onChange={e => set('notes', e.target.value)} className="assets-field w-full rounded-lg border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border shadow-sm font-medium leading-relaxed" placeholder="Description, location, or serial numbers..." />
           </div>
 
           <div className="flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white">Save Asset</Button>
+            <Button onClick={handleSave} className="assets-cta flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white">Save Asset</Button>
           </div>
         </div>
       </Modal>

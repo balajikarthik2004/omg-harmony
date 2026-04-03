@@ -15,7 +15,7 @@ const AppLayout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <TopNavbar />
         <main className="flex-1 p-6 overflow-y-auto" style={{
-          background: 'linear-gradient(180deg, hsl(40, 33%, 97%) 0%, hsl(40, 33%, 98%) 100%)',
+          background: 'linear-gradient(180deg, hsl(212, 36%, 97%) 0%, hsl(210, 40%, 98%) 52%, hsl(42, 34%, 97%) 100%)',
         }}>
           <div className="animate-fade-in">
             <Outlet />

@@ -68,16 +68,16 @@ const InventoryPage: React.FC = () => {
   const inStockCount = items.filter(i => i.stockStatus === 'In Stock').length;
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-amber-50/80 via-background to-orange-50/80">
+    <div className="inventory-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner inventory-header bg-gradient-to-r from-amber-50/80 via-background to-orange-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Package className="w-5 h-5 text-amber-600" /> Inventory & Material Central</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage pooja items, food stock, and see what needs to be ordered.</p>
         </div>
-        {activeSection === 'inventory' && <Button onClick={openAdd} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add New Item</Button>}
+        {activeSection === 'inventory' && <Button onClick={openAdd} className="inventory-cta shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add New Item</Button>}
       </div>
 
-      <div className="rounded-xl border border-border bg-card shadow-sm p-1.5 flex w-full max-w-sm mx-auto md:mx-0">
+      <div className="inventory-tabbar rounded-xl border border-border bg-card shadow-sm p-1.5 flex w-full max-w-sm mx-auto md:mx-0">
          {([
            ['inventory', 'Inventory Ledger', Layers],
            ['procurement', 'Procurement & Orders', Package],
@@ -85,7 +85,7 @@ const InventoryPage: React.FC = () => {
            <button
              key={key}
              onClick={() => setActiveSection(key)}
-             className={`flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-all duration-300 font-bold ${activeSection === key ? 'bg-amber-600 text-white shadow-md scale-[1.02]' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent'}`}
+            className={`inventory-tab-btn flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-all duration-300 font-bold ${activeSection === key ? 'bg-amber-600 text-white shadow-md scale-[1.02]' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent'}`}
            >
              <Icon className="w-4 h-4" /> {label}
            </button>
@@ -97,22 +97,22 @@ const InventoryPage: React.FC = () => {
       {activeSection === 'inventory' && (
       <div className="animate-slide-up space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="stat-card flex flex-col justify-between group overflow-hidden relative">
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative">
             <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/30 group-hover:scale-110 transition-transform" />
             <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Items</p>
             <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{items.length}</p>
           </div>
-          <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/30">
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/30">
             <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
             <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800">Pooja Items</p>
             <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{poojaMaterialsCount}</p>
           </div>
-          <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/30">
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/30">
             <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
             <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800">Food Stock</p>
             <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{prasadamStockCount}</p>
           </div>
-          <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-rose-200 bg-rose-50/80 shadow-[0_4px_12px_-4px_rgba(244,63,94,0.3)]">
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-rose-200 bg-rose-50/80 shadow-[0_4px_12px_-4px_rgba(244,63,94,0.3)]">
             <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-rose-200/50 group-hover:scale-110 transition-transform" />
             <p className="text-[11px] uppercase tracking-widest font-bold text-rose-800 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Low Stock Warning</p>
             <p className="text-3xl font-display font-bold mt-2 text-rose-700 relative z-10">{lowStockItems.length}</p>
@@ -120,7 +120,7 @@ const InventoryPage: React.FC = () => {
         </div>
 
         {lowStockItems.length > 0 && (
-          <div className="rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 to-background p-5 flex items-start gap-4 shadow-sm animate-pulse-slow">
+          <div className="inventory-alert rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 to-background p-5 flex items-start gap-4 shadow-sm animate-pulse-slow">
             <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
                <AlertTriangle className="w-6 h-6 text-rose-600" />
             </div>
@@ -133,7 +133,7 @@ const InventoryPage: React.FC = () => {
           </div>
         )}
 
-        <div className="section-panel shadow-sm">
+        <div className="section-panel inventory-main-panel shadow-sm">
           <div className="section-panel-header gap-4 py-4 border-b border-border/60">
             <h2 className="text-sm font-semibold flex items-center gap-2"><Layers className="w-4 h-4 text-amber-600" /> Main Stock List</h2>
             <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 flex-wrap">
@@ -143,13 +143,13 @@ const InventoryPage: React.FC = () => {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search items, suppliers..."
-                  className="w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none shadow-sm"
+                  className="inventory-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none shadow-sm"
                 />
               </div>
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
-                className="h-10 rounded-lg border border-input bg-background/60 px-3 text-sm transition-all focus:border-amber-500 hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
+                className="inventory-field h-10 rounded-lg border border-input bg-background/60 px-3 text-sm transition-all focus:border-amber-500 hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
               >
                 {categories.map(c => <option key={c}>{c}</option>)}
               </select>
@@ -174,7 +174,7 @@ const InventoryPage: React.FC = () => {
                 const pct = getStockPercent(i.quantity, i.name);
                 const barColor = getProgressColor(pct);
                 return (
-                  <tr key={i.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <tr key={i.id} className="inventory-row border-b border-border hover:bg-muted/30 transition-colors">
                     <td className="p-4 font-bold text-foreground">
                       <p>{i.name}</p>
                       {i.supplier && <p className="text-[10px] text-muted-foreground font-medium mt-0.5" title="Primary Supplier">{i.supplier}</p>}
@@ -221,7 +221,7 @@ const InventoryPage: React.FC = () => {
         </div>
 
         <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Item Details' : 'Add New Item'}>
-          <div className="space-y-5 px-1 py-2">
+          <div className="inventory-form-shell space-y-5 px-1 py-2">
             <div className="grid grid-cols-2 gap-4">
               <FormField label="Item Name" value={form.name} onChange={v => set('name', v)} required placeholder="E.g., Turmeric Powder" />
               <div className="space-y-1.5">

@@ -225,8 +225,8 @@ const HrPage: React.FC = () => {
   const payrollTotal = payrollForMonth.reduce((sum, entry) => sum + entry.netPay, 0);
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-violet-50/80 via-background to-sky-50/80">
+    <div className="hr-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner hr-header bg-gradient-to-r from-violet-50/80 via-background to-sky-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-violet-600" /> HR & Volunteer Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage temple staff details, schedules, payroll, and volunteers.</p>
@@ -234,7 +234,7 @@ const HrPage: React.FC = () => {
         <div className="relative max-w-sm w-full md:w-72 mt-3 md:mt-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
-            className="w-full pl-9 pr-4 h-10 rounded-lg border border-input bg-background/80 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 hover:border-border outline-none shadow-sm"
+            className="hr-search-input w-full pl-9 pr-4 h-10 rounded-lg border border-input bg-background/80 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 hover:border-border outline-none shadow-sm"
             placeholder="Search staff..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -243,29 +243,29 @@ const HrPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative">
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/30 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Active Staff</p>
           <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{totals.activeStaff}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-orange-100 bg-orange-50/40">
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-orange-100 bg-orange-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-orange-100/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-orange-800 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
           <p className="text-3xl font-display font-bold mt-2 text-orange-700 relative z-10">{totals.priests}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800 flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Assigned Duties</p>
           <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{totals.scheduledDuties}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Volunteers</p>
           <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{totals.assignedVolunteers}</p>
         </div>
       </div>
 
-      <div className="bg-card/80 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
+      <div className="hr-tabbar bg-card/80 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
         {([
           { key: 'staff' as HrSection, label: 'Staff List', icon: Briefcase },
           { key: 'duties' as HrSection, label: 'Duties', icon: CalendarDays },
@@ -275,7 +275,7 @@ const HrPage: React.FC = () => {
           <button
             key={sec.key}
             onClick={() => setActiveSection(sec.key)}
-            className={`flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 flex-1 md:flex-none ${activeSection === sec.key ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
+            className={`hr-tab-btn flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 flex-1 md:flex-none ${activeSection === sec.key ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
           >
             <sec.icon className="h-4 w-4" />
             {sec.label}
@@ -285,7 +285,7 @@ const HrPage: React.FC = () => {
 
       <div className="animate-fade-in relative">
         {activeSection === 'staff' && (
-          <section className="section-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
+          <section className="section-panel hr-main-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-primary/5 to-transparent">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> Staff Member List</h2>
               <Button onClick={openAddStaff} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Staff</Button>
@@ -304,7 +304,7 @@ const HrPage: React.FC = () => {
                 </thead>
                 <tbody className="bg-background">
                   {filteredStaff.length === 0 ? <tr><td colSpan={6} className="p-10 text-center font-medium text-muted-foreground border-b border-border">No staff found matching search.</td></tr> : filteredStaff.map(item => (
-                    <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
+                    <tr key={item.id} className="hr-row border-b border-border hover:bg-muted/30 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
@@ -340,7 +340,7 @@ const HrPage: React.FC = () => {
         )}
 
         {activeSection === 'payroll' && (
-          <section className="section-panel bg-gradient-to-b from-background to-slate-50/50 shadow-sm border-l-4 border-slate-500">
+          <section className="section-panel hr-main-panel bg-gradient-to-b from-background to-slate-50/50 shadow-sm border-l-4 border-slate-500">
              <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-slate-100/50 to-transparent">
                <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Management</h2>
              </div>
@@ -408,14 +408,14 @@ const HrPage: React.FC = () => {
         )}
 
         {activeSection === 'duties' && (
-          <section className="section-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--amber))' }}>
+          <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--amber))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-amber-50/50 to-transparent">
               <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-600" /> Active Duties List</h2>
               <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No duties are currently set up.</p> : filteredDuties.map(item => (
-                 <div key={item.id} className="rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden hover:-translate-y-1">
+                 <div key={item.id} className="hr-duty-card rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden hover:-translate-y-1">
                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-500/10 to-transparent pointer-events-none" />
                    <div className="relative z-10 flex flex-col h-full">
                      <div className="flex justify-between items-start mb-4">
@@ -446,7 +446,7 @@ const HrPage: React.FC = () => {
         )}
 
         {activeSection === 'volunteers' && (
-          <section className="section-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
+          <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Enlisted Volunteers</h2>
               <Button onClick={openAddVolunteer} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
@@ -465,7 +465,7 @@ const HrPage: React.FC = () => {
                 </thead>
                 <tbody className="bg-background">
                   {filteredVolunteers.length === 0 ? <tr><td colSpan={6} className="p-12 text-center text-muted-foreground font-medium border-b border-border">No volunteers in community database.</td></tr> : filteredVolunteers.map(item => (
-                    <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors group">
+                    <tr key={item.id} className="hr-row border-b border-border hover:bg-muted/30 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
@@ -507,7 +507,7 @@ const HrPage: React.FC = () => {
 
       {/* Staff Modal */}
       <Modal open={staffModalOpen} onClose={() => setStaffModalOpen(false)} title={staffEditId ? 'Edit Staff File' : 'Add New Staff'}>
-        <div className="grid grid-cols-2 gap-4 px-1 py-2">
+        <div className="hr-form-shell grid grid-cols-2 gap-4 px-1 py-2">
           <FormField label="Full Name" value={staffForm.name} onChange={v => setSField('name', v)} required />
           <div className="space-y-1.5">
              <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Role</label>
@@ -535,7 +535,7 @@ const HrPage: React.FC = () => {
 
       {/* Duty Modal */}
       <Modal open={dutyModalOpen} onClose={() => setDutyModalOpen(false)} title={dutyEditId ? 'Edit Duty Details' : 'Assign New Duty'}>
-        <div className="grid grid-cols-2 gap-4 px-1 py-2">
+        <div className="hr-form-shell grid grid-cols-2 gap-4 px-1 py-2">
           <div className="col-span-2 space-y-1.5">
              <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Member</label>
              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.staffId} onChange={e => setDField('staffId', e.target.value)}>
@@ -575,7 +575,7 @@ const HrPage: React.FC = () => {
 
       {/* Volunteer Modal */}
       <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Edit Volunteer Details' : 'Add New Volunteer'}>
-        <div className="grid grid-cols-2 gap-4 px-1 py-2">
+        <div className="hr-form-shell grid grid-cols-2 gap-4 px-1 py-2">
           <FormField label="Volunteer Name" value={volForm.name} onChange={v => setVField('name', v)} required />
           <FormField label="Phone Number" value={volForm.phone} onChange={v => setVField('phone', v)} />
           <div className="col-span-2">

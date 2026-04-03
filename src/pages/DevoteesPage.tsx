@@ -188,50 +188,50 @@ const DevoteesPage: React.FC = () => {
   const devoteeProfile = selectedDevotee ? deriveDevoteeProfile(selectedDevotee, devDonations, devBookings) : null;
 
   return (
-    <div className=" max-w-[1500px] mx-auto animate-fade-in pb-8">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 pb-5">
+    <div className="devotees-premium max-w-[1500px] mx-auto animate-fade-in pb-8">
+      <div className="devotees-header flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 pb-5 px-5 py-4 mb-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Devotees</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage devotee records, analyze donation trends, and coordinate engagements.</p>
         </div>
         <div className="flex gap-3">
-          <Button onClick={openAdd} className="shadow-sm"><Plus className="h-4 w-4 mr-2" />Add Devotee</Button>
+          <Button onClick={openAdd} className="devotees-cta shadow-sm"><Plus className="h-4 w-4 mr-2" />Add Devotee</Button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
-        <div className="stat-card">
+        <div className="stat-card devotees-stat-card">
           <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Members</p>
           <p className="text-2xl font-bold mt-2 text-foreground">{totalDevotees.toLocaleString()}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card devotees-stat-card">
           <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5" /> Active Members</p>
           <p className="text-2xl font-bold mt-2 text-blue-600">{activeDevotees.toLocaleString()}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card devotees-stat-card">
           <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><HeartHandshake className="w-3.5 h-3.5" /> Major Donors</p>
           <p className="text-2xl font-bold mt-2 text-emerald-600">{majorDonors.toLocaleString()}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card devotees-stat-card">
           <p className="text-xs uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Visited this Month</p>
           <p className="text-2xl font-bold mt-2 text-indigo-600">{recentVisits.toLocaleString()}</p>
         </div>
       </div>
 
-      <div className="bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden flex flex-col relative z-10 mt-4">
-        <div className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 bg-muted/10">
+      <div className="devotees-table-shell bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden flex flex-col relative z-10 mt-4">
+        <div className="devotees-table-toolbar p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 bg-muted/10">
           <div className="flex items-center gap-3">
              <div className="relative max-w-sm w-full md:w-80">
                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                <input
-                 className="w-full pl-9 pr-4 h-9 rounded-md border border-input bg-background text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
+                 className="devotees-search-input w-full pl-9 pr-4 h-9 rounded-md border border-input bg-background text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
                  placeholder="Search by name, phone, email..."
                  value={search}
                  onChange={e => setSearch(e.target.value)}
                />
              </div>
           </div>
-          <span className="text-sm font-medium text-muted-foreground whitespace-nowrap bg-muted px-2.5 py-1 rounded-md border border-border/50 shadow-sm">{filtered.length} records</span>
+          <span className="devotees-record-chip text-sm font-medium text-muted-foreground whitespace-nowrap bg-muted px-2.5 py-1 rounded-md border border-border/50 shadow-sm">{filtered.length} records</span>
         </div>
 
         <div className="overflow-x-auto">
@@ -250,13 +250,13 @@ const DevoteesPage: React.FC = () => {
               {filtered.length === 0 ? (
                 <tr><td colSpan={6} className="p-12 text-center text-muted-foreground font-medium">No results found for your search.</td></tr>
               ) : filtered.map(d => (
-                <tr key={d.id} className="border-b border-border/60 cursor-pointer transition-colors hover:bg-muted/40 group" onClick={() => openDrawer(d)}>
+                <tr key={d.id} className="devotees-row border-b border-border/60 cursor-pointer transition-colors hover:bg-muted/40 group" onClick={() => openDrawer(d)}>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 border border-primary/20">
+                      <div className="devotees-avatar-chip w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0 border border-primary/20">
                         {getInitials(d.name)}
                       </div>
-                      <p className="font-semibold text-foreground group-hover:text-primary transition-colors">{d.name}</p>
+                      <p className="devotees-row-name font-semibold text-foreground group-hover:text-primary transition-colors">{d.name}</p>
                     </div>
                   </td>
                   <td className="p-4 text-muted-foreground">
@@ -286,7 +286,7 @@ const DevoteesPage: React.FC = () => {
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Devotee Details' : 'Add New Devotee'}>
-        <div className="space-y-4 px-1 py-1">
+        <div className="devotees-form-shell space-y-4 px-1 py-1">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Full Name" value={form.name} onChange={v => setFormField('name', v)} required />
             <FormField label="Phone Number" value={form.phone} onChange={v => setFormField('phone', v)} placeholder="+91" />
@@ -301,12 +301,12 @@ const DevoteesPage: React.FC = () => {
              <FormField label="Country" value={form.country} onChange={v => setFormField('country', v)} />
              <div className="space-y-1.5">
                <label className="text-xs font-semibold text-foreground">Status</label>
-               <select value={form.status} onChange={e => setFormField('status', e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+               <select value={form.status} onChange={e => setFormField('status', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                  <option>Active</option><option>Inactive</option>
                </select>
              </div>
           </div>
-          <div className="flex gap-3 pt-5 border-t border-border/60">
+          <div className="devotees-form-actions flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
             <Button onClick={handleSave} className="flex-1 shadow-sm">Save Details</Button>
           </div>
@@ -317,15 +317,15 @@ const DevoteesPage: React.FC = () => {
 
       {drawerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end" onClick={() => setDrawerOpen(false)}>
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
-          <div className="relative h-[100vh] w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
+          <div className="devotees-drawer-overlay absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
+          <div className="devotees-drawer relative h-[100vh] w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
             
             {/* Header / Profile Hero */}
-            <div className="px-6 py-8 border-b border-border/80 bg-gradient-to-b from-blue-50/50 to-background flex-shrink-0 relative">
+            <div className="devotees-drawer-hero px-6 py-8 border-b border-border/80 bg-gradient-to-b from-blue-50/50 to-background flex-shrink-0 relative">
               <Button variant="ghost" size="icon" className="absolute top-4 right-4 h-9 w-9 rounded-full bg-background border border-border/60 hover:bg-muted text-muted-foreground shadow-sm" onClick={() => setDrawerOpen(false)}><X className="h-5 w-5" /></Button>
               
               <div className="flex items-center gap-5">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 border-4 border-white shadow-md flex items-center justify-center text-blue-700 font-display font-bold text-3xl shrink-0">
+                  <div className="devotees-drawer-avatar w-20 h-20 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 border-4 border-white shadow-md flex items-center justify-center text-blue-700 font-display font-bold text-3xl shrink-0">
                     {selectedDevotee && getInitials(selectedDevotee.name)}
                   </div>
                   <div>
@@ -339,17 +339,17 @@ const DevoteesPage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-3 gap-3 mt-8">
-                <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                <div className="devotees-drawer-stat bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
                   <div className="absolute top-0 w-full h-[3px] bg-emerald-500" />
                   <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Total Donations</p>
                   <p className="text-xl font-bold text-emerald-600 font-display">{fmtAmt(selectedDevotee?.totalDonations ?? 0)}</p>
                 </div>
-                <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                <div className="devotees-drawer-stat bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
                   <div className="absolute top-0 w-full h-[3px] bg-blue-500" />
                   <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Donations</p>
                   <p className="text-xl font-bold text-foreground font-display">{devDonations.length}</p>
                 </div>
-                <div className="bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
+                <div className="devotees-drawer-stat bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
                   <div className="absolute top-0 w-full h-[3px] bg-amber-500" />
                   <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Bookings</p>
                   <p className="text-xl font-bold text-foreground font-display">{devBookings.length}</p>
@@ -358,12 +358,12 @@ const DevoteesPage: React.FC = () => {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="flex p-4 px-6 border-b border-border/60 gap-3 shrink-0 bg-background">
+            <div className="devotees-drawer-tabs flex p-4 px-6 border-b border-border/60 gap-3 shrink-0 bg-background">
               {([ { key: 'info', label: 'Info' }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'notify', label: 'Message' } ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-2 text-sm font-bold rounded-xl transition-all border-2 active:scale-[0.98] ${activeTab === tab.key ? 'bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 transform scale-105' : 'bg-background text-muted-foreground border-input hover:border-primary/40 hover:bg-muted/30 hover:text-foreground'}`}
+                  className={`devotees-drawer-tab flex-1 flex items-center justify-center gap-2 py-3 px-2 text-sm font-bold rounded-xl transition-all border-2 active:scale-[0.98] ${activeTab === tab.key ? 'devotees-drawer-tab-active bg-primary text-primary-foreground border-primary shadow-lg shadow-primary/20 transform scale-105' : 'bg-background text-muted-foreground border-input hover:border-primary/40 hover:bg-muted/30 hover:text-foreground'}`}
                 >
                   <span className="truncate">{tab.label}</span>
                   {typeof tab.count === 'number' && (

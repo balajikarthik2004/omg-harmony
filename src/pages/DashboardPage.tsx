@@ -14,23 +14,23 @@ import {
 } from '@/data/mockData';
 
 const kpis = [
-  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-rose-600', bg: 'bg-rose-50 border-rose-100', trend: '+12% from yesterday' },
-  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-100', trend: '4 pending approval' },
-  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100', trend: '+45 this week' },
-  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-100', trend: '' },
+  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-amber-800', bg: 'dashboard-kpi-amber', trend: '+12% from yesterday' },
+  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-blue-800', bg: 'dashboard-kpi-blue', trend: '4 pending approval' },
+  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-emerald-800', bg: 'dashboard-kpi-emerald', trend: '+45 this week' },
+  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-slate-800', bg: 'dashboard-kpi-slate', trend: '' },
 ];
 
 const secondaryKpis = [
-  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-blue-600 font-bold bg-blue-50 border border-blue-100' },
-  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-red-700 font-bold bg-red-50 border border-red-200 ring-2 ring-red-500/20' },
+  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-sky-700 font-bold bg-sky-50 border border-sky-200' },
+  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-amber-800 font-bold bg-amber-50 border border-amber-200 ring-2 ring-amber-500/20' },
 ];
 
 const recentActivity = [
   { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-emerald-100 text-emerald-800' },
-  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-blue-100 text-blue-800' },
+  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-sky-100 text-sky-800' },
   { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-amber-100 text-amber-800' },
   { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-indigo-100 text-indigo-800' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-rose-100 text-rose-800' },
+  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-slate-200 text-slate-700' },
 ];
 
 const upcomingEvents = [
@@ -39,12 +39,34 @@ const upcomingEvents = [
   { name: 'Navratri Festival', date: 'Apr 6', attendees: 3400 },
 ];
 
+const dashboardColors = {
+  line: 'hsl(205, 58%, 33%)',
+  lineGrid: 'hsl(210, 20%, 88%)',
+  lineFillTop: 'hsl(205, 58%, 33%)',
+  lineFillBottom: 'hsl(205, 58%, 33%)',
+  chartAccentA: 'hsl(205, 58%, 33%)',
+  chartAccentB: 'hsl(38, 48%, 45%)',
+  chartAccentC: 'hsl(169, 42%, 34%)',
+  chartAccentD: 'hsl(219, 18%, 49%)',
+  tooltipBorder: '1px solid hsl(210, 18%, 82%)',
+  tooltipShadow: '0 14px 34px -14px rgba(16, 24, 40, 0.35)',
+  tooltipBg: 'hsl(0, 0%, 100%)',
+  chartCursor: 'hsl(210, 40%, 96%)',
+};
+
 
 
 const DashboardPage: React.FC = () => {
+  const donationCategoryPalette = [
+    dashboardColors.chartAccentA,
+    dashboardColors.chartAccentB,
+    dashboardColors.chartAccentC,
+    dashboardColors.chartAccentD,
+  ];
+
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-primary/10 via-background to-secondary/10">
+    <div className="dashboard-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner dashboard-header-banner">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><LayoutDashboard className="w-5 h-5 text-primary" /> Executive Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">Real-time overview of temple operations, finances, and key metrics.</p>
@@ -62,7 +84,7 @@ const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-stagger">
         {kpis.map(kpi => (
-          <div key={kpi.label} className={`rounded-2xl border p-5 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden ${kpi.bg}`}>
+          <div key={kpi.label} className={`dashboard-kpi-card rounded-2xl border p-5 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden ${kpi.bg}`}>
             <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 bg-current ${kpi.color.split(' ')[0]}`} />
             <div className="flex justify-between items-start mb-4 relative z-10">
                <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground opacity-80">{kpi.label}</p>
@@ -80,7 +102,7 @@ const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-stagger">
         {secondaryKpis.map(kpi => (
-          <div key={kpi.label} className={`rounded-xl p-4 flex items-center justify-between shadow-sm ${kpi.color}`}>
+          <div key={kpi.label} className={`dashboard-secondary-kpi rounded-xl p-4 flex items-center justify-between shadow-sm ${kpi.color}`}>
             <div className="flex items-center gap-3">
               <kpi.icon className="w-5 h-5 opacity-80" />
               <p className="text-sm font-semibold">{kpi.label}</p>
@@ -100,25 +122,25 @@ const DashboardPage: React.FC = () => {
               <LineChart data={donationTrendData}>
                 <defs>
                   <linearGradient id="donationGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(1, 76%, 52%)" stopOpacity={0.2} />
-                    <stop offset="95%" stopColor="hsl(1, 76%, 52%)" stopOpacity={0} />
+                    <stop offset="5%" stopColor={dashboardColors.lineFillTop} stopOpacity={0.22} />
+                    <stop offset="95%" stopColor={dashboardColors.lineFillBottom} stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 12%, 92%)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000)}k`} dx={-10} />
                 <Tooltip 
                   formatter={(v: number) => [`₹${v.toLocaleString('en-IN')}`, 'Amount']}
                   separator=": "
-                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(40, 12%, 85%)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '13px', padding: '10px 14px' }}
+                  contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px', padding: '10px 14px' }}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="amount" 
-                  stroke="hsl(1, 76%, 52%)" 
+                  stroke={dashboardColors.line}
                   strokeWidth={3} 
-                  dot={{ r: 4, fill: 'hsl(1, 76%, 52%)', strokeWidth: 2, stroke: '#fff' }}
-                  activeDot={{ r: 6, fill: 'hsl(1, 76%, 52%)', strokeWidth: 2, stroke: '#fff' }}
+                  dot={{ r: 4, fill: dashboardColors.line, strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 6, fill: dashboardColors.line, strokeWidth: 2, stroke: '#fff' }}
                   fill="url(#donationGradient)"
                 />
               </LineChart>
@@ -135,11 +157,11 @@ const DashboardPage: React.FC = () => {
               <PieChart>
                 <Pie data={donationCategoryData} cx="50%" cy="50%" fontSize={12} outerRadius={85} innerRadius={45} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={{ stroke: 'hsl(40, 12%, 80%)' }} strokeWidth={2} stroke="hsl(40, 33%, 98%)">
                   {donationCategoryData.map((entry, i) => (
-                    <Cell key={i} fill={entry.color} />
+                    <Cell key={i} fill={donationCategoryPalette[i % donationCategoryPalette.length]} />
                   ))}
                 </Pie>
                 <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(40, 12%, 85%)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '13px' }}
+                  contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -155,14 +177,14 @@ const DashboardPage: React.FC = () => {
           <div className="p-5">
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={serviceBookingData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 12%, 92%)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="service" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(40, 12%, 85%)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '13px' }}
-                  cursor={{ fill: 'hsl(40, 20%, 94%)' }}
+                  contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
+                  cursor={{ fill: dashboardColors.chartCursor }}
                 />
-                <Bar dataKey="bookings" fill="hsl(233, 53%, 35%)" radius={[6, 6, 0, 0]} barSize={32} />
+                <Bar dataKey="bookings" fill={dashboardColors.chartAccentA} radius={[6, 6, 0, 0]} barSize={32} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -175,16 +197,16 @@ const DashboardPage: React.FC = () => {
           <div className="p-5">
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={inventoryUsageData} barGap={4}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40, 12%, 92%)" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="item" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
                 <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(40, 12%, 85%)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', fontSize: '13px' }}
-                  cursor={{ fill: 'hsl(40, 20%, 94%)' }}
+                  contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
+                  cursor={{ fill: dashboardColors.chartCursor }}
                 />
                 <Legend iconSize={10} wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
-                <Bar dataKey="used" fill="hsl(270, 43%, 32%)" radius={[4, 4, 0, 0]} barSize={24} />
-                <Bar dataKey="remaining" fill="hsl(40, 70%, 50%)" radius={[4, 4, 0, 0]} barSize={24} />
+                <Bar dataKey="used" fill={dashboardColors.chartAccentD} radius={[4, 4, 0, 0]} barSize={24} />
+                <Bar dataKey="remaining" fill={dashboardColors.chartAccentB} radius={[4, 4, 0, 0]} barSize={24} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -219,7 +241,7 @@ const DashboardPage: React.FC = () => {
           </div>
           <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto">
             {upcomingEvents.map((e, i) => (
-              <div key={i} className="flex flex-col p-3.5 bg-background border border-border/60 shadow-sm rounded-xl hover:border-primary/30 transition-colors duration-200 gap-2">
+              <div key={i} className="dashboard-event-card flex flex-col p-3.5 bg-background border border-border/60 shadow-sm rounded-xl hover:border-primary/30 transition-colors duration-200 gap-2">
                 <div className="flex justify-between items-center">
                   <p className="text-sm font-bold text-foreground">{e.name}</p>
                   <span className="text-[10px] text-primary bg-primary/10 rounded-full px-2.5 py-1 font-bold uppercase tracking-wider">{e.date}</span>

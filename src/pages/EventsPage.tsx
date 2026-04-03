@@ -161,32 +161,32 @@ const EventsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto">
-      <div className="page-header-banner">
+    <div className="events-premium space-y-6 max-w-[1500px] mx-auto">
+      <div className="page-header-banner events-header">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Temple Events & Poojas</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Manage daily poojas, festivals, and specialized temple gatherings dynamically.</p>
         </div>
-        <div className="flex bg-muted/80 backdrop-blur-sm rounded-lg p-1 border border-border/60">
-          <button onClick={() => setView('list')} className={`px-4 py-2 text-sm rounded-md transition-all font-medium ${view === 'list' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>List View</button>
-          <button onClick={() => setView('calendar')} className={`px-4 py-2 text-sm rounded-md transition-all font-medium ${view === 'calendar' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>Calendar</button>
+        <div className="events-view-toggle flex bg-muted/80 backdrop-blur-sm rounded-lg p-1 border border-border/60">
+          <button onClick={() => setView('list')} className={`events-view-btn px-4 py-2 text-sm rounded-md transition-all font-medium ${view === 'list' ? 'events-view-btn-active bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>List View</button>
+          <button onClick={() => setView('calendar')} className={`events-view-btn px-4 py-2 text-sm rounded-md transition-all font-medium ${view === 'calendar' ? 'events-view-btn-active bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}>Calendar</button>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 animate-fade-in">
-        <div className="stat-card">
+        <div className="stat-card events-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Temple</p>
           <p className="text-sm font-bold text-foreground truncate">{templeProfile.name}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card events-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Deity</p>
           <p className="text-sm font-bold text-foreground truncate">{templeProfile.deity}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card events-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Location</p>
           <p className="text-sm font-bold text-foreground truncate">{templeProfile.location}</p>
         </div>
-        <div className="stat-card flex items-center justify-between">
+        <div className="stat-card events-stat-card flex items-center justify-between">
           <div>
             <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Contact</p>
             <p className="text-sm font-bold text-foreground truncate">{templeProfile.contact}</p>
@@ -198,7 +198,7 @@ const EventsPage: React.FC = () => {
       </div>
 
       {view === 'list' ? (
-        <div className="section-panel animate-slide-up">
+        <div className="section-panel events-list-panel animate-slide-up">
           <div className="section-panel-header gap-4">
             <h2 className="text-base font-semibold">All Events List</h2>
             <Button onClick={openAdd} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Event</Button>
@@ -239,7 +239,7 @@ const EventsPage: React.FC = () => {
         </div>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 animate-slide-up">
-          <div className="flex-1 section-panel p-5">
+          <div className="flex-1 section-panel events-calendar-panel p-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
               <h2 className="text-2xl font-display font-bold text-foreground">
                 {MONTHS[currentDate.getMonth()]} <span className="text-primary">{currentDate.getFullYear()}</span>
@@ -286,7 +286,7 @@ const EventsPage: React.FC = () => {
           </div>
 
           <div className="w-full lg:w-[400px] flex flex-col gap-4">
-            <div className="section-panel p-5 min-h-[550px] flex flex-col">
+            <div className="section-panel events-day-panel p-5 min-h-[550px] flex flex-col">
               <div className="flex items-center justify-between mb-5">
                 <div>
                   <h3 className="text-lg font-bold text-foreground">{selectedDate ? formatDateDDMMYYYY(selectedDate) : 'Select a date'}</h3>
@@ -318,7 +318,7 @@ const EventsPage: React.FC = () => {
 
               <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin">
                 {filteredEvents.length > 0 ? filteredEvents.map(event => (
-                  <div key={event.id} onClick={() => setDetailEvent(event)} className="bg-background border border-border rounded-xl p-4 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden">
+                  <div key={event.id} onClick={() => setDetailEvent(event)} className="events-event-card bg-background border border-border rounded-xl p-4 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden">
                     {event.festivalName && <div className="absolute top-0 right-0 w-12 h-12 bg-orange-100/50 rounded-bl-full -z-0" />}
                     <div className="relative z-10">
                       <div className="flex gap-3 mb-3">

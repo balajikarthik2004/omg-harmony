@@ -256,16 +256,16 @@ const DonationsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-emerald-50/80 via-background to-teal-50/80">
+    <div className="donations-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner donations-header bg-gradient-to-r from-emerald-50/80 via-background to-teal-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><HandHeart className="w-5 h-5 text-emerald-600" /> Donation Ledger & Receipts</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage Hundi, online, and counter donations with integrated digital receipts.</p>
         </div>
-        <Button onClick={openAdd} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Record Donation</Button>
+        <Button onClick={openAdd} className="donations-cta shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Record Donation</Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center gap-3 justify-between bg-card p-3 rounded-xl border border-border shadow-sm flex-wrap">
+      <div className="donations-filter-bar flex flex-col sm:flex-row items-center gap-3 justify-between bg-card p-3 rounded-xl border border-border shadow-sm flex-wrap">
         <div className="flex flex-wrap items-center gap-2">
           {[
             { key: 'all', label: 'All Time' },
@@ -296,26 +296,26 @@ const DonationsPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-stagger">
-        <div className="stat-card flex flex-col justify-between bg-emerald-50/40 border-emerald-100">
+        <div className="stat-card donations-stat-card flex flex-col justify-between bg-emerald-50/40 border-emerald-100">
           <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 mb-1 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Total Collection</p>
           <div className="flex items-end justify-between mt-auto pt-2">
             <p className="text-3xl font-display font-bold text-foreground tracking-tight">{money(reports.total)}</p>
           </div>
         </div>
 
-        <div className="stat-card flex flex-col justify-between relative overflow-hidden group">
+        <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-16 h-16 bg-muted/40 rounded-bl-[100%] transition-transform group-hover:scale-110" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Hundi Drop</p>
           <p className="text-2xl font-bold text-foreground mt-2">{money(reports.byChannel.Hundi)}</p>
         </div>
 
-        <div className="stat-card flex flex-col justify-between relative overflow-hidden group">
+        <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-[100%] transition-transform group-hover:scale-110" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-blue-700 mb-1">Online Transfer</p>
           <p className="text-2xl font-bold text-blue-700 mt-2">{money(reports.byChannel.Online)}</p>
         </div>
 
-        <div className="stat-card flex flex-col justify-between relative overflow-hidden group">
+        <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-50 rounded-bl-[100%] transition-transform group-hover:scale-110" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-700 mb-1">Office Counter</p>
           <p className="text-2xl font-bold text-emerald-700 mt-2">{money(reports.byChannel.Counter)}</p>
@@ -323,7 +323,7 @@ const DonationsPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-5">
-        <div className="section-panel shadow-sm xl:col-span-3">
+        <div className="section-panel donations-ledger-panel shadow-sm xl:col-span-3">
           <div className="section-panel-header gap-3 border-b border-border/60 pb-3">
             <h2 className="text-sm font-semibold flex items-center gap-2"><Filter className="w-4 h-4 text-emerald-600" /> Donation Master Ledger</h2>
             <div className="relative flex-1 max-w-sm ml-auto">
@@ -393,7 +393,7 @@ const DonationsPage: React.FC = () => {
         </div>
 
         <div className="space-y-5 xl:sticky xl:top-4 self-start">
-          <div className="section-panel shadow-sm">
+          <div className="section-panel donations-side-panel shadow-sm">
             <div className="section-panel-header bg-gradient-to-b from-sky-50/50 to-background border-b border-border/60">
               <h2 className="text-sm font-semibold">Fund Allocation</h2>
               <span className="text-[10px] bg-primary/10 text-primary font-bold rounded-full px-2 py-0.5">{periodItems.length} records</span>
@@ -418,7 +418,7 @@ const DonationsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="section-panel shadow-sm">
+          <div className="section-panel donations-side-panel shadow-sm">
             <div className="section-panel-header border-b border-border/60">
               <h2 className="text-sm font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4 text-primary" /> Settlement Sources</h2>
             </div>
@@ -597,7 +597,7 @@ const DonationsPage: React.FC = () => {
                 )}
               </div>
 
-              <div className="pt-5 border-t border-dashed border-border/80 flex items-center justify-between bg-emerald-50/80 p-4 rounded-xl border-emerald-100/50 shadow-sm">
+              <div className="pt-5 border border-dashed border-emerald-100/50 flex items-center justify-between bg-emerald-50/80 p-4 rounded-xl shadow-sm">
                 <div>
                   <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800/70 mb-0.5">Sum of Rupees</p>
                   <StatusBadge status={selectedReceipt.paymentStatus} />

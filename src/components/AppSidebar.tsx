@@ -52,26 +52,26 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
 
   return (
     <aside
-      className={`flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden border-r border-white/10 shadow-[8px_0_28px_rgba(20,20,40,0.24)] transition-[width] duration-300 ${
+      className={`flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden border-r border-white/10 shadow-[10px_0_36px_rgba(8,18,34,0.34)] transition-[width] duration-300 ${
         isCollapsed ? 'w-20' : 'w-64'
       }`}
       style={{
-        background: 'linear-gradient(180deg, hsl(233, 53%, 30%) 0%, hsl(233, 53%, 21%) 65%, hsl(233, 50%, 18%) 100%)',
+        background: 'linear-gradient(185deg, hsl(211, 52%, 19%) 0%, hsl(218, 50%, 14%) 58%, hsl(222, 46%, 11%) 100%)',
         color: 'hsl(0, 0%, 100%)',
       }}
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full bg-red-300/15 blur-3xl" />
+        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full bg-sky-200/20 blur-3xl" />
+        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full bg-amber-300/20 blur-3xl" />
       </div>
 
       {/* Logo area */}
-      <div className={`relative border-b border-white/10 backdrop-blur-sm ${isCollapsed ? 'p-3' : 'p-5'}`}>
+      <div className={`relative border-b border-white/10 backdrop-blur-sm bg-white/[0.03] ${isCollapsed ? 'p-3' : 'p-5'}`}>
         <div className={`flex ${isCollapsed ? 'flex-col items-center gap-2' : 'items-start justify-between gap-3'}`}>
           <button
             type="button"
             onClick={onToggleCollapse}
-            className={`h-7 w-7 rounded-md border border-white/20 bg-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-colors duration-200 flex items-center justify-center ${
+            className={`h-7 w-7 rounded-md border border-white/20 bg-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-all duration-200 hover:shadow-[0_8px_20px_rgba(0,0,0,0.22)] flex items-center justify-center ${
               isCollapsed ? 'order-1' : 'order-2 mt-0.5'
             }`}
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -108,8 +108,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
                   isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'
                 } ${
                   isActive
-                    ? 'border-white/25 bg-white/14 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_18px_rgba(0,0,0,0.18)] -translate-y-[1px]'
-                    : 'border-transparent text-white/70 hover:text-white hover:bg-white/10 hover:border-white/15 hover:-translate-y-[1px] hover:shadow-[0_8px_18px_rgba(0,0,0,0.14)]'
+                    ? 'border-white/25 bg-[linear-gradient(140deg,rgba(255,255,255,0.22),rgba(255,255,255,0.1))] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_10px_18px_rgba(0,0,0,0.22)] -translate-y-[1px]'
+                    : 'border-transparent text-white/75 hover:text-white hover:bg-white/10 hover:border-white/20 hover:-translate-y-[1px] hover:shadow-[0_8px_18px_rgba(0,0,0,0.18)]'
                 }`
               }
             >
@@ -117,12 +117,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
                 <>
                   <span
                     className={`absolute inset-y-1 left-1 w-1 rounded-full transition-all duration-200 ${
-                      isActive ? 'bg-red-200/90' : 'bg-transparent group-hover:bg-white/35'
+                      isActive ? 'bg-amber-200/95 shadow-[0_0_12px_rgba(252,211,77,0.8)]' : 'bg-transparent group-hover:bg-white/35'
                     }`}
                   />
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200 ${
-                      isActive ? 'bg-white/16 text-white' : 'bg-white/[0.07] text-white/70 group-hover:bg-white/15 group-hover:text-white'
+                      isActive ? 'bg-white/20 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]' : 'bg-white/[0.08] text-white/75 group-hover:bg-white/18 group-hover:text-white'
                     }`}
                   >
                     <link.icon className="h-4 w-4" />
@@ -143,10 +143,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
       </nav>
 
       {/* User info & logout */}
-      <div className={`relative border-t border-white/10 bg-black/5 backdrop-blur-sm ${isCollapsed ? 'p-2.5 space-y-2' : 'p-3.5 space-y-2.5'}`}>
+      <div className={`relative border-t border-white/10 bg-black/10 backdrop-blur-sm ${isCollapsed ? 'p-2.5 space-y-2' : 'p-3.5 space-y-2.5'}`}>
         {/* User info pill */}
-        <div className={`flex items-center rounded-xl bg-white/8 border border-white/10 ${isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'}`}>
-          <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-xs font-semibold text-white shadow-inner">
+        <div className={`flex items-center rounded-xl bg-white/10 border border-white/15 ${isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'}`}>
+          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white shadow-inner">
             {user?.name?.charAt(0) || 'U'}
           </div>
           {!isCollapsed && (
@@ -159,7 +159,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
         <button
           onClick={handleLogout}
           title={isCollapsed ? 'Logout' : undefined}
-          className={`group flex items-center rounded-xl text-sm font-medium text-white/75 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15 w-full transition-all duration-200 hover:-translate-y-[1px] ${
+          className={`group flex items-center rounded-xl text-sm font-medium text-white/75 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/20 w-full transition-all duration-200 hover:-translate-y-[1px] ${
             isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'
           }`}
         >

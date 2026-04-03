@@ -397,32 +397,32 @@ const AnnadhanamPage: React.FC = () => {
   const setDField = <K extends keyof Omit<DistributionLog, 'id'>>(k: K, v: any) => setDistForm(p => ({ ...p, [k]: v }));
 
   return (
-    <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-orange-50/80 via-background to-rose-50/80">
+    <div className="annadhanam-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="page-header-banner annadhanam-header bg-gradient-to-r from-orange-50/80 via-background to-rose-50/80">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><UtensilsCrossed className="w-5 h-5 text-orange-600" /> Annadhanam Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Free meal planning, serving logs, volunteer tracking, and ingredients inventory.</p>
         </div>
         <div className="flex flex-wrap gap-2 justify-end">
-          {tab === 'planner' && <Button onClick={openAddMeal} className="shadow-md bg-orange-600 hover:bg-orange-700 text-white"><Plus className="h-4 w-4 mr-2" />Plan Meal</Button>}
-          {tab === 'distribution' && <Button onClick={openAddDistribution} className="shadow-md bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Log Distribution</Button>}
+          {tab === 'planner' && <Button onClick={openAddMeal} className="annadhanam-cta shadow-md bg-orange-600 hover:bg-orange-700 text-white"><Plus className="h-4 w-4 mr-2" />Plan Meal</Button>}
+          {tab === 'distribution' && <Button onClick={openAddDistribution} className="annadhanam-cta shadow-md bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Log Distribution</Button>}
         </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="stat-card">
+        <div className="stat-card annadhanam-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Total Meal Plans</p>
           <p className="text-2xl font-bold mt-1 text-foreground">{meals.items.length}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card annadhanam-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Served This Month</p>
           <p className="text-2xl font-bold mt-1 text-emerald-700">{servedMonth.toLocaleString('en-IN')}</p>
         </div>
-        <div className="stat-card">
+        <div className="stat-card annadhanam-stat-card">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-orange-800 flex items-center gap-1.5"><Utensils className="w-3.5 h-3.5" /> Meals Today</p>
           <p className="text-2xl font-bold mt-1 text-orange-600">{mealByDate.length}</p>
         </div>
-        <div className="stat-card border-red-100 bg-red-50/30">
+        <div className="stat-card annadhanam-stat-card border-red-100 bg-red-50/30">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-red-800 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Low Stock Items</p>
           <p className="text-2xl font-bold mt-1 text-red-600">{lowStockCount}</p>
         </div>
@@ -437,7 +437,7 @@ const AnnadhanamPage: React.FC = () => {
           <button
             key={sec.key}
             onClick={() => setTab(sec.key)}
-            className={`flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 border-2 shadow-sm
+            className={`annadhanam-tab-btn flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 border-2 shadow-sm
               ${tab === sec.key 
                 ? `${sec.color} text-white shadow-lg scale-[1.03]` 
                 : 'bg-background border-border text-muted-foreground hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground'}`}
@@ -462,15 +462,17 @@ const AnnadhanamPage: React.FC = () => {
       <div className="animate-slide-up">
         {tab === 'planner' && (
           <div className="space-y-6">
-            <WeekCalendar plans={meals.items} selectedDate={selectedDate} onDaySelect={handleDateSelect} />
+            <div className="annadhanam-week-shell">
+              <WeekCalendar plans={meals.items} selectedDate={selectedDate} onDaySelect={handleDateSelect} />
+            </div>
 
-            <section className="section-panel">
+            <section className="section-panel annadhanam-main-panel">
               <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
                 <h2 className="text-sm font-semibold flex items-center gap-2"><ClipboardList className="w-4 h-4 text-primary" /> Active Meal Plans</h2>
                 <div className="relative w-full sm:max-w-xs ml-auto">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
-                    className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 hover:border-border transition-all outline-none shadow-sm"
+                    className="annadhanam-search-input h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 hover:border-border transition-all outline-none shadow-sm"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Search plans or organizers..."
@@ -494,7 +496,7 @@ const AnnadhanamPage: React.FC = () => {
                     {filteredMeals.length === 0 ? <tr><td colSpan={7} className="p-10 text-center text-muted-foreground">No meal plans match the criteria.</td></tr> : filteredMeals.map(plan => {
                       const Icon = mealTypeColor[plan.mealType].icon;
                       return (
-                        <tr key={plan.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                        <tr key={plan.id} className="annadhanam-row border-b border-border hover:bg-muted/30 transition-colors">
                           <td className="p-4">
                             <p className="font-bold text-foreground">{plan.id}</p>
                             <p className="text-[11px] text-muted-foreground mt-0.5 font-medium"><Calendar className="w-3 h-3 inline mr-1" />{formatDateDDMMYYYY(plan.date)}</p>
@@ -534,7 +536,7 @@ const AnnadhanamPage: React.FC = () => {
         )}
 
         {tab === 'distribution' && (
-          <section className="section-panel">
+          <section className="section-panel annadhanam-main-panel">
             <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
               <h2 className="text-sm font-semibold flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Distribution Logs Overview</h2>
             </div>
@@ -562,7 +564,7 @@ const AnnadhanamPage: React.FC = () => {
                     const wastePct = log.expectedCount > 0 ? (wastedCount / log.expectedCount) * 100 : 0;
                     const tone = wastePct >= 15 ? 'bg-red-50 text-red-700 border-red-200' : wastePct > 0 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200';
                     return (
-                      <tr key={log.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                      <tr key={log.id} className="annadhanam-row border-b border-border hover:bg-muted/30 transition-colors">
                         <td className="p-4 font-bold text-foreground">{log.id}</td>
                         <td className="p-4">
                           <p className="font-semibold text-sm">{log.mealType}</p>
@@ -619,7 +621,7 @@ const AnnadhanamPage: React.FC = () => {
 
             <div className="flex flex-col lg:flex-row gap-6">
               <div className="lg:w-64 shrink-0 flex flex-col gap-3">
-                <div className="section-panel p-5 bg-gradient-to-b from-sky-50/50 to-background flex-1">
+                <div className="section-panel annadhanam-side-panel p-5 bg-gradient-to-b from-sky-50/50 to-background flex-1">
                   <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground mb-1">Total Ingredients</p>
                   <p className="text-4xl font-display font-bold text-foreground mb-6">{stock.items.length}</p>
 
@@ -639,7 +641,7 @@ const AnnadhanamPage: React.FC = () => {
                   const isCrit = level === 'critical';
                   const levelColor = isCrit ? 'text-red-700 bg-red-100 border-red-200 ring-2 ring-red-500/20' : level === 'low' ? 'text-amber-800 bg-amber-100 border-amber-300' : 'text-emerald-800 bg-emerald-50 border-emerald-200 border-dashed';
                   return (
-                    <div key={item.id} className="rounded-xl border border-border/60 bg-background shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col items-start relative overflow-hidden group">
+                    <div key={item.id} className="annadhanam-inv-card rounded-xl border border-border/60 bg-background shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col items-start relative overflow-hidden group">
                       {isCrit && <div className="absolute top-0 right-0 w-12 h-12 bg-red-500/5 -z-0 rounded-bl-full" />}
 
                       <div className="w-full flex items-start justify-between mb-4 z-10 relative">
@@ -669,7 +671,7 @@ const AnnadhanamPage: React.FC = () => {
       </div>
 
       <Modal open={mealModalOpen} onClose={() => setMealModalOpen(false)} title={editMealId ? 'Edit Meal Plan Options' : 'Create New Meal Plan'}>
-        <div className="space-y-5 px-1 max-h-[80vh] overflow-y-auto pb-4">
+        <div className="annadhanam-form-shell space-y-5 px-1 max-h-[80vh] overflow-y-auto pb-4">
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Service Date" value={mealForm.date} onChange={v => setMField('date', v)} type="date" required />
             <div className="space-y-1.5">
@@ -736,7 +738,7 @@ const AnnadhanamPage: React.FC = () => {
       </Modal>
 
       <Modal open={distModalOpen} onClose={() => setDistModalOpen(false)} title={editDistId ? 'Update Distribution Log' : 'Create New Log'}>
-        <div className="space-y-4 px-1 pb-2">
+        <div className="annadhanam-form-shell space-y-4 px-1 pb-2">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-foreground">Select Source Meal Plan</label>
             <select className="w-full h-11 rounded-lg border border-input bg-background/60 px-4 text-sm focus:ring-2 focus:ring-primary/20 outline-none font-medium text-foreground group shadow-sm transition-all hover:border-border" value={distForm.mealPlanId} onChange={e => {
