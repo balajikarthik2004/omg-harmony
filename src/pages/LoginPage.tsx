@@ -58,9 +58,9 @@ const LoginPage: React.FC = () => {
         {/* Branding content on image */}
         <div className="relative z-10 flex flex-col justify-between p-10 w-full">
           {/* Top: Logo */}
-          <div className="animate-fade-in">
+          {/* <div className="animate-fade-in">
             <img src={logo} alt="OMG Temple" className="h-14"  />
-          </div>
+          </div> */}
 
           {/* Bottom: Welcome copy */}
           {/* <div className="animate-fade-in max-w-md space-y-4" style={{ animationDelay: '0.2s' }}>

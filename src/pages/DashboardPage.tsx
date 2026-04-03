@@ -14,23 +14,23 @@ import {
 } from '@/data/mockData';
 
 const kpis = [
-  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-amber-800', bg: 'dashboard-kpi-amber', trend: '+12% from yesterday' },
-  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-blue-800', bg: 'dashboard-kpi-blue', trend: '4 pending approval' },
-  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-emerald-800', bg: 'dashboard-kpi-emerald', trend: '+45 this week' },
-  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-slate-800', bg: 'dashboard-kpi-slate', trend: '' },
+  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-[#E22E26]', bg: 'dashboard-kpi-amber', trend: '+12% from yesterday' },
+  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-[#293088]', bg: 'dashboard-kpi-blue', trend: '4 pending approval' },
+  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-[#4F58CA]', bg: 'dashboard-kpi-emerald', trend: '+45 this week' },
+  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-[#C5221D]', bg: 'dashboard-kpi-slate', trend: '' },
 ];
 
 const secondaryKpis = [
-  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-sky-700 font-bold bg-sky-50 border border-sky-200' },
-  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-amber-800 font-bold bg-amber-50 border border-amber-200 ring-2 ring-amber-500/20' },
+  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-[#293088] font-bold bg-[#EBECF9] border border-[#C4C7ED]' },
+  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-[#E22E26] font-bold bg-[#F9D6D4] border border-[#F3ADA8] ring-2 ring-[#E22E26]/20' },
 ];
 
 const recentActivity = [
-  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-emerald-100 text-emerald-800' },
-  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-sky-100 text-sky-800' },
-  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-amber-100 text-amber-800' },
-  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-indigo-100 text-indigo-800' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-slate-200 text-slate-700' },
+  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-[#F9D6D4] text-[#C5221D]' },
+  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-[#EBECF9] text-[#293088]' },
+  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-[#C4C7ED] text-[#293088]' },
+  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-[#9DA2E1] text-[#293088]' },
+  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-[#F3ADA8] text-[#C5221D]' },
 ];
 
 const upcomingEvents = [
@@ -40,18 +40,18 @@ const upcomingEvents = [
 ];
 
 const dashboardColors = {
-  line: 'hsl(205, 58%, 33%)',
-  lineGrid: 'hsl(210, 20%, 88%)',
-  lineFillTop: 'hsl(205, 58%, 33%)',
-  lineFillBottom: 'hsl(205, 58%, 33%)',
-  chartAccentA: 'hsl(205, 58%, 33%)',
-  chartAccentB: 'hsl(38, 48%, 45%)',
-  chartAccentC: 'hsl(169, 42%, 34%)',
-  chartAccentD: 'hsl(219, 18%, 49%)',
-  tooltipBorder: '1px solid hsl(210, 18%, 82%)',
-  tooltipShadow: '0 14px 34px -14px rgba(16, 24, 40, 0.35)',
+  line: '#293088',
+  lineGrid: '#D7DAF0',
+  lineFillTop: '#4F58CA',
+  lineFillBottom: '#4F58CA',
+  chartAccentA: '#293088',
+  chartAccentB: '#4F58CA',
+  chartAccentC: '#767DD6',
+  chartAccentD: '#E22E26',
+  tooltipBorder: '1px solid #C4C7ED',
+  tooltipShadow: '0 14px 34px -14px rgba(41, 48, 136, 0.35)',
   tooltipBg: 'hsl(0, 0%, 100%)',
-  chartCursor: 'hsl(210, 40%, 96%)',
+  chartCursor: '#EBECF9',
 };
 
 
@@ -68,12 +68,12 @@ const DashboardPage: React.FC = () => {
     <div className="dashboard-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
       <div className="page-header-banner dashboard-header-banner">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><LayoutDashboard className="w-5 h-5 text-primary" /> Executive Dashboard</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><LayoutDashboard className="dashboard-title-icon w-5 h-5 text-primary" /> Executive Dashboard</h1>
           <p className="text-sm text-muted-foreground mt-1">Real-time overview of temple operations, finances, and key metrics.</p>
         </div>
         <div className="flex gap-2">
            <div className="relative w-full max-w-[200px] hidden sm:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="dashboard-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
                 placeholder="Quick search..."
@@ -93,7 +93,7 @@ const DashboardPage: React.FC = () => {
                </div>
             </div>
             <div className="relative z-10">
-               <p className="text-3xl font-display font-bold text-foreground tracking-tight">{kpi.value}</p>
+               <p className="numeric-font text-3xl font-bold text-foreground tracking-tight">{kpi.value}</p>
                <p className="text-xs font-semibold text-muted-foreground mt-1">{kpi.trend}</p>
             </div>
           </div>
@@ -107,7 +107,7 @@ const DashboardPage: React.FC = () => {
               <kpi.icon className="w-5 h-5 opacity-80" />
               <p className="text-sm font-semibold">{kpi.label}</p>
             </div>
-            <p className="text-xl font-bold">{kpi.value}</p>
+            <p className="numeric-font text-xl font-bold">{kpi.value}</p>
           </div>
         ))}
       </div>
@@ -155,7 +155,7 @@ const DashboardPage: React.FC = () => {
           <div className="p-5 flex-1 flex flex-col justify-center relative">
             <ResponsiveContainer width="100%" height={230}>
               <PieChart>
-                <Pie data={donationCategoryData} cx="50%" cy="50%" fontSize={12} outerRadius={85} innerRadius={45} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={{ stroke: 'hsl(40, 12%, 80%)' }} strokeWidth={2} stroke="hsl(40, 33%, 98%)">
+                <Pie data={donationCategoryData} cx="50%" cy="50%" fontSize={12} outerRadius={85} innerRadius={45} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={{ stroke: '#C4C7ED' }} strokeWidth={2} stroke="#F8F9FF">
                   {donationCategoryData.map((entry, i) => (
                     <Cell key={i} fill={donationCategoryPalette[i % donationCategoryPalette.length]} />
                   ))}

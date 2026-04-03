@@ -19,7 +19,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const DEMO_USERS: Record<UserRole, User> = {
-  admin: { id: '1', email: 'admin@omgtemple.com', name: 'Admin User', role: 'admin' },
+  admin: { id: '1', email: 'admin@omgtemple.com', name: 'Admin', role: 'admin' },
   manager: { id: '2', email: 'manager@omgtemple.com', name: 'Temple Manager', role: 'manager' },
   devotee: { id: '3', email: 'devotee@omgtemple.com', name: 'Rajesh Kumar', role: 'devotee' },
 };

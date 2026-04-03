@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,8 +6,8 @@
 
 @layer base {
   :root {
-    --background: 40 33% 98%;
-    --foreground: 220 15% 15%;
+    --background: 230 30% 98%;
+    --foreground: 228 28% 18%;
 
     --card: 0 0% 100%;
     --card-foreground: 220 15% 15%;
@@ -15,38 +15,55 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
 
-    --primary: 1 76% 52%;
+    --primary: 2 76% 52%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 233 53% 35%;
+    --secondary: 236 54% 35%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 40 20% 94%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 230 35% 95%;
+    --muted-foreground: 228 12% 42%;
 
-    --accent: 270 43% 32%;
+    --accent: 236 54% 35%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 40 12% 90%;
-    --input: 40 12% 88%;
-    --ring: 1 76% 52%;
+    --border: 232 26% 88%;
+    --input: 232 26% 86%;
+    --ring: 2 76% 52%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 233 53% 28%;
+    --sidebar-background: 236 54% 30%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 1 76% 52%;
+    --sidebar-primary: 2 76% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 233 53% 22%;
+    --sidebar-accent: 236 54% 24%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 233 40% 24%;
-    --sidebar-ring: 1 76% 52%;
+    --sidebar-border: 236 42% 26%;
+    --sidebar-ring: 2 76% 52%;
 
-    --font-display: 'Playfair Display', serif;
-    --font-body: 'Inter', sans-serif;
+    --brand-primary: #E22E26;
+    --brand-secondary: #293088;
+    --brand-blue-50: #EBECF9;
+    --brand-blue-100: #C4C7ED;
+    --brand-blue-200: #9DA2E1;
+    --brand-blue-300: #767DD6;
+    --brand-blue-400: #4F58CA;
+    --brand-blue-500: #353EB0;
+    --brand-blue-600: #293088;
+    --brand-red-100: #F9D6D4;
+    --brand-red-200: #F3ADA8;
+    --brand-red-300: #EC857D;
+    --brand-red-400: #E55C52;
+    --brand-red-500: #E22E26;
+    --brand-red-600: #C5221D;
+
+    --font-display: 'Montserrat', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+    --font-numeric: 'Roboto', 'Montserrat', sans-serif;
 
     --success: 152 60% 40%;
     --warning: 38 92% 50%;
@@ -61,14 +78,54 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    font-variant-numeric: lining-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
+  }
+
+  .font-sans {
+    font-family: var(--font-body) !important;
+  }
+
+  .font-serif {
+    font-family: var(--font-display) !important;
+  }
+
+  .font-mono {
+    font-family: var(--font-body) !important;
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+
+  .kpi-card .text-2xl,
+  .kpi-card .text-3xl,
+  .stat-card .text-2xl,
+  .stat-card .text-3xl,
+  .dashboard-kpi-card .text-2xl,
+  .dashboard-kpi-card .text-3xl,
+  .devotees-drawer-stat .text-xl,
+  .section-panel table td.text-xs,
+  .section-panel table td .font-mono {
+    font-family: var(--font-numeric);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    letter-spacing: 0;
+  }
+
+  .numeric-font {
+    font-family: var(--font-numeric) !important;
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+    letter-spacing: 0;
   }
 
   /* Smooth scrollbars */
@@ -364,28 +421,27 @@
   .dashboard-premium {
     position: relative;
     isolation: isolate;
-    background:
-      linear-gradient(150deg, hsla(210, 35%, 97%, 0.9) 0%, hsla(42, 40%, 96%, 0.72) 60%, hsla(204, 28%, 96%, 0.88) 100%);
+    background: transparent;
   }
 
   .dashboard-premium::before {
-    content: '';
+    content: none;
     position: absolute;
     inset: -24px -20px auto -20px;
     height: 280px;
     background:
-      radial-gradient(70% 85% at 18% 10%, hsla(208, 68%, 30%, 0.22) 0%, transparent 60%),
-      radial-gradient(60% 80% at 78% 12%, hsla(39, 55%, 46%, 0.24) 0%, transparent 62%);
+      radial-gradient(70% 85% at 18% 10%, rgba(41, 48, 136, 0.22) 0%, transparent 60%),
+      radial-gradient(60% 80% at 78% 12%, rgba(226, 46, 38, 0.2) 0%, transparent 62%);
     pointer-events: none;
     z-index: -1;
     filter: blur(5px);
   }
 
   .dashboard-header-banner {
-    background: linear-gradient(130deg, hsla(210, 54%, 20%, 1) 0%, hsla(211, 48%, 26%, 1) 47%, hsla(35, 42%, 33%, 1) 100%);
-    border-color: hsla(209, 40%, 26%, 0.85);
+    background: linear-gradient(130deg, #293088 0%, #353eb0 47%, #e22e26 100%);
+    border-color: rgba(41, 48, 136, 0.85);
     box-shadow:
-      0 20px 32px -22px rgba(10, 22, 35, 0.7),
+      0 10px 12px -22px rgba(33, 37, 96, 0.7),
       0 1px 0 0 rgba(255, 255, 255, 0.08) inset;
   }
 
@@ -395,46 +451,54 @@
     color: hsl(0 0% 100% / 0.96) !important;
   }
 
+  .dashboard-header-banner .dashboard-title-icon {
+    color: #f9d6d4 !important;
+  }
+
+  .dashboard-header-banner .dashboard-search-icon {
+    color: #4f58ca !important;
+  }
+
   .dashboard-header-banner input {
-    background: hsla(210, 35%, 99%, 0.95) !important;
+    background: rgba(255, 255, 255, 0.96) !important;
     border-color: hsla(0, 0%, 100%, 0.24) !important;
-    color: hsl(215, 30%, 19%);
+    color: #232647;
   }
 
   .dashboard-kpi-card {
-    border-color: hsla(210, 18%, 82%, 0.7);
+    border-color: rgba(157, 162, 225, 0.7);
     box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.05),
-      0 16px 28px -24px rgba(15, 23, 42, 0.45);
+      0 1px 2px rgba(41, 48, 136, 0.06),
+      0 16px 28px -24px rgba(41, 48, 136, 0.4);
     backdrop-filter: saturate(1.03);
   }
 
   .dashboard-kpi-card:hover {
     transform: translateY(-3px);
     box-shadow:
-      0 2px 5px rgba(15, 23, 42, 0.06),
-      0 24px 42px -20px rgba(15, 23, 42, 0.52);
-    border-color: hsla(205, 58%, 33%, 0.32);
+      0 2px 5px rgba(41, 48, 136, 0.08),
+      0 24px 42px -20px rgba(41, 48, 136, 0.46);
+    border-color: rgba(41, 48, 136, 0.38);
   }
 
   .dashboard-kpi-amber {
-    background: linear-gradient(165deg, hsla(42, 95%, 95%, 1) 0%, hsla(40, 80%, 90%, 0.9) 100%);
-    border-color: hsla(38, 56%, 69%, 0.68);
+    background: linear-gradient(165deg, #fff3f2 0%, #f9d6d4 100%);
+    border-color: rgba(229, 92, 82, 0.58);
   }
 
   .dashboard-kpi-blue {
-    background: linear-gradient(165deg, hsla(208, 82%, 96%, 1) 0%, hsla(205, 72%, 90%, 0.88) 100%);
-    border-color: hsla(206, 56%, 72%, 0.7);
+    background: linear-gradient(165deg, #f1f2fb 0%, #c4c7ed 100%);
+    border-color: rgba(79, 88, 202, 0.46);
   }
 
   .dashboard-kpi-emerald {
-    background: linear-gradient(165deg, hsla(158, 58%, 95%, 1) 0%, hsla(160, 50%, 89%, 0.9) 100%);
-    border-color: hsla(161, 40%, 69%, 0.68);
+    background: linear-gradient(165deg, #f7f8ff 0%, #9da2e1 100%);
+    border-color: rgba(41, 48, 136, 0.44);
   }
 
   .dashboard-kpi-slate {
-    background: linear-gradient(165deg, hsla(220, 20%, 96%, 1) 0%, hsla(214, 16%, 90%, 0.9) 100%);
-    border-color: hsla(215, 16%, 73%, 0.72);
+    background: linear-gradient(165deg, #fff6f5 0%, #f3ada8 100%);
+    border-color: rgba(226, 46, 38, 0.36);
   }
 
   .dashboard-secondary-kpi {
@@ -443,30 +507,30 @@
 
   .dashboard-secondary-kpi:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 28px -20px rgba(15, 23, 42, 0.44);
-    border-color: hsla(205, 58%, 33%, 0.28);
+    box-shadow: 0 18px 28px -20px rgba(41, 48, 136, 0.44);
+    border-color: rgba(41, 48, 136, 0.34);
   }
 
   .dashboard-premium .section-panel {
-    border-color: hsla(210, 22%, 81%, 0.72);
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 1) 0%, hsla(210, 20%, 99%, 1) 100%);
+    border-color: rgba(157, 162, 225, 0.54);
+    background: linear-gradient(180deg, #ffffff 0%, #f6f7ff 100%);
     box-shadow:
-      0 1px 2px rgba(10, 20, 30, 0.05),
-      0 18px 36px -28px rgba(10, 20, 30, 0.45);
+      0 1px 2px rgba(41, 48, 136, 0.06),
+      0 18px 36px -28px rgba(41, 48, 136, 0.3);
     transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
   }
 
   .dashboard-premium .section-panel:hover {
     transform: translateY(-2px);
-    border-color: hsla(205, 58%, 33%, 0.25);
+    border-color: rgba(41, 48, 136, 0.35);
     box-shadow:
-      0 2px 5px rgba(10, 20, 30, 0.06),
-      0 26px 44px -30px rgba(10, 20, 30, 0.45);
+      0 2px 5px rgba(41, 48, 136, 0.08),
+      0 26px 44px -30px rgba(41, 48, 136, 0.38);
   }
 
   .dashboard-premium .section-panel-header {
-    background: linear-gradient(180deg, hsla(210, 34%, 95%, 1) 0%, hsla(210, 30%, 93%, 0.8) 100%);
-    border-bottom-color: hsla(210, 18%, 80%, 0.85);
+    background: linear-gradient(180deg, #eef0fb 0%, #e3e7fa 100%);
+    border-bottom-color: rgba(157, 162, 225, 0.72);
   }
 
   .dashboard-event-card {
@@ -475,8 +539,8 @@
 
   .dashboard-event-card:hover {
     transform: translateY(-2px) scale(1.005);
-    box-shadow: 0 18px 30px -24px rgba(15, 23, 42, 0.48);
-    border-color: hsla(205, 58%, 33%, 0.3);
+    box-shadow: 0 18px 30px -24px rgba(41, 48, 136, 0.48);
+    border-color: rgba(41, 48, 136, 0.38);
   }
 
   .donations-premium,
@@ -1959,5 +2023,174 @@
   .settings-premium .text-emerald-700,
   .settings-premium .text-primary {
     color: hsl(212, 38%, 32%) !important;
+  }
+
+  /* Global palette refresh: strong red-indigo system */
+  .page-header-banner {
+    border-color: color-mix(in srgb, var(--brand-blue-600) 26%, white) !important;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-50) 72%, white) 0%, color-mix(in srgb, #ffffff 78%, var(--brand-blue-100)) 55%, color-mix(in srgb, #ffffff 75%, var(--brand-red-100)) 100%) !important;
+  }
+
+  .dashboard-header-banner,
+  .donations-header,
+  .events-header,
+  .devotees-header,
+  .poojs-header,
+  .annadhanam-header,
+  .hr-header,
+  .campaign-header,
+  .inventory-header,
+  .assets-header,
+  .docs-header,
+  .settings-header {
+    border-color: color-mix(in srgb, var(--brand-blue-600) 70%, black) !important;
+    background: linear-gradient(135deg, var(--brand-blue-600) 0%, var(--brand-blue-500) 52%, var(--brand-primary) 100%) !important;
+    box-shadow: 0 26px 40px -22px rgba(27, 34, 84, 0.78) !important;
+  }
+
+  .dashboard-header-banner h1,
+  .dashboard-header-banner p,
+  .donations-header h1,
+  .donations-header p,
+  .events-header h1,
+  .events-header p,
+  .devotees-header h1,
+  .devotees-header p,
+  .poojs-header h1,
+  .poojs-header p,
+  .annadhanam-header h1,
+  .annadhanam-header p,
+  .hr-header h1,
+  .hr-header p,
+  .campaign-header h1,
+  .campaign-header p,
+  .inventory-header h1,
+  .inventory-header p,
+  .assets-header h1,
+  .assets-header p,
+  .docs-header h1,
+  .docs-header p,
+  .settings-header h1,
+  .settings-header p {
+    color: #ffffff !important;
+  }
+
+  .donations-cta,
+  .devotees-cta,
+  .pooja-cta,
+  .annadhanam-cta,
+  .campaign-send-btn,
+  .inventory-cta,
+  .assets-cta,
+  .docs-cta,
+  .docs-sync-btn,
+  .settings-cta {
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-red-600) 100%) !important;
+    color: #fff !important;
+    border-color: color-mix(in srgb, var(--brand-red-600) 72%, black) !important;
+    box-shadow: 0 16px 28px -16px rgba(188, 31, 30, 0.65) !important;
+  }
+
+  .donations-cta:hover,
+  .devotees-cta:hover,
+  .pooja-cta:hover,
+  .annadhanam-cta:hover,
+  .campaign-send-btn:hover,
+  .inventory-cta:hover,
+  .assets-cta:hover,
+  .docs-cta:hover,
+  .docs-sync-btn:hover,
+  .settings-cta:hover {
+    background: linear-gradient(135deg, var(--brand-red-600) 0%, var(--brand-primary) 100%) !important;
+    box-shadow: 0 22px 34px -18px rgba(188, 31, 30, 0.76) !important;
+  }
+
+  .stat-card,
+  .section-panel,
+  .donations-ledger-panel,
+  .donations-side-panel,
+  .events-list-panel,
+  .events-calendar-panel,
+  .events-day-panel,
+  .devotees-table-shell,
+  .pooja-main-panel,
+  .pooja-side-panel,
+  .annadhanam-main-panel,
+  .annadhanam-side-panel,
+  .hr-main-panel,
+  .campaign-main-panel,
+  .campaign-side-panel,
+  .inventory-main-panel,
+  .assets-main-panel,
+  .docs-main-panel,
+  .settings-profile-panel,
+  .settings-members-panel {
+    border-color: color-mix(in srgb, var(--brand-blue-300) 38%, white) !important;
+    background: linear-gradient(180deg, #ffffff 0%, color-mix(in srgb, #ffffff 80%, var(--brand-blue-50)) 65%, color-mix(in srgb, #ffffff 86%, var(--brand-red-100)) 100%) !important;
+    box-shadow: 0 24px 36px -30px rgba(41, 48, 136, 0.44) !important;
+  }
+
+  .section-panel-header,
+  .settings-panel-header,
+  .docs-main-header,
+  .assets-main-header,
+  .inventory-main-panel .section-panel-header,
+  .campaign-main-panel .section-panel-header,
+  .campaign-side-panel .section-panel-header,
+  .donations-premium .section-panel-header,
+  .events-premium .section-panel-header {
+    background: linear-gradient(180deg, color-mix(in srgb, #ffffff 62%, var(--brand-blue-50)) 0%, color-mix(in srgb, #ffffff 72%, var(--brand-blue-100)) 100%) !important;
+    border-bottom-color: color-mix(in srgb, var(--brand-blue-300) 45%, white) !important;
+  }
+
+  .dashboard-premium table thead,
+  .donations-ledger-panel thead,
+  .events-premium table thead,
+  .pooja-main-panel thead,
+  .annadhanam-main-panel thead,
+  .hr-main-panel thead,
+  .inventory-premium table thead,
+  .assets-premium table thead,
+  .settings-table-head {
+    background: linear-gradient(180deg, color-mix(in srgb, #ffffff 58%, var(--brand-blue-100)) 0%, color-mix(in srgb, #ffffff 65%, var(--brand-blue-200)) 100%) !important;
+  }
+
+  .dashboard-premium table tbody tr:hover,
+  .donations-ledger-panel tbody tr:hover,
+  .events-premium table tbody tr:hover,
+  .pooja-row:hover,
+  .annadhanam-row:hover,
+  .hr-row:hover,
+  .inventory-row:hover,
+  .assets-row:hover,
+  .settings-row:hover,
+  .devotees-row:hover {
+    background: linear-gradient(90deg, color-mix(in srgb, #ffffff 73%, var(--brand-blue-50)) 0%, color-mix(in srgb, #ffffff 78%, var(--brand-blue-100)) 52%, color-mix(in srgb, #ffffff 82%, var(--brand-red-100)) 100%) !important;
+    box-shadow: inset 4px 0 0 color-mix(in srgb, var(--brand-primary) 76%, var(--brand-blue-500)) !important;
+  }
+
+  .events-view-btn-active,
+  .hr-tab-btn.bg-primary,
+  .annadhanam-filter-chip.bg-primary,
+  .pooja-filter-chip.bg-primary,
+  .inventory-tab-btn.bg-amber-600 {
+    background: linear-gradient(135deg, var(--brand-blue-500) 0%, var(--brand-blue-600) 100%) !important;
+    color: #fff !important;
+    border-color: color-mix(in srgb, var(--brand-blue-600) 72%, black) !important;
+  }
+
+  .dashboard-premium .text-primary,
+  .donations-premium .text-primary,
+  .events-premium .text-primary,
+  .devotees-premium .text-primary,
+  .pooja-premium .text-primary,
+  .annadhanam-premium .text-primary,
+  .hr-premium .text-primary,
+  .campaign-premium .text-primary,
+  .inventory-premium .text-primary,
+  .assets-premium .text-primary,
+  .docs-premium .text-primary,
+  .settings-premium .text-primary {
+    color: var(--brand-blue-600) !important;
   }
 }

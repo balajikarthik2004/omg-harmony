@@ -56,13 +56,13 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
         isCollapsed ? 'w-20' : 'w-64'
       }`}
       style={{
-        background: 'linear-gradient(185deg, hsl(211, 52%, 19%) 0%, hsl(218, 50%, 14%) 58%, hsl(222, 46%, 11%) 100%)',
+        background: 'linear-gradient(185deg, #293088 0%, #353EB0 54%, #E22E26 100%)',
         color: 'hsl(0, 0%, 100%)',
       }}
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full bg-sky-200/20 blur-3xl" />
-        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full bg-amber-300/20 blur-3xl" />
+        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full bg-[#C4C7ED]/30 blur-3xl" />
+        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full bg-[#F3ADA8]/28 blur-3xl" />
       </div>
 
       {/* Logo area */}
@@ -117,7 +117,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
                 <>
                   <span
                     className={`absolute inset-y-1 left-1 w-1 rounded-full transition-all duration-200 ${
-                      isActive ? 'bg-amber-200/95 shadow-[0_0_12px_rgba(252,211,77,0.8)]' : 'bg-transparent group-hover:bg-white/35'
+                      isActive ? 'bg-[#F3ADA8] shadow-[0_0_12px_rgba(243,173,168,0.85)]' : 'bg-transparent group-hover:bg-white/35'
                     }`}
                   />
                   <span
@@ -131,7 +131,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
                   {!isCollapsed && (
                     <span
                       className={`ml-auto h-1.5 w-1.5 rounded-full transition-all duration-200 ${
-                        isActive ? 'bg-white/90 scale-100' : 'bg-white/0 scale-75 group-hover:bg-white/70 group-hover:scale-100'
+                        isActive ? 'bg-[#F9D6D4] scale-100' : 'bg-white/0 scale-75 group-hover:bg-white/70 group-hover:scale-100'
                       }`}
                     />
                   )}
@@ -146,7 +146,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
       <div className={`relative border-t border-white/10 bg-black/10 backdrop-blur-sm ${isCollapsed ? 'p-2.5 space-y-2' : 'p-3.5 space-y-2.5'}`}>
         {/* User info pill */}
         <div className={`flex items-center rounded-xl bg-white/10 border border-white/15 ${isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'}`}>
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-semibold text-white shadow-inner">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-inner" style={{ background: 'linear-gradient(135deg, #4F58CA 0%, #293088 55%, #E22E26 100%)' }}>
             {user?.name?.charAt(0) || 'U'}
           </div>
           {!isCollapsed && (

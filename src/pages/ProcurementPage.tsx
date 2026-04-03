@@ -100,7 +100,7 @@ const currentUser = {
   id: '1',
   email: 'admin@gmail.com',
   role: 'Admin', // or 'Temple Manager'
-  name: 'Admin User',
+  name: 'Admin',
   team: 'All'
 };
 
