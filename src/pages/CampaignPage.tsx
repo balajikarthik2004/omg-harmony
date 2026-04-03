@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Send, Users, UserCheck, Search, MessageSquare, Mail, MessageCircle, CalendarClock } from 'lucide-react';
+import { Send, Users, UserCheck, Search, MessageSquare, Mail, MessageCircle, CalendarClock, Check, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { mockDevotees, mockEvents } from '@/data/mockData';
 import { formatDateDDMMYYYY } from '@/lib/utils';
 import FormField from '@/components/FormField';
+import { sendCampaignEmails } from '@/lib/emailService';
 
 type ChannelKey = 'sms' | 'email' | 'whatsapp';
 type RecipientMode = 'all' | 'selected';
@@ -33,6 +34,7 @@ const CampaignPage: React.FC = () => {
   const [channels, setChannels] = useState<Record<ChannelKey, boolean>>({ sms: true, email: true, whatsapp: true });
   const [lastStatus, setLastStatus] = useState('');
   const [logs, setLogs] = useState<CampaignLog[]>([]);
+  const [isSending, setIsSending] = useState(false);
 
   const selectedEvent = useMemo(() => mockEvents.find(event => event.id === selectedEventId), [selectedEventId]);
 
@@ -59,7 +61,7 @@ const CampaignPage: React.FC = () => {
   const autoFillFromEvent = () => {
     if (!selectedEvent) return;
     const draftSubject = `Invitation: ${selectedEvent.name}`;
-    const draftMessage = `Dear Devotee,\n\nYou are warmly invited to ${selectedEvent.name} on ${formatDateDDMMYYYY(selectedEvent.date)} at ${selectedEvent.time}.\nLocation: ${selectedEvent.location}\n\n${selectedEvent.description}\n\nWith blessings,\nTemple Harmony`;
+    const draftMessage = `Dear Devotee,\n\nWarm greetings from OMG Temple Governance System.\n\nYou are cordially invited to participate in ${selectedEvent.name}. Your presence and blessings will make this occasion even more meaningful for the entire temple community.\n\nEvent Details:\n- Date: ${formatDateDDMMYYYY(selectedEvent.date)}\n- Time: ${selectedEvent.time}\n- Venue: ${selectedEvent.location}\n\nAbout the Event:\n${selectedEvent.description}\n\nImportant Notes:\n- Please arrive at least 15 minutes early for smooth arrangements.\n- Families and children are warmly welcome.\n- Kindly share this invitation with fellow devotees.\n\nIf you need any assistance or additional information, please contact the temple office.\n\nWith prayers and best regards,\nOMG Temple Governance System`;
     setSubject(draftSubject);
     setMessage(draftMessage);
   };
@@ -73,7 +75,7 @@ const CampaignPage: React.FC = () => {
     });
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!subject.trim() || !message.trim()) {
       setLastStatus('Error: Please enter both a title and message before sending.');
       return;
@@ -85,6 +87,36 @@ const CampaignPage: React.FC = () => {
     if (recipientMode === 'selected' && targetUsers.length === 0) {
       setLastStatus('Error: Select at least one devotee for selected-user campaigns.');
       return;
+    }
+
+    setIsSending(true);
+
+    if (channels.email) {
+      try {
+        const emailResult = await sendCampaignEmails({
+          subject,
+          message,
+          recipients: targetUsers.map(user => ({ name: user.name, email: user.email })),
+        });
+
+        if (emailResult.attempted === 0) {
+          setLastStatus('Error: Email channel is enabled, but no recipients have a valid email address.');
+          setIsSending(false);
+          return;
+        }
+
+        if (emailResult.failed > 0) {
+          const detail = emailResult.errors[0] ? ` First error: ${emailResult.errors[0]}` : '';
+          setLastStatus(`Error: Email sent to ${emailResult.sent}/${emailResult.attempted} recipients. ${emailResult.failed} failed.${detail}`);
+          setIsSending(false);
+          return;
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unknown error while sending email.';
+        setLastStatus(`Error: ${message}`);
+        setIsSending(false);
+        return;
+      }
     }
 
     const campaign: CampaignLog = {
@@ -102,6 +134,7 @@ const CampaignPage: React.FC = () => {
     setMessage('');
     setSelectedEventId('');
     if (recipientMode === 'selected') setSelectedUsers(new Set());
+    setIsSending(false);
   };
 
   return (
@@ -228,9 +261,9 @@ const CampaignPage: React.FC = () => {
               </div>
             )}
 
-            <Button className="w-full h-12 text-base font-semibold shadow-md hover:shadow-lg" onClick={handleSend}>
+            <Button className="w-full h-12 text-base font-semibold shadow-md hover:shadow-lg" onClick={handleSend} disabled={isSending}>
               <Send className="h-5 w-5 mr-2" />
-              Launch Campaign
+              {isSending ? 'Sending...' : 'Launch Campaign'}
             </Button>
           </div>
         </div>
@@ -303,6 +336,4 @@ const CampaignPage: React.FC = () => {
     </div>
   );
 };
-  
-import { Check, AlertCircle, CheckCircle2 } from 'lucide-react';
 export default CampaignPage;

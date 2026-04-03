@@ -65,7 +65,9 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
   }
 
@@ -74,43 +76,50 @@
     width: 6px;
     height: 6px;
   }
+
   ::-webkit-scrollbar-track {
     background: transparent;
   }
+
   ::-webkit-scrollbar-thumb {
     background: hsl(220, 10%, 80%);
     border-radius: 3px;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(220, 10%, 65%);
   }
 }
 
 @layer components {
+
   /* ─── Enhanced ERP Card ─── */
   .erp-card {
     @apply bg-card rounded-xl border border-border p-6 transition-all duration-300;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04), 0 1px 2px -1px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
   }
+
   .erp-card:hover {
-    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.08), 0 2px 6px -2px rgba(0,0,0,0.04);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
     border-color: hsl(40, 12%, 85%);
   }
 
   /* ─── Enhanced KPI Card ─── */
   .kpi-card {
     @apply bg-card rounded-xl border border-border p-4 flex items-center gap-4 transition-all duration-300 cursor-default;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
   }
+
   .kpi-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px -4px rgba(0,0,0,0.08), 0 2px 6px -2px rgba(0,0,0,0.03);
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.03);
     border-color: hsl(40, 12%, 85%);
   }
 
   .kpi-icon {
     @apply w-11 h-11 rounded-lg flex items-center justify-center shrink-0 transition-transform duration-300;
   }
+
   .kpi-card:hover .kpi-icon {
     transform: scale(1.08);
   }
@@ -118,13 +127,14 @@
   /* ─── Enhanced Table Container ─── */
   .table-container {
     @apply bg-card rounded-xl border border-border overflow-hidden;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
   }
 
   /* Enhanced table rows */
   .table-container table tbody tr {
     @apply transition-colors duration-200;
   }
+
   .table-container table tbody tr:hover {
     background-color: hsla(40, 20%, 94%, 0.5);
   }
@@ -139,60 +149,99 @@
   }
 
   @keyframes overlay-fade {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 
   /* ─── Staggered fade-in for lists ─── */
-  .animate-stagger > * {
+  .animate-stagger>* {
     animation: stagger-fade 0.35s ease-out both;
   }
-  .animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
-  .animate-stagger > *:nth-child(2) { animation-delay: 50ms; }
-  .animate-stagger > *:nth-child(3) { animation-delay: 100ms; }
-  .animate-stagger > *:nth-child(4) { animation-delay: 150ms; }
-  .animate-stagger > *:nth-child(5) { animation-delay: 200ms; }
-  .animate-stagger > *:nth-child(6) { animation-delay: 250ms; }
-  .animate-stagger > *:nth-child(7) { animation-delay: 300ms; }
-  .animate-stagger > *:nth-child(8) { animation-delay: 350ms; }
+
+  .animate-stagger>*:nth-child(1) {
+    animation-delay: 0ms;
+  }
+
+  .animate-stagger>*:nth-child(2) {
+    animation-delay: 50ms;
+  }
+
+  .animate-stagger>*:nth-child(3) {
+    animation-delay: 100ms;
+  }
+
+  .animate-stagger>*:nth-child(4) {
+    animation-delay: 150ms;
+  }
+
+  .animate-stagger>*:nth-child(5) {
+    animation-delay: 200ms;
+  }
+
+  .animate-stagger>*:nth-child(6) {
+    animation-delay: 250ms;
+  }
+
+  .animate-stagger>*:nth-child(7) {
+    animation-delay: 300ms;
+  }
+
+  .animate-stagger>*:nth-child(8) {
+    animation-delay: 350ms;
+  }
 
   @keyframes stagger-fade {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   /* ─── Page Header Banner ─── */
   .page-header-banner {
     @apply rounded-xl border border-border px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3;
     background: linear-gradient(135deg, hsla(40, 33%, 98%, 1) 0%, hsla(40, 20%, 96%, 1) 100%);
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.03);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
   }
 
   /* ─── Stat Cards (used in Assets, Inventory, Campaign etc.) ─── */
   .stat-card {
     @apply rounded-xl border border-border bg-card p-4 transition-all duration-300;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
   }
+
   .stat-card:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px -2px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06);
     border-color: hsl(40, 12%, 85%);
   }
 
   /* ─── Info Panel (tips, alerts, etc.) ─── */
   .info-panel {
     @apply rounded-xl border border-border bg-card p-4 flex items-start gap-3 transition-all duration-200;
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.03);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
   }
+
   .info-panel:hover {
-    box-shadow: 0 2px 8px -2px rgba(0,0,0,0.06);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.06);
   }
 
   /* ─── Section Panel (with header bar) ─── */
   .section-panel {
     @apply rounded-xl border border-border bg-card overflow-hidden;
-    box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
   }
+
   .section-panel-header {
     @apply px-4 py-3 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-2;
     background: linear-gradient(180deg, hsla(40, 20%, 97%, 1) 0%, hsla(40, 20%, 95%, 0.5) 100%);
@@ -202,6 +251,7 @@
   select {
     @apply transition-all duration-200;
   }
+
   select:focus {
     border-color: hsl(1, 76%, 52%);
     box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
@@ -212,6 +262,7 @@
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]) {
     @apply transition-all duration-200;
   }
+
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus {
     border-color: hsl(1, 76%, 52%);
     box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
@@ -220,6 +271,7 @@
   textarea {
     @apply transition-all duration-200;
   }
+
   textarea:focus {
     border-color: hsl(1, 76%, 52%);
     box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
@@ -236,12 +288,10 @@
   }
 
   .login-image-overlay {
-    background: linear-gradient(
-      135deg,
-      hsla(233, 53%, 28%, 0.85) 0%,
-      hsla(270, 43%, 32%, 0.7) 50%,
-      hsla(1, 76%, 52%, 0.5) 100%
-    );
+    background: linear-gradient(135deg,
+        hsla(233, 53%, 28%, 0.85) 0%,
+        hsla(270, 43%, 32%, 0.7) 50%,
+        hsla(1, 76%, 52%, 0.5) 100%);
   }
 
   .login-btn-premium {
@@ -266,18 +316,21 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.15) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.15) 50%,
+        transparent 100%);
     animation: shimmer 3s ease-in-out infinite;
   }
 
   @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+      transform: translateX(-100%);
+    }
+
+    100% {
+      transform: translateX(100%);
+    }
   }
 
   .login-input-enhanced {

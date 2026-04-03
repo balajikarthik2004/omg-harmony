@@ -16,7 +16,7 @@ import {
 const kpis = [
   { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-rose-600', bg: 'bg-rose-50 border-rose-100', trend: '+12% from yesterday' },
   { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-indigo-600', bg: 'bg-indigo-50 border-indigo-100', trend: '4 pending approval' },
-  { label: 'Total Devotees', value: '2,847', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100', trend: '+45 this week' },
+  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50 border-emerald-100', trend: '+45 this week' },
   { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 border-amber-100', trend: '' },
 ];
 

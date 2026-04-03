@@ -2,12 +2,13 @@ import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import {
-  LayoutDashboard, Users, BookOpen, CalendarDays, Heart,
-  CalendarCheck, CheckSquare, Package, Building2, BarChart3,Briefcase,
-  Settings, LogOut,ShoppingCart, UtensilsCrossed, Megaphone
+  LayoutDashboard, Users, CalendarDays, Heart,
+  CalendarCheck, Package, Building2, BarChart3, Briefcase,
+  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight
 } from 'lucide-react';
 
 import logo from '@/assets/img/logo.png'; 
+import logo1 from '@/assets/img/logo1.png';
 
 const adminLinks = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -33,7 +34,12 @@ const devoteeLinks = [
   { to: '/donate', label: 'Donate', icon: Heart },
 ];
 
-const AppSidebar: React.FC = () => {
+interface AppSidebarProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -45,66 +51,120 @@ const AppSidebar: React.FC = () => {
   };
 
   return (
-    <aside className="w-64 flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden" style={{
-      background: 'linear-gradient(180deg, hsl(233, 53%, 30%) 0%, hsl(233, 53%, 22%) 100%)',
-      color: 'hsl(0, 0%, 100%)',
-    }}>
+    <aside
+      className={`flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden border-r border-white/10 shadow-[8px_0_28px_rgba(20,20,40,0.24)] transition-[width] duration-300 ${
+        isCollapsed ? 'w-20' : 'w-64'
+      }`}
+      style={{
+        background: 'linear-gradient(180deg, hsl(233, 53%, 30%) 0%, hsl(233, 53%, 21%) 65%, hsl(233, 50%, 18%) 100%)',
+        color: 'hsl(0, 0%, 100%)',
+      }}
+    >
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full bg-white/10 blur-3xl" />
+        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full bg-red-300/15 blur-3xl" />
+      </div>
+
       {/* Logo area */}
-      <div className="p-5 border-b border-white/10">
-        <img 
-          src={logo} 
-          alt="OMG Temple" 
-          className="h-[50px] object-contain bg-white px-4 rounded-lg shadow-sm" 
-        />
+      <div className={`relative border-b border-white/10 backdrop-blur-sm ${isCollapsed ? 'p-3' : 'p-5'}`}>
+        <div className={`flex ${isCollapsed ? 'flex-col items-center gap-2' : 'items-start justify-between gap-3'}`}>
+          <button
+            type="button"
+            onClick={onToggleCollapse}
+            className={`h-7 w-7 rounded-md border border-white/20 bg-white/10 text-white/80 hover:text-white hover:bg-white/20 transition-colors duration-200 flex items-center justify-center ${
+              isCollapsed ? 'order-1' : 'order-2 mt-0.5'
+            }`}
+            aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+          </button>
+          <div className={isCollapsed ? 'order-2' : 'order-1'}>
+            <img
+              src={isCollapsed ? logo1 : logo}
+              alt="OMG Temple"
+              className={`object-contain bg-white rounded-lg shadow-sm transition-all duration-200 ${
+                isCollapsed ? 'h-10 w-10 px-1 mx-auto' : 'h-[50px] px-4'
+              }`}
+            />
+          </div>
+        </div>
+        {!isCollapsed && (
+          <p className="mt-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-white/70">Temple Harmony ERP</p>
+        )}
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 py-3 px-3 space-y-0.5 overflow-y-auto">
-        {links.map(link => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) =>
-              `group flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
-                isActive
-                  ? 'bg-white/15 text-white shadow-sm backdrop-blur-sm'
-                  : 'text-white/60 hover:text-white hover:bg-white/8'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <link.icon className={`h-4 w-4 transition-all duration-200 ${
-                  isActive ? 'text-white' : 'text-white/50 group-hover:text-white/80'
-                }`} />
-                <span>{link.label}</span>
-                {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/80" />
-                )}
-              </>
-            )}
-          </NavLink>
-        ))}
+      <nav className={`relative flex-1 py-4 overflow-y-auto ${isCollapsed ? 'px-2' : 'px-3.5'}`}>
+        {!isCollapsed && <p className="px-2 pb-2 text-[10px] font-semibold tracking-[0.18em] uppercase text-white/45">Workspace</p>}
+        <div className="space-y-1">
+          {links.map(link => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              title={isCollapsed ? link.label : undefined}
+              className={({ isActive }) =>
+                `group relative isolate flex items-center rounded-xl border text-sm font-medium transition-all duration-200 ${
+                  isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'
+                } ${
+                  isActive
+                    ? 'border-white/25 bg-white/14 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_10px_18px_rgba(0,0,0,0.18)] -translate-y-[1px]'
+                    : 'border-transparent text-white/70 hover:text-white hover:bg-white/10 hover:border-white/15 hover:-translate-y-[1px] hover:shadow-[0_8px_18px_rgba(0,0,0,0.14)]'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={`absolute inset-y-1 left-1 w-1 rounded-full transition-all duration-200 ${
+                      isActive ? 'bg-red-200/90' : 'bg-transparent group-hover:bg-white/35'
+                    }`}
+                  />
+                  <span
+                    className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200 ${
+                      isActive ? 'bg-white/16 text-white' : 'bg-white/[0.07] text-white/70 group-hover:bg-white/15 group-hover:text-white'
+                    }`}
+                  >
+                    <link.icon className="h-4 w-4" />
+                  </span>
+                  {!isCollapsed && <span className="truncate">{link.label}</span>}
+                  {!isCollapsed && (
+                    <span
+                      className={`ml-auto h-1.5 w-1.5 rounded-full transition-all duration-200 ${
+                        isActive ? 'bg-white/90 scale-100' : 'bg-white/0 scale-75 group-hover:bg-white/70 group-hover:scale-100'
+                      }`}
+                    />
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </div>
       </nav>
 
       {/* User info & logout */}
-      <div className="p-3 border-t border-white/10 space-y-2">
+      <div className={`relative border-t border-white/10 bg-black/5 backdrop-blur-sm ${isCollapsed ? 'p-2.5 space-y-2' : 'p-3.5 space-y-2.5'}`}>
         {/* User info pill */}
-        <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/5">
-          <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-xs font-semibold text-white">
+        <div className={`flex items-center rounded-xl bg-white/8 border border-white/10 ${isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'}`}>
+          <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center text-xs font-semibold text-white shadow-inner">
             {user?.name?.charAt(0) || 'U'}
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium text-white/90 truncate">{user?.name}</p>
-            <p className="text-[10px] text-white/50 capitalize">{user?.role}</p>
-          </div>
+          {!isCollapsed && (
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-semibold text-white/90 truncate">{user?.name}</p>
+              <p className="text-[10px] tracking-wide text-white/55 capitalize">{user?.role}</p>
+            </div>
+          )}
         </div>
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-white/8 w-full transition-all duration-200 group"
+          title={isCollapsed ? 'Logout' : undefined}
+          className={`group flex items-center rounded-xl text-sm font-medium text-white/75 hover:text-white hover:bg-white/10 border border-transparent hover:border-white/15 w-full transition-all duration-200 hover:-translate-y-[1px] ${
+            isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'
+          }`}
         >
           <LogOut className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
-          Logout
+          {!isCollapsed && 'Logout'}
         </button>
       </div>
     </aside>

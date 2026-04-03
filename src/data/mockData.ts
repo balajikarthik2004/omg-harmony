@@ -1,20 +1,20 @@
 // Mock data for all modules
 
 export const mockDevotees = [
-  { id: '1', name: 'Rajesh Kumar', phone: '+91 98765 43210', email: 'rajesh@email.com', address: 'MG Road, Bangalore', city: 'Bangalore', state: 'Karnataka', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12' },
-  { id: '2', name: 'Priya Sharma', phone: '+91 87654 32109', email: 'priya@email.com', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10' },
-  { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit@email.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14' },
-  { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita@email.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15' },
-  { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram@email.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13' },
-  { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha@email.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18' },
-  { id: '7', name: 'Harish Rao', phone: '+91 93456 78120', email: 'harish@email.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16' },
-  { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha@email.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20' },
-  { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin@email.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11' },
+  { id: '1', name: 'Balaji', phone: '+91 98765 43210', email: 'kbalajikbalaji879@gmail.com', address: 'MG Road, Krishnagiri', city: 'Bangalore', state: 'Karnataka', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12' },
+  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'naveenrajanm9@gmail.com', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10' },
+  { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14' },
+  { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita.reddy.hyd@outlook.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15' },
+  { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram.singh.delhi@yahoo.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13' },
+  { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha.nair27@gmail.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18' },
+  { id: '7', name: 'Harish Rao', phone: '+91 93456 78120', email: 'harish.rao.vizag@outlook.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16' },
+  { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20' },
+  { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11' },
   ...Array.from({ length: 21 }).map((_, i) => ({
     id: String(i + 10),
     name: ['Deepak Verma', 'Shelly George', 'Arun Prasath', 'Meera Krishnan', 'Suresh Mani', 'Ganesh Acharya', 'Vidya Sagar'][i % 7] + ' ' + String.fromCharCode(65 + i),
     phone: `+91 9845${i % 10} ${Math.floor(10000 + Math.random() * 89999)}`,
-    email: `devotee${i + 10}@temple.org`,
+    email: `${['deepak.verma', 'shelly.george', 'arun.prasath', 'meera.krishnan', 'suresh.mani', 'ganesh.acharya', 'vidya.sagar'][i % 7]}${(i % 5) + 1}@${['gmail.com', 'outlook.com', 'yahoo.com', 'hotmail.com'][i % 4]}`,
     address: `${i + 10}, Temple Street`,
     city: 'City Name',
     state: 'State',
@@ -49,7 +49,7 @@ export const mockServices = [
 ];
 
 export const mockBookings = [
-  { id: 'BK001', devoteeName: 'Rajesh Kumar', serviceName: 'Ganesh Pooja', date: '2026-03-15', time: '09:00 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
+  { id: 'BK001', devoteeName: 'Balaji', serviceName: 'Ganesh Pooja', date: '2026-03-15', time: '09:00 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK002', devoteeName: 'Priya Sharma', serviceName: 'Abhishekam', date: '2026-03-16', time: '07:00 AM', paymentStatus: 'Pending', bookingStatus: 'Pending' },
   { id: 'BK003', devoteeName: 'Amit Patel', serviceName: 'Homam', date: '2026-03-17', time: '06:00 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK004', devoteeName: 'Sunita Reddy', serviceName: 'Satyanarayana Pooja', date: '2026-03-18', time: '10:00 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
@@ -58,7 +58,7 @@ export const mockBookings = [
   { id: 'BK007', devoteeName: 'Lalitha Iyer', serviceName: 'Rudrabhishekam', date: '2026-03-22', time: '05:30 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
   { id: 'BK008', devoteeName: 'Harish Rao', serviceName: 'Navagraha Shanti', date: '2026-03-23', time: '09:30 AM', paymentStatus: 'Pending', bookingStatus: 'Pending' },
   { id: 'BK009', devoteeName: 'Nitin Joshi', serviceName: 'Ganesh Pooja', date: '2026-03-24', time: '07:30 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
-  { id: 'BK010', devoteeName: 'Rajesh Kumar', serviceName: 'Rudrabhishekam', date: '2026-03-25', time: '06:00 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
+  { id: 'BK010', devoteeName: 'Balaji', serviceName: 'Rudrabhishekam', date: '2026-03-25', time: '06:00 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
   { id: 'BK011', devoteeName: 'Priya Sharma', serviceName: 'Satyanarayana Pooja', date: '2026-03-26', time: '10:30 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK012', devoteeName: 'Amit Patel', serviceName: 'Lakshmi Homam', date: '2026-03-27', time: '09:00 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK013', devoteeName: 'Sunita Reddy', serviceName: 'Archana', date: '2026-03-28', time: '08:15 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
@@ -67,8 +67,8 @@ export const mockBookings = [
   { id: 'BK016', devoteeName: 'Harish Rao', serviceName: 'Satyanarayana Pooja', date: '2026-03-31', time: '11:30 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
   { id: 'BK017', devoteeName: 'Lalitha Iyer', serviceName: 'Chandi Homam', date: '2026-04-01', time: '06:30 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK018', devoteeName: 'Nitin Joshi', serviceName: 'Archana', date: '2026-04-02', time: '08:00 AM', paymentStatus: 'Pending', bookingStatus: 'Pending' },
-  { id: 'BK019', devoteeName: 'Rajesh Kumar', serviceName: 'Navagraha Shanti', date: '2026-04-03', time: '09:00 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
-  { id: 'BK020', devoteeName: 'Rajesh Kumar', serviceName: 'Satyanarayana Pooja', date: '2026-04-09', time: '10:30 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
+  { id: 'BK019', devoteeName: 'Balaji', serviceName: 'Navagraha Shanti', date: '2026-04-03', time: '09:00 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
+  { id: 'BK020', devoteeName: 'Balaji', serviceName: 'Satyanarayana Pooja', date: '2026-04-09', time: '10:30 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
   { id: 'BK021', devoteeName: 'Priya Sharma', serviceName: 'Archana', date: '2026-04-04', time: '07:15 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK022', devoteeName: 'Priya Sharma', serviceName: 'Ganapathi Homam', date: '2026-04-10', time: '09:45 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
   { id: 'BK023', devoteeName: 'Amit Patel', serviceName: 'Rudrabhishekam', date: '2026-04-05', time: '06:15 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
@@ -88,7 +88,7 @@ export const mockBookings = [
 ];
 
 export const mockDonations = [
-  { id: 'DN001', donorName: 'Rajesh Kumar', amount: 55000, category: 'General', paymentMethod: 'UPI', date: '2026-03-14' },
+  { id: 'DN001', donorName: 'Balaji', amount: 55000, category: 'General', paymentMethod: 'UPI', date: '2026-03-14' },
   { id: 'DN002', donorName: 'Priya Sharma', amount: 28000, category: 'Temple Renovation', paymentMethod: 'Card', date: '2026-03-13' },
   { id: 'DN003', donorName: 'Amit Patel', amount: 160000, category: 'Annadanam', paymentMethod: 'Cash', date: '2026-03-12' },
   { id: 'DN004', donorName: 'Sunita Reddy', amount: 22000, category: 'Festival Fund', paymentMethod: 'UPI', date: '2026-03-11' },
@@ -97,7 +97,7 @@ export const mockDonations = [
   { id: 'DN007', donorName: 'Lalitha Iyer', amount: 185000, category: 'Temple Renovation', paymentMethod: 'Bank Transfer', date: '2026-03-20' },
   { id: 'DN008', donorName: 'Harish Rao', amount: 26000, category: 'Festival Fund', paymentMethod: 'Cash', date: '2026-03-18' },
   { id: 'DN009', donorName: 'Nitin Joshi', amount: 18000, category: 'General', paymentMethod: 'UPI', date: '2026-03-05' },
-  { id: 'DN010', donorName: 'Rajesh Kumar', amount: 45000, category: 'Annadanam', paymentMethod: 'Card', date: '2026-03-26' },
+  { id: 'DN010', donorName: 'Balaji', amount: 45000, category: 'Annadanam', paymentMethod: 'Card', date: '2026-03-26' },
   { id: 'DN011', donorName: 'Priya Sharma', amount: 35000, category: 'General', paymentMethod: 'UPI', date: '2026-03-24' },
   { id: 'DN012', donorName: 'Amit Patel', amount: 125000, category: 'Temple Renovation', paymentMethod: 'Bank Transfer', date: '2026-03-27' },
   { id: 'DN013', donorName: 'Sunita Reddy', amount: 30000, category: 'Annadanam', paymentMethod: 'Cash', date: '2026-03-25' },
@@ -106,8 +106,8 @@ export const mockDonations = [
   { id: 'DN016', donorName: 'Harish Rao', amount: 24000, category: 'Annadanam', paymentMethod: 'UPI', date: '2026-03-29' },
   { id: 'DN017', donorName: 'Lalitha Iyer', amount: 75000, category: 'Festival Fund', paymentMethod: 'Card', date: '2026-03-30' },
   { id: 'DN018', donorName: 'Nitin Joshi', amount: 28000, category: 'Temple Renovation', paymentMethod: 'Bank Transfer', date: '2026-03-31' },
-  { id: 'DN019', donorName: 'Rajesh Kumar', amount: 52000, category: 'Temple Renovation', paymentMethod: 'UPI', date: '2026-04-02' },
-  { id: 'DN020', donorName: 'Rajesh Kumar', amount: 47000, category: 'Festival Fund', paymentMethod: 'Card', date: '2026-04-08' },
+  { id: 'DN019', donorName: 'Balaji', amount: 52000, category: 'Temple Renovation', paymentMethod: 'UPI', date: '2026-04-02' },
+  { id: 'DN020', donorName: 'Balaji', amount: 47000, category: 'Festival Fund', paymentMethod: 'Card', date: '2026-04-08' },
   { id: 'DN021', donorName: 'Priya Sharma', amount: 31000, category: 'Annadanam', paymentMethod: 'UPI', date: '2026-04-03' },
   { id: 'DN022', donorName: 'Priya Sharma', amount: 29000, category: 'Festival Fund', paymentMethod: 'Card', date: '2026-04-09' },
   { id: 'DN023', donorName: 'Amit Patel', amount: 140000, category: 'General', paymentMethod: 'Bank Transfer', date: '2026-04-04' },
