@@ -1,13 +1,15 @@
 // Mock data for all modules
 
 export const mockDevotees = [
-  { id: '1', name: 'Balaji', phone: '+91 98765 43210', email: 'kbalajikbalaji879@gmail.com', address: 'MG Road, Krishnagiri', city: 'Bangalore', state: 'Karnataka', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12' },
-  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'naveenrajanm9@gmail.com', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10' },
+  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18' },
+  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17' },
+  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12' },
+  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'rajan.naveen@gwcdata.ai', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10' },
   { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14' },
   { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita.reddy.hyd@outlook.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15' },
   { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram.singh.delhi@yahoo.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13' },
   { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha.nair27@gmail.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18' },
-  { id: '7', name: 'Harish Rao', phone: '+91 93456 78120', email: 'harish.rao.vizag@outlook.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16' },
+  { id: '7', name: 'Balaji', phone: '+91 93456 78120', email: 'kbalajikbalaji879@gmail.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16' },
   { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20' },
   { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11' },
   ...Array.from({ length: 21 }).map((_, i) => ({
@@ -85,6 +87,10 @@ export const mockBookings = [
   { id: 'BK034', devoteeName: 'Lalitha Iyer', serviceName: 'Navagraha Shanti', date: '2026-04-16', time: '09:50 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
   { id: 'BK035', devoteeName: 'Nitin Joshi', serviceName: 'Abhishekam', date: '2026-04-11', time: '07:25 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
   { id: 'BK036', devoteeName: 'Nitin Joshi', serviceName: 'Ganesh Pooja', date: '2026-04-17', time: '08:40 AM', paymentStatus: 'Paid', bookingStatus: 'Completed' },
+  { id: 'BK037', devoteeName: 'Naveen Kumar', serviceName: 'Satyanarayana Pooja', date: '2026-04-19', time: '10:45 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
+  { id: 'BK038', devoteeName: 'Naveen Kumar', serviceName: 'Rudrabhishekam', date: '2026-04-25', time: '06:30 AM', paymentStatus: 'Pending', bookingStatus: 'Pending' },
+  { id: 'BK039', devoteeName: 'Santhosh Kumar', serviceName: 'Ganesh Pooja', date: '2026-04-20', time: '08:15 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
+  { id: 'BK040', devoteeName: 'Santhosh Kumar', serviceName: 'Navagraha Shanti', date: '2026-04-27', time: '09:40 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
 ];
 
 export const mockDonations = [
@@ -124,6 +130,12 @@ export const mockDonations = [
   { id: 'DN034', donorName: 'Lalitha Iyer', amount: 86000, category: 'General', paymentMethod: 'UPI', date: '2026-04-15' },
   { id: 'DN035', donorName: 'Nitin Joshi', amount: 34000, category: 'Festival Fund', paymentMethod: 'UPI', date: '2026-04-09' },
   { id: 'DN036', donorName: 'Nitin Joshi', amount: 30000, category: 'Annadanam', paymentMethod: 'Card', date: '2026-04-16' },
+  { id: 'DN037', donorName: 'Naveen Kumar', amount: 25000, category: 'General', paymentMethod: 'UPI', date: '2026-04-06' },
+  { id: 'DN038', donorName: 'Naveen Kumar', amount: 18000, category: 'Temple Renovation', paymentMethod: 'Card', date: '2026-04-12' },
+  { id: 'DN039', donorName: 'Naveen Kumar', amount: 35000, category: 'Annadanam', paymentMethod: 'Bank Transfer', date: '2026-04-18' },
+  { id: 'DN040', donorName: 'Santhosh Kumar', amount: 12000, category: 'Festival Fund', paymentMethod: 'UPI', date: '2026-04-05' },
+  { id: 'DN041', donorName: 'Santhosh Kumar', amount: 42000, category: 'General', paymentMethod: 'Bank Transfer', date: '2026-04-11' },
+  { id: 'DN042', donorName: 'Santhosh Kumar', amount: 16000, category: 'Temple Renovation', paymentMethod: 'Card', date: '2026-04-17' },
 ];
 
 export const mockEvents = [

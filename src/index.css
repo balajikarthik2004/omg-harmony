@@ -2105,6 +2105,36 @@
     box-shadow: 0 22px 34px -18px rgba(188, 31, 30, 0.76) !important;
   }
 
+  /* Keep original CTA style and add a clear outline for contrast on banner CTAs */
+  .page-header-banner .donations-cta,
+  .page-header-banner .devotees-cta,
+  .page-header-banner .pooja-cta,
+  .page-header-banner .annadhanam-cta,
+  .devotees-header .devotees-cta,
+  .page-header-banner .inventory-cta,
+  .page-header-banner .assets-cta,
+  .page-header-banner .docs-cta,
+  .page-header-banner .docs-sync-btn,
+  .page-header-banner .settings-cta {
+    border: 0.5px solid hsla(0, 0%, 100%, 0.68) !important;
+    outline: 1px solid hsla(0, 0%, 100%, 0.34);
+    outline-offset: 0;
+  }
+
+  .page-header-banner .donations-cta:hover,
+  .page-header-banner .devotees-cta:hover,
+  .page-header-banner .pooja-cta:hover,
+  .page-header-banner .annadhanam-cta:hover,
+  .devotees-header .devotees-cta:hover,
+  .page-header-banner .inventory-cta:hover,
+  .page-header-banner .assets-cta:hover,
+  .page-header-banner .docs-cta:hover,
+  .page-header-banner .docs-sync-btn:hover,
+  .page-header-banner .settings-cta:hover {
+    border-color: hsla(0, 0%, 100%, 0.8) !important;
+    outline-color: hsla(0, 0%, 100%, 0.48);
+  }
+
   .stat-card,
   .section-panel,
   .donations-ledger-panel,
