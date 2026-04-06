@@ -17,7 +17,7 @@ const emptyForm = {
   nakshatra: '', rasi: '', gothram: '',
   spouse: '', children: '',
   familyMembers: '',
-  volunteerInterest: '', membershipType: 'General',
+  volunteerInterest: '', membershipType: 'Regular Devotee',
   notificationSms: true, notificationEmail: true, notificationWhatsApp: true,
   reminderBirthday: true, reminderNakshatra: true, reminderFestivalGreetings: true, reminderDonationAnniversary: true,
 };
@@ -387,7 +387,7 @@ const DevoteesPage: React.FC = () => {
       children: item.children || '',
       familyMembers: item.familyMembers || '',
       volunteerInterest: item.volunteerInterest || '',
-      membershipType: item.membershipType || 'General',
+      membershipType: item.membershipType || 'Regular Devotee',
       notificationSms: item.notificationSms ?? true,
       notificationEmail: item.notificationEmail ?? true,
       notificationWhatsApp: item.notificationWhatsApp ?? true,
@@ -500,7 +500,7 @@ const DevoteesPage: React.FC = () => {
   const profileSpouse = selectedDevotee?.spouse || 'N/A';
   const profileChildren = selectedDevotee?.children || 'N/A';
   const profileVolunteerInterest = selectedDevotee?.volunteerInterest || 'N/A';
-  const profileMembershipType = selectedDevotee?.membershipType || 'General';
+  const profileMembershipType = selectedDevotee?.membershipType || 'Regular Devotee';
 
   const familyMembersData = useMemo(() => {
     if (!selectedDevotee) return [] as FamilyMember[];
@@ -909,10 +909,13 @@ const DevoteesPage: React.FC = () => {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Membership Type</label>
               <select value={form.membershipType} onChange={e => setFormField('membershipType', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                <option>General</option>
-                <option>Volunteer</option>
-                <option>Patron</option>
                 <option>Trust Member</option>
+                <option>Committee Member</option>
+                <option>Volunteer</option>
+                <option>Donor</option>
+                <option>VIP Devotee</option>
+                <option>Regular Devotee</option>
+                <option>Staff Member</option>
               </select>
             </div>
           </div>
@@ -994,7 +997,7 @@ const DevoteesPage: React.FC = () => {
                     <StatusBadge status={selectedDevotee?.status || 'Active'} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 shadow-sm flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3" />
-                      {selectedDevotee?.membershipType || 'General'}
+                      {selectedDevotee?.membershipType || 'Regular Devotee'}
                     </span>
                   </div>
                 </div>

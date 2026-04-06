@@ -1,31 +1,41 @@
 // Mock data for all modules
 
+const membershipTypes = [
+  'Trust Member',
+  'Committee Member',
+  'Volunteer',
+  'Donor',
+  'VIP Devotee',
+  'Regular Devotee',
+  'Staff Member',
+];
+
 export const mockDevotees = [
-  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'General', familyMembers: 'Father: Raghavan Kumar, Mother: Lakshmi Raghavan, Sister: Mamtha (Simmam/Magam)', familyTreeMembers: [
+  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'Trust Member', familyMembers: 'Father: Raghavan Kumar, Mother: Lakshmi Raghavan, Sister: Mamtha (Simmam/Magam)', familyTreeMembers: [
     { id: 'f100-1', name: 'Raghavan Kumar', relation: 'Father', dob: '1960-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
     { id: 'f100-2', name: 'Lakshmi Raghavan', relation: 'Mother', dob: '1965-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
     { id: 'f100-3', name: 'Mamtha', relation: 'Sister', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f100-4', name: 'Santhosh Kumar', relation: 'Brother', dob: '1990-11-22', gender: 'Male', rasi: 'Vrichikam', nakshatra: 'Anusham' }
   ] },
-  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17', membershipType: 'General', familyTreeMembers: [
+  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17', membershipType: 'Committee Member', familyTreeMembers: [
     { id: 'f101-1', name: 'Raghavan Kumar', relation: 'Father', dob: '1960-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
     { id: 'f101-2', name: 'Lakshmi Raghavan', relation: 'Mother', dob: '1965-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
     { id: 'f101-3', name: 'Mamtha', relation: 'Sister', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f101-4', name: 'Naveen Kumar', relation: 'Brother', dob: '1988-09-12', gender: 'Male', rasi: 'Kanni', nakshatra: 'Uththarai' }
   ] },
-  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12', membershipType: 'Patron', familyTreeMembers: [
+  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12', membershipType: 'Volunteer', familyTreeMembers: [
     { id: 'f1-1', name: 'Krishnan', relation: 'Father', rasi: 'Kanni', nakshatra: 'Uthiram' },
     { id: 'f1-2', name: 'Aruna', relation: 'Mother', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f1-3', name: 'Karthik Krishnan', relation: 'Brother', rasi: 'Dhanusu', nakshatra: 'Moolam' }
   ] },
-  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'rajan.naveen@gwcdata.ai', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10', membershipType: 'Volunteer', familyMembers: 'Spouse: Meenakshi, Son: Rahul' },
-  { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14', membershipType: 'Trust Member', familyMembers: 'Spouse: Sunita, Daughter: Ananya' },
-  { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita.reddy.hyd@outlook.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15', membershipType: 'Patron' },
-  { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram.singh.delhi@yahoo.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13', membershipType: 'General' },
-  { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha.nair27@gmail.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18', membershipType: 'Volunteer' },
-  { id: '7', name: 'Balaji', phone: '+91 93456 78120', email: 'kbalajikbalaji879@gmail.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16', membershipType: 'General' },
-  { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20', membershipType: 'Patron' },
-  { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11' },
+  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'rajan.naveen@gwcdata.ai', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10', membershipType: 'Donor', familyMembers: 'Spouse: Meenakshi, Son: Rahul' },
+  { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14', membershipType: 'VIP Devotee', familyMembers: 'Spouse: Sunita, Daughter: Ananya' },
+  { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita.reddy.hyd@outlook.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15', membershipType: 'Regular Devotee' },
+  { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram.singh.delhi@yahoo.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13', membershipType: 'Staff Member' },
+  { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha.nair27@gmail.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18', membershipType: 'Trust Member' },
+  { id: '7', name: 'Balaji', phone: '+91 93456 78120', email: 'kbalajikbalaji879@gmail.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16', membershipType: 'Committee Member' },
+  { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20', membershipType: 'Volunteer' },
+  { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11', membershipType: 'Donor' },
   ...Array.from({ length: 21 }).map((_, i) => ({
     id: String(i + 10),
     name: ['Deepak Verma', 'Shelly George', 'Arun Prasath', 'Meera Krishnan', 'Suresh Mani', 'Ganesh Acharya', 'Vidya Sagar'][i % 7] + ' ' + String.fromCharCode(65 + i),
@@ -37,7 +47,8 @@ export const mockDevotees = [
     country: 'India',
     status: 'Active',
     totalDonations: 30000 + (i * 5000),
-    lastVisit: '2026-03-20'
+    lastVisit: '2026-03-20',
+    membershipType: membershipTypes[i % membershipTypes.length],
   }))
 ];
 
