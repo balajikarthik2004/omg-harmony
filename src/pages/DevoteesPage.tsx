@@ -173,6 +173,7 @@ type FamilyMemberFormState = {
   isPrimary: boolean;
 };
 type TabName = 'info' | 'bookings' | 'donations' | 'family' | 'notify';
+type ReminderTemplateKey = 'birthday' | 'nakshatra' | 'festival' | 'donationAnniversary';
 
 type Donation = typeof mockDonations[0];
 type Booking = typeof mockBookings[0];
@@ -329,7 +330,7 @@ const DevoteesPage: React.FC = () => {
       .map(event => `- ${event.name} | Date: ${fmtDate(event.date)} | Time: ${event.time}`)
       .join('\n');
 
-    const message = `Dear ${selectedDevotee.name},\n\nGreetings from OMG Temple Governance. We are pleased to invite you to the following upcoming temple event${selectedEventDetails.length > 1 ? 's' : ''}:\n\n${eventLines}\n\nYour participation and blessings are deeply valued. If you need any assistance with booking or timing, please contact the temple office.\n\nWith prayers and regards,\nTemple Harmony Communication Desk`;
+    const message = `Dear ${selectedDevotee.name},\n\nGreetings from OMG Temple Governance. We are pleased to invite you to the following upcoming temple event${selectedEventDetails.length > 1 ? 's' : ''}:\n\n${eventLines}\n\nYour participation and blessings are deeply valued. If you need any assistance with booking or timing, please contact the temple office.\n\nWith prayers and regards,\nTemple Governance`;
 
     setNotifSubject(title);
     setNotifMessage(message);
@@ -485,6 +486,36 @@ const DevoteesPage: React.FC = () => {
     setNotifMessage('');
     setSelectedEvents(new Set());
     setNotifSending(false);
+  };
+
+  const applyReminderAutofill = (template: ReminderTemplateKey) => {
+    if (!selectedDevotee) return;
+
+    const devoteeName = selectedDevotee.name;
+    const donationAmount = fmtAmt(selectedDevotee.totalDonations || 0);
+
+    const templateMap: Record<ReminderTemplateKey, { subject: string; message: string }> = {
+      birthday: {
+        subject: `Birthday blessings for ${devoteeName}`,
+        message: `Dear ${devoteeName},\n\nWarm birthday wishes from Temple Governance. May this year bring health, peace, and divine grace to you and your family.\n\nYou are always welcome to visit the temple for special blessings on your birthday.\n\nWith prayers,\nTemple Governance `,
+      },
+      nakshatra: {
+        subject: `Nakshatra reminder for ${devoteeName}`,
+        message: `Dear ${devoteeName},\n\nThis is a gentle reminder for your Nakshatra observance and pooja planning.\n\nIf you would like to book an archana or special seva for your star day, our team will be happy to assist.\n\nWith prayers,\nTemple Governance `,
+      },
+      festival: {
+        subject: `Festival greetings from Temple Governance`,
+        message: `Dear ${devoteeName},\n\nFestival greetings to you and your family from Temple Governance. May this sacred occasion bring prosperity, joy, and spiritual wellbeing.\n\nJoin us at the temple for upcoming celebrations and special sevas.\n\nWith prayers,\nTemple Governance `,
+      },
+      donationAnniversary: {
+        subject: `Donation anniversary gratitude note`,
+        message: `Dear ${devoteeName},\n\nThank you for your continued support and devotion to Temple Governance.\n\nOn your donation anniversary, we express our heartfelt gratitude for your contribution of ${donationAmount}. Your support helps us sustain temple services and community activities.\n\nWith gratitude and prayers,\nTemple Governance`,
+      },
+    };
+
+    setNotifSubject(templateMap[template].subject);
+    setNotifMessage(templateMap[template].message);
+    setNotifSent('');
   };
 
   const devDonations = selectedDevotee ? mockDonations.filter(d => d.donorName === selectedDevotee.name) : [];
@@ -1269,6 +1300,39 @@ const DevoteesPage: React.FC = () => {
                       </button>
                       <button onClick={() => setChannels(p => ({ ...p, whatsapp: !p.whatsapp }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.whatsapp ? 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
                         <MessageCircle className="w-5 h-5" /> <span className="text-[10px]">WHATSAPP</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
+                    <div className="flex justify-between items-center pb-2">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Message Autofill</h3>
+                      <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded">Reminder Templates</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                      <button
+                        onClick={() => applyReminderAutofill('birthday')}
+                        className="text-left px-3 py-2.5 rounded-lg text-xs font-bold transition-all border bg-background border-border text-foreground hover:bg-muted/30 hover:border-primary/40"
+                      >
+                        Birthday reminders
+                      </button>
+                      <button
+                        onClick={() => applyReminderAutofill('nakshatra')}
+                        className="text-left px-3 py-2.5 rounded-lg text-xs font-bold transition-all border bg-background border-border text-foreground hover:bg-muted/30 hover:border-primary/40"
+                      >
+                        Nakshatra reminders
+                      </button>
+                      <button
+                        onClick={() => applyReminderAutofill('festival')}
+                        className="text-left px-3 py-2.5 rounded-lg text-xs font-bold transition-all border bg-background border-border text-foreground hover:bg-muted/30 hover:border-primary/40"
+                      >
+                        Festival greetings
+                      </button>
+                      <button
+                        onClick={() => applyReminderAutofill('donationAnniversary')}
+                        className="text-left px-3 py-2.5 rounded-lg text-xs font-bold transition-all border bg-background border-border text-foreground hover:bg-muted/30 hover:border-primary/40"
+                      >
+                        Donation anniversary reminders
                       </button>
                     </div>
                   </div>

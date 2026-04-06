@@ -78,6 +78,22 @@ const CampaignPage: React.FC = () => {
     setMessage(draftMessage);
   };
 
+  const autoFillVolunteerInvite = () => {
+    if (!selectedEvent) return;
+    const draftSubject = `Volunteer Invitation: ${selectedEvent.name}`;
+    const draftMessage = `Dear Volunteer,\n\nWarm greetings from OMG Temple Governance System.\n\nWe invite you to support and serve during ${selectedEvent.name}. Your time and dedication are valuable to our temple community.\n\nEvent Details:\n- Date: ${formatDateDDMMYYYY(selectedEvent.date)}\n- Time: ${selectedEvent.time}\n- Venue: ${selectedEvent.location}\n\nVolunteer Notes:\n- Please report 30 minutes before start time.\n- Wear volunteer ID and follow coordinator instructions.\n- Contact the temple office if your availability changes.\n\nWith gratitude,\nOMG Temple Volunteer Coordination `;
+    setSubject(draftSubject);
+    setMessage(draftMessage);
+  };
+
+  const autoFillBySection = () => {
+    if (viewMode === 'volunteers') {
+      autoFillVolunteerInvite();
+      return;
+    }
+    autoFillFromEvent();
+  };
+
   const toggleUser = (id: string) => {
     setSelectedUsers(prev => {
       const next = new Set(prev);
@@ -255,8 +271,9 @@ const CampaignPage: React.FC = () => {
                      ))}
                    </select>
                  </div>
-                 <Button variant="outline" className="w-full md:w-auto h-11" onClick={autoFillFromEvent} disabled={!selectedEventId}>
-                   <CalendarClock className="h-4 w-4 mr-2" />Auto-Fill Details
+                 <Button variant="outline" className="w-full md:w-auto h-11" onClick={autoFillBySection} disabled={!selectedEventId}>
+                   <CalendarClock className="h-4 w-4 mr-2" />
+                   {viewMode === 'volunteers' ? 'Auto-Fill Volunteer Invite' : 'Auto-Fill Devotee Invite'}
                  </Button>
                </div>
             </div>

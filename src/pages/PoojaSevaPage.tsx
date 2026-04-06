@@ -487,7 +487,7 @@ const PoojaSevaPage: React.FC = () => {
         <div className="space-y-4 xl:sticky xl:top-4 self-start">
           <div className="section-panel pooja-side-panel shadow-sm">
             <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-sky-50/50 to-background">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><Flower2 className="w-4 h-4 text-primary" /> Global Catalog</h2>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Flower2 className="w-4 h-4 text-primary" /> Pooja & Seva Offerings</h2>
               <span className="text-[10px] py-0.5 px-2 bg-primary/10 text-primary rounded-full font-bold">{eventPoojaCatalog.length} derived</span>
             </div>
             <div className="p-3 space-y-2 max-h-[350px] overflow-y-auto pr-1">

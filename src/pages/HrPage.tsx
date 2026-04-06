@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Pencil, Trash2, CalendarDays, Users, Briefcase, Wallet, Search, Phone, Mail, FileText, BadgeIndianRupee, X, CheckCircle2, UserX, Receipt, Printer } from 'lucide-react';
 import { useStore } from '@/hooks/useStore';
-import { useVolunteerStore } from '@/hooks/useVolunteerStore';
+import { useVolunteerStore, type Volunteer } from '@/hooks/useVolunteerStore';
 import VolunteerForm from '@/components/VolunteerForm';
 import SalarySlip from '@/components/SalarySlip';
 import Modal from '@/components/Modal';
@@ -66,18 +66,73 @@ interface PayrollEntry {
   netPay: number;
   payoutStatus: PayrollStatus;
   absentDays?: number;
+  workingDays?: number;
+  overtimeHours?: number;
+  hra?: number;
+  pf?: number;
+  professionalTax?: number;
+  lopDeduction?: number;
+  overtimePay?: number;
 }
 
 interface AttendanceRecord {
   id: string;
   staffId: string;
   date: string;
-  status: 'Present' | 'Absent';
-  leaveType?: 'Sick' | 'Casual';
+  status: 'Present' | 'Absent' | 'Late';
+  shift?: 'Morning' | 'Evening' | 'Full Day';
+  leaveType?: 'Sick' | 'Casual' | 'Loss of Pay';
+  checkIn?: string;
+  checkOut?: string;
+  overtimeHours?: number;
+  remarks?: string;
 }
 
+const todayIso = new Date().toISOString().split('T')[0];
+const yesterdayIso = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+
 const initialAttendance: AttendanceRecord[] = [
-  { id: 'AT-001', staffId: 'ST002', date: new Date().toISOString().split('T')[0], status: 'Absent' },
+  {
+    id: 'AT-001',
+    staffId: 'ST001',
+    date: todayIso,
+    status: 'Present',
+    shift: 'Full Day',
+    checkIn: '05:00',
+    checkOut: '14:10',
+    overtimeHours: 1.5,
+    remarks: 'Festival prep support'
+  },
+  {
+    id: 'AT-002',
+    staffId: 'ST002',
+    date: todayIso,
+    status: 'Late',
+    shift: 'Morning',
+    checkIn: '09:28',
+    checkOut: '17:10',
+    overtimeHours: 0.5,
+    remarks: 'Traffic delay'
+  },
+  {
+    id: 'AT-003',
+    staffId: 'ST003',
+    date: todayIso,
+    status: 'Absent',
+    leaveType: 'Sick',
+    shift: 'Full Day',
+    remarks: 'Medical leave informed'
+  },
+  {
+    id: 'AT-004',
+    staffId: 'ST002',
+    date: yesterdayIso,
+    status: 'Present',
+    shift: 'Full Day',
+    checkIn: '09:04',
+    checkOut: '17:40',
+    overtimeHours: 1
+  },
 ];
 
 type HrSection = 'staff' | 'payroll' | 'duties' | 'volunteers' | 'attendance';
@@ -104,8 +159,42 @@ const initialVolunteers: VolunteerRecord[] = [
 ];
 
 const initialPayroll: PayrollEntry[] = [
-  { id: 'PY001', staffId: 'ST001', month: '2026-04', basePay: 35000, allowance: 3000, deduction: 1000, netPay: 37000, payoutStatus: 'Unpaid' },
-  { id: 'PY002', staffId: 'ST002', month: '2026-04', basePay: 22000, allowance: 1500, deduction: 500, netPay: 23000, payoutStatus: 'Paid' },
+  {
+    id: 'PY001',
+    staffId: 'ST001',
+    month: '2026-04',
+    basePay: 35000,
+    hra: 7000,
+    overtimePay: 1200,
+    allowance: 8200,
+    pf: 4200,
+    professionalTax: 200,
+    lopDeduction: 0,
+    deduction: 4400,
+    netPay: 38800,
+    payoutStatus: 'Unpaid',
+    absentDays: 0,
+    overtimeHours: 8,
+    workingDays: 30
+  },
+  {
+    id: 'PY002',
+    staffId: 'ST002',
+    month: '2026-04',
+    basePay: 22000,
+    hra: 4400,
+    overtimePay: 600,
+    allowance: 5000,
+    pf: 2640,
+    professionalTax: 0,
+    lopDeduction: 733,
+    deduction: 3373,
+    netPay: 23627,
+    payoutStatus: 'Paid',
+    absentDays: 1,
+    overtimeHours: 4,
+    workingDays: 29
+  },
 ];
 
 const emptyStaffForm = { name: '', role: 'Staff' as StaffRole, department: '', joinedDate: '', salary: 0, phone: '', email: '', status: 'Active' as StaffStatus };
@@ -124,6 +213,7 @@ const HrPage: React.FC = () => {
 
   const [payrollMonth, setPayrollMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedStaffForAttendance, setSelectedStaffForAttendance] = useState<string | null>(null);
+  const [attendanceDate, setAttendanceDate] = useState(todayIso);
   const [viewingBill, setViewingBill] = useState<PayrollEntry | null>(null);
   const [activeSection, setActiveSection] = useState<HrSection>('staff');
 
@@ -183,6 +273,31 @@ const HrPage: React.FC = () => {
 
   const payrollForMonth = useMemo(() => payroll.filter(entry => entry.month === payrollMonth), [payroll, payrollMonth]);
 
+  const attendanceForDate = useMemo(
+    () => attendance.filter(item => item.date === attendanceDate),
+    [attendance, attendanceDate]
+  );
+
+  const attendanceStats = useMemo(() => {
+    const absent = attendanceForDate.filter(item => item.status === 'Absent').length;
+    const late = attendanceForDate.filter(item => item.status === 'Late').length;
+    const present = Math.max(staff.length - absent - late, 0);
+    return { absent, late, present };
+  }, [attendanceForDate, staff.length]);
+
+  const monthlyAttendanceByStaff = useMemo(() => {
+    const monthRecords = attendance.filter(item => item.date.startsWith(payrollMonth));
+    return monthRecords.reduce<Record<string, { absent: number; late: number; overtimeHours: number }>>((acc, item) => {
+      if (!acc[item.staffId]) {
+        acc[item.staffId] = { absent: 0, late: 0, overtimeHours: 0 };
+      }
+      if (item.status === 'Absent') acc[item.staffId].absent += 1;
+      if (item.status === 'Late') acc[item.staffId].late += 1;
+      acc[item.staffId].overtimeHours += item.overtimeHours ?? 0;
+      return acc;
+    }, {});
+  }, [attendance, payrollMonth]);
+
   const totals = useMemo(() => {
     const activeStaff = filteredStaff.filter(item => item.status === 'Active').length;
     const priests = filteredStaff.filter(item => item.role === 'Priest' && item.status === 'Active').length;
@@ -200,7 +315,7 @@ const HrPage: React.FC = () => {
     else addStaff(payload);
     setStaffModalOpen(false);
   };
-  const setSField = <K extends keyof StaffRecord>(k: K, v: any) => setStaffForm(p => ({ ...p, [k]: v }));
+  const setSField = <K extends keyof StaffRecord>(k: K, v: StaffRecord[K]) => setStaffForm(p => ({ ...p, [k]: v }));
 
   const openAddDuty = () => { setDutyForm({ ...emptyDutyForm, staffId: staff[0]?.id ?? '' }); setDutyEditId(null); setDutyModalOpen(true); };
   const openEditDuty = (item: DutySchedule) => { setDutyForm({ ...item }); setDutyEditId(item.id); setDutyModalOpen(true); };
@@ -210,34 +325,66 @@ const HrPage: React.FC = () => {
     else addDuty({ ...dutyForm });
     setDutyModalOpen(false);
   };
-  const setDField = <K extends keyof DutySchedule>(k: K, v: any) => setDutyForm(p => ({ ...p, [k]: v }));
+  const setDField = <K extends keyof DutySchedule>(k: K, v: DutySchedule[K]) => setDutyForm(p => ({ ...p, [k]: v }));
+
+  const upsertAttendance = (staffId: string, patch: Partial<AttendanceRecord>) => {
+    const existing = attendance.find(item => item.staffId === staffId && item.date === attendanceDate);
+    if (existing) {
+      updateAttendance(existing.id, patch);
+      return;
+    }
+
+    addAttendance({
+      id: `AT-${staffId}-${attendanceDate}`,
+      staffId,
+      date: attendanceDate,
+      status: 'Present',
+      shift: 'Full Day',
+      checkIn: '09:00',
+      checkOut: '17:00',
+      overtimeHours: 0,
+      ...patch,
+    });
+  };
+
   const generatePayrollForMonth = () => {
     const existingStaffIds = new Set(payroll.filter(entry => entry.month === payrollMonth).map(entry => entry.staffId));
 
     const newEntries = staff.filter(member => !existingStaffIds.has(member.id)).map(member => {
-      // Calculate Absences for this month
-      const memberAbsences = attendance.filter(a =>
-        a.staffId === member.id &&
-        a.date.startsWith(payrollMonth) &&
-        a.status === 'Absent'
-      ).length;
+      const memberAttendance = monthlyAttendanceByStaff[member.id] ?? { absent: 0, late: 0, overtimeHours: 0 };
+      const memberAbsences = memberAttendance.absent;
+      const overtimeHours = memberAttendance.overtimeHours;
 
       const basePay = member.salary;
-      const allowance = 500;
+      const workingDays = 30 - memberAbsences;
       const dailyRate = basePay / 30;
-      const deduction = Math.round(dailyRate * memberAbsences);
-      const netPay = basePay + allowance - deduction;
+      const hourlyRate = dailyRate / 8;
+      const hra = Math.round(basePay * 0.2);
+      const overtimePay = Math.round(hourlyRate * overtimeHours);
+      const allowance = hra + overtimePay;
+      const lopDeduction = Math.round(dailyRate * memberAbsences);
+      const pf = Math.round(basePay * 0.12);
+      const professionalTax = basePay >= 25000 ? 200 : 0;
+      const deduction = lopDeduction + pf + professionalTax;
+      const netPay = Math.max(basePay + allowance - deduction, 0);
 
       return {
         id: `PAY-${member.id}-${payrollMonth}`,
         staffId: member.id,
         month: payrollMonth,
         basePay,
+        hra,
+        overtimePay,
         allowance,
+        pf,
+        professionalTax,
+        lopDeduction,
         deduction,
         netPay,
         payoutStatus: 'Unpaid' as PayrollStatus,
-        absentDays: memberAbsences
+        absentDays: memberAbsences,
+        overtimeHours,
+        workingDays,
       };
     });
 
@@ -250,6 +397,8 @@ const HrPage: React.FC = () => {
   };
 
   const payrollTotal = payrollForMonth.reduce((sum, entry) => sum + entry.netPay, 0);
+  const paidEntries = payrollForMonth.filter(entry => entry.payoutStatus === 'Paid').length;
+  const unpaidEntries = payrollForMonth.length - paidEntries;
 
   return (
     <div className="hr-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
@@ -383,8 +532,9 @@ const HrPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
-                  <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Salary for Month</p>
+                  <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Monthly Payroll Outflow</p>
                   <p className="text-4xl font-display font-bold text-slate-800 mt-1">{money(payrollTotal)}</p>
+                  <p className="text-xs font-semibold text-muted-foreground mt-2">Paid: {paidEntries} | Pending: {unpaidEntries}</p>
                 </div>
               </div>
 
@@ -412,8 +562,11 @@ const HrPage: React.FC = () => {
 
                           <div className="space-y-2.5 mb-5 text-sm font-semibold bg-muted/20 p-4 rounded-xl border border-border/40 scale-[0.98] group-hover:scale-100 transition-transform origin-center">
                             <div className="flex justify-between text-muted-foreground items-center"><span>Base Pay</span> <span className="text-foreground tracking-tight">{money(entry.basePay)}</span></div>
-                            <div className="flex justify-between text-emerald-700 items-center"><span>Allowances</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.allowance)}</span></div>
-                            {entry.deduction > 0 && <div className="flex justify-between text-rose-600 items-center"><span>Deductions</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.deduction)}</span></div>}
+                            <div className="flex justify-between text-emerald-700 items-center"><span>HRA</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.hra ?? 0)}</span></div>
+                            <div className="flex justify-between text-emerald-700 items-center"><span>Overtime ({entry.overtimeHours ?? 0}h)</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.overtimePay ?? 0)}</span></div>
+                            <div className="flex justify-between text-rose-600 items-center"><span>PF Contribution</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.pf ?? 0)}</span></div>
+                            {(entry.professionalTax ?? 0) > 0 && <div className="flex justify-between text-rose-600 items-center"><span>Professional Tax</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.professionalTax ?? 0)}</span></div>}
+                            {(entry.lopDeduction ?? 0) > 0 && <div className="flex justify-between text-rose-600 items-center"><span>LOP Deduction ({entry.absentDays ?? 0}d)</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.lopDeduction ?? 0)}</span></div>}
                           </div>
 
                           <div className="flex items-center justify-between pt-1">
@@ -423,7 +576,7 @@ const HrPage: React.FC = () => {
                             </div>
                             <div className="flex gap-2">
                               <Button size="sm" variant="outline" className="border-slate-200 h-9 font-bold hover:bg-slate-50" onClick={() => setViewingBill(entry)}>
-                                <Receipt className="w-3.5 h-3.5 mr-1.5" /> Statement
+                                <Receipt className="w-3.5 h-3.5 mr-1.5" /> Pay Slip
                               </Button>
                               {entry.payoutStatus === 'Unpaid' && (
                                 <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 font-bold shadow-sm" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Salary</Button>
@@ -543,6 +696,25 @@ const HrPage: React.FC = () => {
 
             <div className="p-6">
               {/* Attendance Statistics */}
+              <div className="flex flex-col lg:flex-row gap-3 mb-6 items-stretch lg:items-end">
+                <div>
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Attendance Date</label>
+                  <input
+                    type="date"
+                    value={attendanceDate}
+                    onChange={(e) => setAttendanceDate(e.target.value)}
+                    className="h-11 rounded-lg border border-input bg-background px-3 text-sm font-semibold"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" className="h-11" onClick={() => setAttendanceDate(todayIso)}>Today</Button>
+                  <Button variant="outline" className="h-11" onClick={() => setAttendanceDate(yesterdayIso)}>Yesterday</Button>
+                </div>
+                <div className="lg:ml-auto rounded-xl bg-muted/40 border border-border px-4 py-2.5 text-xs font-semibold text-muted-foreground">
+                  Selected Date: {new Date(`${attendanceDate}T00:00:00`).toLocaleDateString('en-GB')}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-slate-200 transition-all">
                   <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:scale-110 transition-transform"><Users className="w-6 h-6" /></div>
@@ -554,48 +726,50 @@ const HrPage: React.FC = () => {
                 <div className="bg-emerald-50 border border-emerald-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-emerald-100/40 transition-all">
                   <div className="w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6" /></div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest leading-none mb-1.5">Present Today</p>
-                    <p className="text-2xl font-display font-bold text-emerald-800 leading-none">{staff.length - attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
+                    <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest leading-none mb-1.5">Present / On Time</p>
+                    <p className="text-2xl font-display font-bold text-emerald-800 leading-none">{attendanceStats.present}</p>
                   </div>
                 </div>
                 <div className="bg-rose-50 border border-rose-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-rose-100/40 transition-all">
                   <div className="w-12 h-12 rounded-2xl bg-white text-rose-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><UserX className="w-6 h-6" /></div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-rose-700 tracking-widest leading-none mb-1.5">Absent Today</p>
-                    <p className="text-2xl font-display font-bold text-rose-800 leading-none">{attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
+                    <p className="text-[10px] uppercase font-bold text-rose-700 tracking-widest leading-none mb-1.5">Absent / Late</p>
+                    <p className="text-2xl font-display font-bold text-rose-800 leading-none">{attendanceStats.absent} / {attendanceStats.late}</p>
                   </div>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {staff.map(member => {
-                  const todayStr = new Date().toISOString().split('T')[0];
-                  const record = attendance.find(a => a.staffId === member.id && a.date === todayStr);
+                  const record = attendanceForDate.find(a => a.staffId === member.id);
                   const isAbsent = record?.status === 'Absent';
+                  const isLate = record?.status === 'Late';
+                  const currentStatus = record?.status ?? 'Present';
 
                   return (
-                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group overflow-hidden relative ${isAbsent ? 'bg-rose-50 border-rose-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40'}`}>
+                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group overflow-hidden relative ${isAbsent ? 'bg-rose-50 border-rose-200' : isLate ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40'} ${selectedStaffForAttendance === member.id ? 'ring-2 ring-primary/25' : ''}`} onClick={() => setSelectedStaffForAttendance(member.id)}>
                       {isAbsent && <div className="absolute top-0 right-0 w-16 h-16 bg-rose-200/20 rounded-bl-full pointer-events-none" />}
                       <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-all duration-300 ${isAbsent ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 ring-4 ring-rose-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}`}>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-all duration-300 ${isAbsent ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 ring-4 ring-rose-100' : isLate ? 'bg-amber-500 text-white shadow-lg shadow-amber-200 ring-4 ring-amber-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}`}>
                           {initials(member.name)}
                         </div>
                         <div>
-                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-rose-900 group-hover:text-rose-950' : 'text-slate-800 group-hover:text-black'}`}>
+                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-rose-900 group-hover:text-rose-950' : isLate ? 'text-amber-900 group-hover:text-amber-950' : 'text-slate-800 group-hover:text-black'}`}>
                             {member.name}
                             {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-rose-200 text-rose-700 text-[9px] uppercase tracking-tighter rounded font-black">{record.leaveType || 'Absent'}</span>}
+                            {isLate && <span className="ml-2 inline-block px-1.5 py-0.5 bg-amber-200 text-amber-800 text-[9px] uppercase tracking-tighter rounded font-black">Late</span>}
                           </p>
                           <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-0.5">{member.role} • {member.department}</p>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         {isAbsent && (
                           <div className="flex gap-1 animate-in fade-in slide-in-from-right-2 duration-300">
-                            {(['Sick', 'Casual'] as const).map(type => (
+                            {(['Sick', 'Casual', 'Loss of Pay'] as const).map(type => (
                               <button
                                 key={type}
-                                onClick={() => updateAttendance(record.id, { leaveType: type })}
+                                onClick={() => record && updateAttendance(record.id, { leaveType: type })}
                                 className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-tight transition-all border ${record.leaveType === type ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-white text-rose-600 border-rose-100 hover:border-rose-300'}`}
                               >
                                 {type} Leave
@@ -603,27 +777,35 @@ const HrPage: React.FC = () => {
                             ))}
                           </div>
                         )}
-                        <Button
-                          onClick={() => {
-                            if (record) {
-                              if (record.status === 'Absent') {
-                                removeAttendance(record.id);
-                                toast.success(`${member.name} marked as Present`, { icon: '✅' });
-                              }
-                            } else {
-                              addAttendance({
-                                staffId: member.id,
-                                date: todayStr,
-                                status: 'Absent',
-                                leaveType: 'Casual'
-                              });
-                              toast.error(`${member.name} marked as Absent`, { icon: '❌' });
-                            }
+
+                        <select
+                          value={currentStatus}
+                          onChange={(e) => {
+                            const nextStatus = e.target.value as AttendanceRecord['status'];
+                            upsertAttendance(member.id, {
+                              status: nextStatus,
+                              leaveType: nextStatus === 'Absent' ? 'Casual' : undefined,
+                            });
+                            if (nextStatus === 'Present') toast.success(`${member.name} marked Present`);
+                            if (nextStatus === 'Late') toast.warning(`${member.name} marked Late`);
+                            if (nextStatus === 'Absent') toast.error(`${member.name} marked Absent`);
                           }}
-                          className={`rounded-xl h-10 w-10 flex items-center justify-center p-0 transition-all shadow-sm ${isAbsent ? 'bg-rose-600 text-white hover:bg-rose-700 shadow-rose-200' : 'bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 border border-slate-100'}`}
+                          className="h-10 rounded-lg border border-input bg-background px-2 text-xs font-bold"
                         >
-                          {isAbsent ? <X className="w-5 h-5" /> : <UserX className="w-5 h-5" />}
-                        </Button>
+                          <option value="Present">Present</option>
+                          <option value="Late">Late</option>
+                          <option value="Absent">Absent</option>
+                        </select>
+
+                        {/* <input
+                          type="number"
+                          min={0}
+                          step={0.5}
+                          value={record?.overtimeHours ?? 0}
+                          onChange={(e) => upsertAttendance(member.id, { overtimeHours: Number(e.target.value) || 0 })}
+                          className="h-10 w-20 rounded-lg border border-input bg-background px-2 text-xs font-semibold"
+                          title="Overtime hours"
+                        /> */}
                       </div>
                     </div>
                   );
@@ -659,8 +841,8 @@ const HrPage: React.FC = () => {
         open={!!viewingBill}
         onClose={() => setViewingBill(null)}
         title=""
-        containerClassName="max-w-[1100px]"
-        bodyClassName="p-3 md:p-4"
+        containerClassName="max-w-[1280px]"
+        bodyClassName="p-2 md:p-3"
       >
         {viewingBill && (
           <SalarySlip
@@ -677,16 +859,16 @@ const HrPage: React.FC = () => {
           <FormField label="Full Name" value={staffForm.name} onChange={v => setSField('name', v)} required />
           <div className="space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Role</label>
-            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value)}>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value as StaffRole)}>
               <option value="Priest">Priest</option><option value="Staff">Support Staff</option>
             </select>
           </div>
           <FormField label="Department" value={staffForm.department} onChange={v => setSField('department', v)} />
           <FormField label="Joining Date" value={staffForm.joinedDate} onChange={v => setSField('joinedDate', v)} type="date" />
-          <FormField label="Salary (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', v)} type="number" />
+          <FormField label="Salary (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', Number(v) || 0)} type="number" />
           <div className="space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Status</label>
-            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value)}>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value as StaffStatus)}>
               <option value="Active">Active</option><option value="Inactive">Inactive</option>
             </select>
           </div>
@@ -710,7 +892,7 @@ const HrPage: React.FC = () => {
           </div>
           <div className="col-span-2 space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Type</label>
-            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.dutyType} onChange={e => setDField('dutyType', e.target.value)}>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.dutyType} onChange={e => setDField('dutyType', e.target.value as DutyType)}>
               {dutyTypeOptions.map(t => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
@@ -724,7 +906,7 @@ const HrPage: React.FC = () => {
           <FormField label="Location" value={dutyForm.location} onChange={v => setDField('location', v)} />
           <div className="space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Status</label>
-            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.status} onChange={e => setDField('status', e.target.value)}>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.status} onChange={e => setDField('status', e.target.value as DutyStatus)}>
               <option value="Scheduled">Scheduled</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
             </select>
           </div>
@@ -745,8 +927,8 @@ const HrPage: React.FC = () => {
           <VolunteerForm
             initialData={volEditId ? volunteers.find(v => v.id === volEditId) : null}
             onSave={(data) => {
-              if (volEditId) updateVolunteer(volEditId, data as any);
-              else addVolunteer(data as any);
+              if (volEditId) updateVolunteer(volEditId, data as Partial<Volunteer>);
+              else addVolunteer(data as Omit<Volunteer, 'id'>);
               setVolModalOpen(false);
               setVolEditId(null);
             }}

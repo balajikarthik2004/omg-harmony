@@ -57,7 +57,7 @@ const SalarySlip: React.FC<SalarySlipProps> = ({ member, entry, onClose }) => {
   };
  
   return (
-    <div className="salary-slip-root bg-white p-2 md:p-4 w-full max-w-[980px] mx-auto font-sans text-zinc-900 border border-zinc-300 shadow-sm rounded-lg">
+    <div className="salary-slip-root bg-white p-2 md:p-4 w-full max-w-[1180px] mx-auto font-sans text-zinc-900 border border-zinc-300 shadow-sm rounded-lg">
       <div id="salary-slip-printable" className="bg-white border border-zinc-300 rounded-lg print:border-0 print:rounded-none">
         <div className="px-4 md:px-6 py-4 border-b border-zinc-300">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-2">

@@ -40,6 +40,48 @@ export interface VolunteerCampaign {
 
 const INITIAL_VOLUNTEERS: Volunteer[] = [
   {
+    id: 'V-008',
+    name: 'Naveen Kumar',
+    contact: '9591433122',
+    email: 'naveen.kumar@gwcdata.ai',
+    skills: ['Events Desk', 'Crowd Control'],
+    availability: 'Weekends',
+    experienceLevel: 'Expert',
+    participationCount: 22,
+    reliabilityScore: 96,
+    status: 'Active',
+    lastParticipation: '2026-04-18',
+    preferredArea: 'Events Desk'
+  },
+  {
+    id: 'V-009',
+    name: 'Santhosh Kumar',
+    contact: '8754808098',
+    email: 'santhosh.kumar@gwcdata.ai',
+    skills: ['Volunteer Coordination', 'Queue Management'],
+    availability: 'Full Day',
+    experienceLevel: 'Intermediate',
+    participationCount: 14,
+    reliabilityScore: 90,
+    status: 'Active',
+    lastParticipation: '2026-04-17',
+    preferredArea: 'Crowd Management'
+  },
+  {
+    id: 'V-010',
+    name: 'Balaji Krishnan',
+    contact: '9876543210',
+    email: 'balaji.krishnan@gwcdata.ai',
+    skills: ['Annadhanam', 'Temple Logistics'],
+    availability: 'Evening',
+    experienceLevel: 'Expert',
+    participationCount: 28,
+    reliabilityScore: 97,
+    status: 'Assigned',
+    lastParticipation: '2026-03-12',
+    preferredArea: 'Kitchen'
+  },
+  {
     id: 'V-001',
     name: 'Anand Kumar',
     contact: '9876543210',
@@ -138,6 +180,7 @@ const INITIAL_VOLUNTEERS: Volunteer[] = [
     lastParticipation: '2026-02-28',
     preferredArea: 'Crowd Management'
   }
+  
 ];
 
 const INITIAL_CAMPAIGNS: VolunteerCampaign[] = [

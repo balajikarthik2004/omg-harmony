@@ -187,6 +187,10 @@ const defaultVendors: AgentVendor[] = [
   { vendor_id: 'V-104', vendor_name: 'Legacy Traders', unit_price: 2800, delivery_eta_days: 6, reliability_score: 60, emergency_support: false, contract_status: 'Blacklisted' },
 ];
 
+type ProcurementRecord = typeof mockProcurements[number];
+type BannerTone = 'success' | 'info';
+type BannerMessage = { id: number; tone: BannerTone; title: string; detail: string };
+
 const ProcurementPage: React.FC = () => {
   const { items, add, update, remove } = useStore(mockProcurements);
   const [modalOpen, setModalOpen] = useState(false);
@@ -228,6 +232,8 @@ const ProcurementPage: React.FC = () => {
     approval_email: { subject: string; body: string };
     vendor_rfp_email: Array<{ vendor: string; subject: string; body: string }>;
   }>(null);
+  const [agentApprovedPRs, setAgentApprovedPRs] = useState<string[]>([]);
+  const [bannerMessages, setBannerMessages] = useState<BannerMessage[]>([]);
 
   // Check user role
   const isAdmin = currentUser.role === 'Admin';
@@ -322,6 +328,66 @@ const ProcurementPage: React.FC = () => {
         body: `Hi ${v.vendor_name},\n\nPlease find attached the RFP document for the following procurement request.\n\nPR ID : ${agentRequest.pr_id}\nItem : ${agentRequest.item_description}\nQuantity : ${agentRequest.requested_quantity}\nDelivery By : ${agentRequest.required_date}\n\nKindly review the attached RFP and submit your quotation as per instructions.\n\nRegards,\nProcurement Team`,
       })),
     });
+  };
+
+  const pushBanner = (tone: BannerTone, title: string, detail: string) => {
+    const id = Date.now() + Math.floor(Math.random() * 10000);
+    setBannerMessages(prev => [...prev, { id, tone, title, detail }]);
+    setTimeout(() => {
+      setBannerMessages(prev => prev.filter(message => message.id !== id));
+    }, 3200);
+  };
+
+  const createPOFromAgent = () => {
+    if (!agentResult) return;
+    if (agentApprovedPRs.includes(agentRequest.pr_id)) {
+      pushBanner('info', 'Already Approved', `${agentRequest.pr_id} is already converted to a purchase order.`);
+      return;
+    }
+
+    const bestVendor = agentResult.vendor_evaluations
+      .filter(v => v.rank !== null)
+      .sort((a, b) => (a.rank ?? Number.MAX_SAFE_INTEGER) - (b.rank ?? Number.MAX_SAFE_INTEGER))[0];
+
+    const selectedVendor = bestVendor?.vendor_name || agentResult.selected_vendor.split(' + ')[0] || 'Sri Pooja Supplies';
+    const unitPrice = bestVendor?.unit_price || Math.round(agentResult.requested_value / Math.max(1, agentRequest.requested_quantity));
+    const poDate = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    const newEntry: ProcurementRecord = {
+      id: String(Date.now()),
+      poNumber: generatePONumber(),
+      vendor: selectedVendor,
+      amount: Math.round(agentResult.requested_value),
+      date: poDate,
+      status: 'Approved',
+      items: [
+        {
+          name: agentRequest.item_description,
+          quantity: Math.max(1, agentRequest.requested_quantity),
+          price: unitPrice,
+        },
+      ],
+      submittedBy: currentUser.id,
+      submittedByName: currentUser.name,
+      approvedBy: currentUser.id,
+      approvedByName: currentUser.name,
+      approvedDate: poDate,
+      rejectedBy: null,
+      rejectedDate: null,
+      rejectionReason: '',
+    };
+
+    add(newEntry as unknown as typeof items[number]);
+    setAgentApprovedPRs(prev => [...prev, agentRequest.pr_id]);
+    setStatusFilter('all');
+
+    pushBanner('success', 'Approval Completed', `${agentRequest.pr_id} approved and ${newEntry.poNumber} created.`);
+    setTimeout(() => {
+      pushBanner('success', 'Mail Sent Successfully', `Approval mail sent to workflow roles for ${newEntry.poNumber}.`);
+    }, 350);
+    setTimeout(() => {
+      pushBanner('success', 'Vendor RFP Sent', `RFP sent successfully to ${selectedVendor}.`);
+    }, 700);
   };
 
   const openAdd = () => { 
@@ -593,10 +659,48 @@ const ProcurementPage: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs uppercase tracking-wider font-bold text-emerald-800">Agent Action</p>
+                  <p className="text-sm font-semibold text-emerald-900 mt-0.5">Approve recommendation and push it to Purchase Orders.</p>
+                </div>
+                <Button
+                  onClick={createPOFromAgent}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
+                  disabled={agentApprovedPRs.includes(agentRequest.pr_id)}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  {agentApprovedPRs.includes(agentRequest.pr_id) ? 'Already Approved' : 'Approve & Create PO'}
+                </Button>
+              </div>
             </>
           )}
         </div>
       </div>
+
+      {bannerMessages.length > 0 && (
+        <div className="fixed top-4 right-4 z-[70] flex flex-col gap-2 w-[min(92vw,420px)]">
+          {bannerMessages.map(message => (
+            <div
+              key={message.id}
+              className={`rounded-xl border p-3 shadow-lg backdrop-blur-sm animate-fade-in ${message.tone === 'success' ? 'bg-emerald-50/95 border-emerald-200' : 'bg-sky-50/95 border-sky-200'}`}
+            >
+              <div className="flex items-start gap-2">
+                {message.tone === 'success' ? (
+                  <CheckCircle className="w-4 h-4 mt-0.5 text-emerald-700" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 mt-0.5 text-sky-700" />
+                )}
+                <div>
+                  <p className={`text-xs font-bold uppercase tracking-wider ${message.tone === 'success' ? 'text-emerald-800' : 'text-sky-800'}`}>{message.title}</p>
+                  <p className="text-sm text-foreground font-medium mt-0.5">{message.detail}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
@@ -624,7 +728,7 @@ const ProcurementPage: React.FC = () => {
       <div className="section-panel shadow-sm border-l-4" style={{ borderLeftColor: 'var(--primary)' }}>
         {/* Search and Actions */}
         <div className="section-panel-header gap-4 flex-wrap bg-gradient-to-r from-primary/5 to-transparent border-b border-border/60 pb-4">
-          <h2 className="text-sm font-semibold whitespace-nowrap hidden md:flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-primary" /> Purchase Orders Manifest</h2>
+          <h2 className="text-sm font-semibold whitespace-nowrap hidden md:flex items-center gap-2"><LayoutGrid className="w-4 h-4 text-primary" /> Purchase Orders</h2>
           <div className="flex-1 flex flex-col sm:flex-row items-center gap-3 justify-end">
              <div className="relative w-full sm:max-w-sm">
                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />

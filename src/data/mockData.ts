@@ -11,19 +11,19 @@ const membershipTypes = [
 ];
 
 export const mockDevotees = [
-  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'Trust Member', familyMembers: 'Father: Raghavan Kumar, Mother: Lakshmi Raghavan, Sister: Mamtha (Simmam/Magam)', familyTreeMembers: [
-    { id: 'f100-1', name: 'Raghavan Kumar', relation: 'Father', dob: '1960-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
-    { id: 'f100-2', name: 'Lakshmi Raghavan', relation: 'Mother', dob: '1965-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
-    { id: 'f100-3', name: 'Mamtha', relation: 'Sister', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
-    { id: 'f100-4', name: 'Santhosh Kumar', relation: 'Brother', dob: '1990-11-22', gender: 'Male', rasi: 'Vrichikam', nakshatra: 'Anusham' }
+  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'Trust Member', familyTreeMembers: [
+    { id: 'f100-1', name: 'Pachamuthu', relation: 'Father', dob: '1970-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
+    { id: 'f100-2', name: 'Devi', relation: 'Mother', dob: '1988-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
+    { id: 'f100-3', name: 'Mamtha', relation: 'Wife', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
+    { id: 'f100-4', name: 'Kaniyan', relation: 'Son', gender: 'Male', rasi: 'Vrichikam', nakshatra: 'Anusham' }
   ] },
-  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17', membershipType: 'Committee Member', familyTreeMembers: [
-    { id: 'f101-1', name: 'Raghavan Kumar', relation: 'Father', dob: '1960-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
-    { id: 'f101-2', name: 'Lakshmi Raghavan', relation: 'Mother', dob: '1965-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
+  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17', membershipType: 'Committee Member', familyTreeMembers: [
+    { id: 'f101-1', name: 'Anbalagan', relation: 'Father', dob: '1960-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
+    { id: 'f101-2', name: 'Kala', relation: 'Mother', dob: '1965-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
     { id: 'f101-3', name: 'Mamtha', relation: 'Sister', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f101-4', name: 'Naveen Kumar', relation: 'Brother', dob: '1988-09-12', gender: 'Male', rasi: 'Kanni', nakshatra: 'Uththarai' }
   ] },
-  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'Krisnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12', membershipType: 'Volunteer', familyTreeMembers: [
+  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'krishnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12', membershipType: 'Volunteer', familyTreeMembers: [
     { id: 'f1-1', name: 'Krishnan', relation: 'Father', rasi: 'Kanni', nakshatra: 'Uthiram' },
     { id: 'f1-2', name: 'Aruna', relation: 'Mother', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f1-3', name: 'Karthik Krishnan', relation: 'Brother', rasi: 'Dhanusu', nakshatra: 'Moolam' }

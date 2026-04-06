@@ -80,6 +80,26 @@ const hallUtilization = [
 
 const COLORS = ['#293088', '#4F58CA', '#767DD6', '#E22E26'];
 
+type BookingReceipt = {
+    id: string;
+    date: string;
+    hall: string;
+    devotee: string;
+    slot: string;
+    event: string;
+    phone: string;
+    email: string;
+    addOns: string;
+    basePrice: number;
+    addOnsPrice: number;
+    surge: number;
+    total: number;
+    advance: number;
+    balance: number;
+};
+
+type BookingItem = (typeof initialBookings)[number];
+
 // Unified button class: black text default → red bg + white text on hover
 const BTN = "bg-white text-foreground border border-border font-bold transition-all duration-200 hover:bg-[#E22E26] hover:text-white hover:border-[#E22E26] active:scale-[0.98]";
 
@@ -124,6 +144,12 @@ const HallBookingPage = () => {
     const [selectedAddonIds, setSelectedAddonIds] = useState([]);
     const [isConfirmed, setIsConfirmed] = useState(false);
     const [newBookingId, setNewBookingId] = useState(null);
+    const [latestReceipt, setLatestReceipt] = useState<BookingReceipt | null>(null);
+    const [receiptByBookingId, setReceiptByBookingId] = useState<Record<string, BookingReceipt>>({});
+    const [selectedCalendarBooking, setSelectedCalendarBooking] = useState<BookingItem | null>(null);
+    const [calendarDetailsOpen, setCalendarDetailsOpen] = useState(false);
+    const [receiptPreviewOpen, setReceiptPreviewOpen] = useState(false);
+    const [activeReceipt, setActiveReceipt] = useState<BookingReceipt | null>(null);
 
     // Add New Hall Dialog state
     const [newHallData, setNewHallData] = useState({
@@ -171,13 +197,135 @@ const HallBookingPage = () => {
         return { basePrice, addOnsPrice, surge, total, advance };
     };
 
+    const buildReceiptFromBooking = (booking: BookingItem): BookingReceipt => {
+        const total = booking.amount || 0;
+        const advance = Math.round(total * 0.5);
+        return {
+            id: booking.id,
+            date: booking.date,
+            hall: booking.hall,
+            devotee: booking.devotee,
+            slot: booking.slot,
+            event: booking.event,
+            phone: 'N/A',
+            email: 'N/A',
+            addOns: 'Not available',
+            basePrice: total,
+            addOnsPrice: 0,
+            surge: 0,
+            total,
+            advance,
+            balance: total - advance,
+        };
+    };
+
+    const openReceiptPreview = (receipt: BookingReceipt) => {
+        setActiveReceipt(receipt);
+        setReceiptPreviewOpen(true);
+    };
+
+    const handleCalendarBookingClick = (booking: BookingItem) => {
+        setSelectedCalendarBooking(booking);
+        setCalendarDetailsOpen(true);
+    };
+
+    const handleReviewReceiptForBooking = (booking: BookingItem) => {
+        const existing = receiptByBookingId[booking.id];
+        const resolvedReceipt = existing || buildReceiptFromBooking(booking);
+        openReceiptPreview(resolvedReceipt);
+    };
+
+        const buildReceiptText = (receipt: BookingReceipt) => {
+                return [
+                        'Temple Harmony ERP - Hall Booking Receipt',
+                        '------------------------------------------',
+                        `Receipt ID: RCPT-${receipt.id}`,
+                        `Booking ID: ${receipt.id}`,
+                        `Date: ${receipt.date}`,
+                        `Devotee: ${receipt.devotee}`,
+                        `Phone: ${receipt.phone}`,
+                        `Email: ${receipt.email}`,
+                        `Venue: ${receipt.hall}`,
+                        `Slot: ${receipt.slot}`,
+                        `Event: ${receipt.event}`,
+                        `Add-ons: ${receipt.addOns}`,
+                        '',
+                        `Hall Rental: Rs ${receipt.basePrice.toLocaleString()}`,
+                        `Festival Surge (20%): Rs ${receipt.surge.toLocaleString()}`,
+                        `Add-ons Total: Rs ${receipt.addOnsPrice.toLocaleString()}`,
+                        `Grand Total: Rs ${receipt.total.toLocaleString()}`,
+                        `Advance Paid (50%): Rs ${receipt.advance.toLocaleString()}`,
+                        `Balance Due: Rs ${receipt.balance.toLocaleString()}`,
+                ].join('\n');
+        };
+
+        const handleDownloadReceipt = (receipt: BookingReceipt) => {
+                const blob = new Blob([buildReceiptText(receipt)], { type: 'text/plain;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `booking_receipt_${receipt.id}.txt`;
+                link.click();
+                window.URL.revokeObjectURL(url);
+        };
+
+        const handlePrintReceipt = (receipt: BookingReceipt) => {
+                const printWindow = window.open('', '_blank', 'width=900,height=700');
+                if (!printWindow) return;
+
+                const html = `
+<!doctype html>
+<html>
+<head>
+    <title>Receipt ${receipt.id}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 24px; color: #111827; }
+        h1 { font-size: 20px; margin-bottom: 4px; }
+        p { margin: 4px 0; }
+        .muted { color: #6b7280; }
+        .row { display: flex; justify-content: space-between; margin: 6px 0; }
+        .box { border: 1px solid #d1d5db; border-radius: 8px; padding: 12px; margin-top: 12px; }
+        .strong { font-weight: 700; }
+    </style>
+</head>
+<body>
+    <h1>Temple Harmony ERP</h1>
+    <p class="muted">Hall Booking Receipt</p>
+    <p><strong>Receipt ID:</strong> RCPT-${receipt.id}</p>
+    <p><strong>Booking ID:</strong> ${receipt.id}</p>
+    <p><strong>Date:</strong> ${receipt.date}</p>
+    <p><strong>Devotee:</strong> ${receipt.devotee}</p>
+    <p><strong>Venue:</strong> ${receipt.hall}</p>
+    <p><strong>Slot:</strong> ${receipt.slot}</p>
+    <p><strong>Event:</strong> ${receipt.event}</p>
+    <p><strong>Phone:</strong> ${receipt.phone}</p>
+    <p><strong>Email:</strong> ${receipt.email}</p>
+    <p><strong>Add-ons:</strong> ${receipt.addOns}</p>
+    <div class="box">
+        <div class="row"><span>Hall Rental</span><span>Rs ${receipt.basePrice.toLocaleString()}</span></div>
+        <div class="row"><span>Festival Surge (20%)</span><span>Rs ${receipt.surge.toLocaleString()}</span></div>
+        <div class="row"><span>Add-ons</span><span>Rs ${receipt.addOnsPrice.toLocaleString()}</span></div>
+        <div class="row strong"><span>Grand Total</span><span>Rs ${receipt.total.toLocaleString()}</span></div>
+        <div class="row strong"><span>Advance Paid (50%)</span><span>Rs ${receipt.advance.toLocaleString()}</span></div>
+        <div class="row strong"><span>Balance Due</span><span>Rs ${receipt.balance.toLocaleString()}</span></div>
+    </div>
+</body>
+</html>`;
+
+                printWindow.document.open();
+                printWindow.document.write(html);
+                printWindow.document.close();
+                printWindow.focus();
+                printWindow.print();
+        };
+
     const handleConfirmBooking = () => {
         const summary = calculateSummary();
         const id = `B${Math.floor(Math.random() * 9000) + 1000}`;
         const slotLabel = bookingFormData.slot === 'full' ? 'Full Day' : bookingFormData.slot === 'morning' ? 'Morning Half' : 'Evening Half';
         // Format date for display
         const dateObj = new Date(bookingFormData.date);
-        const displayDate = isNaN(dateObj) ? bookingFormData.date :
+        const displayDate = Number.isNaN(dateObj.getTime()) ? bookingFormData.date :
             `${String(dateObj.getDate()).padStart(2, '0')}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${dateObj.getFullYear()}`;
         const newBooking = {
             id,
@@ -189,9 +337,33 @@ const HallBookingPage = () => {
             amount: summary.total,
             event: bookingFormData.category.charAt(0).toUpperCase() + bookingFormData.category.slice(1)
         };
+        const receipt = {
+            id,
+            date: displayDate,
+            hall: newBooking.hall,
+            devotee: newBooking.devotee,
+            slot: slotLabel,
+            event: newBooking.event,
+            phone: bookingFormData.phone || 'N/A',
+            email: bookingFormData.email || 'N/A',
+            addOns: selectedAddonIds
+                .map(addonId => ADDONS.find(a => a.id === addonId)?.title)
+                .filter(Boolean)
+                .join(', ') || 'None',
+            basePrice: summary.basePrice,
+            addOnsPrice: summary.addOnsPrice,
+            surge: summary.surge,
+            total: summary.total,
+            advance: summary.advance,
+            balance: summary.total - summary.advance,
+        };
+
         setBookingsList(prev => [newBooking, ...prev]);
         setNewBookingId(id);
+        setLatestReceipt(receipt);
+        setReceiptByBookingId(prev => ({ ...prev, [id]: receipt }));
         setIsConfirmed(true);
+        openReceiptPreview(receipt);
     };
 
     const handleDeleteBooking = (id) => {
@@ -236,7 +408,7 @@ const HallBookingPage = () => {
     const resetBooking = () => {
         setBookingStep(1); setSelectedHallId(null);
         setBookingFormData({ firstName: '', lastName: '', phone: '', email: '', category: 'marriage', guests: '', notes: '', date: '2026-04-12', slot: 'full' });
-        setSelectedAddonIds([]); setIsConfirmed(false); setNewBookingId(null);
+        setSelectedAddonIds([]); setIsConfirmed(false); setNewBookingId(null); setLatestReceipt(null); setActiveReceipt(null);
     };
 
     return (
@@ -249,7 +421,7 @@ const HallBookingPage = () => {
                         <div className="bg-white/20 p-2 rounded-lg backdrop-blur-md hidden sm:flex">
                             <Building2 className="w-6 h-6" />
                         </div>
-                        Hall Booking System
+                        Rental Venue Management
                     </h1>
                     <p className="text-sm mt-1.5 max-w-xl font-medium opacity-90">
                         Manage temple venues, monitor event schedules, and optimize space utilization.
@@ -430,7 +602,7 @@ const HallBookingPage = () => {
                                                 <span>{stat.hall}</span>
                                                 <span className={stat.progress === 100 ? "text-emerald-600" : "text-muted-foreground"}>{stat.status}</span>
                                             </div>
-                                            <Progress value={stat.progress} className="h-1.5" indicatorClassName={stat.color} />
+                                            <Progress value={stat.progress} className="h-1.5" />
                                         </div>
                                     ))}
                                 </CardContent>
@@ -774,7 +946,7 @@ const HallBookingPage = () => {
                                         <DialogTrigger asChild>
                                             <Button className={`${BTN} h-10 px-8 md:px-12 text-xs font-bold shadow-lg`}
                                                 onClick={handleConfirmBooking}>
-                                                Confirm & Pay
+                                                Confirm & Get Receipt
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md rounded-2xl p-6 md:p-8">
@@ -793,8 +965,10 @@ const HallBookingPage = () => {
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <div className="space-y-2.5">
-                                                <Button className={`${BTN} w-full h-11 text-sm font-bold shadow-md`}>
-                                                    <Receipt className="w-4 h-4 mr-2" /> Download Receipt
+                                                <Button className={`${BTN} w-full h-11 text-sm font-bold shadow-md`}
+                                                    onClick={() => latestReceipt && openReceiptPreview(latestReceipt)}
+                                                    disabled={!latestReceipt}>
+                                                    <Receipt className="w-4 h-4 mr-2" /> Review Receipt
                                                 </Button>
                                                 <Button className={`${BTN} w-full h-11 text-sm font-bold`}
                                                     onClick={() => { resetBooking(); setActiveTab('overview'); }}>
@@ -856,9 +1030,11 @@ const HallBookingPage = () => {
                                                             <span className={`text-[10px] md:text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E22E26] text-white' : 'text-foreground'}`}>{day}</span>
                                                             <div className="mt-1 space-y-0.5">
                                                                 {events.slice(0, 2).map(ev => (
-                                                                    <div key={ev.id} className={`text-[7px] md:text-[8px] text-white p-0.5 md:p-1 rounded font-bold truncate shadow-sm ${ev.status === 'Confirmed' ? 'bg-[#293088]/90' : ev.status === 'Pending' ? 'bg-amber-500/90' : 'bg-slate-500/90'}`}>
+                                                                    <button key={ev.id} type="button"
+                                                                        onClick={() => handleCalendarBookingClick(ev)}
+                                                                        className={`w-full text-left text-[7px] md:text-[8px] text-white p-0.5 md:p-1 rounded font-bold truncate shadow-sm transition-opacity hover:opacity-90 ${ev.status === 'Confirmed' ? 'bg-[#293088]/90' : ev.status === 'Pending' ? 'bg-amber-500/90' : 'bg-slate-500/90'}`}>
                                                                         {ev.devotee.split(' ')[0]}: {ev.event}
-                                                                    </div>
+                                                                    </button>
                                                                 ))}
                                                                 {events.length > 2 && <div className="text-[7px] text-muted-foreground font-bold">+{events.length - 2} more</div>}
                                                             </div>
@@ -1178,6 +1354,96 @@ const HallBookingPage = () => {
                     </Card>
                 </TabsContent>
             </Tabs>
+
+            <Dialog open={calendarDetailsOpen} onOpenChange={setCalendarDetailsOpen}>
+                <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg rounded-2xl p-6">
+                    <DialogHeader>
+                        <DialogTitle className="font-bold text-base text-[#293088]">Booking Details</DialogTitle>
+                        <DialogDescription className="text-xs">
+                            View event details from the calendar and review the receipt.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {selectedCalendarBooking && (
+                        <div className="space-y-2.5">
+                            {[
+                                { label: 'Booking ID', value: selectedCalendarBooking.id },
+                                { label: 'Devotee', value: selectedCalendarBooking.devotee },
+                                { label: 'Hall', value: selectedCalendarBooking.hall },
+                                { label: 'Event', value: selectedCalendarBooking.event },
+                                { label: 'Date', value: selectedCalendarBooking.date },
+                                { label: 'Slot', value: selectedCalendarBooking.slot },
+                                { label: 'Status', value: selectedCalendarBooking.status },
+                                { label: 'Amount', value: `₹${selectedCalendarBooking.amount.toLocaleString()}` },
+                            ].map(row => (
+                                <div key={row.label} className="flex items-center justify-between rounded-lg border border-border/60 p-2.5 text-xs">
+                                    <span className="font-semibold text-muted-foreground uppercase tracking-wide">{row.label}</span>
+                                    <span className="font-bold text-foreground text-right">{row.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    <DialogFooter>
+                        <Button className={`${BTN} w-full h-10 text-xs font-bold`}
+                            onClick={() => selectedCalendarBooking && handleReviewReceiptForBooking(selectedCalendarBooking)}
+                            disabled={!selectedCalendarBooking}>
+                            <FileText className="w-3.5 h-3.5 mr-2" /> Review Receipt
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={receiptPreviewOpen} onOpenChange={setReceiptPreviewOpen}>
+                <DialogContent overlayClassName="bg-transparent" className="max-w-[calc(100%-2rem)] sm:max-w-2xl rounded-2xl p-6 bg-white/95 backdrop-blur-sm">
+                    <DialogHeader>
+                        <DialogTitle className="font-bold text-base text-[#293088]">Booking Receipt</DialogTitle>
+                        <DialogDescription className="text-xs">
+                            Receipt preview for booking confirmation and review.
+                        </DialogDescription>
+                    </DialogHeader>
+                    {activeReceipt && (
+                        <div className="rounded-xl border border-[#293088]/20 bg-[#F7F8FF] p-4 space-y-3 text-xs">
+                            <div className="flex items-center justify-between border-b border-[#293088]/15 pb-2">
+                                <div>
+                                    <p className="font-bold text-[#293088]">Temple Harmony ERP</p>
+                                    <p className="text-muted-foreground">Hall Booking Receipt</p>
+                                </div>
+                                <Badge className="bg-[#293088] text-white border-none">RCPT-{activeReceipt.id}</Badge>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Booking ID:</strong> {activeReceipt.id}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Date:</strong> {activeReceipt.date}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Devotee:</strong> {activeReceipt.devotee}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Venue:</strong> {activeReceipt.hall}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Slot:</strong> {activeReceipt.slot}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Event:</strong> {activeReceipt.event}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Phone:</strong> {activeReceipt.phone}</div>
+                                <div className="rounded-md bg-white border border-border/60 p-2"><strong>Email:</strong> {activeReceipt.email}</div>
+                            </div>
+                            <div className="rounded-md bg-white border border-border/60 p-3 space-y-1.5">
+                                <div className="flex justify-between"><span>Hall Rental</span><strong>₹{activeReceipt.basePrice.toLocaleString()}</strong></div>
+                                <div className="flex justify-between"><span>Festival Surge (20%)</span><strong>₹{activeReceipt.surge.toLocaleString()}</strong></div>
+                                <div className="flex justify-between"><span>Add-ons</span><strong>₹{activeReceipt.addOnsPrice.toLocaleString()}</strong></div>
+                                <div className="flex justify-between text-sm border-t pt-1.5"><span className="font-bold">Grand Total</span><strong>₹{activeReceipt.total.toLocaleString()}</strong></div>
+                                <div className="flex justify-between text-emerald-700"><span className="font-bold">Advance Paid (50%)</span><strong>₹{activeReceipt.advance.toLocaleString()}</strong></div>
+                                <div className="flex justify-between text-amber-700"><span className="font-bold">Balance Due</span><strong>₹{activeReceipt.balance.toLocaleString()}</strong></div>
+                            </div>
+                            <p className="text-[11px] text-muted-foreground">Add-ons: {activeReceipt.addOns}</p>
+                        </div>
+                    )}
+                    <DialogFooter>
+                        <Button className={`${BTN} w-full sm:w-auto h-10 text-xs font-bold`}
+                            onClick={() => activeReceipt && handleDownloadReceipt(activeReceipt)}
+                            disabled={!activeReceipt}>
+                            <Download className="w-3.5 h-3.5 mr-2" /> Download Receipt
+                        </Button>
+                        <Button className={`${BTN} w-full sm:w-auto h-10 text-xs font-bold`}
+                            onClick={() => activeReceipt && handlePrintReceipt(activeReceipt)}
+                            disabled={!activeReceipt}>
+                            <FileText className="w-3.5 h-3.5 mr-2" /> Print Receipt
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* ═══════════════════════════════════════════
                 DELETE CONFIRM DIALOG
