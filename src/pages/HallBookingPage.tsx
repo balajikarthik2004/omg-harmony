@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Building2, Calendar, FileText, IndianRupee, Users,
-    Settings, CheckCircle2, AlertCircle, Clock,
+    Edit, CheckCircle2, AlertCircle, Clock,
     Plus, Search, Filter, Download, Trash2,
     LayoutDashboard, PieChart, Info, MapPin,
     Utensils, Armchair, Zap, Sparkles, ChevronRight,
@@ -380,7 +380,7 @@ const HallBookingPage = () => {
                                                             className={`${BTN} h-6 w-6 rounded-md border-border/50`}
                                                             onClick={() => setEditingBookingId(editingBookingId === booking.id ? null : booking.id)}
                                                             title="Edit status">
-                                                            <Settings className="w-3 h-3" />
+                                                            <Edit className="w-3 h-3" />
                                                         </Button>
                                                         <Button size="icon"
                                                             className="h-6 w-6 rounded-md bg-white text-foreground border border-border font-bold hover:bg-[#E22E26] hover:text-white hover:border-[#E22E26] transition-all"
@@ -1046,7 +1046,7 @@ const HallBookingPage = () => {
                                 </CardContent>
                                 <CardFooter className="p-3 bg-muted/5 rounded-b-xl gap-2">
                                     <Button className={`${BTN} flex-1 text-[10px] h-9 font-bold`}>
-                                        <Settings className="w-3.5 h-3.5 mr-1" /> Config
+                                        <Edit className="w-3.5 h-3.5 mr-1" /> Config
                                     </Button>
                                     <Button className={`${BTN} flex-1 text-[10px] h-9 font-bold`}>
                                         <IndianRupee className="w-3.5 h-3.5 mr-1" /> Pricing

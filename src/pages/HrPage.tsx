@@ -75,6 +75,10 @@ interface AttendanceRecord {
   status: 'Present' | 'Absent';
 }
 
+const initialAttendance: AttendanceRecord[] = [
+  { id: 'AT-001', staffId: 'ST002', date: new Date().toISOString().split('T')[0], status: 'Absent' },
+];
+
 type HrSection = 'staff' | 'payroll' | 'duties' | 'volunteers' | 'attendance';
 
 const initialStaff: StaffRecord[] = [
@@ -115,7 +119,7 @@ const HrPage: React.FC = () => {
   const { items: volunteers, add: addVolunteer, update: updateVolunteer, remove: removeVolunteer } = useVolunteerStore();
   
   const { items: payroll, add: addPayroll, update: updatePayroll, setItems: setPayroll } = useStore<PayrollEntry>(initialPayroll);
-  const { items: attendance, add: addAttendance, update: updateAttendance, remove: removeAttendance } = useStore<AttendanceRecord>([]);
+  const { items: attendance, add: addAttendance, update: updateAttendance, remove: removeAttendance } = useStore<AttendanceRecord>(initialAttendance);
   
   const [payrollMonth, setPayrollMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedStaffForAttendance, setSelectedStaffForAttendance] = useState<string | null>(null);
@@ -292,6 +296,7 @@ const HrPage: React.FC = () => {
           { key: 'staff' as HrSection, label: 'Staff List', icon: Briefcase },
           { key: 'duties' as HrSection, label: 'Duties', icon: CalendarDays },
           { key: 'volunteers' as HrSection, label: 'Volunteers', icon: Users },
+          { key: 'attendance' as HrSection, label: 'Attendance', icon: UserX },
           { key: 'payroll' as HrSection, label: 'Payroll', icon: Wallet },
         ]).map(sec => (
           <button
@@ -525,15 +530,42 @@ const HrPage: React.FC = () => {
           </section>
         )}
         {activeSection === 'attendance' && (
-          <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--destructive))' }}>
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-rose-50/50 to-transparent">
+          <section className="section-panel hr-main-panel border-l-4 border-rose-500">
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-rose-50/80 to-transparent">
               <div className="flex-1">
-                <h2 className="text-sm font-semibold flex items-center gap-2"><UserX className="w-4 h-4 text-rose-600" /> Attendance Registry</h2>
-                <p className="text-[11px] font-bold text-muted-foreground mt-1 uppercase tracking-widest leading-none">Daily Duty Checklist • {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                <h2 className="text-sm font-semibold flex items-center gap-2 pr-4 border-r border-border/60"><UserX className="w-4 h-4 text-rose-600" /> Attendance Registry</h2>
+                <div className="flex items-center gap-2 ml-4">
+                  <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Daily Duty Checklist • {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                </div>
               </div>
             </div>
             
             <div className="p-6">
+              {/* Attendance Statistics */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-slate-200 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:scale-110 transition-transform"><Users className="w-6 h-6" /></div>
+                    <div>
+                       <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none mb-1.5 text-center">Total Staff</p>
+                       <p className="text-2xl font-display font-bold text-slate-800 leading-none">{staff.length}</p>
+                    </div>
+                 </div>
+                 <div className="bg-emerald-50 border border-emerald-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-emerald-100/40 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6" /></div>
+                    <div>
+                       <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest leading-none mb-1.5">Present Today</p>
+                       <p className="text-2xl font-display font-bold text-emerald-800 leading-none">{staff.length - attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
+                    </div>
+                 </div>
+                 <div className="bg-rose-50 border border-rose-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-rose-100/40 transition-all">
+                    <div className="w-12 h-12 rounded-2xl bg-white text-rose-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><UserX className="w-6 h-6" /></div>
+                    <div>
+                       <p className="text-[10px] uppercase font-bold text-rose-700 tracking-widest leading-none mb-1.5">Absent Today</p>
+                       <p className="text-2xl font-display font-bold text-rose-800 leading-none">{attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
+                    </div>
+                 </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 {staff.map(member => {
                   const todayStr = new Date().toISOString().split('T')[0];
@@ -541,13 +573,17 @@ const HrPage: React.FC = () => {
                   const isAbsent = record?.status === 'Absent';
                   
                   return (
-                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group ${isAbsent ? 'bg-rose-50 border-rose-100 shadow-inner' : 'bg-white border-slate-100 shadow-sm hover:shadow-md'}`}>
-                      <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-colors ${isAbsent ? 'bg-rose-600 text-white shadow-lg shadow-rose-200' : 'bg-slate-100 text-slate-500'}`}>
+                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group overflow-hidden relative ${isAbsent ? 'bg-rose-50 border-rose-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40'}`}>
+                      {isAbsent && <div className="absolute top-0 right-0 w-16 h-16 bg-rose-200/20 rounded-bl-full pointer-events-none" />}
+                      <div className="flex items-center gap-4 relative z-10">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-all duration-300 ${isAbsent ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 ring-4 ring-rose-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}`}>
                           {initials(member.name)}
                         </div>
                         <div>
-                          <p className={`font-bold text-base tracking-tight ${isAbsent ? 'text-rose-900 line-through opacity-70' : 'text-slate-800'}`}>{member.name}</p>
+                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-rose-900 group-hover:text-rose-950' : 'text-slate-800 group-hover:text-black'}`}>
+                            {member.name}
+                            {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-rose-200 text-rose-700 text-[9px] uppercase tracking-tighter rounded font-black">Absent</span>}
+                          </p>
                           <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-0.5">{member.role} • {member.department}</p>
                         </div>
                       </div>
@@ -555,40 +591,47 @@ const HrPage: React.FC = () => {
                       <Button 
                         onClick={() => {
                             if (record) {
-                                // Toggle or Delete
                                 if (record.status === 'Absent') {
                                     removeAttendance(record.id);
-                                    toast.success(`${member.name} marked as Present`);
+                                    toast.success(`${member.name} marked as Present`, { icon: '✅' });
                                 }
                             } else {
                                 addAttendance({
+                                    id: `AT-${member.id}-${todayStr}`,
                                     staffId: member.id,
                                     date: todayStr,
                                     status: 'Absent'
                                 });
-                                toast.error(`${member.name} marked as Absent`);
+                                toast.error(`${member.name} marked as Absent`, { icon: '❌' });
                             }
                         }}
-                        className={`rounded-xl h-10 px-4 font-bold text-xs transition-all ${isAbsent ? 'bg-white text-rose-600 hover:bg-rose-100 border border-rose-200' : 'bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600'}`}
+                        className={`rounded-xl h-10 w-10 flex items-center justify-center p-0 transition-all shadow-sm ${isAbsent ? 'bg-rose-600 text-white hover:bg-rose-700 shadow-rose-200' : 'bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 border border-slate-100'}`}
                       >
-                        {isAbsent ? 'Undo Absence' : 'Mark Absent'}
+                         {isAbsent ? <X className="w-5 h-5" /> : <UserX className="w-5 h-5" />}
                       </Button>
                     </div>
                   );
                 })}
               </div>
               
-              <div className="mt-8 bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200">
-                        <CalendarDays className="w-6 h-6" />
+              <div className="mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 border-none rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-indigo-100 overflow-hidden relative">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -ml-16 -mb-16" />
+                
+                <div className="flex items-center gap-6 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center shadow-inner">
+                        <Wallet className="w-8 h-8" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-indigo-900 uppercase tracking-wider">Payroll Implications</p>
-                        <p className="text-xs font-semibold text-indigo-600/80">Absences recorded here will automatically calculate Loss of Pay during payroll generation.</p>
+                        <p className="text-indigo-100 text-[11px] font-bold uppercase tracking-widest mb-1.5 opacity-80">Connected Subsystem</p>
+                        <h3 className="text-xl font-display font-bold text-white leading-none">Automated Payroll Deduction</h3>
+                        <p className="text-indigo-100 text-sm font-medium mt-2 max-w-md">Every absence recorded in this registry is automatically calculated as a Loss of Pay (L.O.P.) during the monthly payroll generation.</p>
                     </div>
                 </div>
-                <Badge variant="outline" className="bg-white border-indigo-200 text-indigo-700 font-bold px-4 py-1.5 rounded-full">Automated LOP Active</Badge>
+                <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl border border-white/30 text-white font-black text-center relative z-10 group hover:bg-white/30 transition-all cursor-default">
+                    <p className="text-[10px] uppercase tracking-[0.2em] mb-1 opacity-80">Status</p>
+                    <p className="text-lg">L.O.P. ACTIVE</p>
+                </div>
               </div>
             </div>
           </section>
