@@ -100,7 +100,7 @@ const DashboardPage: React.FC = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-stagger">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-stagger">
         {secondaryKpis.map(kpi => (
           <div key={kpi.label} className={`dashboard-secondary-kpi rounded-xl p-4 flex items-center justify-between shadow-sm ${kpi.color}`}>
             <div className="flex items-center gap-3">
@@ -110,7 +110,7 @@ const DashboardPage: React.FC = () => {
             <p className="numeric-font text-xl font-bold">{kpi.value}</p>
           </div>
         ))}
-      </div>
+      </div> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <section className="section-panel shadow-sm lg:col-span-2 flex flex-col">

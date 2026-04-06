@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar, Search, Users, ShieldCheck, HeartHandshake, History, CreditCard, Clock, CheckCircle2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar, Search, Users, ShieldCheck, HeartHandshake, History, CreditCard, Clock, CheckCircle2, Maximize2, UserPlus, Crown } from 'lucide-react';
 import { mockDevotees, mockDonations, mockBookings, mockEvents } from '@/data/mockData';
 import { useStore } from '@/hooks/useStore';
 import Modal from '@/components/Modal';
@@ -12,8 +12,68 @@ import { sendCampaignEmails } from '@/lib/emailService';
 const emptyForm = {
   name: '', phone: '', email: '', address: '',
   city: '', state: '', country: 'India',
-  status: 'Active', totalDonations: 0, lastVisit: ''
+  status: 'Active', totalDonations: 0, lastVisit: '',
+  dob: '', gender: '', occupation: '',
+  nakshatra: '', rasi: '', gothram: '',
+  spouse: '', children: '',
+  familyMembers: '',
+  volunteerInterest: '', membershipType: 'General',
+  notificationSms: true, notificationEmail: true, notificationWhatsApp: true,
+  reminderBirthday: true, reminderNakshatra: true, reminderFestivalGreetings: true, reminderDonationAnniversary: true,
 };
+
+const emptyFamilyMemberForm: FamilyMemberFormState = {
+  id: null,
+  name: '',
+  relation: '',
+  dob: '',
+  gender: '',
+  occupation: '',
+  phone: '',
+  parentId: 'root',
+  isPrimary: false,
+};
+
+function buildLegacyFamilyMembers(devotee: Devotee): FamilyMember[] {
+  const legacyMembers: FamilyMember[] = [];
+
+  if (devotee.spouse?.trim()) {
+    legacyMembers.push({ id: 'legacy-spouse', name: devotee.spouse.trim(), relation: 'Spouse', parentId: null });
+  }
+
+  const childTokens = (devotee.children || '')
+    .split(',')
+    .map(token => token.trim())
+    .filter(Boolean);
+  const parsedChildren = childTokens.length === 1 && /^\d+$/.test(childTokens[0])
+    ? Array.from({ length: Number(childTokens[0]) }, (_, index) => `Child ${index + 1}`)
+    : childTokens;
+
+  parsedChildren.forEach((child, index) => {
+    legacyMembers.push({ id: `legacy-child-${index + 1}`, name: child, relation: 'Child', parentId: null });
+  });
+
+  const rawFamilyMembers = (devotee.familyMembers || '')
+    .split(',')
+    .map(token => token.trim())
+    .filter(Boolean);
+
+  rawFamilyMembers.forEach((member, index) => {
+    const [relationRaw, ...nameParts] = member.split(':');
+    if (nameParts.length === 0) {
+      legacyMembers.push({ id: `legacy-family-${index + 1}`, relation: 'Family', name: relationRaw.trim(), parentId: null });
+      return;
+    }
+    legacyMembers.push({
+      id: `legacy-family-${index + 1}`,
+      relation: relationRaw.trim() || 'Family',
+      name: nameParts.join(':').trim() || 'N/A',
+      parentId: null,
+    });
+  });
+
+  return legacyMembers;
+}
 
 function getInitials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -44,11 +104,150 @@ function bookingBadgeClass(status: string) {
   return map[status] ?? 'bg-muted text-muted-foreground';
 }
 
-type Devotee = typeof mockDevotees[0];
-type TabName = 'info' | 'donations' | 'bookings' | 'notify';
+const REL_COLORS: Record<string, { rc: string; rb: string; rt: string }> = {
+  spouse: { rc: '#7F77DD', rb: '#EEEDFE', rt: '#3C3489' },
+  father: { rc: '#185FA5', rb: '#E6F1FB', rt: '#0C447C' },
+  mother: { rc: '#D4537E', rb: '#FBEAF0', rt: '#72243E' },
+  brother: { rc: '#1D9E75', rb: '#E1F5EE', rt: '#085041' },
+  sister: { rc: '#D85A30', rb: '#FAECE7', rt: '#4A1B0C' },
+  son: { rc: '#185FA5', rb: '#E6F1FB', rt: '#0C447C' },
+  daughter: { rc: '#D4537E', rb: '#FBEAF0', rt: '#72243E' },
+  child: { rc: '#639922', rb: '#EAF3DE', rt: '#27500A' },
+  family: { rc: '#888780', rb: '#F1EFE8', rt: '#444441' },
+};
+const DEFAULT_REL_COLOR = { rc: '#BA7517', rb: '#FAEEDA', rt: '#633806' };
+
+function getRelColor(rel: string) {
+  return REL_COLORS[rel.toLowerCase().trim()] ?? DEFAULT_REL_COLOR;
+}
+
+type Devotee = (typeof mockDevotees)[number] & {
+  dob?: string;
+  gender?: string;
+  occupation?: string;
+  nakshatra?: string;
+  rasi?: string;
+  gothram?: string;
+  spouse?: string;
+  children?: string;
+  familyMembers?: string;
+  familyTreeMembers?: FamilyMember[];
+  volunteerInterest?: string;
+  membershipType?: string;
+  notificationSms?: boolean;
+  notificationEmail?: boolean;
+  notificationWhatsApp?: boolean;
+  reminderBirthday?: boolean;
+  reminderNakshatra?: boolean;
+  reminderFestivalGreetings?: boolean;
+  reminderDonationAnniversary?: boolean;
+};
+
+type FamilyMember = {
+  id: string;
+  name: string;
+  relation: string;
+  dob?: string;
+  gender?: string;
+  occupation?: string;
+  phone?: string;
+  parentId?: string | null;
+  isPrimary?: boolean;
+};
+
+type FamilyMemberFormState = {
+  id: string | null;
+  name: string;
+  relation: string;
+  dob: string;
+  gender: string;
+  occupation: string;
+  phone: string;
+  parentId: string;
+  isPrimary: boolean;
+};
+type TabName = 'info' | 'family' | 'donations' | 'bookings' | 'notify';
 
 type Donation = typeof mockDonations[0];
 type Booking = typeof mockBookings[0];
+
+function useFamilyConnectors(
+  containerRef: React.RefObject<HTMLDivElement>,
+  members: FamilyMember[],
+  collapsedNodes: Set<string>,
+  dep?: unknown,
+) {
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    container.querySelectorAll('.ftree-svg-overlay').forEach(el => el.remove());
+
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.classList.add('ftree-svg-overlay');
+    container.style.position = 'relative';
+    container.appendChild(svg);
+
+    const containerRect = container.getBoundingClientRect();
+
+    function relRect(el: Element) {
+      const r = el.getBoundingClientRect();
+      return {
+        cx: r.left - containerRect.left + r.width / 2,
+        top: r.top - containerRect.top,
+        bottom: r.top - containerRect.top + r.height,
+      };
+    }
+
+    const rootEl = container.querySelector('.ftree-root-node');
+
+    members.forEach(member => {
+      const parentId = member.parentId ?? null;
+
+      if (parentId && collapsedNodes.has(parentId)) return;
+
+      const parentEl = parentId
+        ? container.querySelector(`[data-ftree-id="${parentId}"]`)
+        : rootEl;
+      const childEl = container.querySelector(`[data-ftree-id="${member.id}"]`);
+
+      if (!parentEl || !childEl) return;
+
+      const p = relRect(parentEl);
+      const c = relRect(childEl);
+
+      const x1 = p.cx;
+      const y1 = p.bottom;
+      const x2 = c.cx;
+      const y2 = c.top;
+      const my = (y1 + y2) / 2;
+      const snap = (value: number) => Math.round(value) + 0.5;
+
+      const col = getRelColor(member.relation);
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('class', `ftree-connector-path${member.isPrimary ? ' ftree-connector-primary' : ''}`);
+      path.setAttribute('d', `M${snap(x1)},${snap(y1)} V${snap(my)} H${snap(x2)} V${snap(y2)}`);
+      path.setAttribute('fill', 'none');
+      path.setAttribute('stroke', col.rc);
+      path.setAttribute('stroke-width', member.isPrimary ? '2.2' : '1.6');
+      path.setAttribute('stroke-opacity', member.isPrimary ? '0.7' : '0.42');
+      path.setAttribute('stroke-dasharray', member.isPrimary ? '0' : '6 3');
+      path.setAttribute('stroke-linecap', 'square');
+      path.setAttribute('stroke-linejoin', 'round');
+      svg.appendChild(path);
+
+      const endpoint = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      endpoint.setAttribute('class', 'ftree-connector-dot');
+      endpoint.setAttribute('cx', `${snap(x2)}`);
+      endpoint.setAttribute('cy', `${snap(y2)}`);
+      endpoint.setAttribute('r', member.isPrimary ? '2.3' : '1.8');
+      endpoint.setAttribute('fill', col.rc);
+      endpoint.setAttribute('fill-opacity', member.isPrimary ? '0.78' : '0.54');
+      svg.appendChild(endpoint);
+    });
+  }, [containerRef, members, collapsedNodes, dep]);
+}
 
 function deriveDevoteeProfile(devotee: Devotee, donations: Donation[], bookings: Booking[]) {
   const seed = devotee.id.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
@@ -74,7 +273,7 @@ function deriveDevoteeProfile(devotee: Devotee, donations: Donation[], bookings:
 }
 
 const DevoteesPage: React.FC = () => {
-  const { items, add, update, remove } = useStore(mockDevotees);
+  const { items, add, update, remove } = useStore<Devotee>(mockDevotees as Devotee[]);
 
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -92,6 +291,14 @@ const DevoteesPage: React.FC = () => {
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
   const [notifSent, setNotifSent] = useState('');
   const [notifSending, setNotifSending] = useState(false);
+
+  const [familyMemberForm, setFamilyMemberForm] = useState<FamilyMemberFormState>(emptyFamilyMemberForm);
+  const [familyFormOpen, setFamilyFormOpen] = useState(false);
+  const [familyFullViewOpen, setFamilyFullViewOpen] = useState(false);
+  const [collapsedNodes, setCollapsedNodes] = useState<Set<string>>(new Set());
+  const treeContainerRef = useRef<HTMLDivElement>(null);
+  const fullTreeRef = useRef<HTMLDivElement>(null);
+  const [hoveredMemberId, setHoveredMemberId] = useState<string | null>(null);
 
   const selectedEventDetails = useMemo(
     () => mockEvents.filter(event => selectedEvents.has(event.id)),
@@ -114,6 +321,12 @@ const DevoteesPage: React.FC = () => {
     setNotifSubject(title);
     setNotifMessage(message);
   }, [selectedDevotee, selectedEventDetails]);
+
+  useEffect(() => {
+    if (!selectedDevotee) return;
+    const updatedDevotee = items.find(item => item.id === selectedDevotee.id);
+    if (updatedDevotee) setSelectedDevotee(updatedDevotee as Devotee);
+  }, [items, selectedDevotee]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().replace(/\s/g, '');
@@ -140,7 +353,36 @@ const DevoteesPage: React.FC = () => {
   const openAdd = () => { setForm(emptyForm); setEditId(null); setModalOpen(true); };
   const openEdit = (e: React.MouseEvent, item: Devotee) => {
     e.stopPropagation();
-    setForm({ name: item.name, phone: item.phone, email: item.email, address: item.address, city: item.city, state: item.state, country: item.country, status: item.status, totalDonations: item.totalDonations, lastVisit: item.lastVisit });
+    setForm({
+      name: item.name,
+      phone: item.phone,
+      email: item.email,
+      address: item.address,
+      city: item.city,
+      state: item.state,
+      country: item.country,
+      status: item.status,
+      totalDonations: item.totalDonations,
+      lastVisit: item.lastVisit,
+      dob: item.dob || '',
+      gender: item.gender || '',
+      occupation: item.occupation || '',
+      nakshatra: item.nakshatra || '',
+      rasi: item.rasi || '',
+      gothram: item.gothram || '',
+      spouse: item.spouse || '',
+      children: item.children || '',
+      familyMembers: item.familyMembers || '',
+      volunteerInterest: item.volunteerInterest || '',
+      membershipType: item.membershipType || 'General',
+      notificationSms: item.notificationSms ?? true,
+      notificationEmail: item.notificationEmail ?? true,
+      notificationWhatsApp: item.notificationWhatsApp ?? true,
+      reminderBirthday: item.reminderBirthday ?? true,
+      reminderNakshatra: item.reminderNakshatra ?? true,
+      reminderFestivalGreetings: item.reminderFestivalGreetings ?? true,
+      reminderDonationAnniversary: item.reminderDonationAnniversary ?? true,
+    });
     setEditId(item.id);
     setModalOpen(true);
   };
@@ -152,6 +394,7 @@ const DevoteesPage: React.FC = () => {
   };
 
   const setFormField = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
+  const setFormToggleField = (key: string, val: boolean) => setForm(prev => ({ ...prev, [key]: val }));
 
   const openDrawer = (item: Devotee) => {
     setSelectedDevotee(item);
@@ -161,6 +404,11 @@ const DevoteesPage: React.FC = () => {
     setNotifMessage('');
     setChannels({ sms: true, email: true, whatsapp: true });
     setSelectedEvents(new Set());
+    setFamilyMemberForm(emptyFamilyMemberForm);
+    setFamilyFormOpen(false);
+    setFamilyFullViewOpen(false);
+    setCollapsedNodes(new Set());
+    setHoveredMemberId(null);
     setDrawerOpen(true);
   };
 
@@ -219,6 +467,240 @@ const DevoteesPage: React.FC = () => {
   const devDonations = selectedDevotee ? mockDonations.filter(d => d.donorName === selectedDevotee.name) : [];
   const devBookings = selectedDevotee ? mockBookings.filter(b => b.devoteeName === selectedDevotee.name) : [];
   const devoteeProfile = selectedDevotee ? deriveDevoteeProfile(selectedDevotee, devDonations, devBookings) : null;
+
+  const profileDob = selectedDevotee?.dob || devoteeProfile?.dateOfBirth || 'N/A';
+  const profileGender = selectedDevotee?.gender || 'N/A';
+  const profileOccupation = selectedDevotee?.occupation || 'N/A';
+  const profileNakshatra = selectedDevotee?.nakshatra || 'N/A';
+  const profileRasi = selectedDevotee?.rasi || 'N/A';
+  const profileGothram = selectedDevotee?.gothram || 'N/A';
+  const profileSpouse = selectedDevotee?.spouse || 'N/A';
+  const profileChildren = selectedDevotee?.children || 'N/A';
+  const profileVolunteerInterest = selectedDevotee?.volunteerInterest || 'N/A';
+  const profileMembershipType = selectedDevotee?.membershipType || 'General';
+
+  const familyMembersData = useMemo(() => {
+    if (!selectedDevotee) return [] as FamilyMember[];
+    if (selectedDevotee.familyTreeMembers && selectedDevotee.familyTreeMembers.length > 0) return selectedDevotee.familyTreeMembers;
+    return buildLegacyFamilyMembers(selectedDevotee);
+  }, [selectedDevotee]);
+
+  const familyMembersByParent = useMemo(() => {
+    return familyMembersData.reduce<Record<string, FamilyMember[]>>((acc, member) => {
+      const key = member.parentId || 'root';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(member);
+      return acc;
+    }, {});
+  }, [familyMembersData]);
+
+  const familyNodeCount = familyMembersData.length;
+  const toggleNodeCollapse = useCallback((id: string) => {
+    setCollapsedNodes(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  useFamilyConnectors(treeContainerRef, familyMembersData, collapsedNodes, selectedDevotee?.id);
+  useFamilyConnectors(fullTreeRef, familyMembersData, collapsedNodes, familyFullViewOpen ? selectedDevotee?.id : 'closed');
+
+  const persistFamilyMembers = (members: FamilyMember[]) => {
+    if (!selectedDevotee) return;
+
+    const normalizedMembers = members.map(member => ({
+      ...member,
+      parentId: member.parentId === 'root' ? null : (member.parentId || null),
+    }));
+
+    const familyMembersSummary = normalizedMembers
+      .filter(member => member.relation.toLowerCase() !== 'spouse' && member.relation.toLowerCase() !== 'child')
+      .map(member => `${member.relation}: ${member.name}`)
+      .join(', ');
+    const spouseMember = normalizedMembers.find(member => member.relation.toLowerCase() === 'spouse');
+    const childrenSummary = normalizedMembers
+      .filter(member => member.relation.toLowerCase() === 'child')
+      .map(member => member.name)
+      .join(', ');
+
+    update(selectedDevotee.id, {
+      familyTreeMembers: normalizedMembers,
+      familyMembers: familyMembersSummary,
+      spouse: spouseMember?.name || selectedDevotee.spouse || '',
+      children: childrenSummary || selectedDevotee.children || '',
+    });
+  };
+
+  const openAddFamilyMember = () => {
+    setFamilyFullViewOpen(false);
+    setFamilyMemberForm(emptyFamilyMemberForm);
+    setFamilyFormOpen(true);
+  };
+
+  const openEditFamilyMember = (member: FamilyMember) => {
+    setFamilyFullViewOpen(false);
+    setFamilyMemberForm({
+      id: member.id,
+      name: member.name,
+      relation: member.relation,
+      dob: member.dob || '',
+      gender: member.gender || '',
+      occupation: member.occupation || '',
+      phone: member.phone || '',
+      parentId: member.parentId || 'root',
+      isPrimary: member.isPrimary === true,
+    });
+    setFamilyFormOpen(true);
+  };
+
+  const saveFamilyMember = () => {
+    if (!familyMemberForm.name.trim() || !familyMemberForm.relation.trim()) return;
+
+    const payload: FamilyMember = {
+      id: familyMemberForm.id || crypto.randomUUID(),
+      name: familyMemberForm.name.trim(),
+      relation: familyMemberForm.relation.trim(),
+      dob: familyMemberForm.dob || undefined,
+      gender: familyMemberForm.gender || undefined,
+      occupation: familyMemberForm.occupation || undefined,
+      phone: familyMemberForm.phone || undefined,
+      parentId: familyMemberForm.parentId === 'root' ? null : familyMemberForm.parentId,
+      isPrimary: familyMemberForm.isPrimary,
+    };
+
+    const withoutCurrent = familyMembersData.filter(member => member.id !== payload.id).map(member => ({
+      ...member,
+      isPrimary: payload.isPrimary ? false : member.isPrimary,
+    }));
+    const nextMembers = [payload, ...withoutCurrent];
+    persistFamilyMembers(nextMembers);
+    setFamilyMemberForm(emptyFamilyMemberForm);
+    setFamilyFormOpen(false);
+  };
+
+  const removeFamilyMember = (memberId: string) => {
+    const nextMembers = familyMembersData
+      .filter(member => member.id !== memberId)
+      .map(member => member.parentId === memberId ? { ...member, parentId: null } : member);
+    persistFamilyMembers(nextMembers);
+  };
+
+  const relationPriority = (relation: string) => {
+    const normalized = relation.trim().toLowerCase();
+    const table: Record<string, number> = {
+      spouse: 1,
+      father: 2,
+      mother: 3,
+      brother: 4,
+      sister: 5,
+      son: 6,
+      daughter: 7,
+      child: 8,
+      family: 9,
+    };
+    return table[normalized] ?? 50;
+  };
+
+  const openAddRelatedMember = (parentId: string, relation = 'Child') => {
+    setFamilyFullViewOpen(false);
+    setFamilyMemberForm({
+      ...emptyFamilyMemberForm,
+      relation,
+      parentId,
+    });
+    setFamilyFormOpen(true);
+  };
+
+  const renderFamilyNodesNew = (parentId: string, depth = 0): React.ReactNode => {
+    const nodes = [...(familyMembersByParent[parentId] || [])]
+      .sort((a, b) => {
+        if (a.isPrimary && !b.isPrimary) return -1;
+        if (!a.isPrimary && b.isPrimary) return 1;
+        const priorityDelta = relationPriority(a.relation) - relationPriority(b.relation);
+        if (priorityDelta !== 0) return priorityDelta;
+        return a.name.localeCompare(b.name);
+      });
+    if (!nodes.length) return null;
+
+    return (
+      <div className="ftree-tier" style={{ animationDelay: `${depth * 0.06}s` }}>
+        {nodes.map((member, idx) => {
+          const col = getRelColor(member.relation);
+          const hasChildren = (familyMembersByParent[member.id]?.length ?? 0) > 0;
+          const isCollapsed = collapsedNodes.has(member.id);
+          const animDelay = `${depth * 0.06 + idx * 0.04}s`;
+          return (
+            <div key={member.id} className="ftree-item">
+              <div
+                className="ftree-node"
+                data-ftree-id={member.id}
+                data-rel={member.relation.toLowerCase().trim()}
+                style={{ animationDelay: animDelay }}
+                onMouseEnter={() => {
+                  setHoveredMemberId(member.id);
+                }}
+                onMouseLeave={() => {
+                  setHoveredMemberId(prev => (prev === member.id ? null : prev));
+                }}
+              >
+                <div className="ftree-rel-badge">{member.relation}</div>
+
+                {member.isPrimary && (
+                  <div className="ftree-crown">
+                    <Crown className="h-3.5 w-3.5" style={{ color: col.rc }} />
+                  </div>
+                )}
+
+                <div className="ftree-name" title={member.name}>{member.name}</div>
+
+                <div className="ftree-meta">
+                  {member.dob && <p>DOB <span>{fmtDate(member.dob)}</span></p>}
+                  {member.gender && <p>Gender <span>{member.gender}</span></p>}
+                  {member.occupation && <p className="ftree-meta-full">Works as <span>{member.occupation}</span></p>}
+                  {member.phone && <p className="ftree-meta-full">Phone <span>{member.phone}</span></p>}
+              </div>
+
+                <div className={`ftree-actions ${hoveredMemberId === member.id ? 'ftree-actions-visible' : ''}`}>
+                  <button className="ftree-act" onClick={e => { e.stopPropagation(); openAddRelatedMember(member.id, 'Child'); }}>
+                    + Child
+                  </button>
+                  <button className="ftree-act" onClick={e => { e.stopPropagation(); openEditFamilyMember(member); }}>
+                    Edit
+                  </button>
+                  <button className="ftree-act ftree-act-del" onClick={e => { e.stopPropagation(); removeFamilyMember(member.id); }}>
+                    Remove
+                  </button>
+                </div>
+
+                {hasChildren && (
+                  <div className="ftree-toggle" title={isCollapsed ? 'Expand children' : 'Collapse children'} onClick={e => { e.stopPropagation(); toggleNodeCollapse(member.id); }}>
+                    {isCollapsed ? '+' : '-'}
+                  </div>
+                )}
+              </div>
+
+              {!isCollapsed && renderFamilyNodesNew(member.id, depth + 1)}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const profileNotificationPrefs = [
+    selectedDevotee?.notificationSms !== false && 'SMS',
+    selectedDevotee?.notificationEmail !== false && 'Email',
+    selectedDevotee?.notificationWhatsApp !== false && 'WhatsApp',
+  ].filter(Boolean).join(', ') || 'No channels selected';
+
+  const profileReminderPrefs = [
+    selectedDevotee?.reminderBirthday !== false && 'Birthday reminders',
+    selectedDevotee?.reminderNakshatra !== false && 'Nakshatra reminders',
+    selectedDevotee?.reminderFestivalGreetings !== false && 'Festival greetings',
+    selectedDevotee?.reminderDonationAnniversary !== false && 'Donation anniversary reminders',
+  ].filter(Boolean).join(', ') || 'No reminders selected';
 
   return (
     <div className="devotees-premium max-w-[1500px] mx-auto animate-fade-in pb-8">
@@ -320,6 +802,7 @@ const DevoteesPage: React.FC = () => {
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Devotee Details' : 'Add New Devotee'}>
         <div className="devotees-form-shell space-y-4 px-1 py-1">
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 1: Contact Info</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField label="Full Name" value={form.name} onChange={v => setFormField('name', v)} required />
             <FormField label="Phone Number" value={form.phone} onChange={v => setFormField('phone', v)} placeholder="+91" />
@@ -339,6 +822,99 @@ const DevoteesPage: React.FC = () => {
                </select>
              </div>
           </div>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 2: Personal Info</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormField label="DOB" value={form.dob} onChange={v => setFormField('dob', v)} type="date" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Gender</label>
+              <select value={form.gender} onChange={e => setFormField('gender', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+                <option>Prefer not to say</option>
+              </select>
+            </div>
+            <FormField label="Occupation" value={form.occupation} onChange={v => setFormField('occupation', v)} placeholder="Teacher, Engineer..." />
+          </div>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 3: Spiritual Info</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormField label="Nakshatra" value={form.nakshatra} onChange={v => setFormField('nakshatra', v)} />
+            <FormField label="Rasi" value={form.rasi} onChange={v => setFormField('rasi', v)} />
+            <FormField label="Gothram" value={form.gothram} onChange={v => setFormField('gothram', v)} />
+          </div>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 4: Family Info</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField label="Spouse" value={form.spouse} onChange={v => setFormField('spouse', v)} />
+            <FormField label="Children" value={form.children} onChange={v => setFormField('children', v)} placeholder="Names (comma separated) or count" />
+          </div>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 5: Family Relationship Map</h3>
+          <FormField label="Hierarchy Members" value={form.familyMembers} onChange={v => setFormField('familyMembers', v)} placeholder="Father: Raghavan, Mother: Lakshmi, Brother: Karthik" textarea />
+          <p className="text-[11px] text-muted-foreground -mt-2">Use format Relation: Name for each member, separated by commas.</p>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 6: Engagement Info</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Volunteer Interest</label>
+              <select value={form.volunteerInterest} onChange={e => setFormField('volunteerInterest', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <option value="">Select</option>
+                <option>High</option>
+                <option>Medium</option>
+                <option>Low</option>
+                <option>Not Interested</option>
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Membership Type</label>
+              <select value={form.membershipType} onChange={e => setFormField('membershipType', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <option>General</option>
+                <option>Volunteer</option>
+                <option>Patron</option>
+                <option>Trust Member</option>
+              </select>
+            </div>
+          </div>
+
+          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 7: Preferences</h3>
+          <div className="space-y-4 rounded-xl border border-border/60 p-4 bg-muted/10">
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Notifications toggles</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.notificationSms} onChange={e => setFormToggleField('notificationSms', e.target.checked)} className="h-4 w-4 accent-primary" /> SMS
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.notificationEmail} onChange={e => setFormToggleField('notificationEmail', e.target.checked)} className="h-4 w-4 accent-primary" /> Email
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.notificationWhatsApp} onChange={e => setFormToggleField('notificationWhatsApp', e.target.checked)} className="h-4 w-4 accent-primary" /> WhatsApp
+                </label>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Auto reminders (CRM)</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.reminderBirthday} onChange={e => setFormToggleField('reminderBirthday', e.target.checked)} className="h-4 w-4 accent-primary" /> Birthday reminders
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.reminderNakshatra} onChange={e => setFormToggleField('reminderNakshatra', e.target.checked)} className="h-4 w-4 accent-primary" /> Nakshatra reminders
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.reminderFestivalGreetings} onChange={e => setFormToggleField('reminderFestivalGreetings', e.target.checked)} className="h-4 w-4 accent-primary" /> Festival greetings
+                </label>
+                <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <input type="checkbox" checked={form.reminderDonationAnniversary} onChange={e => setFormToggleField('reminderDonationAnniversary', e.target.checked)} className="h-4 w-4 accent-primary" /> Donation anniversary reminders
+                </label>
+              </div>
+            </div>
+          </div>
+
           <div className="devotees-form-actions flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1">Cancel</Button>
             <Button onClick={handleSave} className="flex-1 shadow-sm">Save Details</Button>
@@ -366,7 +942,7 @@ const DevoteesPage: React.FC = () => {
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {selectedDevotee?.city}, {selectedDevotee?.state}</p>
                     <div className="flex gap-2 mt-3 items-center">
                        <StatusBadge status={selectedDevotee?.status || 'Active'} />
-                       <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2 py-0.5 rounded border border-border bg-muted/40 text-center shadow-sm">ID #{selectedDevotee?.id.padStart(4, '0')}</span>
+                       {/* <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2 py-0.5 rounded border border-border bg-muted/40 text-center shadow-sm">ID #{selectedDevotee?.id.padStart(4, '0')}</span> */}
                     </div>
                   </div>
               </div>
@@ -392,7 +968,7 @@ const DevoteesPage: React.FC = () => {
 
             {/* Navigation Tabs */}
             <div className="devotees-drawer-tabs flex p-4 px-6 border-b border-border/60 gap-3 shrink-0 bg-background">
-              {([ { key: 'info', label: 'Info' }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'notify', label: 'Message' } ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
+              {([ { key: 'info', label: 'Info' }, { key: 'family', label: 'Family', count: familyNodeCount }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'notify', label: 'Message' } ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
@@ -445,8 +1021,16 @@ const DevoteesPage: React.FC = () => {
                      <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
                        <div className="flex justify-between items-center p-4 border-b border-border/40">
                           <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Date of Birth</span>
-                          <span className="text-sm font-bold text-foreground">{devoteeProfile?.dateOfBirth ?? 'N/A'}</span>
+                        <span className="text-sm font-bold text-foreground">{profileDob ? fmtDate(profileDob) : 'N/A'}</span>
                        </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Gender</span>
+                        <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{profileGender}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Occupation</span>
+                        <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{profileOccupation}</span>
+                      </div>
                        <div className="flex justify-between items-center p-4 border-b border-border/40">
                           <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Joint Date</span>
                           <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{devoteeProfile?.memberSince ?? 'N/A'}</span>
@@ -457,6 +1041,105 @@ const DevoteesPage: React.FC = () => {
                        </div>
                      </div>
                    </div>
+
+                   <div className="space-y-4">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Spiritual & Family</h3>
+                    <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Nakshatra</span>
+                        <span className="text-xs font-bold text-foreground">{profileNakshatra}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Rasi</span>
+                        <span className="text-xs font-bold text-foreground">{profileRasi}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Gothram</span>
+                        <span className="text-xs font-bold text-foreground">{profileGothram}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Spouse</span>
+                        <span className="text-xs font-bold text-foreground">{profileSpouse}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Children</span>
+                        <span className="text-xs font-bold text-foreground">{profileChildren}</span>
+                      </div>
+                    </div>
+                   </div>
+
+                   <div className="space-y-4">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Engagement & Reminders</h3>
+                    <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Volunteer Interest</span>
+                        <span className="text-xs font-bold text-foreground">{profileVolunteerInterest}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Membership Type</span>
+                        <span className="text-xs font-bold text-foreground">{profileMembershipType}</span>
+                      </div>
+                      <div className="p-4 border-b border-border/40">
+                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-1.5">Notification Channels</p>
+                        <p className="text-xs font-bold text-foreground leading-relaxed">{profileNotificationPrefs}</p>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-1.5">Auto Reminder Setup</p>
+                        <p className="text-xs font-bold text-foreground leading-relaxed">{profileReminderPrefs}</p>
+                      </div>
+                    </div>
+                   </div>
+                </div>
+              )}
+
+              {activeTab === 'family' && selectedDevotee && (
+                <div className="p-6 space-y-5 pb-10 animate-fade-in">
+                  <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                    <div>
+                      <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Family Hierarchy</h3>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{familyNodeCount} member{familyNodeCount !== 1 ? 's' : ''} linked</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button className="h-8 px-3 text-xs font-semibold rounded-lg border border-border bg-background hover:bg-muted/50 transition-colors" onClick={() => openAddRelatedMember('root', 'Child')}>+ Child</button>
+                      <button className="h-8 px-3 text-xs font-semibold rounded-lg border border-border bg-background hover:bg-muted/50 transition-colors" onClick={openAddFamilyMember}>+ Add Member</button>
+                      <button className="h-8 px-3 text-xs font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors" onClick={() => setFamilyFullViewOpen(true)}>Full View</button>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-slate-200/80 bg-gradient-to-b from-slate-50/60 to-background p-5 shadow-sm overflow-auto">
+                    <div ref={treeContainerRef} className="min-w-max mx-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      <div className="ftree-root-node">
+                        <div className="ftree-root-label">Primary Devotee</div>
+                        <div className="ftree-root-name">{selectedDevotee.name}</div>
+                        <div className="ftree-root-sub">
+                          {selectedDevotee.city}
+                          {selectedDevotee.state && `, ${selectedDevotee.state}`}
+                          {selectedDevotee.membershipType && ` · ${selectedDevotee.membershipType}`}
+                        </div>
+                      </div>
+
+                      {familyMembersData.length > 0 ? (
+                        renderFamilyNodesNew('root', 0)
+                      ) : (
+                        <div className="ftree-empty mt-12 w-64">
+                          <p className="text-xs font-semibold text-muted-foreground">No members added yet</p>
+                          <p className="text-[11px] text-muted-foreground mt-1">Click Add Member to start building the family tree.</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {familyMembersData.length > 0 && (
+                      <div className="ftree-legend mt-4">
+                        {Array.from(new Map(familyMembersData.map(m => [m.relation.toLowerCase().trim(), { rel: m.relation, col: getRelColor(m.relation) }])).values()).map(({ rel, col }) => (
+                          <div key={rel} className="ftree-legend-item">
+                            <div className="ftree-legend-dot" style={{ background: col.rc, opacity: 0.75 }} />
+                            {rel}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                 </div>
               )}
 
@@ -576,6 +1259,85 @@ const DevoteesPage: React.FC = () => {
                  </Button>
                </div>
             )}
+
+          </div>
+        </div>
+      )}
+
+      <Modal
+        open={familyFormOpen}
+        onClose={() => { setFamilyMemberForm(emptyFamilyMemberForm); setFamilyFormOpen(false); }}
+        title={familyMemberForm.id ? 'Edit Family Member' : 'Add Family Member'}
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <FormField label="Member Name" value={familyMemberForm.name} onChange={v => setFamilyMemberForm(prev => ({ ...prev, name: v }))} />
+            <FormField label="Relation" value={familyMemberForm.relation} onChange={v => setFamilyMemberForm(prev => ({ ...prev, relation: v }))} placeholder="Father, Mother, Sibling..." />
+            <FormField label="Date of Birth" value={familyMemberForm.dob} onChange={v => setFamilyMemberForm(prev => ({ ...prev, dob: v }))} type="date" />
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Gender</label>
+              <select value={familyMemberForm.gender} onChange={e => setFamilyMemberForm(prev => ({ ...prev, gender: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <FormField label="Occupation" value={familyMemberForm.occupation} onChange={v => setFamilyMemberForm(prev => ({ ...prev, occupation: v }))} />
+            <FormField label="Phone" value={familyMemberForm.phone} onChange={v => setFamilyMemberForm(prev => ({ ...prev, phone: v }))} />
+            <div className="space-y-1.5 md:col-span-2">
+              <label className="text-xs font-semibold text-foreground">Parent Node</label>
+              <select value={familyMemberForm.parentId} onChange={e => setFamilyMemberForm(prev => ({ ...prev, parentId: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <option value="root">Primary Devotee</option>
+                {familyMembersData.filter(member => member.id !== familyMemberForm.id).map(member => (
+                  <option key={member.id} value={member.id}>{member.relation}: {member.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <label className="inline-flex items-center gap-2 text-sm font-medium text-foreground">
+            <input type="checkbox" checked={familyMemberForm.isPrimary} onChange={e => setFamilyMemberForm(prev => ({ ...prev, isPrimary: e.target.checked }))} className="h-4 w-4 accent-primary" />
+            Mark as primary family member
+          </label>
+
+          <div className="flex gap-2 pt-2">
+            <Button onClick={saveFamilyMember}>Save Member</Button>
+            <Button variant="outline" onClick={() => { setFamilyMemberForm(emptyFamilyMemberForm); setFamilyFormOpen(false); }}>Cancel</Button>
+          </div>
+        </div>
+      </Modal>
+
+      {familyFullViewOpen && selectedDevotee && !familyFormOpen && (
+        <div className="modal-overlay z-[70]" onClick={() => setFamilyFullViewOpen(false)}>
+          <div className="bg-card rounded-2xl shadow-2xl w-[min(94vw,1200px)] h-[min(90vh,850px)] border border-border/60 overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-5 border-b border-border/70 bg-gradient-to-r from-slate-50 to-background">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Full Hierarchy View</p>
+                <h3 className="text-lg font-bold text-foreground mt-0.5">{selectedDevotee.name} Family Tree</h3>
+              </div>
+              <Button variant="outline" onClick={() => setFamilyFullViewOpen(false)}>
+                <X className="h-4 w-4 mr-1" /> Close
+              </Button>
+            </div>
+
+            <div className="p-6 overflow-auto h-[calc(100%-77px)] bg-gradient-to-b from-slate-50/40 to-background">
+              <div ref={fullTreeRef} className="min-w-max mx-auto" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div className="ftree-root-node mb-2">
+                  <div className="ftree-root-label">Primary Devotee</div>
+                  <div className="ftree-root-name">{selectedDevotee.name}</div>
+                  <div className="ftree-root-sub">Total linked members: {familyNodeCount}</div>
+                </div>
+
+                {familyMembersData.length > 0 ? (
+                  renderFamilyNodesNew('root', 0)
+                ) : (
+                  <div className="rounded-lg border border-dashed border-border bg-background px-3 py-8 text-center">
+                    <p className="text-sm font-semibold text-muted-foreground">No hierarchy members added yet.</p>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
