@@ -1,17 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, CalendarIcon, List, ChevronLeft, ChevronRight, X, MapPin, Clock, User, Calendar, Bell, Flower2, Utensils, Star, Phone } from 'lucide-react';
+import { Plus, Pencil, Trash2, CalendarIcon, List, ChevronLeft, ChevronRight, X, MapPin, Clock, User, Calendar, Bell, Flower2, Utensils, Star, Phone, Package } from 'lucide-react';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
 import { formatDateDDMMYYYY } from '@/lib/utils';
 import { type TempleEvent, useTempleEventsStore } from '@/hooks/useTempleEventsStore';
+import { toast } from 'sonner';
 
 const DAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-type EventForm = Omit<TempleEvent, 'id' | 'templeId'>;
+type EventForm = Omit<TempleEvent, 'id' | 'templeId'> & {
+  isRecurring?: boolean;
+  totalDays?: number;
+};
 
 const EventsPage: React.FC = () => {
   const { templeProfile, items, add, update, remove } = useTempleEventsStore();
@@ -35,7 +39,10 @@ const EventsPage: React.FC = () => {
     resourceNeeded: '',
     prasadam: '',
     attendees: 0,
+    location: templeProfile.location,
     festivalName: '',
+    isRecurring: false,
+    totalDays: 1,
   });
 
   const today = new Date();
@@ -60,7 +67,10 @@ const EventsPage: React.FC = () => {
       resourceNeeded: '',
       prasadam: '',
       attendees: 0,
+      location: templeProfile.location,
       festivalName: '',
+      isRecurring: false,
+      totalDays: 1,
     });
     setEditId(null);
     setModalOpen(true);
@@ -78,7 +88,10 @@ const EventsPage: React.FC = () => {
       resourceNeeded: item.resourceNeeded,
       prasadam: item.prasadam,
       attendees: item.attendees,
+      location: item.location,
       festivalName: item.festivalName,
+      isRecurring: false,
+      totalDays: 1,
     });
     setEditId(item.id);
     setModalOpen(true);
@@ -86,11 +99,34 @@ const EventsPage: React.FC = () => {
 
   const handleSave = () => {
     if (!form.name.trim() || !form.date || !form.time) return;
+    
     if (editId) {
       update(editId, form);
+      setModalOpen(false);
+      return;
+    }
+
+    if (form.isRecurring && form.totalDays && form.totalDays > 1) {
+      const baseDate = new Date(form.date);
+      let count = 0;
+      
+      for (let i = 0; i < form.totalDays; i++) {
+        const d = new Date(baseDate);
+        d.setDate(baseDate.getDate() + i);
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        
+        add({
+          ...form,
+          date: dateStr
+        });
+        count++;
+      }
+      toast.success(`Successfully scheduled ${count} daily events for ${form.name}.`);
     } else {
       add(form);
+      toast.success(`${form.name} added successfully.`);
     }
+    
     setModalOpen(false);
   };
 
@@ -456,6 +492,43 @@ const EventsPage: React.FC = () => {
               <FormField label="Resource Needed" value={form.resourceNeeded} onChange={v => setField('resourceNeeded', v)} placeholder="E.g. 5kg Milk, 2kg Flowers" />
             </div>
           </div>
+
+          {!editId && (
+            <div className="bg-muted/30 p-4 rounded-xl border border-border/50 mt-2 space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-bold text-foreground">Recurring Schedule</p>
+                  <p className="text-[10px] text-muted-foreground font-medium">Auto-schedule for consecutive days</p>
+                </div>
+                <input 
+                  type="checkbox" 
+                  checked={form.isRecurring} 
+                  onChange={e => setField('isRecurring', e.target.checked)}
+                  className="w-5 h-5 accent-primary cursor-pointer"
+                />
+              </div>
+              
+              {form.isRecurring && (
+                <div className="pt-2 animate-fade-in divide-y divide-border/40">
+                  <div className="flex items-center justify-between py-2">
+                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Days to Schedule</label>
+                    <div className="flex items-center gap-3">
+                      <input 
+                        type="number" 
+                        min="2" 
+                        max="30"
+                        value={String(form.totalDays)} 
+                        onChange={e => setField('totalDays', Number(e.target.value) || 2)}
+                        className="w-20 h-9 rounded-lg border border-input bg-background font-bold text-center text-sm outline-none focus:ring-2 focus:ring-primary/20"
+                      />
+                      <span className="text-[10px] items-center text-muted-foreground font-bold">DAYS</span>
+                    </div>
+                  </div>
+                  <p className="text-[9px] text-primary/80 font-bold uppercase tracking-widest pt-2">Creating {form.totalDays} entries automatically</p>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="flex gap-3 pt-4 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>

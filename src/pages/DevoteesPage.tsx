@@ -30,6 +30,8 @@ const emptyFamilyMemberForm: FamilyMemberFormState = {
   gender: '',
   occupation: '',
   phone: '',
+  rasi: '',
+  nakshatra: '',
   parentId: 'root',
   isPrimary: false,
 };
@@ -121,7 +123,7 @@ function getRelColor(rel: string) {
   return REL_COLORS[rel.toLowerCase().trim()] ?? DEFAULT_REL_COLOR;
 }
 
-type Devotee = (typeof mockDevotees)[number] & {
+type Devotee = Omit<(typeof mockDevotees)[number], 'familyTreeMembers'> & {
   dob?: string;
   gender?: string;
   occupation?: string;
@@ -151,6 +153,8 @@ type FamilyMember = {
   gender?: string;
   occupation?: string;
   phone?: string;
+  rasi?: string;
+  nakshatra?: string;
   parentId?: string | null;
   isPrimary?: boolean;
 };
@@ -163,10 +167,12 @@ type FamilyMemberFormState = {
   gender: string;
   occupation: string;
   phone: string;
+  rasi: string;
+  nakshatra: string;
   parentId: string;
   isPrimary: boolean;
 };
-type TabName = 'info' | 'family' | 'donations' | 'bookings' | 'notify';
+type TabName = 'info' | 'bookings' | 'donations' | 'family' | 'notify';
 
 type Donation = typeof mockDonations[0];
 type Booking = typeof mockBookings[0];
@@ -280,7 +286,7 @@ function getDonationTier(total: number) {
 }
 
 const DevoteesPage: React.FC = () => {
-  const { items, add, update, remove } = useStore<Devotee>(mockDevotees as Devotee[]);
+  const { items, add, update, remove } = useStore<Devotee>(mockDevotees as any[]);
 
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -419,6 +425,16 @@ const DevoteesPage: React.FC = () => {
     setDrawerOpen(true);
   };
 
+  // Sync effect to ensure static mock data updates show up in development
+  useEffect(() => {
+    if (selectedDevotee && (!selectedDevotee.familyTreeMembers || selectedDevotee.familyTreeMembers.length === 0)) {
+      const mockVer = (mockDevotees as any[]).find(d => d.id === selectedDevotee.id);
+      if (mockVer && mockVer.familyTreeMembers && mockVer.familyTreeMembers.length > 0) {
+        update(selectedDevotee.id, { familyTreeMembers: mockVer.familyTreeMembers });
+      }
+    }
+  }, [selectedDevotee?.id, update]);
+
   const toggleEvent = (id: string) => {
     setSelectedEvents(prev => {
       const next = new Set(prev);
@@ -488,8 +504,17 @@ const DevoteesPage: React.FC = () => {
 
   const familyMembersData = useMemo(() => {
     if (!selectedDevotee) return [] as FamilyMember[];
-    if (selectedDevotee.familyTreeMembers && selectedDevotee.familyTreeMembers.length > 0) return selectedDevotee.familyTreeMembers;
-    return buildLegacyFamilyMembers(selectedDevotee);
+    const treeMembers = selectedDevotee.familyTreeMembers || [];
+    const legacyMembers = buildLegacyFamilyMembers(selectedDevotee);
+    
+    // Combine and remove duplicates by name
+    const combined = [...treeMembers];
+    legacyMembers.forEach(lm => {
+      if (!combined.some(c => c.name.toLowerCase() === lm.name.toLowerCase())) {
+        combined.push(lm);
+      }
+    });
+    return combined;
   }, [selectedDevotee]);
 
   const familyMembersByParent = useMemo(() => {
@@ -533,7 +558,7 @@ const DevoteesPage: React.FC = () => {
       .join(', ');
 
     update(selectedDevotee.id, {
-      familyTreeMembers: normalizedMembers,
+      familyTreeMembers: normalizedMembers as any,
       familyMembers: familyMembersSummary,
       spouse: spouseMember?.name || selectedDevotee.spouse || '',
       children: childrenSummary || selectedDevotee.children || '',
@@ -556,6 +581,8 @@ const DevoteesPage: React.FC = () => {
       gender: member.gender || '',
       occupation: member.occupation || '',
       phone: member.phone || '',
+      rasi: member.rasi || '',
+      nakshatra: member.nakshatra || '',
       parentId: member.parentId || 'root',
       isPrimary: member.isPrimary === true,
     });
@@ -573,6 +600,8 @@ const DevoteesPage: React.FC = () => {
       gender: familyMemberForm.gender || undefined,
       occupation: familyMemberForm.occupation || undefined,
       phone: familyMemberForm.phone || undefined,
+      rasi: familyMemberForm.rasi || undefined,
+      nakshatra: familyMemberForm.nakshatra || undefined,
       parentId: familyMemberForm.parentId === 'root' ? null : familyMemberForm.parentId,
       isPrimary: familyMemberForm.isPrimary,
     };
@@ -666,8 +695,10 @@ const DevoteesPage: React.FC = () => {
                   {member.dob && <p>DOB <span>{fmtDate(member.dob)}</span></p>}
                   {member.gender && <p>Gender <span>{member.gender}</span></p>}
                   {member.occupation && <p className="ftree-meta-full">Works as <span>{member.occupation}</span></p>}
-                  {member.phone && <p className="ftree-meta-full">Phone <span>{member.phone}</span></p>}
-              </div>
+                  {member.phone && <p>Phone <span>{member.phone}</span></p>}
+                  {member.rasi && <p>Rasi <span>{member.rasi}</span></p>}
+                  {member.nakshatra && <p>Star <span>{member.nakshatra}</span></p>}
+                </div>
 
                 <div className={`ftree-actions ${hoveredMemberId === member.id ? 'ftree-actions-visible' : ''}`}>
                   <button className="ftree-act" onClick={e => { e.stopPropagation(); openAddRelatedMember(member.id, 'Child'); }}>
@@ -743,15 +774,15 @@ const DevoteesPage: React.FC = () => {
       <div className="devotees-table-shell bg-card rounded-xl border border-border/80 shadow-sm overflow-hidden flex flex-col relative z-10 mt-4">
         <div className="devotees-table-toolbar p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border/60 bg-muted/10">
           <div className="flex items-center gap-3">
-             <div className="relative max-w-sm w-full md:w-80">
-               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-               <input
-                 className="devotees-search-input w-full pl-9 pr-4 h-9 rounded-md border border-input bg-background text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
-                 placeholder="Search by name, phone, email..."
-                 value={search}
-                 onChange={e => setSearch(e.target.value)}
-               />
-             </div>
+            <div className="relative max-w-sm w-full md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                className="devotees-search-input w-full pl-9 pr-4 h-9 rounded-md border border-input bg-background text-sm transition-all focus:border-primary focus:ring-1 focus:ring-primary outline-none shadow-sm"
+                placeholder="Search by name, phone, email..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+            </div>
           </div>
           <span className="devotees-record-chip text-sm font-medium text-muted-foreground whitespace-nowrap bg-muted px-2.5 py-1 rounded-md border border-border/50 shadow-sm">{filtered.length} records</span>
         </div>
@@ -786,11 +817,11 @@ const DevoteesPage: React.FC = () => {
                     <p className="text-[11px] font-medium text-muted-foreground mt-0.5">{d.email}</p>
                   </td>
                   <td className="p-4 text-muted-foreground text-xs">
-                     <span className="font-semibold">{d.city}</span>{d.state && `, ${d.state}`}
+                    <span className="font-semibold">{d.city}</span>{d.state && `, ${d.state}`}
                   </td>
                   <td className="p-4"><StatusBadge status={d.status} /></td>
                   <td className="p-4 text-muted-foreground text-xs font-medium">
-                     <div className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 opacity-60" /> {fmtDate(d.lastVisit)}</div>
+                    <div className="inline-flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 opacity-60" /> {fmtDate(d.lastVisit)}</div>
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex gap-1 justify-end" onClick={e => e.stopPropagation()}>
@@ -821,13 +852,13 @@ const DevoteesPage: React.FC = () => {
             <FormField label="State" value={form.state} onChange={v => setFormField('state', v)} />
           </div>
           <div className="grid grid-cols-2 gap-4">
-             <FormField label="Country" value={form.country} onChange={v => setFormField('country', v)} />
-             <div className="space-y-1.5">
-               <label className="text-xs font-semibold text-foreground">Status</label>
-               <select value={form.status} onChange={e => setFormField('status', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                 <option>Active</option><option>Inactive</option>
-               </select>
-             </div>
+            <FormField label="Country" value={form.country} onChange={v => setFormField('country', v)} />
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-foreground">Status</label>
+              <select value={form.status} onChange={e => setFormField('status', e.target.value)} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+                <option>Active</option><option>Inactive</option>
+              </select>
+            </div>
           </div>
 
           <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Section 2: Personal Info</h3>
@@ -935,35 +966,38 @@ const DevoteesPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-end" onClick={() => setDrawerOpen(false)}>
           <div className="devotees-drawer-overlay absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
           <div className="devotees-drawer relative h-[100vh] w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
-            
+
             {/* Header / Profile Hero */}
             <div className="devotees-drawer-hero px-6 py-8 border-b border-border/80 bg-gradient-to-b from-blue-50/50 to-background flex-shrink-0 relative">
               <Button variant="ghost" size="icon" className="absolute top-4 right-4 h-9 w-9 rounded-full bg-background border border-border/60 hover:bg-muted text-muted-foreground shadow-sm" onClick={() => setDrawerOpen(false)}><X className="h-5 w-5" /></Button>
-              
+
               <div className="flex items-center gap-5">
-                  <div className="devotees-drawer-avatar w-20 h-20 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 border-4 border-white shadow-md flex items-center justify-center text-blue-700 font-display font-bold text-3xl shrink-0">
-                    {selectedDevotee && getInitials(selectedDevotee.name)}
+                <div className="devotees-drawer-avatar w-20 h-20 rounded-full bg-gradient-to-tr from-blue-100 to-indigo-50 border-4 border-white shadow-md flex items-center justify-center text-blue-700 font-display font-bold text-3xl shrink-0">
+                  {selectedDevotee && getInitials(selectedDevotee.name)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <h2 className="text-2xl font-bold font-display text-foreground leading-tight tracking-tight">{selectedDevotee?.name}</h2>
+                    {selectedDevotee && (() => {
+                      const tier = getDonationTier(selectedDevotee.totalDonations);
+                      const TierIcon = tier.icon;
+                      return (
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm ${tier.color}`}>
+                          <TierIcon className={`h-3 w-3 ${tier.fill}`} />
+                          {tier.label}
+                        </div>
+                      );
+                    })()}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <h2 className="text-2xl font-bold font-display text-foreground leading-tight tracking-tight">{selectedDevotee?.name}</h2>
-                      {selectedDevotee && (() => {
-                        const tier = getDonationTier(selectedDevotee.totalDonations);
-                        const TierIcon = tier.icon;
-                        return (
-                          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm ${tier.color}`}>
-                            <TierIcon className={`h-3 w-3 ${tier.fill}`} />
-                            {tier.label}
-                          </div>
-                        );
-                      })()}
-                    </div>
-                    <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {selectedDevotee?.city}, {selectedDevotee?.state}</p>
-                    <div className="flex gap-2 mt-3 items-center">
-                       <StatusBadge status={selectedDevotee?.status || 'Active'} />
-                       {/* <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground px-2 py-0.5 rounded border border-border bg-muted/40 text-center shadow-sm">ID #{selectedDevotee?.id.padStart(4, '0')}</span> */}
-                    </div>
+                  <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {selectedDevotee?.city}, {selectedDevotee?.state}</p>
+                  <div className="flex gap-2 mt-3 items-center">
+                    <StatusBadge status={selectedDevotee?.status || 'Active'} />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100 shadow-sm flex items-center gap-1">
+                      <ShieldCheck className="w-3 h-3" />
+                      {selectedDevotee?.membershipType || 'General'}
+                    </span>
                   </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-3 mt-8">
@@ -987,7 +1021,7 @@ const DevoteesPage: React.FC = () => {
 
             {/* Navigation Tabs */}
             <div className="devotees-drawer-tabs flex p-4 px-6 border-b border-border/60 gap-3 shrink-0 bg-background">
-              {([ { key: 'info', label: 'Info' }, { key: 'family', label: 'Family', count: familyNodeCount }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'notify', label: 'Message' } ] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
+              {([{ key: 'info', label: 'Info' }, { key: 'donations', label: 'Donations', count: devDonations.length }, { key: 'bookings', label: 'Bookings', count: devBookings.length }, { key: 'family', label: 'Lineage', count: familyNodeCount }, { key: 'notify', label: 'Message' }] as Array<{ key: TabName; label: string; count?: number }>).map(tab => (
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
@@ -1005,43 +1039,43 @@ const DevoteesPage: React.FC = () => {
             <div className="flex-1 overflow-y-auto bg-card relative">
               {activeTab === 'info' && selectedDevotee && (
                 <div className="p-6 space-y-8 pb-10 animate-fade-in">
-                   {/* Contact Section */}
-                   <div className="space-y-4">
-                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Direct Contact</h3>
-                     <div className="grid gap-3">
-                       <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
-                          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100 group-hover:scale-110 transition-transform"><Phone className="w-4 h-4 text-blue-600" /></div>
-                          <div>
-                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Mobile Contact</p>
-                            <p className="text-sm font-bold mt-0.5 text-foreground">{selectedDevotee.phone}</p>
-                          </div>
-                       </div>
-                       <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
-                          <div className="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100 group-hover:scale-110 transition-transform"><Mail className="w-4 h-4 text-sky-600" /></div>
-                          <div className="min-w-0">
-                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Email Address</p>
-                            <p className="text-sm font-bold mt-0.5 truncate text-foreground">{selectedDevotee.email || 'N/A'}</p>
-                          </div>
-                       </div>
-                       <div className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
-                          <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100 mt-1 group-hover:scale-110 transition-transform"><MapPin className="w-4 h-4 text-amber-600" /></div>
-                          <div>
-                            <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Registered Address</p>
-                            <p className="text-sm font-medium mt-1 leading-relaxed text-foreground">{selectedDevotee.address || 'Address not listed'}</p>
-                            <p className="text-xs text-muted-foreground font-medium mt-1.5 bg-muted/50 px-2 py-0.5 rounded border border-border inline-block">{selectedDevotee.city}{selectedDevotee.state && `, ${selectedDevotee.state}`} {selectedDevotee.country && ` - ${selectedDevotee.country}`}</p>
-                          </div>
-                       </div>
-                     </div>
-                   </div>
+                  {/* Contact Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Direct Contact</h3>
+                    <div className="grid gap-3">
+                      <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 border border-blue-100 group-hover:scale-110 transition-transform"><Phone className="w-4 h-4 text-blue-600" /></div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Mobile Contact</p>
+                          <p className="text-sm font-bold mt-0.5 text-foreground">{selectedDevotee.phone}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center shrink-0 border border-sky-100 group-hover:scale-110 transition-transform"><Mail className="w-4 h-4 text-sky-600" /></div>
+                        <div className="min-w-0">
+                          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Email Address</p>
+                          <p className="text-sm font-bold mt-0.5 truncate text-foreground">{selectedDevotee.email || 'N/A'}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-4 p-4 rounded-xl border border-border/50 bg-background shadow-sm group hover:border-blue-200 transition-colors">
+                        <div className="w-10 h-10 rounded-full bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100 mt-1 group-hover:scale-110 transition-transform"><MapPin className="w-4 h-4 text-amber-600" /></div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-wider">Registered Address</p>
+                          <p className="text-sm font-medium mt-1 leading-relaxed text-foreground">{selectedDevotee.address || 'Address not listed'}</p>
+                          <p className="text-xs text-muted-foreground font-medium mt-1.5 bg-muted/50 px-2 py-0.5 rounded border border-border inline-block">{selectedDevotee.city}{selectedDevotee.state && `, ${selectedDevotee.state}`} {selectedDevotee.country && ` - ${selectedDevotee.country}`}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
 
-                   {/* Demographics Section */}
-                   <div className="space-y-4">
-                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Profile Meta</h3>
-                     <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
-                       <div className="flex justify-between items-center p-4 border-b border-border/40">
-                          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Date of Birth</span>
+                  {/* Demographics Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Profile Meta</h3>
+                    <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Date of Birth</span>
                         <span className="text-sm font-bold text-foreground">{profileDob ? fmtDate(profileDob) : 'N/A'}</span>
-                       </div>
+                      </div>
                       <div className="flex justify-between items-center p-4 border-b border-border/40">
                         <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Gender</span>
                         <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{profileGender}</span>
@@ -1050,18 +1084,18 @@ const DevoteesPage: React.FC = () => {
                         <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Occupation</span>
                         <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{profileOccupation}</span>
                       </div>
-                       <div className="flex justify-between items-center p-4 border-b border-border/40">
-                          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Joint Date</span>
-                          <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{devoteeProfile?.memberSince ?? 'N/A'}</span>
-                       </div>
-                       <div className="flex justify-between items-center p-4">
-                          <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><HeartHandshake className="w-4 h-4 text-primary" /> Preferred Seva</span>
-                          <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{devoteeProfile?.preferredSeva}</span>
-                       </div>
-                     </div>
-                   </div>
+                      <div className="flex justify-between items-center p-4 border-b border-border/40">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Joint Date</span>
+                        <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{devoteeProfile?.memberSince ?? 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-4">
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><HeartHandshake className="w-4 h-4 text-primary" /> Preferred Seva</span>
+                        <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{devoteeProfile?.preferredSeva}</span>
+                      </div>
+                    </div>
+                  </div>
 
-                   <div className="space-y-4">
+                  <div className="space-y-4">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Spiritual & Family</h3>
                     <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
                       <div className="flex justify-between items-center p-4 border-b border-border/40">
@@ -1085,9 +1119,9 @@ const DevoteesPage: React.FC = () => {
                         <span className="text-xs font-bold text-foreground">{profileChildren}</span>
                       </div>
                     </div>
-                   </div>
+                  </div>
 
-                   <div className="space-y-4">
+                  <div className="space-y-4">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Engagement & Reminders</h3>
                     <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
                       <div className="flex justify-between items-center p-4 border-b border-border/40">
@@ -1107,7 +1141,7 @@ const DevoteesPage: React.FC = () => {
                         <p className="text-xs font-bold text-foreground leading-relaxed">{profileReminderPrefs}</p>
                       </div>
                     </div>
-                   </div>
+                  </div>
                 </div>
               )}
 
@@ -1135,6 +1169,12 @@ const DevoteesPage: React.FC = () => {
                           {selectedDevotee.state && `, ${selectedDevotee.state}`}
                           {selectedDevotee.membershipType && ` · ${selectedDevotee.membershipType}`}
                         </div>
+                        {(selectedDevotee.rasi || selectedDevotee.nakshatra) && (
+                          <div className="mt-2 pt-2 border-t border-blue-200/50 flex flex-col items-center gap-1">
+                            {selectedDevotee.rasi && <p className="text-[10px] font-bold text-blue-700 bg-blue-50/50 px-2 py-0.5 rounded-full border border-blue-100">Rasi: {selectedDevotee.rasi}</p>}
+                            {selectedDevotee.nakshatra && <p className="text-[10px] font-bold text-indigo-700 bg-indigo-50/50 px-2 py-0.5 rounded-full border border-indigo-100">Star: {selectedDevotee.nakshatra}</p>}
+                          </div>
+                        )}
                       </div>
 
                       {familyMembersData.length > 0 ? (
@@ -1175,8 +1215,8 @@ const DevoteesPage: React.FC = () => {
                       <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent pointer-events-none" />
                       <div className="flex justify-between items-start mb-4 relative z-10">
                         <div>
-                           <p className="text-sm font-bold text-foreground">{dn.category}</p>
-                           <p className="text-xs font-mono font-semibold text-muted-foreground mt-1 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> ID: {dn.id}</p>
+                          <p className="text-sm font-bold text-foreground">{dn.category}</p>
+                          <p className="text-xs font-mono font-semibold text-muted-foreground mt-1 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> ID: {dn.id}</p>
                         </div>
                         <p className="text-2xl font-bold font-display text-emerald-600">{fmtAmt(dn.amount)}</p>
                       </div>
@@ -1201,12 +1241,12 @@ const DevoteesPage: React.FC = () => {
                     <div key={bk.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-blue-300 transition-all hover:shadow-md relative overflow-hidden grid">
                       <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500/20" />
                       <div className="flex justify-between items-start mb-4 relative z-10 pl-2">
-                         <p className="text-sm font-bold text-foreground max-w-[70%] leading-relaxed">{bk.serviceName}</p>
-                         <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${bookingBadgeClass(bk.bookingStatus)}`}>{bk.bookingStatus}</span>
+                        <p className="text-sm font-bold text-foreground max-w-[70%] leading-relaxed">{bk.serviceName}</p>
+                        <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${bookingBadgeClass(bk.bookingStatus)}`}>{bk.bookingStatus}</span>
                       </div>
                       <div className="flex justify-between items-center mt-2 pt-4 border-t border-border/40 relative z-10 pl-2">
-                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(bk.date)}</span>
-                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-blue-500" />{bk.time}</span>
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(bk.date)}</span>
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-blue-500" />{bk.time}</span>
                       </div>
                     </div>
                   ))}
@@ -1215,68 +1255,68 @@ const DevoteesPage: React.FC = () => {
 
               {activeTab === 'notify' && selectedDevotee && (
                 <div className="p-6 space-y-6 pb-[100px] animate-fade-in">
-                   <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
-                     <h3 className="text-xs font-bold uppercase tracking-widest text-foreground pb-2">Delivery Channels</h3>
-                     <div className="grid grid-cols-3 gap-3">
-                        <button onClick={() => setChannels(p => ({ ...p, sms: !p.sms }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.sms ? 'bg-primary/5 text-primary border-primary/30 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
-                           <MessageSquare className="w-5 h-5" /> <span className="text-[10px]">SMS</span>
-                        </button>
-                        <button onClick={() => setChannels(p => ({ ...p, email: !p.email }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.email ? 'bg-sky-50 text-sky-700 border-sky-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
-                           <Mail className="w-5 h-5" /> <span className="text-[10px]">EMAIL</span>
-                        </button>
-                        <button onClick={() => setChannels(p => ({ ...p, whatsapp: !p.whatsapp }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.whatsapp ? 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
-                           <MessageCircle className="w-5 h-5" /> <span className="text-[10px]">WHATSAPP</span>
-                        </button>
-                     </div>
-                   </div>
+                  <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-foreground pb-2">Delivery Channels</h3>
+                    <div className="grid grid-cols-3 gap-3">
+                      <button onClick={() => setChannels(p => ({ ...p, sms: !p.sms }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.sms ? 'bg-primary/5 text-primary border-primary/30 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                        <MessageSquare className="w-5 h-5" /> <span className="text-[10px]">SMS</span>
+                      </button>
+                      <button onClick={() => setChannels(p => ({ ...p, email: !p.email }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.email ? 'bg-sky-50 text-sky-700 border-sky-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                        <Mail className="w-5 h-5" /> <span className="text-[10px]">EMAIL</span>
+                      </button>
+                      <button onClick={() => setChannels(p => ({ ...p, whatsapp: !p.whatsapp }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.whatsapp ? 'bg-emerald-50 text-emerald-700 border-emerald-200 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                        <MessageCircle className="w-5 h-5" /> <span className="text-[10px]">WHATSAPP</span>
+                      </button>
+                    </div>
+                  </div>
 
-                   <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
-                     <div className="flex justify-between items-center pb-2">
-                       <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Attach Events</h3>
-                       <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded">Optional</span>
-                     </div>
-                     <div className="flex flex-wrap gap-2">
-                        {mockEvents.map(ev => (
-                          <button key={ev.id} onClick={() => toggleEvent(ev.id)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border ${selectedEvents.has(ev.id) ? 'bg-muted border-foreground/30 text-foreground shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]' : 'bg-background border-border text-muted-foreground hover:border-border/80 hover:bg-muted/30'}`}>
-                             {ev.name}
-                          </button>
-                        ))}
-                     </div>
-                   </div>
+                  <div className="space-y-4 border border-border/60 bg-background p-5 rounded-xl shadow-sm">
+                    <div className="flex justify-between items-center pb-2">
+                      <h3 className="text-xs font-bold uppercase tracking-widest text-foreground">Attach Events</h3>
+                      <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded">Optional</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {mockEvents.map(ev => (
+                        <button key={ev.id} onClick={() => toggleEvent(ev.id)} className={`px-3 py-2 rounded-lg text-xs font-bold transition-all border ${selectedEvents.has(ev.id) ? 'bg-muted border-foreground/30 text-foreground shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]' : 'bg-background border-border text-muted-foreground hover:border-border/80 hover:bg-muted/30'}`}>
+                          {ev.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                   <div className="space-y-4">
-                     <h3 className="text-xs font-bold uppercase tracking-widest text-foreground px-1">Message Detail</h3>
-                     <div className="space-y-4">
-                       <div>
-                         <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-1.5 ml-1">Subject / Header</label>
-                         <input value={notifSubject} onChange={e => setNotifSubject(e.target.value)} className="w-full h-11 rounded-xl border border-input bg-background/50 hover:bg-background px-4 text-sm font-semibold transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm" placeholder="Subject line..." />
-                       </div>
-                       <div>
-                         <div className="flex items-center justify-between mb-1.5 px-1">
-                            <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Notification Body</label>
-                            <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase bg-muted/60 border border-border/50 px-2 py-0.5 rounded shadow-sm">{notifMessage.length} characters</span>
-                         </div>
-                         <textarea value={notifMessage} onChange={e => setNotifMessage(e.target.value)} className="w-full rounded-xl border border-input bg-background/50 hover:bg-background p-5 text-base min-h-[220px] resize-y transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm placeholder:text-muted-foreground/60 leading-7 font-medium" placeholder={`Type your message...`} />
-                       </div>
-                     </div>
-                     
-                     {notifSent && (
-                       <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
-                         <CheckCircle2 className="w-5 h-5 text-emerald-600" /> {notifSent}
-                       </div>
-                     )}
-                   </div>
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold uppercase tracking-widest text-foreground px-1">Message Detail</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block mb-1.5 ml-1">Subject / Header</label>
+                        <input value={notifSubject} onChange={e => setNotifSubject(e.target.value)} className="w-full h-11 rounded-xl border border-input bg-background/50 hover:bg-background px-4 text-sm font-semibold transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm" placeholder="Subject line..." />
+                      </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1.5 px-1">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Notification Body</label>
+                          <span className="text-[9px] text-muted-foreground font-bold tracking-widest uppercase bg-muted/60 border border-border/50 px-2 py-0.5 rounded shadow-sm">{notifMessage.length} characters</span>
+                        </div>
+                        <textarea value={notifMessage} onChange={e => setNotifMessage(e.target.value)} className="w-full rounded-xl border border-input bg-background/50 hover:bg-background p-5 text-base min-h-[220px] resize-y transition-all focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none shadow-sm placeholder:text-muted-foreground/60 leading-7 font-medium" placeholder={`Type your message...`} />
+                      </div>
+                    </div>
+
+                    {notifSent && (
+                      <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" /> {notifSent}
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
 
             {/* Sticky Action Footer */}
             {activeTab === 'notify' && (
-               <div className="absolute bottom-0 left-0 w-full p-5 bg-card/90 backdrop-blur-md border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-                 <Button className="w-full h-12 text-sm font-bold rounded-xl shadow-lg border-b-4 border-black/10 active:border-b-0 active:translate-y-1 transition-all" onClick={sendNotification} disabled={notifSending || !notifSubject.trim() || !notifMessage.trim() || (!channels.sms && !channels.email && !channels.whatsapp)}>
-                   {notifSending ? 'Dispatching...' : `Execute Dispatch (${Number(channels.sms) + Number(channels.email) + Number(channels.whatsapp)} Routes)`}
-                 </Button>
-               </div>
+              <div className="absolute bottom-0 left-0 w-full p-5 bg-card/90 backdrop-blur-md border-t border-border shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
+                <Button className="w-full h-12 text-sm font-bold rounded-xl shadow-lg border-b-4 border-black/10 active:border-b-0 active:translate-y-1 transition-all" onClick={sendNotification} disabled={notifSending || !notifSubject.trim() || !notifMessage.trim() || (!channels.sms && !channels.email && !channels.whatsapp)}>
+                  {notifSending ? 'Dispatching...' : `Execute Dispatch (${Number(channels.sms) + Number(channels.email) + Number(channels.whatsapp)} Routes)`}
+                </Button>
+              </div>
             )}
 
           </div>
@@ -1304,6 +1344,8 @@ const DevoteesPage: React.FC = () => {
             </div>
             <FormField label="Occupation" value={familyMemberForm.occupation} onChange={v => setFamilyMemberForm(prev => ({ ...prev, occupation: v }))} />
             <FormField label="Phone" value={familyMemberForm.phone} onChange={v => setFamilyMemberForm(prev => ({ ...prev, phone: v }))} />
+            <FormField label="Rasi" value={familyMemberForm.rasi} onChange={v => setFamilyMemberForm(prev => ({ ...prev, rasi: v }))} />
+            <FormField label="Nakshatra" value={familyMemberForm.nakshatra} onChange={v => setFamilyMemberForm(prev => ({ ...prev, nakshatra: v }))} />
             <div className="space-y-1.5 md:col-span-2">
               <label className="text-xs font-semibold text-foreground">Parent Node</label>
               <select value={familyMemberForm.parentId} onChange={e => setFamilyMemberForm(prev => ({ ...prev, parentId: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">

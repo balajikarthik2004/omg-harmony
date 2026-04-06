@@ -2,12 +2,13 @@ import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Send, Users, UserCheck, Search, MessageSquare, Mail, MessageCircle, CalendarClock, Check, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { mockDevotees, mockEvents } from '@/data/mockData';
+import { useVolunteerStore } from '@/hooks/useVolunteerStore';
 import { formatDateDDMMYYYY } from '@/lib/utils';
 import FormField from '@/components/FormField';
 import { sendCampaignEmails } from '@/lib/emailService';
 
 type ChannelKey = 'sms' | 'email' | 'whatsapp';
-type RecipientMode = 'all' | 'selected';
+type RecipientMode = 'all' | 'selected' | 'volunteers';
 
 type CampaignLog = {
   id: string;
@@ -25,6 +26,8 @@ const channelConfig: Record<ChannelKey, { label: string; icon: React.ReactNode; 
 };
 
 const CampaignPage: React.FC = () => {
+  const { items: volunteerItems } = useVolunteerStore();
+  const [viewMode, setViewMode] = useState<'devotees' | 'volunteers'>('devotees');
   const [recipientMode, setRecipientMode] = useState<RecipientMode>('all');
   const [search, setSearch] = useState('');
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
@@ -39,19 +42,28 @@ const CampaignPage: React.FC = () => {
   const selectedEvent = useMemo(() => mockEvents.find(event => event.id === selectedEventId), [selectedEventId]);
 
   const devotees = useMemo(() => {
+    // If volunteers mode, use volunteer store items, otherwise use devotee mock data
+    const base = viewMode === 'volunteers' 
+      ? volunteerItems.map(v => ({ id: v.id, name: v.name, phone: v.contact, email: v.email, city: v.preferredArea || 'N/A' }))
+      : mockDevotees;
+      
     const q = search.toLowerCase().trim();
-    if (!q) return mockDevotees;
-    return mockDevotees.filter(item =>
+    if (!q) return base;
+    return base.filter(item =>
       item.name.toLowerCase().includes(q) ||
       item.phone.toLowerCase().includes(q) ||
-      item.city.toLowerCase().includes(q)
+      (item.city && item.city.toLowerCase().includes(q))
     );
-  }, [search]);
+  }, [search, viewMode, volunteerItems]);
 
   const targetUsers = useMemo(() => {
-    if (recipientMode === 'all') return mockDevotees;
-    return mockDevotees.filter(item => selectedUsers.has(item.id));
-  }, [recipientMode, selectedUsers]);
+    const base = viewMode === 'volunteers' 
+      ? volunteerItems.map(v => ({ id: v.id, name: v.name, phone: v.contact, email: v.email, city: v.preferredArea || 'N/A' }))
+      : mockDevotees;
+
+    if (recipientMode === 'all' || (viewMode === 'volunteers' && recipientMode === 'volunteers')) return base;
+    return base.filter(item => selectedUsers.has(item.id));
+  }, [recipientMode, selectedUsers, viewMode, volunteerItems]);
 
   const selectedChannels = useMemo(
     () => (Object.keys(channels) as ChannelKey[]).filter(key => channels[key]).map(key => channelConfig[key].label),
@@ -139,29 +151,51 @@ const CampaignPage: React.FC = () => {
 
   return (
     <div className="campaign-premium space-y-6 max-w-[1500px] mx-auto">
-      <div className="page-header-banner campaign-header bg-gradient-to-r from-sky-50/70 via-background to-emerald-50/70 py-4">
-        <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">Campaign Manager</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Send bulk announcements to devotees through SMS, WhatsApp, and Email.</p>
+      <div className="page-header-banner campaign-header bg-gradient-to-r from-sky-50/70 via-background to-emerald-50/70 py-4 mb-2">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-display font-bold text-foreground">Campaign Manager</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Send bulk announcements to devotees and volunteers through SMS, WhatsApp, and Email.</p>
+          </div>
+          <div className="campaign-view-toggle-wrap">
+            <div className="campaign-view-toggle">
+            <button
+              onClick={() => { setViewMode('devotees'); setRecipientMode('all'); }}
+              className={`campaign-view-btn ${viewMode === 'devotees' ? 'campaign-view-btn-active-devotees' : ''}`}
+            >
+              <Users className="h-4.5 w-4.5" />
+              Devotees
+            </button>
+            <button
+              onClick={() => { setViewMode('volunteers'); setRecipientMode('volunteers'); }}
+              className={`campaign-view-btn ${viewMode === 'volunteers' ? 'campaign-view-btn-active-volunteers' : ''}`}
+            >
+              <UserCheck className="h-4.5 w-4.5" />
+              Volunteers
+            </button>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 animate-stagger">
-        <div className="stat-card campaign-stat-card">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total Devotees</p>
-          <p className="text-2xl font-bold mt-1 text-foreground">{mockDevotees.length}</p>
+        <div className={`stat-card campaign-stat-card border-l-4 ${viewMode === 'volunteers' ? 'border-l-orange-500' : 'border-l-sky-500'} transition-all duration-300 transform`}>
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Focus Population</p>
+          <p className={`text-2xl font-bold mt-1 ${viewMode === 'volunteers' ? 'text-orange-600' : 'text-blue-700'}`}>
+            {viewMode === 'volunteers' ? volunteerItems.length : mockDevotees.length}
+          </p>
         </div>
-        <div className="stat-card campaign-stat-card">
+        <div className="stat-card campaign-stat-card border-l-4 border-l-indigo-500 shadow-sm">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Target Recipients</p>
-          <p className="text-2xl font-bold mt-1 text-blue-700">{targetUsers.length}</p>
+          <p className="text-2xl font-bold mt-1 text-blue-700 font-display">{targetUsers.length}</p>
         </div>
-        <div className="stat-card campaign-stat-card">
+        <div className="stat-card campaign-stat-card border-l-4 border-l-emerald-500 shadow-sm">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Active Channels</p>
-          <p className="text-2xl font-bold mt-1 text-emerald-700">{selectedChannels.length}</p>
+          <p className="text-2xl font-bold mt-1 text-emerald-700 font-display">{selectedChannels.length}</p>
         </div>
-        <div className="stat-card campaign-stat-card">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total Campaigns</p>
-          <p className="text-2xl font-bold mt-1 text-violet-700">{logs.length}</p>
+        <div className="stat-card campaign-stat-card border-l-4 border-l-violet-500 shadow-sm">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Campaigns Executed</p>
+          <p className="text-2xl font-bold mt-1 text-violet-700 font-display">{logs.length}</p>
         </div>
       </div>
 
@@ -174,16 +208,20 @@ const CampaignPage: React.FC = () => {
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button
-                onClick={() => setRecipientMode('all')}
-                className={`campaign-mode-card rounded-xl border-2 px-5 py-4 text-left transition-all duration-300 ${recipientMode === 'all' ? 'border-primary bg-primary/5 shadow-sm transform scale-[1.01]' : 'border-border hover:border-primary/40 hover:bg-muted/30 hover:shadow-sm'}`}
+                onClick={() => setRecipientMode(viewMode === 'volunteers' ? 'volunteers' : 'all')}
+                className={`campaign-mode-card rounded-xl border-2 px-5 py-4 text-left transition-all duration-300 ${recipientMode === (viewMode === 'volunteers' ? 'volunteers' : 'all') ? 'border-primary bg-primary/5 shadow-sm transform scale-[1.01]' : 'border-border hover:border-primary/40 hover:bg-muted/30 hover:shadow-sm'}`}
               >
                 <div className="flex items-center gap-3 mb-2">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${recipientMode === 'all' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${recipientMode === (viewMode === 'volunteers' ? 'volunteers' : 'all') ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                     <Users className="h-5 w-5" />
                   </div>
-                  <h3 className="text-sm font-semibold text-foreground">All Devotees</h3>
+                  <h3 className="text-sm font-semibold text-foreground">
+                    {viewMode === 'volunteers' ? 'All Volunteers' : 'All Devotees'}
+                  </h3>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">Broadcast message to every active devotee in the temple database.</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Broadcast to every active {viewMode === 'volunteers' ? 'volunteer' : 'devotee'} in the database.
+                </p>
               </button>
 
               <button
@@ -192,11 +230,13 @@ const CampaignPage: React.FC = () => {
               >
                 <div className="flex items-center gap-3 mb-2">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${recipientMode === 'selected' ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                    <UserCheck className="h-5 w-5" />
+                    <Users className="h-5 w-5" />
                   </div>
-                  <h3 className="text-sm font-semibold text-foreground">Selected Devotees</h3>
+                  <h3 className="text-sm font-semibold text-foreground">Selected Individuals</h3>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">Choose specific individuals or segments from the devotee list.</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Choose specific {viewMode === 'volunteers' ? 'volunteers' : 'individuals'} from the list.
+                </p>
               </button>
             </div>
 

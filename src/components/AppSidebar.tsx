@@ -25,7 +25,7 @@ const adminLinks = [
   { to: '/inventory', label: 'Inventory', icon: Package },
   { to: '/assets', label: 'Assets', icon: Building2 },
   { to: '/parking', label: 'Parking', icon: Car },
-  { to: '/volunteers', label: 'Volunteers', icon: HeartHandshake },
+  // { to: '/volunteers', label: 'Volunteers', icon: HeartHandshake },
   { to: '/reports', label: 'Documents', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

@@ -269,10 +269,16 @@ const HallBookingPage = () => {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <div className="overflow-x-auto pb-1">
                     <TabsList className="bg-muted/40 p-1 rounded-xl h-11 md:h-12 backdrop-blur-sm border border-border/50 min-w-max">
-                        {['overview', 'book', 'calendar', 'inventory', 'revenue'].map(tab => (
-                            <TabsTrigger key={tab} value={tab}
+                        {[
+                            { value: 'overview', label: 'overview' },
+                            { value: 'book', label: 'Book New' },
+                            { value: 'calendar', label: 'calendar' },
+                            { value: 'inventory', label: 'Spiritual Venue Registry' },
+                            { value: 'revenue', label: 'revenue' },
+                        ].map(tab => (
+                            <TabsTrigger key={tab.value} value={tab.value}
                                 className="data-[state=active]:bg-white data-[state=active]:text-[#293088] data-[state=active]:shadow-md rounded-lg px-3 md:px-5 font-bold transition-all text-[11px] md:text-sm capitalize">
-                                {tab === 'book' ? 'Book New' : tab}
+                                {tab.label}
                             </TabsTrigger>
                         ))}
                     </TabsList>

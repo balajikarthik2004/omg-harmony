@@ -7,15 +7,17 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  containerClassName?: string;
+  bodyClassName?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
+const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, containerClassName = '', bodyClassName = 'p-6' }) => {
   if (!open) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto border border-border/50"
+        className={`bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto border border-border/50 ${containerClassName}`}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b border-border/70">
@@ -29,7 +31,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
             <X className="h-4 w-4" />
           </Button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className={bodyClassName}>{children}</div>
       </div>
     </div>
   );

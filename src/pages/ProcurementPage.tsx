@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, Search, Eye, CheckCircle, XCircle, FileClock, IndianRupee, Truck, Calendar, DollarSign, PackageOpen, LayoutGrid, AlertCircle } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Eye, CheckCircle, XCircle, FileClock, IndianRupee, Truck, Calendar, DollarSign, PackageOpen, LayoutGrid, AlertCircle, BrainCircuit, ShieldCheck, Mail, Send } from 'lucide-react';
 import { useStore } from '@/hooks/useStore';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
@@ -125,6 +125,68 @@ const emptyItem = {
   price: 0
 };
 
+type Urgency = 'Low' | 'Medium' | 'High' | 'Critical';
+type Category = 'Pooja' | 'Annadhanam' | 'Maintenance' | 'General';
+
+type AgentRequest = {
+  pr_id: string;
+  item_description: string;
+  requested_quantity: number;
+  urgency: Urgency;
+  required_date: string;
+  reason_for_request: string;
+  category: Category;
+};
+
+type AgentInventory = {
+  current_stock: number;
+  daily_consumption: number;
+  minimum_threshold: number;
+};
+
+type AgentEvent = {
+  upcoming_event_date: string;
+  demand_multiplier: number;
+};
+
+type AgentVendor = {
+  vendor_id: string;
+  vendor_name: string;
+  unit_price: number;
+  delivery_eta_days: number;
+  reliability_score: number;
+  emergency_support: boolean;
+  contract_status: 'Active' | 'Limited' | 'Blacklisted';
+};
+
+const defaultRequest: AgentRequest = {
+  pr_id: 'PR-2026-0412',
+  item_description: 'Pure Ghee (15kg tins)',
+  requested_quantity: 25,
+  urgency: 'High',
+  required_date: '2026-04-15',
+  reason_for_request: 'Annadhanam and festival demand spike',
+  category: 'Annadhanam',
+};
+
+const defaultInventory: AgentInventory = {
+  current_stock: 10,
+  daily_consumption: 4,
+  minimum_threshold: 6,
+};
+
+const defaultEvent: AgentEvent = {
+  upcoming_event_date: '2026-04-14',
+  demand_multiplier: 1.6,
+};
+
+const defaultVendors: AgentVendor[] = [
+  { vendor_id: 'V-101', vendor_name: 'Sri Pooja Supplies', unit_price: 3200, delivery_eta_days: 4, reliability_score: 90, emergency_support: true, contract_status: 'Active' },
+  { vendor_id: 'V-102', vendor_name: 'Temple Agro Wholesale', unit_price: 2950, delivery_eta_days: 7, reliability_score: 82, emergency_support: false, contract_status: 'Active' },
+  { vendor_id: 'V-103', vendor_name: 'Rapid Ritual Logistics', unit_price: 3450, delivery_eta_days: 2, reliability_score: 76, emergency_support: true, contract_status: 'Limited' },
+  { vendor_id: 'V-104', vendor_name: 'Legacy Traders', unit_price: 2800, delivery_eta_days: 6, reliability_score: 60, emergency_support: false, contract_status: 'Blacklisted' },
+];
+
 const ProcurementPage: React.FC = () => {
   const { items, add, update, remove } = useStore(mockProcurements);
   const [modalOpen, setModalOpen] = useState(false);
@@ -140,10 +202,127 @@ const ProcurementPage: React.FC = () => {
   const [itemModalOpen, setItemModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(emptyItem);
   const [editingItemIndex, setEditingItemIndex] = useState<number | null>(null);
+  const [agentRequest, setAgentRequest] = useState<AgentRequest>(defaultRequest);
+  const [agentInventory, setAgentInventory] = useState<AgentInventory>(defaultInventory);
+  const [agentEvent, setAgentEvent] = useState<AgentEvent>(defaultEvent);
+  const [availableBudget, setAvailableBudget] = useState(220000);
+  const [agentResult, setAgentResult] = useState<null | {
+    stock_exhaust_days: number;
+    adjusted_daily_consumption: number;
+    strategy: 'lowest_cost_vendor' | 'fastest_delivery_vendor' | 'split_procurement_strategy';
+    selected_vendor: string;
+    requested_value: number;
+    post_approval_balance: number;
+    decision_reason: string;
+    approval_required: Array<{ role: string; reason: string }>;
+    vendor_evaluations: Array<{
+      vendor_id: string;
+      vendor_name: string;
+      unit_price: number;
+      delivery_eta_days: number;
+      delivery_possible: boolean;
+      reliability_score: number;
+      contract_status: string;
+      rank: number | null;
+    }>;
+    approval_email: { subject: string; body: string };
+    vendor_rfp_email: Array<{ vendor: string; subject: string; body: string }>;
+  }>(null);
 
   // Check user role
   const isAdmin = currentUser.role === 'Admin';
   const isManager = currentUser.role === 'Temple Manager';
+
+  const runAgent = () => {
+    const adjustedDaily = Number((agentInventory.daily_consumption * agentEvent.demand_multiplier).toFixed(2));
+    const stockDays = adjustedDaily > 0 ? Number((agentInventory.current_stock / adjustedDaily).toFixed(2)) : 0;
+
+    const validVendors = defaultVendors.map(v => {
+      const deliveryPossible = v.delivery_eta_days <= stockDays;
+      return {
+        ...v,
+        delivery_possible: deliveryPossible,
+        requested_value: v.unit_price * agentRequest.requested_quantity,
+        blocked: v.contract_status === 'Blacklisted',
+      };
+    });
+
+    const eligible = validVendors.filter(v => !v.blocked);
+    if (!eligible.length) {
+      setAgentResult(null);
+      return;
+    }
+
+    const ranked = [...eligible]
+      .sort((a, b) => {
+        if (a.delivery_possible !== b.delivery_possible) return a.delivery_possible ? -1 : 1;
+        if (a.unit_price !== b.unit_price) return a.unit_price - b.unit_price;
+        return b.reliability_score - a.reliability_score;
+      })
+      .map((v, idx) => ({ ...v, rank: idx + 1 }));
+
+    const cheapest = [...eligible].sort((a, b) => a.unit_price - b.unit_price)[0];
+    const fastest = [...eligible].sort((a, b) => a.delivery_eta_days - b.delivery_eta_days)[0];
+
+    let strategy: 'lowest_cost_vendor' | 'fastest_delivery_vendor' | 'split_procurement_strategy' = 'lowest_cost_vendor';
+    let selectedVendor = cheapest.vendor_name;
+    let requestedValue = cheapest.requested_value;
+    let decisionReason = 'Stock coverage is sufficient, so lowest-cost vendor is selected.';
+
+    if (stockDays < cheapest.delivery_eta_days && stockDays >= fastest.delivery_eta_days) {
+      strategy = 'split_procurement_strategy';
+      selectedVendor = `${fastest.vendor_name} + ${cheapest.vendor_name}`;
+      const urgentQty = Math.min(agentRequest.requested_quantity, Math.max(1, Math.ceil(adjustedDaily * 2)));
+      const balanceQty = Math.max(0, agentRequest.requested_quantity - urgentQty);
+      requestedValue = urgentQty * fastest.unit_price + balanceQty * cheapest.unit_price;
+      decisionReason = `Partial shortage risk detected. Split order: ${urgentQty} urgent units from fast vendor and remaining from low-cost vendor.`;
+    } else if (stockDays < cheapest.delivery_eta_days) {
+      strategy = 'fastest_delivery_vendor';
+      selectedVendor = fastest.vendor_name;
+      requestedValue = fastest.requested_value;
+      decisionReason = 'Stock-out risk detected before cheapest vendor ETA, so fastest vendor is selected.';
+    }
+
+    const approvalRequired =
+      requestedValue <= 10000
+        ? [{ role: 'System', reason: 'Auto approval for values up to Rs.10,000.' }]
+        : requestedValue <= 50000
+          ? [{ role: 'Manager', reason: 'Manager approval required for values from Rs.10,001 to Rs.50,000.' }]
+          : [{ role: 'Trustee', reason: 'Trustee approval required for values above Rs.50,000.' }];
+
+    setAgentResult({
+      stock_exhaust_days: stockDays,
+      adjusted_daily_consumption: adjustedDaily,
+      strategy,
+      selected_vendor: selectedVendor,
+      requested_value: requestedValue,
+      post_approval_balance: availableBudget - requestedValue,
+      decision_reason: decisionReason,
+      approval_required: approvalRequired,
+      vendor_evaluations: defaultVendors.map(v => {
+        const m = ranked.find(r => r.vendor_id === v.vendor_id);
+        return {
+          vendor_id: v.vendor_id,
+          vendor_name: v.vendor_name,
+          unit_price: v.unit_price,
+          delivery_eta_days: v.delivery_eta_days,
+          delivery_possible: v.delivery_eta_days <= stockDays,
+          reliability_score: v.reliability_score,
+          contract_status: v.contract_status,
+          rank: m ? m.rank : null,
+        };
+      }),
+      approval_email: {
+        subject: `Procurement Request - ${agentRequest.pr_id}`,
+        body: `Hi,\n\nPlease review the new procurement request ${agentRequest.pr_id} by ${currentUser.name} and provide your approval.\n\nRegards,\nProcurement Team`,
+      },
+      vendor_rfp_email: defaultVendors.map(v => ({
+        vendor: v.vendor_name,
+        subject: `RFP - ${agentRequest.pr_id} | ${agentRequest.item_description} | ${agentRequest.required_date}`,
+        body: `Hi ${v.vendor_name},\n\nPlease find attached the RFP document for the following procurement request.\n\nPR ID : ${agentRequest.pr_id}\nItem : ${agentRequest.item_description}\nQuantity : ${agentRequest.requested_quantity}\nDelivery By : ${agentRequest.required_date}\n\nKindly review the attached RFP and submit your quotation as per instructions.\n\nRegards,\nProcurement Team`,
+      })),
+    });
+  };
 
   const openAdd = () => { 
     setForm({
@@ -238,7 +417,7 @@ const ProcurementPage: React.FC = () => {
     };
     
     if (editId) update(editId, formattedForm);
-    else add(formattedForm as any);
+    else add(formattedForm as unknown as typeof items[number]);
     setModalOpen(false);
     setViewId(null);
   };
@@ -311,6 +490,114 @@ const ProcurementPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
+      <div className="section-panel border-l-4 border-l-indigo-600 overflow-hidden">
+        <div className="section-panel-header bg-gradient-to-r from-indigo-50 via-background to-sky-50 border-b border-border/60">
+          <div>
+            <h2 className="text-base font-bold flex items-center gap-2"><BrainCircuit className="w-4 h-4 text-indigo-600" /> AI Procurement Agent Console</h2>
+            <p className="text-xs text-muted-foreground mt-1">Evaluates all vendors, balances cost vs delivery risk, and produces approval + communication outputs.</p>
+          </div>
+          <Button onClick={runAgent} className="bg-indigo-600 hover:bg-indigo-700 text-white"><ShieldCheck className="w-4 h-4 mr-2" />Run AI Evaluation</Button>
+        </div>
+        <div className="p-5 space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormField label="PR ID" value={agentRequest.pr_id} onChange={v => setAgentRequest(prev => ({ ...prev, pr_id: v }))} />
+            <FormField label="Item Description" value={agentRequest.item_description} onChange={v => setAgentRequest(prev => ({ ...prev, item_description: v }))} />
+            <FormField label="Requested Quantity" value={String(agentRequest.requested_quantity)} onChange={v => setAgentRequest(prev => ({ ...prev, requested_quantity: Number(v) || 0 }))} type="number" />
+            <div className="space-y-1.5">
+              <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Urgency</label>
+              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm" value={agentRequest.urgency} onChange={e => setAgentRequest(prev => ({ ...prev, urgency: e.target.value as Urgency }))}>
+                {['Low', 'Medium', 'High', 'Critical'].map(u => <option key={u} value={u}>{u}</option>)}
+              </select>
+            </div>
+            <FormField label="Required Date" value={agentRequest.required_date} onChange={v => setAgentRequest(prev => ({ ...prev, required_date: v }))} type="date" />
+            <div className="space-y-1.5">
+              <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Category</label>
+              <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm" value={agentRequest.category} onChange={e => setAgentRequest(prev => ({ ...prev, category: e.target.value as Category }))}>
+                {['Pooja', 'Annadhanam', 'Maintenance', 'General'].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <FormField label="Current Stock" value={String(agentInventory.current_stock)} onChange={v => setAgentInventory(prev => ({ ...prev, current_stock: Number(v) || 0 }))} type="number" />
+            <FormField label="Daily Consumption" value={String(agentInventory.daily_consumption)} onChange={v => setAgentInventory(prev => ({ ...prev, daily_consumption: Number(v) || 0 }))} type="number" />
+            <FormField label="Demand Multiplier" value={String(agentEvent.demand_multiplier)} onChange={v => setAgentEvent(prev => ({ ...prev, demand_multiplier: Number(v) || 1 }))} type="number" />
+            <FormField label="Available Budget (Rs.)" value={String(availableBudget)} onChange={v => setAvailableBudget(Number(v) || 0)} type="number" />
+            <FormField label="Reason for Request" value={agentRequest.reason_for_request} onChange={v => setAgentRequest(prev => ({ ...prev, reason_for_request: v }))} />
+          </div>
+
+          {agentResult && (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="stat-card"><p className="text-[10px] uppercase text-muted-foreground">Adjusted Daily</p><p className="text-xl font-bold">{agentResult.adjusted_daily_consumption}</p></div>
+                <div className="stat-card"><p className="text-[10px] uppercase text-muted-foreground">Stock Exhaust (Days)</p><p className="text-xl font-bold">{agentResult.stock_exhaust_days}</p></div>
+                <div className="stat-card"><p className="text-[10px] uppercase text-muted-foreground">Requested Value</p><p className="text-xl font-bold">Rs.{agentResult.requested_value.toLocaleString('en-IN')}</p></div>
+                <div className="stat-card"><p className="text-[10px] uppercase text-muted-foreground">Post Approval Balance</p><p className="text-xl font-bold">Rs.{agentResult.post_approval_balance.toLocaleString('en-IN')}</p></div>
+              </div>
+
+              <div className="table-container">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th className="text-left p-3 text-xs">Vendor</th>
+                      <th className="text-right p-3 text-xs">Unit Price</th>
+                      <th className="text-center p-3 text-xs">ETA (days)</th>
+                      <th className="text-center p-3 text-xs">Delivery Possible</th>
+                      <th className="text-center p-3 text-xs">Reliability</th>
+                      <th className="text-center p-3 text-xs">Contract</th>
+                      <th className="text-center p-3 text-xs">Rank</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agentResult.vendor_evaluations.map(v => (
+                      <tr key={v.vendor_id}>
+                        <td className="p-3 font-semibold">{v.vendor_name}</td>
+                        <td className="p-3 text-right">Rs.{v.unit_price.toLocaleString('en-IN')}</td>
+                        <td className="p-3 text-center">{v.delivery_eta_days}</td>
+                        <td className="p-3 text-center">{v.delivery_possible ? 'Yes' : 'No'}</td>
+                        <td className="p-3 text-center">{v.reliability_score}</td>
+                        <td className="p-3 text-center">{v.contract_status}</td>
+                        <td className="p-3 text-center font-bold">{v.rank ?? '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="info-panel">
+                  <div>
+                    <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">AI Advisory Summary</p>
+                    <p className="text-sm font-semibold mt-1">Strategy: {agentResult.strategy.replace(/_/g, ' ')}</p>
+                    <p className="text-sm mt-1">Recommended: {agentResult.selected_vendor}</p>
+                    <p className="text-xs text-muted-foreground mt-2">{agentResult.decision_reason}</p>
+                  </div>
+                </div>
+                <div className="info-panel">
+                  <div>
+                    <p className="text-xs uppercase tracking-wider font-bold text-muted-foreground">Approval Workflow</p>
+                    {agentResult.approval_required.map(a => (
+                      <p key={a.role} className="text-sm mt-1"><span className="font-semibold">{a.role}:</span> {a.reason}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="rounded-xl border border-border p-4 bg-muted/10">
+                  <p className="text-xs uppercase font-bold text-muted-foreground mb-2 flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Approval Email</p>
+                  <p className="text-xs font-semibold">{agentResult.approval_email.subject}</p>
+                  <p className="text-xs text-muted-foreground mt-2 whitespace-pre-wrap">{agentResult.approval_email.body}</p>
+                </div>
+                <div className="rounded-xl border border-border p-4 bg-muted/10">
+                  <p className="text-xs uppercase font-bold text-muted-foreground mb-2 flex items-center gap-1"><Send className="w-3.5 h-3.5" />Vendor RFP Subject Preview</p>
+                  {agentResult.vendor_rfp_email.map(v => (
+                    <p key={v.vendor} className="text-xs mt-1"><span className="font-semibold">{v.vendor}:</span> {v.subject}</p>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
@@ -325,7 +612,7 @@ const ProcurementPage: React.FC = () => {
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-indigo-100 bg-indigo-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-indigo-100/50 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-indigo-800 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> Total Value</p>
-          <p className="text-3xl font-display font-bold mt-2 text-indigo-700 relative z-10">₹{totalValue.toLocaleString('en-IN')}</p>
+          <p className="text-3xl font-display font-bold mt-2 text-indigo-700 relative z-10">Rs.{totalValue.toLocaleString('en-IN')}</p>
         </div>
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-blue-100 bg-blue-50/40">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-100/50 group-hover:scale-110 transition-transform" />
@@ -373,7 +660,7 @@ const ProcurementPage: React.FC = () => {
                 <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[12%] text-xs">Total Amount</th>
                 <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[13%] text-xs">Status</th>
                 <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[45%] text-xs">Ordered Items</th>
-                <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs text-center">Actions</th>
+                <th className="py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs text-center">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-background">
@@ -388,7 +675,7 @@ const ProcurementPage: React.FC = () => {
                     {isAdmin && <p className="text-[9px] font-medium text-muted-foreground mt-0.5 truncate max-w-[180px]">By: {proc.submittedByName}</p>}
                   </td>
                   <td className="py-4 px-3 text-right whitespace-nowrap">
-                    <p className="text-base font-bold text-emerald-700 font-display tracking-tight">₹{proc.amount.toLocaleString('en-IN')}</p>
+                    <p className="text-base font-bold text-emerald-700 font-display tracking-tight">Rs.{proc.amount.toLocaleString('en-IN')}</p>
                   </td>
                   <td className="py-4 px-3">
                     <StatusBadge status={proc.status} />
@@ -482,7 +769,7 @@ const ProcurementPage: React.FC = () => {
                     <div className="flex-1">
                       <p className="font-bold text-sm">{item.name}</p>
                       <p className="text-xs text-muted-foreground mt-1 font-medium bg-muted/40 inline-flex px-2 py-0.5 rounded">
-                        Qty: {item.quantity} × ₹{item.price.toLocaleString('en-IN')} = <span className="text-foreground font-bold ml-1">₹{(item.quantity * item.price).toLocaleString('en-IN')}</span>
+                        Qty: {item.quantity} x Rs.{item.price.toLocaleString('en-IN')} = <span className="text-foreground font-bold ml-1">Rs.{(item.quantity * item.price).toLocaleString('en-IN')}</span>
                       </p>
                     </div>
                     {!viewId && (
@@ -498,7 +785,7 @@ const ProcurementPage: React.FC = () => {
             
             <div className="mt-5 pt-4 border-t border-border/60 flex justify-between items-center bg-gradient-to-r from-emerald-50/50 to-background p-4 rounded-xl border border-emerald-100 shadow-sm">
                <span className="text-xs uppercase tracking-widest font-bold text-emerald-800">Total Invoice Valuation</span>
-               <span className="text-2xl font-bold text-emerald-700 font-display tracking-tight">₹{Number(form.amount).toLocaleString('en-IN')}</span>
+               <span className="text-2xl font-bold text-emerald-700 font-display tracking-tight">Rs.{Number(form.amount).toLocaleString('en-IN')}</span>
             </div>
           </div>
 
@@ -538,11 +825,11 @@ const ProcurementPage: React.FC = () => {
           <FormField label="Item Designation" value={currentItem.name} onChange={v => setCurrentItem({ ...currentItem, name: v })} required placeholder="e.g. Pure Ghee 15kg" />
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Volume Wanted" value={currentItem.quantity.toString()} onChange={v => setCurrentItem({ ...currentItem, quantity: Number(v) || 0 })} type="number" required />
-            <FormField label="Quote Unit Price (₹)" value={currentItem.price.toString()} onChange={v => setCurrentItem({ ...currentItem, price: Number(v) || 0 })} type="number" required />
+            <FormField label="Quote Unit Price (G�)" value={currentItem.price.toString()} onChange={v => setCurrentItem({ ...currentItem, price: Number(v) || 0 })} type="number" required />
           </div>
           <div className="bg-gradient-to-r from-sky-50 to-background text-sky-900 p-5 rounded-xl border border-sky-100 flex justify-between items-center shadow-sm">
             <span className="text-sm font-bold uppercase tracking-widest text-sky-800">Projection Line Total</span>
-            <span className="text-2xl font-bold font-display">₹{(currentItem.quantity * currentItem.price).toLocaleString('en-IN')}</span>
+            <span className="text-2xl font-bold font-display">Rs.{(currentItem.quantity * currentItem.price).toLocaleString('en-IN')}</span>
           </div>
           <div className="flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => { setItemModalOpen(false); setCurrentItem(emptyItem); setEditingItemIndex(null); }} className="flex-1 py-5">Omit Changes</Button>

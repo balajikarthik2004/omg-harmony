@@ -1415,6 +1415,73 @@
     opacity: 0.86;
   }
 
+  .campaign-view-toggle-wrap {
+    @apply w-full flex justify-end;
+  }
+
+  @media (min-width: 768px) {
+    .campaign-header {
+      position: relative;
+      padding-right: 19rem;
+    }
+
+    .campaign-view-toggle-wrap {
+      position: absolute;
+      top: 1rem;
+      right: 1.25rem;
+      width: auto;
+      z-index: 1;
+    }
+  }
+
+  .campaign-view-toggle {
+    @apply flex rounded-xl p-1 border;
+    background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-red-600) 100%);
+    border-color: hsla(0, 0%, 100%, 0.5);
+    box-shadow: 0 14px 24px -14px rgba(188, 31, 30, 0.72), inset 0 1px 0 hsla(0, 0%, 100%, 0.18);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .campaign-view-btn {
+    @apply inline-flex items-center gap-2.5 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-300 border;
+    color: hsla(0, 0%, 100%, 0.8);
+    border-color: transparent;
+    cursor: pointer;
+  }
+
+  .campaign-view-btn:hover {
+    color: hsla(0, 0%, 100%, 0.98);
+    background: hsla(0, 0%, 100%, 0.12);
+    border-color: hsla(0, 0%, 100%, 0.24);
+  }
+
+  .campaign-view-btn:active {
+    transform: translateY(1px);
+  }
+
+  .campaign-view-btn svg {
+    color: currentColor !important;
+    opacity: 0.9;
+    transition: opacity 0.2s ease;
+  }
+
+  .campaign-view-btn-active-devotees,
+  .campaign-view-btn-active-volunteers {
+    background: hsla(0, 0%, 100%, 0.96);
+    transform: translateY(-1px);
+    border-color: hsla(0, 0%, 100%, 0.82);
+    box-shadow: 0 10px 24px -16px rgba(188, 31, 30, 0.75), inset 0 0 0 1px hsla(0, 0%, 100%, 0.58);
+  }
+
+  .campaign-view-btn-active-devotees {
+    color: var(--brand-primary);
+  }
+
+  .campaign-view-btn-active-volunteers {
+    color: var(--brand-red-600);
+  }
+
   .campaign-stat-card,
   .campaign-main-panel,
   .campaign-side-panel {

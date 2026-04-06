@@ -73,6 +73,7 @@ interface AttendanceRecord {
   staffId: string;
   date: string;
   status: 'Present' | 'Absent';
+  leaveType?: 'Sick' | 'Casual';
 }
 
 const initialAttendance: AttendanceRecord[] = [
@@ -117,10 +118,10 @@ const HrPage: React.FC = () => {
   const { items: staff, add: addStaff, update: updateStaff, remove: removeStaff } = useStore<StaffRecord>(initialStaff);
   const { items: duties, add: addDuty, update: updateDuty, remove: removeDuty } = useStore<DutySchedule>(initialDuties);
   const { items: volunteers, add: addVolunteer, update: updateVolunteer, remove: removeVolunteer } = useVolunteerStore();
-  
+
   const { items: payroll, add: addPayroll, update: updatePayroll, setItems: setPayroll } = useStore<PayrollEntry>(initialPayroll);
   const { items: attendance, add: addAttendance, update: updateAttendance, remove: removeAttendance } = useStore<AttendanceRecord>(initialAttendance);
-  
+
   const [payrollMonth, setPayrollMonth] = useState(new Date().toISOString().slice(0, 7));
   const [selectedStaffForAttendance, setSelectedStaffForAttendance] = useState<string | null>(null);
   const [viewingBill, setViewingBill] = useState<PayrollEntry | null>(null);
@@ -212,12 +213,12 @@ const HrPage: React.FC = () => {
   const setDField = <K extends keyof DutySchedule>(k: K, v: any) => setDutyForm(p => ({ ...p, [k]: v }));
   const generatePayrollForMonth = () => {
     const existingStaffIds = new Set(payroll.filter(entry => entry.month === payrollMonth).map(entry => entry.staffId));
-    
+
     const newEntries = staff.filter(member => !existingStaffIds.has(member.id)).map(member => {
       // Calculate Absences for this month
-      const memberAbsences = attendance.filter(a => 
-        a.staffId === member.id && 
-        a.date.startsWith(payrollMonth) && 
+      const memberAbsences = attendance.filter(a =>
+        a.staffId === member.id &&
+        a.date.startsWith(payrollMonth) &&
         a.status === 'Absent'
       ).length;
 
@@ -241,10 +242,10 @@ const HrPage: React.FC = () => {
     });
 
     if (newEntries.length > 0) {
-        setPayroll([...payroll, ...newEntries]);
-        toast.success(`Generated payroll for ${newEntries.length} staff members.`);
+      setPayroll([...payroll, ...newEntries]);
+      toast.success(`Generated payroll for ${newEntries.length} staff members.`);
     } else {
-        toast.info("Payroll already generated for all staff this month.");
+      toast.info("Payroll already generated for all staff this month.");
     }
   };
 
@@ -335,7 +336,7 @@ const HrPage: React.FC = () => {
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
-                             {initials(item.name)}
+                            {initials(item.name)}
                           </div>
                           <div>
                             <p className="font-bold text-foreground text-sm tracking-wide">{item.name}</p>
@@ -368,74 +369,74 @@ const HrPage: React.FC = () => {
 
         {activeSection === 'payroll' && (
           <section className="section-panel hr-main-panel bg-gradient-to-b from-background to-slate-50/50 shadow-sm border-l-4 border-slate-500">
-             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-slate-100/50 to-transparent">
-               <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Management</h2>
-             </div>
-             <div className="p-6">
-                <div className="flex flex-col md:flex-row gap-6 mb-8 bg-background border border-border/70 p-6 rounded-2xl shadow-sm relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-bl-full pointer-events-none" />
-                  <div className="flex-1 relative z-10">
-                    <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Select Month</label>
-                    <div className="flex gap-3">
-                      <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-slate-500/20 outline-none hover:border-border transition-all shadow-inner" />
-                      <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-slate-700 hover:bg-slate-800 text-white">Generate Payroll</Button>
-                    </div>
-                  </div>
-                  <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
-                    <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Salary for Month</p>
-                    <p className="text-4xl font-display font-bold text-slate-800 mt-1">{money(payrollTotal)}</p>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-slate-100/50 to-transparent">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Management</h2>
+            </div>
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row gap-6 mb-8 bg-background border border-border/70 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-bl-full pointer-events-none" />
+                <div className="flex-1 relative z-10">
+                  <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Select Month</label>
+                  <div className="flex gap-3">
+                    <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-slate-500/20 outline-none hover:border-border transition-all shadow-inner" />
+                    <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-slate-700 hover:bg-slate-800 text-white">Generate Payroll</Button>
                   </div>
                 </div>
+                <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
+                  <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Salary for Month</p>
+                  <p className="text-4xl font-display font-bold text-slate-800 mt-1">{money(payrollTotal)}</p>
+                </div>
+              </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Paid Salaries Record</h3>
-                  {payrollForMonth.length === 0 ? (
-                    <div className="text-center py-16 bg-muted/20 border-2 border-dashed border-border rounded-2xl">
-                      <Wallet className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
-                      <p className="text-base font-bold text-foreground">No payroll generated for this month</p>
-                      <p className="text-sm font-medium text-muted-foreground mt-1">Select a month and click "Generate Payroll" to populate.</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                      {payrollForMonth.map(entry => {
-                        const member = staffById[entry.staffId];
-                        return (
-                          <div key={entry.id} className="rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5">
-                            <div className="flex items-center justify-between mb-4 border-b border-border/50 pb-4">
-                              <div>
-                                <p className="text-base font-bold text-foreground tracking-tight">{member?.name ?? 'Unknown Staff'}</p>
-                                <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground mt-1 bg-muted/50 inline-flex px-1.5 py-0.5 rounded border border-border/50">{member?.role} · {member?.department}</p>
-                              </div>
-                              <StatusBadge status={entry.payoutStatus} />
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Paid Salaries Record</h3>
+                {payrollForMonth.length === 0 ? (
+                  <div className="text-center py-16 bg-muted/20 border-2 border-dashed border-border rounded-2xl">
+                    <Wallet className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-base font-bold text-foreground">No payroll generated for this month</p>
+                    <p className="text-sm font-medium text-muted-foreground mt-1">Select a month and click "Generate Payroll" to populate.</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {payrollForMonth.map(entry => {
+                      const member = staffById[entry.staffId];
+                      return (
+                        <div key={entry.id} className="rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all group hover:-translate-y-0.5">
+                          <div className="flex items-center justify-between mb-4 border-b border-border/50 pb-4">
+                            <div>
+                              <p className="text-base font-bold text-foreground tracking-tight">{member?.name ?? 'Unknown Staff'}</p>
+                              <p className="text-[11px] uppercase font-bold tracking-widest text-muted-foreground mt-1 bg-muted/50 inline-flex px-1.5 py-0.5 rounded border border-border/50">{member?.role} · {member?.department}</p>
                             </div>
-                            
-                            <div className="space-y-2.5 mb-5 text-sm font-semibold bg-muted/20 p-4 rounded-xl border border-border/40 scale-[0.98] group-hover:scale-100 transition-transform origin-center">
-                              <div className="flex justify-between text-muted-foreground items-center"><span>Base Pay</span> <span className="text-foreground tracking-tight">{money(entry.basePay)}</span></div>
-                              <div className="flex justify-between text-emerald-700 items-center"><span>Allowances</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.allowance)}</span></div>
-                              {entry.deduction > 0 && <div className="flex justify-between text-rose-600 items-center"><span>Deductions</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.deduction)}</span></div>}
+                            <StatusBadge status={entry.payoutStatus} />
+                          </div>
+
+                          <div className="space-y-2.5 mb-5 text-sm font-semibold bg-muted/20 p-4 rounded-xl border border-border/40 scale-[0.98] group-hover:scale-100 transition-transform origin-center">
+                            <div className="flex justify-between text-muted-foreground items-center"><span>Base Pay</span> <span className="text-foreground tracking-tight">{money(entry.basePay)}</span></div>
+                            <div className="flex justify-between text-emerald-700 items-center"><span>Allowances</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.allowance)}</span></div>
+                            {entry.deduction > 0 && <div className="flex justify-between text-rose-600 items-center"><span>Deductions</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.deduction)}</span></div>}
+                          </div>
+
+                          <div className="flex items-center justify-between pt-1">
+                            <div>
+                              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-0.5">Net Pay</p>
+                              <p className="text-2xl font-display font-bold text-foreground tracking-tight">{money(entry.netPay)}</p>
                             </div>
-                            
-                            <div className="flex items-center justify-between pt-1">
-                              <div>
-                                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-0.5">Net Pay</p>
-                                <p className="text-2xl font-display font-bold text-foreground tracking-tight">{money(entry.netPay)}</p>
-                              </div>
-                              <div className="flex gap-2">
-                                <Button size="sm" variant="outline" className="border-slate-200 h-9 font-bold hover:bg-slate-50" onClick={() => setViewingBill(entry)}>
-                                    <Receipt className="w-3.5 h-3.5 mr-1.5" /> Statement
-                                </Button>
-                                {entry.payoutStatus === 'Unpaid' && (
-                                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 font-bold shadow-sm" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Salary</Button>
-                                )}
-                              </div>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline" className="border-slate-200 h-9 font-bold hover:bg-slate-50" onClick={() => setViewingBill(entry)}>
+                                <Receipt className="w-3.5 h-3.5 mr-1.5" /> Statement
+                              </Button>
+                              {entry.payoutStatus === 'Unpaid' && (
+                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 font-bold shadow-sm" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Salary</Button>
+                              )}
                             </div>
                           </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-             </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           </section>
         )}
 
@@ -446,33 +447,33 @@ const HrPage: React.FC = () => {
               <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-               {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No duties are currently set up.</p> : filteredDuties.map(item => (
-                 <div key={item.id} className="hr-duty-card rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden hover:-translate-y-1">
-                   <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-500/10 to-transparent pointer-events-none" />
-                   <div className="relative z-10 flex flex-col h-full">
-                     <div className="flex justify-between items-start mb-4">
-                       <div className="flex gap-3">
-                         <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700 font-bold text-sm shrink-0 border border-amber-200 shadow-sm">{initials(staffById[item.staffId]?.name ?? 'US')}</div>
-                         <div>
-                           <p className="font-bold text-base leading-tight text-foreground tracking-tight">{staffById[item.staffId]?.name ?? 'Unknown Staff'}</p>
-                           <p className="text-[10px] uppercase tracking-widest text-amber-700 font-bold mt-1 bg-amber-50 inline-flex px-1.5 rounded">{item.dutyType}</p>
-                         </div>
-                       </div>
-                       <StatusBadge status={item.status} />
-                     </div>
-                     <div className="space-y-2 text-xs text-muted-foreground font-semibold bg-muted/30 p-3.5 rounded-xl border border-border/50 mb-4 flex-1">
-                        <div className="flex items-center gap-2"><CalendarDays className="w-3.5 h-3.5 text-primary/70" /> <span className="text-foreground">{item.dutyDate}</span> • {item.slot}</div>
-                        <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-emerald-600/70" /> <span className="text-foreground">{item.location}</span></div>
-                     </div>
-                     {item.notes && <div className="text-xs text-muted-foreground italic mb-5 border-l-2 border-amber-300 pl-2 py-0.5">"{item.notes}"</div>}
-                     
-                     <div className="flex gap-2 mt-auto pt-4 border-t border-border/60">
-                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold bg-muted/40 hover:bg-muted" onClick={() => openEditDuty(item)}><Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground group-hover:text-foreground" />Edit</Button>
-                        <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDutyDeleteId(item.id)}><Trash2 className="h-3.5 w-3.5 mr-2" />Delete</Button>
-                     </div>
-                   </div>
-                 </div>
-               ))}
+              {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No duties are currently set up.</p> : filteredDuties.map(item => (
+                <div key={item.id} className="hr-duty-card rounded-2xl border border-border bg-background p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden hover:-translate-y-1">
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-amber-500/10 to-transparent pointer-events-none" />
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700 font-bold text-sm shrink-0 border border-amber-200 shadow-sm">{initials(staffById[item.staffId]?.name ?? 'US')}</div>
+                        <div>
+                          <p className="font-bold text-base leading-tight text-foreground tracking-tight">{staffById[item.staffId]?.name ?? 'Unknown Staff'}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-amber-700 font-bold mt-1 bg-amber-50 inline-flex px-1.5 rounded">{item.dutyType}</p>
+                        </div>
+                      </div>
+                      <StatusBadge status={item.status} />
+                    </div>
+                    <div className="space-y-2 text-xs text-muted-foreground font-semibold bg-muted/30 p-3.5 rounded-xl border border-border/50 mb-4 flex-1">
+                      <div className="flex items-center gap-2"><CalendarDays className="w-3.5 h-3.5 text-primary/70" /> <span className="text-foreground">{item.dutyDate}</span> • {item.slot}</div>
+                      <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-emerald-600/70" /> <span className="text-foreground">{item.location}</span></div>
+                    </div>
+                    {item.notes && <div className="text-xs text-muted-foreground italic mb-5 border-l-2 border-amber-300 pl-2 py-0.5">"{item.notes}"</div>}
+
+                    <div className="flex gap-2 mt-auto pt-4 border-t border-border/60">
+                      <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold bg-muted/40 hover:bg-muted" onClick={() => openEditDuty(item)}><Pencil className="h-3.5 w-3.5 mr-2 text-muted-foreground group-hover:text-foreground" />Edit</Button>
+                      <Button variant="ghost" size="sm" className="flex-1 h-9 font-bold text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDutyDeleteId(item.id)}><Trash2 className="h-3.5 w-3.5 mr-2" />Delete</Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
         )}
@@ -500,12 +501,12 @@ const HrPage: React.FC = () => {
                       <td className="p-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
-                             {initials(item.name)}
+                            {initials(item.name)}
                           </div>
                           <div>
                             <p className="font-bold text-foreground text-sm tracking-wide">{item.name}</p>
                             <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground mt-1 flex gap-2">
-                               <span><Phone className="w-3 h-3 inline pb-0.5 opacity-70" /> {item.contact}</span>
+                              <span><Phone className="w-3 h-3 inline pb-0.5 opacity-70" /> {item.contact}</span>
                             </p>
                           </div>
                         </div>
@@ -539,31 +540,31 @@ const HrPage: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="p-6">
               {/* Attendance Statistics */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                 <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-slate-200 transition-all">
-                    <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:scale-110 transition-transform"><Users className="w-6 h-6" /></div>
-                    <div>
-                       <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none mb-1.5 text-center">Total Staff</p>
-                       <p className="text-2xl font-display font-bold text-slate-800 leading-none">{staff.length}</p>
-                    </div>
-                 </div>
-                 <div className="bg-emerald-50 border border-emerald-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-emerald-100/40 transition-all">
-                    <div className="w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6" /></div>
-                    <div>
-                       <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest leading-none mb-1.5">Present Today</p>
-                       <p className="text-2xl font-display font-bold text-emerald-800 leading-none">{staff.length - attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
-                    </div>
-                 </div>
-                 <div className="bg-rose-50 border border-rose-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-rose-100/40 transition-all">
-                    <div className="w-12 h-12 rounded-2xl bg-white text-rose-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><UserX className="w-6 h-6" /></div>
-                    <div>
-                       <p className="text-[10px] uppercase font-bold text-rose-700 tracking-widest leading-none mb-1.5">Absent Today</p>
-                       <p className="text-2xl font-display font-bold text-rose-800 leading-none">{attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
-                    </div>
-                 </div>
+                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-slate-200 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:scale-110 transition-transform"><Users className="w-6 h-6" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none mb-1.5 text-center">Total Staff</p>
+                    <p className="text-2xl font-display font-bold text-slate-800 leading-none">{staff.length}</p>
+                  </div>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-emerald-100/40 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest leading-none mb-1.5">Present Today</p>
+                    <p className="text-2xl font-display font-bold text-emerald-800 leading-none">{staff.length - attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
+                  </div>
+                </div>
+                <div className="bg-rose-50 border border-rose-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-rose-100/40 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-white text-rose-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><UserX className="w-6 h-6" /></div>
+                  <div>
+                    <p className="text-[10px] uppercase font-bold text-rose-700 tracking-widest leading-none mb-1.5">Absent Today</p>
+                    <p className="text-2xl font-display font-bold text-rose-800 leading-none">{attendance.filter(a => a.date === new Date().toISOString().split('T')[0] && a.status === 'Absent').length}</p>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -571,7 +572,7 @@ const HrPage: React.FC = () => {
                   const todayStr = new Date().toISOString().split('T')[0];
                   const record = attendance.find(a => a.staffId === member.id && a.date === todayStr);
                   const isAbsent = record?.status === 'Absent';
-                  
+
                   return (
                     <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group overflow-hidden relative ${isAbsent ? 'bg-rose-50 border-rose-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40'}`}>
                       {isAbsent && <div className="absolute top-0 right-0 w-16 h-16 bg-rose-200/20 rounded-bl-full pointer-events-none" />}
@@ -582,55 +583,70 @@ const HrPage: React.FC = () => {
                         <div>
                           <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-rose-900 group-hover:text-rose-950' : 'text-slate-800 group-hover:text-black'}`}>
                             {member.name}
-                            {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-rose-200 text-rose-700 text-[9px] uppercase tracking-tighter rounded font-black">Absent</span>}
+                            {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-rose-200 text-rose-700 text-[9px] uppercase tracking-tighter rounded font-black">{record.leaveType || 'Absent'}</span>}
                           </p>
                           <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-0.5">{member.role} • {member.department}</p>
                         </div>
                       </div>
-                      
-                      <Button 
-                        onClick={() => {
+
+                      <div className="flex items-center gap-3">
+                        {isAbsent && (
+                          <div className="flex gap-1 animate-in fade-in slide-in-from-right-2 duration-300">
+                            {(['Sick', 'Casual'] as const).map(type => (
+                              <button
+                                key={type}
+                                onClick={() => updateAttendance(record.id, { leaveType: type })}
+                                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-tight transition-all border ${record.leaveType === type ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-white text-rose-600 border-rose-100 hover:border-rose-300'}`}
+                              >
+                                {type} Leave
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <Button
+                          onClick={() => {
                             if (record) {
-                                if (record.status === 'Absent') {
-                                    removeAttendance(record.id);
-                                    toast.success(`${member.name} marked as Present`, { icon: '✅' });
-                                }
+                              if (record.status === 'Absent') {
+                                removeAttendance(record.id);
+                                toast.success(`${member.name} marked as Present`, { icon: '✅' });
+                              }
                             } else {
-                                addAttendance({
-                                    id: `AT-${member.id}-${todayStr}`,
-                                    staffId: member.id,
-                                    date: todayStr,
-                                    status: 'Absent'
-                                });
-                                toast.error(`${member.name} marked as Absent`, { icon: '❌' });
+                              addAttendance({
+                                staffId: member.id,
+                                date: todayStr,
+                                status: 'Absent',
+                                leaveType: 'Casual'
+                              });
+                              toast.error(`${member.name} marked as Absent`, { icon: '❌' });
                             }
-                        }}
-                        className={`rounded-xl h-10 w-10 flex items-center justify-center p-0 transition-all shadow-sm ${isAbsent ? 'bg-rose-600 text-white hover:bg-rose-700 shadow-rose-200' : 'bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 border border-slate-100'}`}
-                      >
-                         {isAbsent ? <X className="w-5 h-5" /> : <UserX className="w-5 h-5" />}
-                      </Button>
+                          }}
+                          className={`rounded-xl h-10 w-10 flex items-center justify-center p-0 transition-all shadow-sm ${isAbsent ? 'bg-rose-600 text-white hover:bg-rose-700 shadow-rose-200' : 'bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 border border-slate-100'}`}
+                        >
+                          {isAbsent ? <X className="w-5 h-5" /> : <UserX className="w-5 h-5" />}
+                        </Button>
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              
+
               <div className="mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 border-none rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-indigo-100 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -ml-16 -mb-16" />
-                
+
                 <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center shadow-inner">
-                        <Wallet className="w-8 h-8" />
-                    </div>
-                    <div>
-                        <p className="text-indigo-100 text-[11px] font-bold uppercase tracking-widest mb-1.5 opacity-80">Connected Subsystem</p>
-                        <h3 className="text-xl font-display font-bold text-white leading-none">Automated Payroll Deduction</h3>
-                        <p className="text-indigo-100 text-sm font-medium mt-2 max-w-md">Every absence recorded in this registry is automatically calculated as a Loss of Pay (L.O.P.) during the monthly payroll generation.</p>
-                    </div>
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center shadow-inner">
+                    <Wallet className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <p className="text-indigo-100 text-[11px] font-bold uppercase tracking-widest mb-1.5 opacity-80">Connected Subsystem</p>
+                    <h3 className="text-xl font-display font-bold text-white leading-none">Payroll Reconciliation</h3>
+                    <p className="text-indigo-100 text-sm font-medium mt-2 max-w-md">Automated attendance records ensure precise, real-time payroll adjustments.</p>
+                  </div>
                 </div>
                 <div className="bg-white/20 backdrop-blur-sm px-6 py-4 rounded-2xl border border-white/30 text-white font-black text-center relative z-10 group hover:bg-white/30 transition-all cursor-default">
-                    <p className="text-[10px] uppercase tracking-[0.2em] mb-1 opacity-80">Status</p>
-                    <p className="text-lg">L.O.P. ACTIVE</p>
+                  <p className="text-[10px] uppercase tracking-[0.2em] mb-1 opacity-80">System Status</p>
+                  <p className="text-lg capitalize">Synchronized</p>
                 </div>
               </div>
             </div>
@@ -639,13 +655,19 @@ const HrPage: React.FC = () => {
       </div>
 
       {/* Viewing Bill Modal */}
-      <Modal open={!!viewingBill} onClose={() => setViewingBill(null)} title="Official Salary Bill">
+      <Modal
+        open={!!viewingBill}
+        onClose={() => setViewingBill(null)}
+        title=""
+        containerClassName="max-w-[1100px]"
+        bodyClassName="p-3 md:p-4"
+      >
         {viewingBill && (
-            <SalarySlip 
-                entry={viewingBill} 
-                member={staffById[viewingBill.staffId]} 
-                onClose={() => setViewingBill(null)} 
-            />
+          <SalarySlip
+            entry={viewingBill}
+            member={staffById[viewingBill.staffId]}
+            onClose={() => setViewingBill(null)}
+          />
         )}
       </Modal>
 
@@ -654,19 +676,19 @@ const HrPage: React.FC = () => {
         <div className="hr-form-shell grid grid-cols-2 gap-4 px-1 py-2">
           <FormField label="Full Name" value={staffForm.name} onChange={v => setSField('name', v)} required />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Role</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value)}>
-                <option value="Priest">Priest</option><option value="Staff">Support Staff</option>
-             </select>
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Role</label>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value)}>
+              <option value="Priest">Priest</option><option value="Staff">Support Staff</option>
+            </select>
           </div>
           <FormField label="Department" value={staffForm.department} onChange={v => setSField('department', v)} />
           <FormField label="Joining Date" value={staffForm.joinedDate} onChange={v => setSField('joinedDate', v)} type="date" />
           <FormField label="Salary (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', v)} type="number" />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Status</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value)}>
-                <option value="Active">Active</option><option value="Inactive">Inactive</option>
-             </select>
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Status</label>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value)}>
+              <option value="Active">Active</option><option value="Inactive">Inactive</option>
+            </select>
           </div>
           <FormField label="Phone Number" value={staffForm.phone} onChange={v => setSField('phone', v)} />
           <FormField label="Email Address" value={staffForm.email} onChange={v => setSField('email', v)} type="email" />
@@ -681,34 +703,34 @@ const HrPage: React.FC = () => {
       <Modal open={dutyModalOpen} onClose={() => setDutyModalOpen(false)} title={dutyEditId ? 'Edit Duty Details' : 'Assign New Duty'}>
         <div className="hr-form-shell grid grid-cols-2 gap-4 px-1 py-2">
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Member</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.staffId} onChange={e => setDField('staffId', e.target.value)}>
-                {staff.filter(s => s.status === 'Active').map(s => <option key={s.id} value={s.id}>{s.name} ({s.role})</option>)}
-             </select>
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Member</label>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.staffId} onChange={e => setDField('staffId', e.target.value)}>
+              {staff.filter(s => s.status === 'Active').map(s => <option key={s.id} value={s.id}>{s.name} ({s.role})</option>)}
+            </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Type</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.dutyType} onChange={e => setDField('dutyType', e.target.value)}>
-                {dutyTypeOptions.map(t => <option key={t} value={t}>{t}</option>)}
-             </select>
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Type</label>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={dutyForm.dutyType} onChange={e => setDField('dutyType', e.target.value)}>
+              {dutyTypeOptions.map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
           </div>
           <FormField label="Duty Date" value={dutyForm.dutyDate} onChange={v => setDField('dutyDate', v)} type="date" />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Time Slot</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.slot} onChange={e => setDField('slot', e.target.value)}>
-                 <option>05:00 AM - 09:00 AM</option><option>09:00 AM - 01:00 PM</option><option>01:00 PM - 05:00 PM</option><option>05:00 PM - 09:00 PM</option>
-             </select>
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Time Slot</label>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.slot} onChange={e => setDField('slot', e.target.value)}>
+              <option>05:00 AM - 09:00 AM</option><option>09:00 AM - 01:00 PM</option><option>01:00 PM - 05:00 PM</option><option>05:00 PM - 09:00 PM</option>
+            </select>
           </div>
           <FormField label="Location" value={dutyForm.location} onChange={v => setDField('location', v)} />
           <div className="space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Status</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.status} onChange={e => setDField('status', e.target.value)}>
-                <option value="Scheduled">Scheduled</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
-             </select>
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Duty Status</label>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-bold" value={dutyForm.status} onChange={e => setDField('status', e.target.value)}>
+              <option value="Scheduled">Scheduled</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
+            </select>
           </div>
           <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Optional Notes</label>
-             <textarea className="w-full rounded-xl border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm" value={dutyForm.notes} onChange={e => setDField('notes', e.target.value)} placeholder="Type specific instructions..." />
+            <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Optional Notes</label>
+            <textarea className="w-full rounded-xl border border-input bg-background/80 px-3 py-3 text-sm min-h-[100px] resize-none outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium shadow-sm" value={dutyForm.notes} onChange={e => setDField('notes', e.target.value)} placeholder="Type specific instructions..." />
           </div>
           <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
             <Button variant="outline" onClick={() => setDutyModalOpen(false)} className="flex-1 py-5">Cancel</Button>
@@ -720,7 +742,7 @@ const HrPage: React.FC = () => {
       {/* Volunteer Modal */}
       <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Edit Volunteer Details' : 'Add New Volunteer'}>
         <div className="p-1">
-          <VolunteerForm 
+          <VolunteerForm
             initialData={volEditId ? volunteers.find(v => v.id === volEditId) : null}
             onSave={(data) => {
               if (volEditId) updateVolunteer(volEditId, data as any);
