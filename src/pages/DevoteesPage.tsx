@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar, Search, Users, ShieldCheck, HeartHandshake, History, CreditCard, Clock, CheckCircle2, Maximize2, UserPlus, Crown } from 'lucide-react';
+import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar, Search, Users, ShieldCheck, HeartHandshake, History, CreditCard, Clock, CheckCircle2, Maximize2, UserPlus, Crown, Award, Medal } from 'lucide-react';
 import { mockDevotees, mockDonations, mockBookings, mockEvents } from '@/data/mockData';
 import { useStore } from '@/hooks/useStore';
 import Modal from '@/components/Modal';
@@ -270,6 +270,13 @@ function deriveDevoteeProfile(devotee: Devotee, donations: Donation[], bookings:
     : 'No recent offerings';
 
   return { dateOfBirth, memberSince: fmtDate(memberSince), preferredSeva, offeringSummary };
+}
+
+function getDonationTier(total: number) {
+  if (total >= 100000) return { label: 'Platinum', icon: Crown, color: 'text-indigo-700 bg-indigo-50 border-indigo-200', fill: 'fill-indigo-500/20' };
+  if (total >= 50000) return { label: 'Gold', icon: Award, color: 'text-amber-700 bg-amber-50 border-amber-200', fill: 'fill-amber-500/20' };
+  if (total >= 10000) return { label: 'Silver', icon: Medal, color: 'text-slate-700 bg-slate-50 border-slate-200', fill: 'fill-slate-500/20' };
+  return { label: 'Devotee', icon: HeartHandshake, color: 'text-emerald-700 bg-emerald-50 border-emerald-200', fill: 'fill-emerald-500/10' };
 }
 
 const DevoteesPage: React.FC = () => {
@@ -938,7 +945,19 @@ const DevoteesPage: React.FC = () => {
                     {selectedDevotee && getInitials(selectedDevotee.name)}
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold font-display text-foreground leading-tight tracking-tight mb-1">{selectedDevotee?.name}</h2>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <h2 className="text-2xl font-bold font-display text-foreground leading-tight tracking-tight">{selectedDevotee?.name}</h2>
+                      {selectedDevotee && (() => {
+                        const tier = getDonationTier(selectedDevotee.totalDonations);
+                        const TierIcon = tier.icon;
+                        return (
+                          <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border shadow-sm ${tier.color}`}>
+                            <TierIcon className={`h-3 w-3 ${tier.fill}`} />
+                            {tier.label}
+                          </div>
+                        );
+                      })()}
+                    </div>
                     <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {selectedDevotee?.city}, {selectedDevotee?.state}</p>
                     <div className="flex gap-2 mt-3 items-center">
                        <StatusBadge status={selectedDevotee?.status || 'Active'} />

@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CalendarDays, Heart,
   CalendarCheck, Package, Building2, BarChart3, Briefcase,
-  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car
+  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car, HeartHandshake, Hotel
 } from 'lucide-react';
 
 import logo from '@/assets/img/logo.png'; 
@@ -18,12 +18,14 @@ const adminLinks = [
   { to: '/hr', label: 'HR', icon: Briefcase},
   // { to: '/procurement', label: 'Procurement', icon: ShoppingCart},
   { to: '/donations', label: 'Donations', icon: ShoppingCart  },
+  { to: '/hall-booking', label: 'Hall Booking', icon: Hotel },
   { to: '/events', label: 'Events & Calendar', icon: CalendarCheck },
   { to: '/campaign', label: 'Campaigns', icon: Megaphone },
   // { to: '/tasks', label: 'Tasks', icon: CheckSquare },
   { to: '/inventory', label: 'Inventory', icon: Package },
   { to: '/assets', label: 'Assets', icon: Building2 },
   { to: '/parking', label: 'Parking', icon: Car },
+  { to: '/volunteers', label: 'Volunteers', icon: HeartHandshake },
   { to: '/reports', label: 'Documents', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];

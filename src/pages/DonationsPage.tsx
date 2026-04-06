@@ -1,6 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, ReceiptText, QrCode, CreditCard, ShieldCheck, Smartphone, Target, HandHeart, Search, Filter } from 'lucide-react';
+import { 
+  Plus, Pencil, Trash2, ReceiptText, QrCode, CreditCard, 
+  ShieldCheck, Smartphone, Target, HandHeart, Search, Filter, 
+  Crown, Award, Medal, Users, Send, TrendingUp, History, 
+  UserCheck, AlertTriangle, BarChart3, LayoutList,
+  Phone, Mail, Calendar
+} from 'lucide-react';
 import { mockDonations } from '@/data/mockData';
 import { useStore } from '@/hooks/useStore';
 import { formatDateDDMMYYYY } from '@/lib/utils';
@@ -8,6 +14,22 @@ import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
+import { toast } from 'sonner';
+
+type DonorTier = 'Platinum' | 'Gold' | 'Silver' | 'Member';
+
+interface DonorProfile {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  totalAmount: number;
+  frequency: number;
+  lastDonationDate: string;
+  preferredCategory: string;
+  tier: DonorTier;
+  isInactive: boolean;
+}
 
 type DonationChannel = 'Hundi' | 'Online' | 'Counter';
 type DonationCategory = 'General' | 'Annadanam' | 'Temple Renovation' | 'Festival Fund' | 'Education' | 'Medical Aid';
@@ -37,34 +59,9 @@ const channelOptions: DonationChannel[] = ['Hundi', 'Online', 'Counter'];
 const categoryOptions: DonationCategory[] = ['General', 'Annadanam', 'Temple Renovation', 'Festival Fund', 'Education', 'Medical Aid'];
 const methodOptions: PaymentMethod[] = ['Cash', 'UPI', 'Card'];
 
-function mapChannel(method: string): DonationChannel {
-  if (method === 'UPI' || method === 'Card') return 'Online';
-  return 'Counter';
+function money(n: number) {
+  return `₹ ${n.toLocaleString('en-IN')}`;
 }
-
-function mapGateway(method: string): Gateway {
-  if (method === 'UPI') return 'PhonePe';
-  if (method === 'Card') return 'Razorpay';
-  return 'Temple POS';
-}
-
-const initialDonations: DonationRecord[] = mockDonations.map((item, idx) => ({
-  id: `seed-${item.id}`,
-  donationCode: item.id,
-  donorName: item.donorName,
-  phone: '',
-  email: '',
-  category: (categoryOptions.includes(item.category as DonationCategory) ? item.category : 'General') as DonationCategory,
-  amount: item.amount,
-  date: item.date,
-  channel: mapChannel(item.paymentMethod),
-  paymentMethod: (methodOptions.includes(item.paymentMethod as PaymentMethod) ? item.paymentMethod : 'Cash') as PaymentMethod,
-  gateway: mapGateway(item.paymentMethod),
-  transactionRef: `TXN-${item.id}`,
-  paymentStatus: 'Success',
-  receiptNumber: `RC-${String(idx + 1).padStart(4, '0')}`,
-  notes: '',
-}));
 
 const emptyForm = {
   donorName: '',
@@ -105,10 +102,6 @@ function createTxnRef(gateway: Gateway) {
   return `${prefix}-${serial}`;
 }
 
-function money(n: number) {
-  return `₹ ${n.toLocaleString('en-IN')}`;
-}
-
 function inSelectedPeriod(dateText: string, period: ReportPeriod, start: string, end: string) {
   if (!dateText) return false;
   if (period === 'all') return true;
@@ -141,7 +134,7 @@ function inSelectedPeriod(dateText: string, period: ReportPeriod, start: string,
 }
 
 const DonationsPage: React.FC = () => {
-  const { items, add, update, remove } = useStore<DonationRecord>(initialDonations);
+  const { items, add, update, remove } = useStore<DonationRecord>(mockDonations as DonationRecord[]);
 
   const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
@@ -153,6 +146,54 @@ const DonationsPage: React.FC = () => {
   const [reportPeriod, setReportPeriod] = useState<ReportPeriod>('month');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
+  const [activeTab, setActiveTab] = useState<'ledger' | 'analytics'>('ledger');
+  const [selectedProfile, setSelectedProfile] = useState<DonorProfile | null>(null);
+
+  const donorProfiles = useMemo(() => {
+    const profiles: DonorProfile[] = [];
+    const donorsMap = new Map<string, DonationRecord[]>();
+
+    items.forEach(rec => {
+      const key = rec.phone || rec.donorName;
+      if (!donorsMap.has(key)) donorsMap.set(key, []);
+      donorsMap.get(key)!.push(rec);
+    });
+
+    donorsMap.forEach((donations, key) => {
+      const latest = donations.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      const totalAmount = donations.reduce((sum, d) => sum + d.amount, 0);
+      const frequency = donations.length;
+      
+      const catCounts: Record<string, number> = {};
+      donations.forEach(d => catCounts[d.category] = (catCounts[d.category] || 0) + 1);
+      const preferredCategory = Object.entries(catCounts).sort((a, b) => b[1] - a[1])[0][0];
+
+      const lastDate = new Date(latest.date);
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      const isInactive = lastDate < sixMonthsAgo;
+
+      let tier: DonorTier = 'Member';
+      if (totalAmount >= 100000 || (totalAmount >= 50000 && frequency >= 10)) tier = 'Platinum';
+      else if (totalAmount >= 25000 || (totalAmount >= 10000 && frequency >= 5)) tier = 'Gold';
+      else if (totalAmount >= 5000 || frequency >= 2) tier = 'Silver';
+
+      profiles.push({
+        id: key,
+        name: latest.donorName,
+        phone: latest.phone,
+        email: latest.email,
+        totalAmount,
+        frequency,
+        lastDonationDate: latest.date,
+        preferredCategory,
+        tier,
+        isInactive
+      });
+    });
+
+    return profiles.sort((a, b) => b.totalAmount - a.totalAmount);
+  }, [items]);
 
   const periodItems = useMemo(
     () => items.filter(item => inSelectedPeriod(item.date, reportPeriod, customFrom, customTo)),
@@ -265,180 +306,284 @@ const DonationsPage: React.FC = () => {
         <Button onClick={openAdd} className="donations-cta shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Record Donation</Button>
       </div>
 
-      <div className="donations-filter-bar flex flex-col sm:flex-row items-center gap-3 justify-between bg-card p-3 rounded-xl border border-border shadow-sm flex-wrap">
-        <div className="flex flex-wrap items-center gap-2">
-          {[
-            { key: 'all', label: 'All Time' },
-            { key: 'today', label: 'Today' },
-            { key: 'week', label: 'Last 7 Days' },
-            { key: 'month', label: 'This Month' },
-            { key: 'custom', label: 'Custom Range' },
-          ].map(option => (
-            <button
-              key={option.key}
-              onClick={() => setReportPeriod(option.key as ReportPeriod)}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border ${reportPeriod === option.key
-                  ? 'bg-emerald-100 text-emerald-800 border-emerald-200 shadow-sm scale-105'
-                  : 'bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/80 hover:text-foreground'
-                }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-        {reportPeriod === 'custom' && (
-          <div className="flex items-center gap-2 animate-fade-in bg-muted/20 p-1.5 rounded-lg border border-border">
-            <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)} className="h-9 rounded-md border border-input bg-background px-3 text-xs focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all" />
-            <span className="text-muted-foreground text-xs font-bold">—</span>
-            <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)} className="h-9 rounded-md border border-input bg-background px-3 text-xs focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all" />
-          </div>
-        )}
+      <div className="flex bg-muted/40 p-1 rounded-xl w-fit border border-border/60 mb-2">
+        <button 
+          onClick={() => setActiveTab('ledger')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'ledger' ? 'bg-white text-emerald-700 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <LayoutList className="w-4 h-4" /> Transaction Ledger
+        </button>
+        <button 
+          onClick={() => setActiveTab('analytics')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all ${activeTab === 'analytics' ? 'bg-white text-indigo-700 shadow-sm font-display' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <BarChart3 className="w-4 h-4" /> Donor Analytics System {donorProfiles.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-indigo-50 text-indigo-600 text-[10px] rounded-full border border-indigo-100">{donorProfiles.length}</span>}
+        </button>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-stagger">
-        <div className="stat-card donations-stat-card flex flex-col justify-between bg-emerald-50/40 border-emerald-100">
-          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 mb-1 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Total Collection</p>
-          <div className="flex items-end justify-between mt-auto pt-2">
-            <p className="text-3xl font-display font-bold text-foreground tracking-tight">{money(reports.total)}</p>
+      {activeTab === 'ledger' ? (
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-400">
+          <div className="donations-filter-bar flex flex-col sm:flex-row items-center gap-3 justify-between bg-card p-3 rounded-xl border border-border shadow-sm flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
+              {[
+                { key: 'all', label: 'All Time' },
+                { key: 'today', label: 'Today' },
+                { key: 'week', label: 'Last 7 Days' },
+                { key: 'month', label: 'This Month' },
+                { key: 'custom', label: 'Custom Range' },
+              ].map(option => (
+                <button
+                  key={option.key}
+                  onClick={() => setReportPeriod(option.key as ReportPeriod)}
+                  className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 border ${reportPeriod === option.key
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200 shadow-sm scale-105'
+                    : 'bg-muted/30 text-muted-foreground border-transparent hover:bg-muted/80 hover:text-foreground'
+                    }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            {reportPeriod === 'custom' && (
+              <div className="flex items-center gap-2 animate-fade-in bg-muted/20 p-1.5 rounded-lg border border-border">
+                <input type="date" value={customFrom} onChange={e => setCustomFrom(e.target.value)} className="h-9 rounded-md border border-input bg-background px-3 text-xs focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all" />
+                <span className="text-muted-foreground text-xs font-bold">—</span>
+                <input type="date" value={customTo} onChange={e => setCustomTo(e.target.value)} className="h-9 rounded-md border border-input bg-background px-3 text-xs focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all" />
+              </div>
+            )}
           </div>
-        </div>
 
-        <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-muted/40 rounded-bl-[100%] transition-transform group-hover:scale-110" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Hundi Drop</p>
-          <p className="text-2xl font-bold text-foreground mt-2">{money(reports.byChannel.Hundi)}</p>
-        </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-stagger">
+            <div className="stat-card donations-stat-card flex flex-col justify-between bg-emerald-50/40 border-emerald-100">
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 mb-1 flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Total Collection</p>
+              <div className="flex items-end justify-between mt-auto pt-2">
+                <p className="text-3xl font-display font-bold text-foreground tracking-tight">{money(reports.total)}</p>
+              </div>
+            </div>
 
-        <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-[100%] transition-transform group-hover:scale-110" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-blue-700 mb-1">Online Transfer</p>
-          <p className="text-2xl font-bold text-blue-700 mt-2">{money(reports.byChannel.Online)}</p>
-        </div>
+            <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-muted/40 rounded-bl-[100%] transition-transform group-hover:scale-110" />
+              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground mb-1">Hundi Drop</p>
+              <p className="text-2xl font-bold text-foreground mt-2">{money(reports.byChannel.Hundi)}</p>
+            </div>
 
-        <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-50 rounded-bl-[100%] transition-transform group-hover:scale-110" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-700 mb-1">Office Counter</p>
-          <p className="text-2xl font-bold text-emerald-700 mt-2">{money(reports.byChannel.Counter)}</p>
-        </div>
-      </div>
+            <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-blue-50 rounded-bl-[100%] transition-transform group-hover:scale-110" />
+              <p className="text-[11px] uppercase tracking-widest font-bold text-blue-700 mb-1">Online Transfer</p>
+              <p className="text-2xl font-bold text-blue-700 mt-2">{money(reports.byChannel.Online)}</p>
+            </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-5">
-        <div className="section-panel donations-ledger-panel shadow-sm xl:col-span-3">
-          <div className="section-panel-header gap-3 border-b border-border/60 pb-3">
-            <h2 className="text-sm font-semibold flex items-center gap-2"><Filter className="w-4 h-4 text-emerald-600" /> Donation Master Ledger</h2>
-            <div className="relative flex-1 max-w-sm ml-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                className="w-full h-10 pl-9 pr-3 text-sm border border-input rounded-lg bg-background/60 hover:border-border transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm"
-                placeholder="Search ref code, donor, category..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
+            <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-50 rounded-bl-[100%] transition-transform group-hover:scale-110" />
+              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-700 mb-1">Office Counter</p>
+              <p className="text-2xl font-bold text-emerald-700 mt-2">{money(reports.byChannel.Counter)}</p>
             </div>
           </div>
 
-          <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/40">
-                <tr className="border-b border-border">
-                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[8%] text-xs">Ref ID</th>
-                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Donor Name</th>
-                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[8%] text-xs">Channel</th>
-                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Category</th>
-                  <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Payment Information</th>
-                  <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[10%] text-emerald-800 text-xs">Total Amount</th>
-                  <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-background">
-                {filtered.length === 0 ? <tr><td colSpan={7} className="p-10 text-center text-muted-foreground border-b border-border">No donations found. Check active filters.</td></tr> : filtered.map(item => (
-                  <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                    <td className="py-4 px-3 align-top">
-                      <p className="font-bold text-foreground text-xs">{item.donationCode}</p>
-                    </td>
-                    <td className="py-4 px-3 align-top">
-                      <p className="font-bold text-foreground truncate w-full" title={item.donorName}>{item.donorName}</p>
-                    </td>
-                    <td className="py-4 px-3 align-top">
-                       <div className="flex items-center gap-1.5">
-                         <div className={`w-1.5 h-1.5 rounded-full ${item.channel === 'Online' ? 'bg-blue-500' : item.channel === 'Hundi' ? 'bg-muted-foreground' : 'bg-emerald-500'}`} />
-                         <span className="text-[11px] font-bold text-foreground/80">{item.channel}</span>
-                       </div>
-                    </td>
-                    <td className="py-4 px-3 align-top">
-                      <span className="text-accent text-[11px] font-bold tracking-wider uppercase italic">{item.category}</span>
-                    </td>
-                    <td className="py-4 px-3 align-top whitespace-nowrap">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <span className="font-bold text-foreground text-[10px] font-mono">{item.paymentMethod}</span>
-                        {item.channel === 'Online' && <span className="text-[9px] bg-muted/60 border border-border/60 px-1 py-0.5 rounded font-semibold text-muted-foreground">{item.gateway}</span>}
-                      </div>
-                      <p className="text-[10px] font-medium text-muted-foreground">{formatDateDDMMYYYY(item.date)}</p>
-                    </td>
-                    <td className="py-4 px-3 align-top text-right font-display font-bold text-foreground text-lg tracking-tight pt-3 text-emerald-700 whitespace-nowrap">{money(item.amount)}</td>
-                    <td className="py-4 px-3 align-top text-right">
-                      <div className="flex justify-end gap-1.5">
-                        <Button variant="ghost" size="icon" onClick={() => { setSelectedReceipt(item); setReceiptOpen(true); }} className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-700 shadow-sm border border-border/50 bg-background" title="View Digital Receipt">
-                          <ReceiptText className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(item)} title="Edit Record"><Pencil className="h-3.5 w-3.5" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Record"><Trash2 className="h-3.5 w-3.5" /></Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div></div>
-        </div>
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-5">
+            <div className="section-panel donations-ledger-panel shadow-sm xl:col-span-3">
+              <div className="section-panel-header gap-3 border-b border-border/60 pb-3">
+                <h2 className="text-sm font-semibold flex items-center gap-2"><Filter className="w-4 h-4 text-emerald-600" /> Donation Master Ledger</h2>
+                <div className="relative flex-1 max-w-sm ml-auto">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input
+                    className="w-full h-10 pl-9 pr-3 text-sm border border-input rounded-lg bg-background/60 hover:border-border transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm"
+                    placeholder="Search ref code, donor, category..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                  />
+                </div>
+              </div>
 
-        <div className="space-y-5 xl:sticky xl:top-4 self-start">
-          <div className="section-panel donations-side-panel shadow-sm">
-            <div className="section-panel-header bg-gradient-to-b from-sky-50/50 to-background border-b border-border/60">
-              <h2 className="text-sm font-semibold">Fund Allocation</h2>
-              <span className="text-[10px] bg-primary/10 text-primary font-bold rounded-full px-2 py-0.5">{periodItems.length} records</span>
+              <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted/40">
+                    <tr className="border-b border-border">
+                      <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[40%] text-xs">Donor & Category</th>
+                      <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[25%] text-xs">Donation Details</th>
+                      <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-emerald-800 text-xs">Amount</th>
+                      <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-background">
+                    {filtered.length === 0 ? <tr><td colSpan={4} className="p-10 text-center text-muted-foreground border-b border-border">No donations found. Check active filters.</td></tr> : filtered.map(item => (
+                      <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                        <td className="py-4 px-3 align-top">
+                          <div className="flex flex-col gap-0.5">
+                            <p className="font-bold text-foreground text-sm flex items-center gap-2">
+                              {item.donorName}
+                              <span className="text-[9px] px-1.5 py-0.5 bg-muted font-mono rounded text-muted-foreground">{item.donationCode}</span>
+                            </p>
+                            <div className="flex items-center gap-2 mt-1">
+                               <span className="text-accent text-[10px] font-bold tracking-wider uppercase italic">{item.category}</span>
+                               <span className="text-[9px] text-muted-foreground font-medium">• {item.channel}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-3 align-top whitespace-nowrap">
+                          <div className="flex items-center gap-1.5 mb-1">
+                            <span className="font-bold text-foreground text-[10px] whitespace-nowrap">{item.paymentMethod}</span>
+                            {item.channel === 'Online' && <span className="text-[9px] bg-muted/60 border border-border/60 px-1 py-0.5 rounded font-semibold text-muted-foreground">{item.gateway}</span>}
+                          </div>
+                          <p className="text-[10px] font-medium text-muted-foreground">{formatDateDDMMYYYY(item.date)}</p>
+                        </td>
+                        <td className="py-4 px-3 align-top text-right font-display font-bold text-foreground text-lg tracking-tight pt-3 text-emerald-700 whitespace-nowrap">{money(item.amount)}</td>
+                        <td className="py-4 px-3 align-top text-right">
+                          <div className="flex justify-end gap-1.5">
+                            <Button variant="ghost" size="icon" onClick={() => { setSelectedReceipt(item); setReceiptOpen(true); }} className="h-8 w-8 hover:bg-emerald-50 hover:text-emerald-700 shadow-sm border border-border/50 bg-background" title="View Digital Receipt">
+                              <ReceiptText className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(item)} title="Edit Record"><Pencil className="h-3.5 w-3.5" /></Button>
+                            <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Record"><Trash2 className="h-3.5 w-3.5" /></Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div></div>
             </div>
-            <div className="p-3 max-h-[350px] overflow-y-auto">
-              {reports.byCategory.map(([name, total]) => {
-                const pct = reports.total > 0 ? (total / reports.total) * 100 : 0;
-                return (
-                  <div key={name} className="flex flex-col gap-1 p-3 hover:bg-muted/40 rounded-xl transition-colors border border-transparent hover:border-border/60">
-                    <div className="flex items-center justify-between text-sm mb-1">
-                      <span className="font-bold text-foreground text-xs">{name}</span>
-                      <span className="font-bold text-emerald-700">{money(total)}</span>
-                    </div>
-                    <div className="w-full h-1.5 bg-muted/60 border border-border/40 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
-                    </div>
-                    <p className="text-[9px] text-muted-foreground font-bold text-right tracking-wider">{pct.toFixed(1)}%</p>
+
+            <div className="space-y-5 xl:sticky xl:top-4 self-start">
+              <div className="section-panel donations-side-panel shadow-sm">
+                <div className="section-panel-header bg-gradient-to-b from-sky-50/50 to-background border-b border-border/60">
+                  <h2 className="text-sm font-semibold">Fund Allocation</h2>
+                  <span className="text-[10px] bg-primary/10 text-primary font-bold rounded-full px-2 py-0.5">{periodItems.length} records</span>
+                </div>
+                <div className="p-3 max-h-[350px] overflow-y-auto">
+                  {reports.byCategory.map(([name, total]) => {
+                    const pct = reports.total > 0 ? (total / reports.total) * 100 : 0;
+                    return (
+                      <div key={name} className="flex flex-col gap-1 p-3 hover:bg-muted/40 rounded-xl transition-colors border border-transparent hover:border-border/60">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="font-bold text-foreground text-xs">{name}</span>
+                          <span className="font-bold text-emerald-700">{money(total)}</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-muted/60 border border-border/40 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                        </div>
+                        <p className="text-[9px] text-muted-foreground font-bold text-right tracking-wider">{pct.toFixed(1)}%</p>
+                      </div>
+                    );
+                  })}
+                  {reports.byCategory.length === 0 && <p className="p-5 text-sm text-center text-muted-foreground italic font-medium">No category data present.</p>}
+                </div>
+              </div>
+
+              <div className="section-panel donations-side-panel shadow-sm">
+                <div className="section-panel-header border-b border-border/60">
+                  <h2 className="text-sm font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4 text-primary" /> Settlement Sources</h2>
+                </div>
+                <div className="p-4 space-y-2">
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/10 hover:border-primary/20 transition-colors">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Cash</span>
+                    <span className="font-bold text-base">{money(reports.byMethod.Cash)}</span>
                   </div>
-                );
-              })}
-              {reports.byCategory.length === 0 && <p className="p-5 text-sm text-center text-muted-foreground italic font-medium">No category data present.</p>}
-            </div>
-          </div>
-
-          <div className="section-panel donations-side-panel shadow-sm">
-            <div className="section-panel-header border-b border-border/60">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><CreditCard className="w-4 h-4 text-primary" /> Settlement Sources</h2>
-            </div>
-            <div className="p-4 space-y-2">
-              <div className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-muted/10 hover:border-primary/20 transition-colors">
-                <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Cash</span>
-                <span className="font-bold text-base">{money(reports.byMethod.Cash)}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg border border-blue-100 bg-blue-50/30 hover:border-blue-200 transition-colors">
-                <span className="text-xs font-bold text-blue-800 uppercase tracking-widest">UPI Scan</span>
-                <span className="font-bold text-base text-blue-700">{money(reports.byMethod.UPI)}</span>
-              </div>
-              <div className="flex items-center justify-between p-3 rounded-lg border border-emerald-100 bg-emerald-50/30 hover:border-emerald-200 transition-colors">
-                <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest">Card Swipe</span>
-                <span className="font-bold text-base text-emerald-700">{money(reports.byMethod.Card)}</span>
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-blue-100 bg-blue-50/30 hover:border-blue-200 transition-colors">
+                    <span className="text-xs font-bold text-blue-800 uppercase tracking-widest">UPI Scan</span>
+                    <span className="font-bold text-base text-blue-700">{money(reports.byMethod.UPI)}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-emerald-100 bg-emerald-50/30 hover:border-emerald-200 transition-colors">
+                    <span className="text-xs font-bold text-emerald-800 uppercase tracking-widest">Card Swipe</span>
+                    <span className="font-bold text-base text-emerald-700">{money(reports.byMethod.Card)}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="donor-segmentation-engine space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-10">
+           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Summary Stats Cards */}
+              <div className="lg:col-span-4 grid grid-cols-2 md:grid-cols-4 gap-4 animate-stagger">
+                <div className="p-6 rounded-2xl border border-indigo-100 bg-indigo-50/20 shadow-sm transition-all hover:shadow-md">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-indigo-600 mb-1 flex items-center gap-1.5"><Crown className="w-4 h-4" /> Platinum</p>
+                  <p className="text-4xl font-display font-bold text-indigo-900 mt-2">{donorProfiles.filter(p => p.tier === 'Platinum').length}</p>
+                  <p className="text-[10px] mt-2 text-indigo-400 font-bold uppercase italic tracking-wider">Elite Patron Base</p>
+                </div>
+                <div className="p-6 rounded-2xl border border-amber-100 bg-amber-50/20 shadow-sm transition-all hover:shadow-md">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-amber-600 mb-1 flex items-center gap-1.5"><Medal className="w-4 h-4" /> Gold Tier</p>
+                  <p className="text-4xl font-display font-bold text-amber-900 mt-2">{donorProfiles.filter(p => p.tier === 'Gold').length}</p>
+                  <p className="text-[10px] mt-2 text-amber-400 font-bold uppercase italic tracking-wider">Core Supporters</p>
+                </div>
+                <div className="p-6 rounded-2xl border border-slate-100 bg-slate-50/20 shadow-sm transition-all hover:shadow-md">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-slate-600 mb-1 flex items-center gap-1.5"><Award className="w-4 h-4" /> Silver</p>
+                  <p className="text-4xl font-display font-bold text-slate-900 mt-2">{donorProfiles.filter(p => p.tier === 'Silver').length}</p>
+                  <p className="text-[10px] mt-2 text-slate-400 font-bold uppercase italic tracking-wider">Growing Base</p>
+                </div>
+                <div className="p-6 rounded-2xl border border-rose-100 bg-rose-50/20 shadow-sm transition-all hover:shadow-md">
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-rose-600 mb-1 flex items-center gap-1.5"><AlertTriangle className="w-4 h-4" /> Inactive</p>
+                  <p className="text-4xl font-display font-bold text-rose-900 mt-2">{donorProfiles.filter(p => p.isInactive).length}</p>
+                  <p className="text-[10px] mt-2 text-rose-400 font-bold uppercase italic tracking-wider">Dormant Outreach</p>
+                </div>
+              </div>
+
+              {/* Donor Leaderboard Table */}
+              <div className="lg:col-span-4 section-panel border-t-4 border-t-indigo-600 shadow-sm">
+                <div className="section-panel-header border-b border-border/60 bg-gradient-to-r from-indigo-50/30 to-transparent">
+                  <h3 className="font-bold flex items-center gap-2"><TrendingUp className="w-4 h-4 text-indigo-700" /> Executive Donor Board</h3>
+                </div>
+                <div className="table-container border-0 shadow-none"><div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-muted/30">
+                        <tr className="border-b border-border">
+                          <th className="text-left p-4 font-medium text-muted-foreground uppercase tracking-widest text-[10px]">Patron Ranking</th>
+                          <th className="text-left p-4 font-medium text-muted-foreground uppercase tracking-widest text-[10px]">Classification</th>
+                          <th className="text-left p-4 font-medium text-muted-foreground uppercase tracking-widest text-[10px]">Contribution Value</th>
+                          <th className="text-right p-4 font-medium text-muted-foreground uppercase tracking-widest text-[10px]">Engagement</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {donorProfiles.slice(0, 15).map((profile, idx) => {
+                          const tierStyles = {
+                            Platinum: 'text-indigo-700 bg-indigo-50 border-indigo-100',
+                            Gold: 'text-amber-700 bg-amber-50 border-amber-100',
+                            Silver: 'text-slate-700 bg-slate-50 border-slate-100',
+                            Member: 'text-emerald-700 bg-emerald-50 border-emerald-100'
+                          }[profile.tier];
+                          const TierIcon = { Platinum: Crown, Gold: Medal, Silver: Award, Member: Users }[profile.tier];
+
+                          return (
+                            <tr key={profile.id} className="group border-b border-border/40 transition-colors hover:bg-slate-50/50">
+                               <td className="p-4">
+                                  <div className="flex items-center gap-3">
+                                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${idx < 3 ? 'bg-indigo-600 text-white shadow-sm scale-110' : 'bg-muted text-muted-foreground'}`}>{idx + 1}</div>
+                                    <div className="flex flex-col">
+                                      <span className="font-bold text-foreground text-sm">{profile.name}</span>
+                                      <span className="text-[10px] text-muted-foreground flex items-center gap-1.5 mt-0.5"><History className="w-3 h-3" /> Last: {formatDateDDMMYYYY(profile.lastDonationDate)}</span>
+                                    </div>
+                                  </div>
+                               </td>
+                               <td className="p-4">
+                                  <span className={`px-2 py-0.5 rounded-lg border text-[10px] font-bold tracking-wider uppercase flex items-center w-fit gap-1.5 ${tierStyles}`}>
+                                    <TierIcon className="w-3 h-3" /> {profile.tier}
+                                  </span>
+                               </td>
+                               <td className="p-4">
+                                  <div className="flex flex-col">
+                                    <span className="font-display font-bold text-indigo-950 text-base">{money(profile.totalAmount)}</span>
+                                    <span className="text-[9px] uppercase tracking-widest font-bold text-indigo-400">{profile.preferredCategory} Patron</span>
+                                  </div>
+                               </td>
+                               <td className="p-4 text-right">
+                                  <div className="flex flex-col items-end">
+                                    <span className="font-mono font-bold text-sm text-foreground">{profile.frequency}x <span className="text-[10px] text-muted-foreground uppercase font-sans tracking-wide">Times</span></span>
+                                    <Button variant="ghost" size="sm" className="h-7 text-[10px] font-bold px-2 mt-1 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg group-hover:visible invisible" onClick={() => setSelectedProfile(profile)}>
+                                      Detailed View
+                                    </Button>
+                                  </div>
+                               </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                </div></div>
+              </div>
+           </div>
+        </div>
+      )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Manage Donation Entry' : 'Record New Donation'}>
         <div className="space-y-5 px-1 pb-4 max-h-[85vh] overflow-y-auto">
@@ -617,6 +762,97 @@ const DonationsPage: React.FC = () => {
       </Modal>
 
       <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Delete Ledger Entry" message="Are you absolutely sure you want to permanently delete this donation record? This will alter financial audit trails." />
+
+      <Modal open={!!selectedProfile} onClose={() => setSelectedProfile(null)} title="Patron Contribution Insight">
+        {selectedProfile && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300 pb-2">
+            {/* Header Profile Section */}
+            <div className="bg-gradient-to-br from-indigo-50/50 to-white p-6 rounded-2xl border border-indigo-100 shadow-sm relative overflow-hidden">
+               <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-bl-full pointer-events-none" />
+               <div className="flex items-center gap-4 relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
+                    {selectedProfile.name.charAt(0)}
+                  </div>
+                  <div className="flex-1">
+                     <div className="flex items-center gap-2">
+                        <h3 className="text-xl font-bold text-indigo-950">{selectedProfile.name}</h3>
+                        <span className={`px-2 py-0.5 rounded-lg border text-[9px] font-bold tracking-wider uppercase flex items-center gap-1.5 
+                        ${selectedProfile.tier === 'Platinum' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-emerald-100 text-emerald-700 border-emerald-200'}`}>
+                           {selectedProfile.tier}
+                        </span>
+                     </div>
+                     <div className="flex items-center gap-3 mt-1.5">
+                        <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 font-medium"><Phone className="w-3.5 h-3.5" /> {selectedProfile.phone || 'No phone recorded'}</p>
+                        {selectedProfile.email && <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 font-medium"><Mail className="w-3.5 h-3.5" /> {selectedProfile.email}</p>}
+                     </div>
+                  </div>
+               </div>
+            </div>
+
+            {/* Contribution Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+               <div className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-1">Lifetime Value</p>
+                  <p className="text-2xl font-display font-bold text-indigo-900">{money(selectedProfile.totalAmount)}</p>
+                  <p className="text-[10px] text-indigo-500/70 font-semibold italic mt-1">Gross Cumulative Contribution</p>
+               </div>
+               <div className="p-5 rounded-2xl border border-slate-100 bg-slate-50/50">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mb-1">Engagement</p>
+                  <p className="text-2xl font-display font-bold text-indigo-900">{selectedProfile.frequency} Submissions</p>
+                  <p className="text-[10px] text-indigo-500/70 font-semibold italic mt-1">Average Frequency Level</p>
+               </div>
+            </div>
+
+            {/* Behavioral Summary */}
+            <div className="space-y-4">
+               <div className="section-panel bg-white border border-slate-100 shadow-none overflow-hidden">
+                  <div className="grid grid-cols-2 divide-x divide-slate-100">
+                     <div className="p-4 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                           <Award className="w-4 h-4" />
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Focus Category</p>
+                           <p className="text-xs font-bold text-foreground mt-0.5">{selectedProfile.preferredCategory}</p>
+                        </div>
+                     </div>
+                     <div className="p-4 flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                           <Calendar className="w-4 h-4" />
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-70">Last Visit</p>
+                           <p className="text-xs font-bold text-foreground mt-0.5">{formatDateDDMMYYYY(selectedProfile.lastDonationDate)}</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+
+               <div className={`p-4 rounded-xl flex items-center justify-between border ${selectedProfile.isInactive ? 'bg-rose-50 border-rose-100' : 'bg-indigo-50 border-indigo-100'}`}>
+                  <div className="flex items-center gap-3">
+                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${selectedProfile.isInactive ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-indigo-600 text-white shadow-indigo-200'} shadow-md`}>
+                        {selectedProfile.isInactive ? <AlertTriangle className="w-4 h-4" /> : <UserCheck className="w-4 h-4" />}
+                     </div>
+                     <div>
+                        <p className="text-xs font-bold text-slate-800">{selectedProfile.isInactive ? 'Dormant Patron' : 'Active Contributor'}</p>
+                        <p className="text-[10px] text-slate-400 font-medium italic mt-0.5">{selectedProfile.isInactive ? 'No records found in the last 6 months' : 'Consistent engagement history detected'}</p>
+                     </div>
+                  </div>
+                  {selectedProfile.isInactive && (
+                     <Button size="sm" variant="outline" className="h-8 text-[10px] font-bold bg-white text-rose-600 border-rose-200 hover:bg-rose-50">
+                        Initiate Re-engage
+                     </Button>
+                  )}
+               </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+               <Button variant="outline" onClick={() => setSelectedProfile(null)} className="flex-1 py-5 font-bold tracking-tight">Close Profile</Button>
+               <Button className="flex-1 py-5 bg-indigo-600 hover:bg-indigo-700 shadow-md font-bold tracking-tight">Issue Personalized Gratitude</Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

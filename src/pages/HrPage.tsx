@@ -1,10 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, CalendarDays, Users, Briefcase, Wallet, Search, Phone, Mail, FileText, BadgeIndianRupee } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Pencil, Trash2, CalendarDays, Users, Briefcase, Wallet, Search, Phone, Mail, FileText, BadgeIndianRupee, X, CheckCircle2, UserX, Receipt, Printer } from 'lucide-react';
 import { useStore } from '@/hooks/useStore';
+import { useVolunteerStore } from '@/hooks/useVolunteerStore';
+import VolunteerForm from '@/components/VolunteerForm';
+import SalarySlip from '@/components/SalarySlip';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import StatusBadge from '@/components/StatusBadge';
+import { toast } from 'sonner';
 import FormField from '@/components/FormField';
 
 type StaffRole = 'Priest' | 'Staff';
@@ -51,7 +56,7 @@ type VolunteerRecord = {
 
 type PayrollStatus = 'Paid' | 'Unpaid';
 
-type PayrollEntry = {
+interface PayrollEntry {
   id: string;
   staffId: string;
   month: string;
@@ -60,9 +65,17 @@ type PayrollEntry = {
   deduction: number;
   netPay: number;
   payoutStatus: PayrollStatus;
-};
+  absentDays?: number;
+}
 
-type HrSection = 'staff' | 'payroll' | 'duties' | 'volunteers';
+interface AttendanceRecord {
+  id: string;
+  staffId: string;
+  date: string;
+  status: 'Present' | 'Absent';
+}
+
+type HrSection = 'staff' | 'payroll' | 'duties' | 'volunteers' | 'attendance';
 
 const initialStaff: StaffRecord[] = [
   { id: 'ST001', name: 'Pandit Sharma', role: 'Priest', department: 'Main Sanctum', joinedDate: '2020-01-10', salary: 35000, phone: '+91 9876543210', email: 'sharma@temple.org', status: 'Active' },
@@ -92,7 +105,6 @@ const initialPayroll: PayrollEntry[] = [
 
 const emptyStaffForm = { name: '', role: 'Staff' as StaffRole, department: '', joinedDate: '', salary: 0, phone: '', email: '', status: 'Active' as StaffStatus };
 const emptyDutyForm = { staffId: '', dutyType: 'Temple Operations' as DutyType, dutyDate: '', slot: '05:00 AM - 09:00 AM', location: '', status: 'Scheduled' as DutyStatus, notes: '' };
-const emptyVolunteerForm = { name: '', phone: '', email: '', preferredArea: '', availability: '', assignedDutyId: '', status: 'Registered' as VolunteerStatus };
 
 function money(n: number) { return `₹${n.toLocaleString('en-IN')}`; }
 function initials(name: string) { return name.split(' ').map(part => part[0]).join('').slice(0, 2).toUpperCase(); }
@@ -100,12 +112,17 @@ function initials(name: string) { return name.split(' ').map(part => part[0]).jo
 const HrPage: React.FC = () => {
   const { items: staff, add: addStaff, update: updateStaff, remove: removeStaff } = useStore<StaffRecord>(initialStaff);
   const { items: duties, add: addDuty, update: updateDuty, remove: removeDuty } = useStore<DutySchedule>(initialDuties);
-  const { items: volunteers, add: addVolunteer, update: updateVolunteer, remove: removeVolunteer } = useStore<VolunteerRecord>(initialVolunteers);
+  const { items: volunteers, add: addVolunteer, update: updateVolunteer, remove: removeVolunteer } = useVolunteerStore();
+  
   const { items: payroll, add: addPayroll, update: updatePayroll, setItems: setPayroll } = useStore<PayrollEntry>(initialPayroll);
+  const { items: attendance, add: addAttendance, update: updateAttendance, remove: removeAttendance } = useStore<AttendanceRecord>([]);
+  
+  const [payrollMonth, setPayrollMonth] = useState(new Date().toISOString().slice(0, 7));
+  const [selectedStaffForAttendance, setSelectedStaffForAttendance] = useState<string | null>(null);
+  const [viewingBill, setViewingBill] = useState<PayrollEntry | null>(null);
+  const [activeSection, setActiveSection] = useState<HrSection>('staff');
 
   const [search, setSearch] = useState('');
-  const [payrollMonth, setPayrollMonth] = useState('2026-04');
-  const [activeSection, setActiveSection] = useState<HrSection>('staff');
 
   const [staffModalOpen, setStaffModalOpen] = useState(false);
   const [staffEditId, setStaffEditId] = useState<string | null>(null);
@@ -120,7 +137,6 @@ const HrPage: React.FC = () => {
   const [volModalOpen, setVolModalOpen] = useState(false);
   const [volEditId, setVolEditId] = useState<string | null>(null);
   const [volDeleteId, setVolDeleteId] = useState<string | null>(null);
-  const [volForm, setVolForm] = useState(emptyVolunteerForm);
 
   const staffById = useMemo(() => Object.fromEntries(staff.map(item => [item.id, item])), [staff]);
   const normalizedQuery = search.toLowerCase().trim();
@@ -153,10 +169,10 @@ const HrPage: React.FC = () => {
     if (!normalizedQuery) return volunteers;
     return volunteers.filter(item =>
       item.name.toLowerCase().includes(normalizedQuery) ||
-      item.preferredArea.toLowerCase().includes(normalizedQuery) ||
+      (item.preferredArea || '').toLowerCase().includes(normalizedQuery) ||
       item.availability.toLowerCase().includes(normalizedQuery) ||
       item.status.toLowerCase().includes(normalizedQuery) ||
-      item.phone.toLowerCase().includes(normalizedQuery)
+      item.contact.toLowerCase().includes(normalizedQuery)
     );
   }, [volunteers, normalizedQuery]);
 
@@ -190,36 +206,42 @@ const HrPage: React.FC = () => {
     setDutyModalOpen(false);
   };
   const setDField = <K extends keyof DutySchedule>(k: K, v: any) => setDutyForm(p => ({ ...p, [k]: v }));
-
-  const openAddVolunteer = () => { setVolForm(emptyVolunteerForm); setVolEditId(null); setVolModalOpen(true); };
-  const openEditVolunteer = (item: VolunteerRecord) => { setVolForm({ ...item }); setVolEditId(item.id); setVolModalOpen(true); };
-  const saveVolunteer = () => {
-    if (!volForm.name.trim()) return;
-    if (volEditId) updateVolunteer(volEditId, { ...volForm });
-    else addVolunteer({ ...volForm });
-    setVolModalOpen(false);
-  };
-  const setVField = <K extends keyof VolunteerRecord>(k: K, v: any) => setVolForm(p => ({ ...p, [k]: v }));
-
   const generatePayrollForMonth = () => {
     const existingStaffIds = new Set(payroll.filter(entry => entry.month === payrollMonth).map(entry => entry.staffId));
-    const newEntries: PayrollEntry[] = staff
-      .filter(item => item.status === 'Active' && !existingStaffIds.has(item.id))
-      .map(item => {
-        const allowance = item.role === 'Priest' ? 2500 : 1200;
-        const deduction = 0;
-        return {
-          id: `tmp-${crypto.randomUUID()}`,
-          staffId: item.id,
-          month: payrollMonth,
-          basePay: item.salary,
-          allowance,
-          deduction,
-          netPay: item.salary + allowance - deduction,
-          payoutStatus: 'Unpaid',
-        };
-      });
-    if (newEntries.length > 0) setPayroll(prev => [...newEntries, ...prev]);
+    
+    const newEntries = staff.filter(member => !existingStaffIds.has(member.id)).map(member => {
+      // Calculate Absences for this month
+      const memberAbsences = attendance.filter(a => 
+        a.staffId === member.id && 
+        a.date.startsWith(payrollMonth) && 
+        a.status === 'Absent'
+      ).length;
+
+      const basePay = member.salary;
+      const allowance = 500;
+      const dailyRate = basePay / 30;
+      const deduction = Math.round(dailyRate * memberAbsences);
+      const netPay = basePay + allowance - deduction;
+
+      return {
+        id: `PAY-${member.id}-${payrollMonth}`,
+        staffId: member.id,
+        month: payrollMonth,
+        basePay,
+        allowance,
+        deduction,
+        netPay,
+        payoutStatus: 'Unpaid' as PayrollStatus,
+        absentDays: memberAbsences
+      };
+    });
+
+    if (newEntries.length > 0) {
+        setPayroll([...payroll, ...newEntries]);
+        toast.success(`Generated payroll for ${newEntries.length} staff members.`);
+    } else {
+        toast.info("Payroll already generated for all staff this month.");
+    }
   };
 
   const payrollTotal = payrollForMonth.reduce((sum, entry) => sum + entry.netPay, 0);
@@ -361,7 +383,7 @@ const HrPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Disbursed Salaries</h3>
+                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2"><BadgeIndianRupee className="h-4 w-4 text-slate-600" /> Paid Salaries Record</h3>
                   {payrollForMonth.length === 0 ? (
                     <div className="text-center py-16 bg-muted/20 border-2 border-dashed border-border rounded-2xl">
                       <Wallet className="w-10 h-10 text-muted-foreground/30 mx-auto mb-4" />
@@ -393,9 +415,14 @@ const HrPage: React.FC = () => {
                                 <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-0.5">Net Pay</p>
                                 <p className="text-2xl font-display font-bold text-foreground tracking-tight">{money(entry.netPay)}</p>
                               </div>
-                              {entry.payoutStatus === 'Unpaid' && (
-                                <Button size="sm" variant="outline" className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 shadow-sm font-bold" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Now</Button>
-                              )}
+                              <div className="flex gap-2">
+                                <Button size="sm" variant="outline" className="border-slate-200 h-9 font-bold hover:bg-slate-50" onClick={() => setViewingBill(entry)}>
+                                    <Receipt className="w-3.5 h-3.5 mr-1.5" /> Statement
+                                </Button>
+                                {entry.payoutStatus === 'Unpaid' && (
+                                    <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 font-bold shadow-sm" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Salary</Button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
@@ -449,7 +476,7 @@ const HrPage: React.FC = () => {
           <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Enlisted Volunteers</h2>
-              <Button onClick={openAddVolunteer} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
+              <Button onClick={() => { setVolEditId(null); setVolModalOpen(true); }} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -458,7 +485,6 @@ const HrPage: React.FC = () => {
                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Volunteer Name</th>
                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Preferred Area</th>
                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Availability</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Assigned Duty</th>
                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Status</th>
                     <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Actions</th>
                   </tr>
@@ -474,25 +500,20 @@ const HrPage: React.FC = () => {
                           <div>
                             <p className="font-bold text-foreground text-sm tracking-wide">{item.name}</p>
                             <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground mt-1 flex gap-2">
-                               <span><Phone className="w-3 h-3 inline pb-0.5 opacity-70" /> {item.phone}</span>
+                               <span><Phone className="w-3 h-3 inline pb-0.5 opacity-70" /> {item.contact}</span>
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="p-4 text-sm font-bold text-foreground/80">{item.preferredArea}</td>
                       <td className="p-4 text-muted-foreground text-xs font-semibold">{item.availability}</td>
-                      <td className="p-4 text-xs">
-                        {item.assignedDutyId ? (
-                           <div className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg inline-flex flex-col gap-0.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)]">
-                             <span className="font-bold">{duties.find(d => d.id === item.assignedDutyId)?.location}</span>
-                             <span className="text-[9px] uppercase tracking-widest opacity-80 font-bold">{duties.find(d => d.id === item.assignedDutyId)?.dutyDate}</span>
-                           </div>
-                        ) : <span className="text-muted-foreground italic font-medium px-2 py-1 bg-muted/40 rounded border border-border/40">Not Assigned</span>}
-                      </td>
                       <td className="p-4"><StatusBadge status={item.status} /></td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-1.5">
-                          <Button variant="ghost" size="icon" onClick={() => openEditVolunteer(item)} title="Edit Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => {
+                            setVolEditId(item.id);
+                            setVolModalOpen(true);
+                          }} title="Edit Details"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
                           <Button variant="ghost" size="icon" onClick={() => setVolDeleteId(item.id)} className="hover:text-destructive hover:bg-destructive/10" title="Remove Record"><Trash2 className="h-4 w-4 text-muted-foreground group-hover:text-destructive" /></Button>
                         </div>
                       </td>
@@ -503,7 +524,87 @@ const HrPage: React.FC = () => {
             </div></div>
           </section>
         )}
+        {activeSection === 'attendance' && (
+          <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--destructive))' }}>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-rose-50/50 to-transparent">
+              <div className="flex-1">
+                <h2 className="text-sm font-semibold flex items-center gap-2"><UserX className="w-4 h-4 text-rose-600" /> Attendance Registry</h2>
+                <p className="text-[11px] font-bold text-muted-foreground mt-1 uppercase tracking-widest leading-none">Daily Duty Checklist • {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {staff.map(member => {
+                  const todayStr = new Date().toISOString().split('T')[0];
+                  const record = attendance.find(a => a.staffId === member.id && a.date === todayStr);
+                  const isAbsent = record?.status === 'Absent';
+                  
+                  return (
+                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group ${isAbsent ? 'bg-rose-50 border-rose-100 shadow-inner' : 'bg-white border-slate-100 shadow-sm hover:shadow-md'}`}>
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-colors ${isAbsent ? 'bg-rose-600 text-white shadow-lg shadow-rose-200' : 'bg-slate-100 text-slate-500'}`}>
+                          {initials(member.name)}
+                        </div>
+                        <div>
+                          <p className={`font-bold text-base tracking-tight ${isAbsent ? 'text-rose-900 line-through opacity-70' : 'text-slate-800'}`}>{member.name}</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-0.5">{member.role} • {member.department}</p>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        onClick={() => {
+                            if (record) {
+                                // Toggle or Delete
+                                if (record.status === 'Absent') {
+                                    removeAttendance(record.id);
+                                    toast.success(`${member.name} marked as Present`);
+                                }
+                            } else {
+                                addAttendance({
+                                    staffId: member.id,
+                                    date: todayStr,
+                                    status: 'Absent'
+                                });
+                                toast.error(`${member.name} marked as Absent`);
+                            }
+                        }}
+                        className={`rounded-xl h-10 px-4 font-bold text-xs transition-all ${isAbsent ? 'bg-white text-rose-600 hover:bg-rose-100 border border-rose-200' : 'bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600'}`}
+                      >
+                        {isAbsent ? 'Undo Absence' : 'Mark Absent'}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="mt-8 bg-indigo-50 border border-indigo-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center shadow-lg shadow-indigo-200">
+                        <CalendarDays className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <p className="text-sm font-bold text-indigo-900 uppercase tracking-wider">Payroll Implications</p>
+                        <p className="text-xs font-semibold text-indigo-600/80">Absences recorded here will automatically calculate Loss of Pay during payroll generation.</p>
+                    </div>
+                </div>
+                <Badge variant="outline" className="bg-white border-indigo-200 text-indigo-700 font-bold px-4 py-1.5 rounded-full">Automated LOP Active</Badge>
+              </div>
+            </div>
+          </section>
+        )}
       </div>
+
+      {/* Viewing Bill Modal */}
+      <Modal open={!!viewingBill} onClose={() => setViewingBill(null)} title="Official Salary Bill">
+        {viewingBill && (
+            <SalarySlip 
+                entry={viewingBill} 
+                member={staffById[viewingBill.staffId]} 
+                onClose={() => setViewingBill(null)} 
+            />
+        )}
+      </Modal>
 
       {/* Staff Modal */}
       <Modal open={staffModalOpen} onClose={() => setStaffModalOpen(false)} title={staffEditId ? 'Edit Staff File' : 'Add New Staff'}>
@@ -575,31 +676,20 @@ const HrPage: React.FC = () => {
 
       {/* Volunteer Modal */}
       <Modal open={volModalOpen} onClose={() => setVolModalOpen(false)} title={volEditId ? 'Edit Volunteer Details' : 'Add New Volunteer'}>
-        <div className="hr-form-shell grid grid-cols-2 gap-4 px-1 py-2">
-          <FormField label="Volunteer Name" value={volForm.name} onChange={v => setVField('name', v)} required />
-          <FormField label="Phone Number" value={volForm.phone} onChange={v => setVField('phone', v)} />
-          <div className="col-span-2">
-            <FormField label="Email ID" value={volForm.email} onChange={v => setVField('email', v)} type="email" />
-          </div>
-          <FormField label="Preferred Work Area" value={volForm.preferredArea} onChange={v => setVField('preferredArea', v)} placeholder="E.g. Crowd Control" />
-          <FormField label="Availability" value={volForm.availability} onChange={v => setVField('availability', v)} placeholder="E.g. Weekends Morning" />
-          <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Assign Role/Duty</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-semibold selection:bg-emerald-100" value={volForm.assignedDutyId} onChange={e => setVField('assignedDutyId', e.target.value)}>
-                <option value="">-- No Duty Selected --</option>
-                {duties.filter(d => d.status === 'Scheduled').map(d => <option key={d.id} value={d.id}>{d.location} ({d.dutyDate})</option>)}
-             </select>
-          </div>
-          <div className="col-span-2 space-y-1.5">
-             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Account Status</label>
-             <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-bold" value={volForm.status} onChange={e => setVField('status', e.target.value)}>
-                <option value="Registered">Registered</option><option value="Assigned">Assigned</option><option value="Inactive">Inactive</option>
-             </select>
-          </div>
-          <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
-            <Button variant="outline" onClick={() => setVolModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-            <Button onClick={saveVolunteer} className="flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold">Save Record</Button>
-          </div>
+        <div className="p-1">
+          <VolunteerForm 
+            initialData={volEditId ? volunteers.find(v => v.id === volEditId) : null}
+            onSave={(data) => {
+              if (volEditId) updateVolunteer(volEditId, data as any);
+              else addVolunteer(data as any);
+              setVolModalOpen(false);
+              setVolEditId(null);
+            }}
+            onCancel={() => {
+              setVolModalOpen(false);
+              setVolEditId(null);
+            }}
+          />
         </div>
       </Modal>
 

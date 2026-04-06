@@ -24,6 +24,8 @@ import HrPage from "@/pages/HrPage";
 import ProcurementPage from "@/pages/ProcurementPage";
 import AnnadhanamPage from "@/pages/AnnadhanamPage";
 import ParkingPage from "@/pages/ParkingPage";
+import VolunteerPage from "@/pages/VolunteerPage";
+import HallBookingPage from "@/pages/HallBookingPage";
 
 const queryClient = new QueryClient();
 
@@ -56,6 +58,8 @@ const App = () => (
               <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin']}><SettingsPage /></ProtectedRoute>} />
               <Route path="/hr" element={<ProtectedRoute allowedRoles={['admin']}><HrPage /></ProtectedRoute>} />
               <Route path="/parking" element={<ProtectedRoute allowedRoles={['admin', 'manager']}><ParkingPage /></ProtectedRoute>} />
+              <Route path="/volunteers" element={<ProtectedRoute allowedRoles={['admin', 'manager']}><VolunteerPage /></ProtectedRoute>} />
+              <Route path="/hall-booking" element={<ProtectedRoute allowedRoles={['admin', 'manager']}><HallBookingPage /></ProtectedRoute>} />
               <Route path="/donate" element={<DonatePage />} />
             </Route>
 

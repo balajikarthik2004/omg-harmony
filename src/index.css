@@ -2042,6 +2042,7 @@
   .inventory-header,
   .assets-header,
   .docs-header,
+  .hall-booking-header,
   .settings-header {
     border-color: color-mix(in srgb, var(--brand-blue-600) 70%, black) !important;
     background: linear-gradient(135deg, var(--brand-blue-600) 0%, var(--brand-blue-500) 52%, var(--brand-primary) 100%) !important;
@@ -2049,6 +2050,8 @@
   }
 
   .dashboard-header-banner h1,
+  .hall-booking-header h1,
+  .hall-booking-header p,
   .dashboard-header-banner p,
   .donations-header h1,
   .donations-header p,
@@ -2084,6 +2087,7 @@
   .assets-cta,
   .docs-cta,
   .docs-sync-btn,
+  .hall-booking-cta,
   .settings-cta {
     background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-red-600) 100%) !important;
     color: #fff !important;
@@ -2100,6 +2104,7 @@
   .assets-cta:hover,
   .docs-cta:hover,
   .docs-sync-btn:hover,
+  .hall-booking-cta:hover,
   .settings-cta:hover {
     background: linear-gradient(135deg, var(--brand-red-600) 0%, var(--brand-primary) 100%) !important;
     box-shadow: 0 22px 34px -18px rgba(188, 31, 30, 0.76) !important;
@@ -2115,6 +2120,7 @@
   .page-header-banner .assets-cta,
   .page-header-banner .docs-cta,
   .page-header-banner .docs-sync-btn,
+  .page-header-banner .hall-booking-cta,
   .page-header-banner .settings-cta {
     border: 0.5px solid hsla(0, 0%, 100%, 0.68) !important;
     outline: 1px solid hsla(0, 0%, 100%, 0.34);
@@ -2130,6 +2136,7 @@
   .page-header-banner .assets-cta:hover,
   .page-header-banner .docs-cta:hover,
   .page-header-banner .docs-sync-btn:hover,
+  .page-header-banner .hall-booking-cta:hover,
   .page-header-banner .settings-cta:hover {
     border-color: hsla(0, 0%, 100%, 0.8) !important;
     outline-color: hsla(0, 0%, 100%, 0.48);
