@@ -58,7 +58,7 @@ const DonatePage: React.FC = () => {
           <Heart className="w-3.5 h-3.5" /> Secure Giving
         </div>
         <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground tracking-tight mb-4">Make a Donation</h1>
-        <p className="text-muted-foreground text-sm md:text-base font-medium max-w-sm mx-auto leading-relaxed">Your generous support helps sustain Temple Harmony services, annadanam, and operations.</p>
+        <p className="text-muted-foreground text-sm md:text-base font-medium max-w-sm mx-auto leading-relaxed">Your generous support helps sustain Temple Governance services, annadanam, and operations.</p>
       </div>
 
       <div className="flex items-center justify-center gap-4 mb-10 relative px-4">

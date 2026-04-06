@@ -23,6 +23,7 @@ import NotFound from "@/pages/NotFound";
 import HrPage from "@/pages/HrPage";
 import ProcurementPage from "@/pages/ProcurementPage";
 import AnnadhanamPage from "@/pages/AnnadhanamPage";
+import ParkingPage from "@/pages/ParkingPage";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
               <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin']}><ReportsPage /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin']}><SettingsPage /></ProtectedRoute>} />
               <Route path="/hr" element={<ProtectedRoute allowedRoles={['admin']}><HrPage /></ProtectedRoute>} />
+              <Route path="/parking" element={<ProtectedRoute allowedRoles={['admin', 'manager']}><ParkingPage /></ProtectedRoute>} />
               <Route path="/donate" element={<DonatePage />} />
             </Route>
 

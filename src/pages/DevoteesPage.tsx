@@ -316,7 +316,7 @@ const DevoteesPage: React.FC = () => {
       .map(event => `- ${event.name} | Date: ${fmtDate(event.date)} | Time: ${event.time}`)
       .join('\n');
 
-    const message = `Dear ${selectedDevotee.name},\n\nGreetings from Temple Harmony. We are pleased to invite you to the following upcoming temple event${selectedEventDetails.length > 1 ? 's' : ''}:\n\n${eventLines}\n\nYour participation and blessings are deeply valued. If you need any assistance with booking or timing, please contact the temple office.\n\nWith prayers and regards,\nTemple Harmony Communication Desk`;
+    const message = `Dear ${selectedDevotee.name},\n\nGreetings from OMG Temple Governance. We are pleased to invite you to the following upcoming temple event${selectedEventDetails.length > 1 ? 's' : ''}:\n\n${eventLines}\n\nYour participation and blessings are deeply valued. If you need any assistance with booking or timing, please contact the temple office.\n\nWith prayers and regards,\nTemple Harmony Communication Desk`;
 
     setNotifSubject(title);
     setNotifMessage(message);

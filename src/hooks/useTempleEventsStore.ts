@@ -30,7 +30,7 @@ export type TempleEvent = {
 
 const templeProfile: TempleProfile = {
   id: 'TH-001',
-  name: 'Sri Harmony Temple',
+  name: 'Sri Durga Temple',
   deity: 'Lord Shiva & Devi',
   location: 'Temple Street, Mylapore',
   city: 'Chennai',

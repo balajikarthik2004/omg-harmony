@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CalendarDays, Heart,
   CalendarCheck, Package, Building2, BarChart3, Briefcase,
-  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight
+  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car
 } from 'lucide-react';
 
 import logo from '@/assets/img/logo.png'; 
@@ -23,6 +23,7 @@ const adminLinks = [
   // { to: '/tasks', label: 'Tasks', icon: CheckSquare },
   { to: '/inventory', label: 'Inventory', icon: Package },
   { to: '/assets', label: 'Assets', icon: Building2 },
+  { to: '/parking', label: 'Parking', icon: Car },
   { to: '/reports', label: 'Documents', icon: BarChart3 },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
@@ -90,7 +91,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
           </div>
         </div>
         {!isCollapsed && (
-          <p className="mt-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-white/70">Temple Harmony ERP</p>
+          <p className="mt-2 text-[11px] font-semibold tracking-[0.12em] uppercase text-white/70">Temple Governance System</p>
         )}
       </div>
 

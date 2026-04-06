@@ -121,7 +121,7 @@ async function sendOneEmail(
         to_name: recipient.name,
         to_email: cleanEmail,
         reply_to: cleanEmail,
-        from_name: "Temple Harmony ERP",
+        from_name: "Temple Governance",
         brand_name: "OMG Temple Governance System",
         preview_text: previewText,
         message_html: fullEmailHtml,

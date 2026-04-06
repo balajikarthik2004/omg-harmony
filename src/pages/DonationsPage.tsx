@@ -559,7 +559,7 @@ const DonationsPage: React.FC = () => {
                 <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3 border border-emerald-200">
                   <ShieldCheck className="w-6 h-6 text-emerald-600" />
                 </div>
-                <h3 className="font-display font-bold text-2xl text-foreground">Temple Harmony Trust</h3>
+                <h3 className="font-display font-bold text-2xl text-foreground">Temple Governance Trust</h3>
                 <p className="text-[11px] text-muted-foreground font-medium mt-1">Reg No: THT-8832-IN · Official Acknowledgement</p>
               </div>
 
