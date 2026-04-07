@@ -40,18 +40,18 @@ const upcomingEvents = [
 ];
 
 const dashboardColors = {
-  line: '#293088',
-  lineGrid: '#D7DAF0',
-  lineFillTop: '#4F58CA',
-  lineFillBottom: '#4F58CA',
-  chartAccentA: '#293088',
-  chartAccentB: '#4F58CA',
-  chartAccentC: '#767DD6',
-  chartAccentD: '#E22E26',
-  tooltipBorder: '1px solid #C4C7ED',
-  tooltipShadow: '0 14px 34px -14px rgba(41, 48, 136, 0.35)',
+  line: 'hsl(var(--secondary))',
+  lineGrid: 'var(--chart-grid)',
+  lineFillTop: 'var(--chart-accent-c)',
+  lineFillBottom: 'var(--chart-accent-c)',
+  chartAccentA: 'var(--chart-accent-a)',
+  chartAccentB: 'var(--chart-accent-b)',
+  chartAccentC: 'var(--chart-accent-c)',
+  chartAccentD: 'var(--chart-accent-d)',
+  tooltipBorder: '1px solid hsl(var(--border))',
+  tooltipShadow: '0 14px 34px -14px hsl(var(--secondary) / 0.35)',
   tooltipBg: 'hsl(0, 0%, 100%)',
-  chartCursor: '#EBECF9',
+  chartCursor: 'var(--chart-cursor)',
 };
 
 

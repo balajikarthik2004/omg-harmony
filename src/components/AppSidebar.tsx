@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CalendarDays, Heart,
   CalendarCheck, Package, Building2, BarChart3, Briefcase,
-  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car, HeartHandshake, Hotel
+  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car, HeartHandshake, Hotel, Palette
 } from 'lucide-react';
 
 import logo from '@/assets/img/logo.png'; 
@@ -27,6 +27,7 @@ const adminLinks = [
   { to: '/parking', label: 'Parking', icon: Car },
   // { to: '/volunteers', label: 'Volunteers', icon: HeartHandshake },
   { to: '/reports', label: 'Documents', icon: BarChart3 },
+  { to: '/theme-studio', label: 'Theme Studio', icon: Palette },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -34,6 +35,7 @@ const managerLinks = adminLinks.filter(l => !['/reports', '/settings', '/assets'
 const devoteeLinks = [
   { to: '/pooja-seva', label: 'Pooja & Seva Desk', icon: CalendarDays },
   { to: '/events', label: 'Events', icon: CalendarCheck },
+  { to: '/theme-studio', label: 'Theme Studio', icon: Palette },
   { to: '/donate', label: 'Donate', icon: Heart },
 ];
 
@@ -59,13 +61,13 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
         isCollapsed ? 'w-20' : 'w-64'
       }`}
       style={{
-        background: 'linear-gradient(185deg, #293088 0%, #353EB0 54%, #E22E26 100%)',
+        background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
         color: 'hsl(0, 0%, 100%)',
       }}
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full bg-[#C4C7ED]/30 blur-3xl" />
-        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full bg-[#F3ADA8]/28 blur-3xl" />
+        <div className="absolute -top-24 -left-14 h-52 w-52 rounded-full blur-3xl" style={{ background: 'var(--sidebar-glow-a)' }} />
+        <div className="absolute bottom-10 -right-14 h-44 w-44 rounded-full blur-3xl" style={{ background: 'var(--sidebar-glow-b)' }} />
       </div>
 
       {/* Logo area */}
@@ -120,8 +122,9 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
                 <>
                   <span
                     className={`absolute inset-y-1 left-1 w-1 rounded-full transition-all duration-200 ${
-                      isActive ? 'bg-[#F3ADA8] shadow-[0_0_12px_rgba(243,173,168,0.85)]' : 'bg-transparent group-hover:bg-white/35'
+                      isActive ? 'shadow-[0_0_12px_rgba(0,0,0,0.28)]' : 'bg-transparent group-hover:bg-white/35'
                     }`}
+                    style={isActive ? { background: 'var(--sidebar-highlight)' } : undefined}
                   />
                   <span
                     className={`flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200 ${
@@ -134,8 +137,9 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
                   {!isCollapsed && (
                     <span
                       className={`ml-auto h-1.5 w-1.5 rounded-full transition-all duration-200 ${
-                        isActive ? 'bg-[#F9D6D4] scale-100' : 'bg-white/0 scale-75 group-hover:bg-white/70 group-hover:scale-100'
+                        isActive ? 'scale-100' : 'bg-white/0 scale-75 group-hover:bg-white/70 group-hover:scale-100'
                       }`}
+                      style={isActive ? { background: 'var(--sidebar-highlight-soft)' } : undefined}
                     />
                   )}
                 </>
@@ -149,7 +153,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
       <div className={`relative border-t border-white/10 bg-black/10 backdrop-blur-sm ${isCollapsed ? 'p-2.5 space-y-2' : 'p-3.5 space-y-2.5'}`}>
         {/* User info pill */}
         <div className={`flex items-center rounded-xl bg-white/10 border border-white/15 ${isCollapsed ? 'justify-center px-2 py-2.5' : 'gap-3 px-3 py-2.5'}`}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-inner" style={{ background: 'linear-gradient(135deg, #4F58CA 0%, #293088 55%, #E22E26 100%)' }}>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shadow-inner" style={{ background: 'linear-gradient(135deg, var(--sidebar-gradient-mid) 0%, var(--sidebar-gradient-start) 55%, var(--sidebar-avatar-mid) 100%)' }}>
             {user?.name?.charAt(0) || 'U'}
           </div>
           {!isCollapsed && (

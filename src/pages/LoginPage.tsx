@@ -27,17 +27,24 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="min-h-screen flex bg-background relative overflow-hidden">
+      <div className="absolute inset-0 lg:hidden">
+        <img src={bg} alt="Temple Background" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 login-image-overlay opacity-80" />
+      </div>
+
+      <div className="absolute inset-0 lg:hidden bg-background/55 backdrop-blur-[1px]" />
+
       {/* Decorative background orbs for right panel */}
       <div
         className="login-floating-orb animate-float hidden lg:block"
-        style={{ width: 300, height: 300, background: 'hsl(1, 76%, 52%)', top: '-5%', right: '5%' }}
+        style={{ width: 300, height: 300, background: 'hsl(var(--primary))', top: '-5%', right: '5%' }}
       />
       <div
         className="login-floating-orb hidden lg:block"
         style={{
           width: 200,
           height: 200,
-          background: 'hsl(233, 53%, 35%)',
+          background: 'hsl(var(--secondary))',
           bottom: '10%',
           right: '20%',
           animationDelay: '1.5s',
@@ -88,7 +95,7 @@ const LoginPage: React.FC = () => {
       </div>
 
       {/* Right login form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10 relative">
+      <div className="flex-1 flex items-center justify-center p-6 sm:p-10 relative z-10">
         <div className="w-full max-w-[400px] animate-slide-in-right">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2.5 mb-8">

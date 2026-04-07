@@ -67,6 +67,42 @@
 
     --success: 152 60% 40%;
     --warning: 38 92% 50%;
+
+    --layout-bg-start: hsl(212 36% 97%);
+    --layout-bg-mid: hsl(210 40% 98%);
+    --layout-bg-end: hsl(42 34% 97%);
+    --layout-gradient-angle: 180deg;
+
+    --topbar-bg-start: hsl(0 0% 100%);
+    --topbar-bg-end: hsl(235 47% 94%);
+    --topbar-gradient-angle: 180deg;
+    --topbar-border: hsl(230 47% 84%);
+    --topbar-shadow: hsla(232, 54%, 35%, 0.5);
+    --topbar-title: hsl(236 54% 35%);
+    --topbar-subtitle: hsl(234 53% 65%);
+    --topbar-icon: hsl(234 53% 55%);
+
+    --sidebar-gradient-start: #293088;
+    --sidebar-gradient-mid: #353EB0;
+    --sidebar-gradient-end: #E22E26;
+    --sidebar-gradient-angle: 185deg;
+    --sidebar-glow-a: hsla(230, 52%, 78%, 0.3);
+    --sidebar-glow-b: hsla(4, 80%, 80%, 0.28);
+    --sidebar-highlight: #F3ADA8;
+    --sidebar-highlight-soft: #F9D6D4;
+    --sidebar-avatar-mid: #4F58CA;
+
+    --theme-overlay-start: hsla(233, 53%, 28%, 0.85);
+    --theme-overlay-mid: hsla(250, 40%, 31%, 0.72);
+    --theme-overlay-end: hsla(1, 76%, 52%, 0.5);
+    --overlay-gradient-angle: 135deg;
+
+    --chart-accent-a: #293088;
+    --chart-accent-b: #E22E26;
+    --chart-accent-c: #4F58CA;
+    --chart-accent-d: #E55C52;
+    --chart-grid: #D7DAF0;
+    --chart-cursor: #EBECF9;
   }
 }
 
@@ -310,8 +346,8 @@
   }
 
   select:focus {
-    border-color: hsl(1, 76%, 52%);
-    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
     outline: none;
   }
 
@@ -321,8 +357,8 @@
   }
 
   input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus {
-    border-color: hsl(1, 76%, 52%);
-    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
   }
 
   textarea {
@@ -330,8 +366,8 @@
   }
 
   textarea:focus {
-    border-color: hsl(1, 76%, 52%);
-    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.1);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
     outline: none;
   }
 
@@ -345,28 +381,28 @@
   }
 
   .login-image-overlay {
-    background: linear-gradient(135deg,
-        hsla(233, 53%, 28%, 0.85) 0%,
-        hsla(270, 43%, 32%, 0.7) 50%,
-        hsla(1, 76%, 52%, 0.5) 100%);
+    background: linear-gradient(var(--overlay-gradient-angle),
+        var(--theme-overlay-start) 0%,
+        var(--theme-overlay-mid) 50%,
+        var(--theme-overlay-end) 100%);
   }
 
   .login-btn-premium {
     @apply relative overflow-hidden font-semibold tracking-wide;
-    background: linear-gradient(135deg, hsl(1, 76%, 52%) 0%, hsl(1, 76%, 42%) 100%);
-    box-shadow: 0 4px 14px -2px hsla(1, 76%, 52%, 0.4);
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.82) 100%);
+    box-shadow: 0 4px 14px -2px hsl(var(--primary) / 0.4);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .login-btn-premium:hover {
-    box-shadow: 0 6px 20px -2px hsla(1, 76%, 52%, 0.55);
+    box-shadow: 0 6px 20px -2px hsl(var(--primary) / 0.55);
     transform: translateY(-1px);
-    background: linear-gradient(135deg, hsl(1, 76%, 56%) 0%, hsl(1, 76%, 46%) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary) / 0.94) 0%, hsl(var(--primary) / 0.8) 100%);
   }
 
   .login-btn-premium:active {
     transform: translateY(0);
-    box-shadow: 0 2px 10px -2px hsla(1, 76%, 52%, 0.4);
+    box-shadow: 0 2px 10px -2px hsl(var(--primary) / 0.4);
   }
 
   .login-btn-shimmer::after {
@@ -395,8 +431,22 @@
   }
 
   .login-input-enhanced:focus {
-    border-color: hsl(1, 76%, 52%);
-    box-shadow: 0 0 0 3px hsla(1, 76%, 52%, 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border-color: hsl(var(--primary));
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.12), 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .theme-studio-page {
+    position: relative;
+  }
+
+  .theme-studio-hero {
+    background: linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 52%, var(--sidebar-gradient-end) 100%);
+    box-shadow: 0 26px 36px -32px hsl(var(--secondary) / 0.7);
+  }
+
+  .theme-studio-hero-orb {
+    background: radial-gradient(circle at center, hsl(0 0% 100% / 0.18) 0%, transparent 65%);
+    filter: blur(2px);
   }
 
   .login-floating-orb {
@@ -438,10 +488,10 @@
   }
 
   .dashboard-header-banner {
-    background: linear-gradient(130deg, #293088 0%, #353eb0 47%, #e22e26 100%);
-    border-color: rgba(41, 48, 136, 0.85);
+    background: linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 47%, var(--sidebar-gradient-end) 100%);
+    border-color: hsl(var(--secondary) / 0.72);
     box-shadow:
-      0 10px 12px -22px rgba(33, 37, 96, 0.7),
+      0 10px 12px -22px hsl(var(--secondary) / 0.7),
       0 1px 0 0 rgba(255, 255, 255, 0.08) inset;
   }
 
