@@ -421,7 +421,7 @@ const HallBookingPage = () => {
                         <div className="bg-white/20 p-2 rounded-lg backdrop-blur-md hidden sm:flex">
                             <Building2 className="w-6 h-6" />
                         </div>
-                        Rental Venue Management
+                        Rental Venue
                     </h1>
                     <p className="text-sm mt-1.5 max-w-xl font-medium opacity-90">
                         Manage temple venues, monitor event schedules, and optimize space utilization.
