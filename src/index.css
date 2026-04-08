@@ -2730,10 +2730,6 @@
   }
 }
 
-color: #fff !important;
-border-color: color-mix(in srgb, var(--brand-blue-600) 72%, black) !important;
-}
-
 .dashboard-premium .text-primary,
 .donations-premium .text-primary,
 .events-premium .text-primary,
@@ -3128,5 +3124,4 @@ border-color: color-mix(in srgb, var(--brand-blue-600) 72%, black) !important;
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
 }

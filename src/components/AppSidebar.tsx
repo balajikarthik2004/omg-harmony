@@ -33,10 +33,10 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
     <aside
       className="layout-sidebar hidden lg:flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden border transition-[width,box-shadow,transform] duration-300"
       style={{
-<<<<<<< HEAD
+
         background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
         color: 'hsl(var(--sidebar-foreground))',
-=======
+
         width: isCollapsed ? 'var(--layout-sidebar-collapsed-width)' : 'var(--layout-sidebar-expanded-width)',
         backgroundImage: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
         backgroundColor: 'var(--layout-frame-background)',
@@ -46,7 +46,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
         backdropFilter: 'var(--layout-frame-backdrop)',
         WebkitBackdropFilter: 'var(--layout-frame-backdrop)',
         color: 'hsl(0, 0%, 100%)',
->>>>>>> d731352180962034e1232637f1e3343306677892
+
       }}
     >
       <div className="pointer-events-none absolute inset-0">
