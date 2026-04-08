@@ -14,23 +14,23 @@ import {
 } from '@/data/mockData';
 
 const kpis = [
-  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-[#E22E26]', bg: 'dashboard-kpi-amber', trend: '+12% from yesterday' },
-  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-[#293088]', bg: 'dashboard-kpi-blue', trend: '4 pending approval' },
-  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-[#4F58CA]', bg: 'dashboard-kpi-emerald', trend: '+45 this week' },
-  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-[#C5221D]', bg: 'dashboard-kpi-slate', trend: '' },
+  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-red-500', bg: 'bg-primary/15 border-primary/25', trend: '+12% from yesterday' },
+  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-accent', bg: 'bg-accent/15 border-accent/30', trend: '4 pending approval' },
+  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-foreground', bg: 'bg-foreground/10 border-foreground/20', trend: '+45 this week' },
+  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-success', bg: 'bg-success/15 border-success/30', trend: '' },
 ];
 
 const secondaryKpis = [
-  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-[#293088] font-bold bg-[#EBECF9] border border-[#C4C7ED]' },
-  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-[#E22E26] font-bold bg-[#F9D6D4] border border-[#F3ADA8] ring-2 ring-[#E22E26]/20' },
+  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-primary font-bold bg-primary/10 border border-primary/20' },
+  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-destructive font-bold bg-destructive/10 border border-destructive/20 ring-2 ring-destructive/20' },
 ];
 
 const recentActivity = [
-  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-[#F9D6D4] text-[#C5221D]' },
-  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-[#EBECF9] text-[#293088]' },
-  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-[#C4C7ED] text-[#293088]' },
-  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-[#9DA2E1] text-[#293088]' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-[#F3ADA8] text-[#C5221D]' },
+  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-primary/10 text-primary border border-primary/20' },
+  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-primary/10 text-primary border border-primary/20' },
+  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-muted text-muted-foreground border border-border' },
+  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-primary/10 text-primary border border-primary/20' },
+  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' },
 ];
 
 const upcomingEvents = [
@@ -40,7 +40,7 @@ const upcomingEvents = [
 ];
 
 const dashboardColors = {
-  line: 'hsl(var(--secondary))',
+  line: 'hsl(var(--primary))',
   lineGrid: 'var(--chart-grid)',
   lineFillTop: 'var(--chart-accent-c)',
   lineFillBottom: 'var(--chart-accent-c)',
@@ -50,7 +50,7 @@ const dashboardColors = {
   chartAccentD: 'var(--chart-accent-d)',
   tooltipBorder: '1px solid hsl(var(--border))',
   tooltipShadow: '0 14px 34px -14px hsl(var(--secondary) / 0.35)',
-  tooltipBg: 'hsl(0, 0%, 100%)',
+  tooltipBg: 'hsl(var(--card))',
   chartCursor: 'var(--chart-cursor)',
 };
 
@@ -72,13 +72,13 @@ const DashboardPage: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Real-time overview of temple operations, finances, and key metrics.</p>
         </div>
         <div className="flex gap-2">
-           <div className="relative w-full max-w-[200px] hidden sm:block">
-              <Search className="dashboard-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
-                placeholder="Quick search..."
-              />
-           </div>
+          <div className="relative w-full max-w-[200px] hidden sm:block">
+            <Search className="dashboard-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
+              placeholder="Quick search..."
+            />
+          </div>
         </div>
       </div>
 
@@ -87,30 +87,18 @@ const DashboardPage: React.FC = () => {
           <div key={kpi.label} className={`dashboard-kpi-card rounded-2xl border p-5 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden ${kpi.bg}`}>
             <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 bg-current ${kpi.color.split(' ')[0]}`} />
             <div className="flex justify-between items-start mb-4 relative z-10">
-               <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground opacity-80">{kpi.label}</p>
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-background/80 shadow-sm ${kpi.color}`}>
-                  <kpi.icon className="w-4 h-4" />
-               </div>
+              <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground opacity-80">{kpi.label}</p>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${kpi.color} bg-background`}>
+                <kpi.icon className="w-4 h-4" />
+              </div>
             </div>
             <div className="relative z-10">
-               <p className="numeric-font text-3xl font-bold text-foreground tracking-tight">{kpi.value}</p>
-               <p className="text-xs font-semibold text-muted-foreground mt-1">{kpi.trend}</p>
+              <p className="numeric-font text-3xl font-bold text-foreground tracking-tight">{kpi.value}</p>
+              <p className="text-xs font-semibold text-muted-foreground mt-1">{kpi.trend}</p>
             </div>
           </div>
         ))}
       </div>
-
-      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-3 animate-stagger">
-        {secondaryKpis.map(kpi => (
-          <div key={kpi.label} className={`dashboard-secondary-kpi rounded-xl p-4 flex items-center justify-between shadow-sm ${kpi.color}`}>
-            <div className="flex items-center gap-3">
-              <kpi.icon className="w-5 h-5 opacity-80" />
-              <p className="text-sm font-semibold">{kpi.label}</p>
-            </div>
-            <p className="numeric-font text-xl font-bold">{kpi.value}</p>
-          </div>
-        ))}
-      </div> */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <section className="section-panel shadow-sm lg:col-span-2 flex flex-col">
@@ -128,19 +116,19 @@ const DashboardPage: React.FC = () => {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} dy={10} />
-                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000)}k`} dx={-10} />
-                <Tooltip 
+                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v / 1000)}k`} dx={-10} />
+                <Tooltip
                   formatter={(v: number) => [`₹${v.toLocaleString('en-IN')}`, 'Amount']}
                   separator=": "
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px', padding: '10px 14px' }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
+                <Line
+                  type="monotone"
+                  dataKey="amount"
                   stroke={dashboardColors.line}
-                  strokeWidth={3} 
-                  dot={{ r: 4, fill: dashboardColors.line, strokeWidth: 2, stroke: '#fff' }}
-                  activeDot={{ r: 6, fill: dashboardColors.line, strokeWidth: 2, stroke: '#fff' }}
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: dashboardColors.line, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
+                  activeDot={{ r: 6, fill: dashboardColors.line, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
                   fill="url(#donationGradient)"
                 />
               </LineChart>
@@ -155,12 +143,12 @@ const DashboardPage: React.FC = () => {
           <div className="p-5 flex-1 flex flex-col justify-center relative">
             <ResponsiveContainer width="100%" height={230}>
               <PieChart>
-                <Pie data={donationCategoryData} cx="50%" cy="50%" fontSize={12} outerRadius={85} innerRadius={45} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={{ stroke: '#C4C7ED' }} strokeWidth={2} stroke="#F8F9FF">
+                <Pie data={donationCategoryData} cx="50%" cy="50%" fontSize={12} outerRadius={85} innerRadius={45} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={{ stroke: 'hsl(var(--muted-foreground))' }} strokeWidth={2} stroke="hsl(var(--background))">
                   {donationCategoryData.map((entry, i) => (
                     <Cell key={i} fill={donationCategoryPalette[i % donationCategoryPalette.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                 />
               </PieChart>
@@ -180,7 +168,7 @@ const DashboardPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="service" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                   cursor={{ fill: dashboardColors.chartCursor }}
                 />
@@ -200,7 +188,7 @@ const DashboardPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="item" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                   cursor={{ fill: dashboardColors.chartCursor }}
                 />
@@ -222,7 +210,7 @@ const DashboardPage: React.FC = () => {
             {recentActivity.map((a, i) => (
               <div key={i} className="flex items-start gap-3 group">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs ${a.color}`}>
-                   {a.initial}
+                  {a.initial}
                 </div>
                 <div className="pt-1.5 flex-1 border-b border-border/40 pb-3 group-last:border-0 group-last:pb-0">
                   <p className="text-[13px] font-medium text-foreground leading-snug">{a.text}</p>
@@ -232,8 +220,6 @@ const DashboardPage: React.FC = () => {
             ))}
           </div>
         </section>
-
-
 
         <section className="section-panel shadow-sm">
           <div className="section-panel-header">

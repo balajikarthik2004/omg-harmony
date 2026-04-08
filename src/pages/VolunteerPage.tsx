@@ -253,14 +253,14 @@ const VolunteerPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Volunteer Campaign System</h1>
-          <p className="text-slate-500 mt-1">Mobilize, track and empower temple volunteers for seamless operations.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Volunteer Campaign System</h1>
+          <p className="text-muted-foreground mt-1">Mobilize, track and empower temple volunteers for seamless operations.</p>
         </div>
         
         <div className="flex items-center gap-3">
           <Dialog open={isCampaignDialogOpen} onOpenChange={setIsCampaignDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl shadow-lg bg-gradient-to-r from-[#293088] to-[#353EB0] hover:shadow-indigo-200/50 transition-all border-none py-6 h-auto px-6">
+              <Button className="rounded-xl shadow-lg bg-primary hover:opacity-90 transition-all border-none py-6 h-auto px-6 text-primary-foreground">
                 <Plus className="w-5 h-5 mr-2" />
                 New Campaign
               </Button>
@@ -268,7 +268,7 @@ const VolunteerPage: React.FC = () => {
             <DialogContent className="sm:max-w-[500px] rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                  <ShieldCheck className="w-6 h-6 text-indigo-600" />
+                  <ShieldCheck className="w-6 h-6 text-primary" />
                   Initiate Campaign
                 </DialogTitle>
                 <DialogDescription>
@@ -309,7 +309,7 @@ const VolunteerPage: React.FC = () => {
                 <div className="space-y-2">
                   <Label>Campaign Objectives & Details</Label>
                   <textarea 
-                    className="w-full min-h-[100px] rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    className="w-full min-h-[100px] rounded-xl border border-border bg-background/50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Describe the mission goals..."
                     value={newCampaign.description}
                     onChange={(e) => setNewCampaign({...newCampaign, description: e.target.value})}
@@ -319,7 +319,7 @@ const VolunteerPage: React.FC = () => {
               <DialogFooter>
                 <Button 
                     onClick={handleCreateCampaign}
-                    className="w-full py-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-lg shadow-xl shadow-indigo-100"
+                    className="w-full py-6 rounded-xl bg-primary hover:opacity-90 text-primary-foreground text-lg shadow-xl shadow-primary/10"
                 >
                   Confirm Mission Launch
                 </Button>
@@ -330,17 +330,17 @@ const VolunteerPage: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] rounded-2xl p-1 bg-white/50 backdrop-blur-sm border border-slate-100 shadow-sm mb-6">
-          <TabsTrigger value="dashboard" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] rounded-2xl p-1 bg-muted/50 backdrop-blur-sm border border-border shadow-sm mb-6">
+          <TabsTrigger value="dashboard" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Insights
           </TabsTrigger>
-          <TabsTrigger value="directory" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+          <TabsTrigger value="directory" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Volunteer Base
           </TabsTrigger>
-          <TabsTrigger value="campaigns" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+          <TabsTrigger value="campaigns" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Missions
           </TabsTrigger>
-          <TabsTrigger value="attendance" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+          <TabsTrigger value="attendance" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Engagement
           </TabsTrigger>
         </TabsList>
@@ -348,81 +348,81 @@ const VolunteerPage: React.FC = () => {
         <TabsContent value="dashboard" className="space-y-6">
           {/* Top Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden group">
-              <div className="h-1.5 w-full bg-[#293088]" />
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden group">
+              <div className="h-1.5 w-full bg-primary" />
               <CardHeader className="pb-2">
-                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-[#293088]/60">Total Base</CardDescription>
+                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-primary/60">Total Base</CardDescription>
                 <div className="flex items-center justify-between mt-1">
-                  <CardTitle className="text-2xl font-bold">{totalVolunteers}</CardTitle>
-                  <div className="p-2 rounded-lg bg-indigo-50 text-[#293088]">
+                  <CardTitle className="text-2xl font-bold text-foreground">{totalVolunteers}</CardTitle>
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
                     <Users className="w-5 h-5" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-[11px] text-slate-500 font-medium">
-                  <span className="text-emerald-600 font-bold">+3 new</span> registered this month
+                <p className="text-[11px] text-muted-foreground font-medium">
+                  <span className="text-emerald-500 font-bold">+3 new</span> registered this month
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
-              <div className="h-1.5 w-full bg-[#E22E26]" />
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
+              <div className="h-1.5 w-full bg-secondary" />
               <CardHeader className="pb-2">
-                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-red-600/60">Active Missions</CardDescription>
+                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-secondary/60">Active Missions</CardDescription>
                 <div className="flex items-center justify-between mt-1">
-                  <CardTitle className="text-2xl font-bold">{activeCampaigns}</CardTitle>
-                  <div className="p-2 rounded-lg bg-red-50 text-red-600">
+                  <CardTitle className="text-2xl font-bold text-foreground">{activeCampaigns}</CardTitle>
+                  <div className="p-2 rounded-lg bg-secondary/10 text-secondary">
                     <HeartHandshake className="w-5 h-5" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-[11px] text-slate-500 font-medium">Participated by 82 volunteers</p>
+                <p className="text-[11px] text-muted-foreground font-medium">Participated by 82 volunteers</p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
               <div className="h-1.5 w-full bg-emerald-500" />
               <CardHeader className="pb-2">
                 <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-emerald-600/60">Reliability Index</CardDescription>
                 <div className="flex items-center justify-between mt-1">
-                  <CardTitle className="text-2xl font-bold">{avgReliability}%</CardTitle>
-                  <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                  <CardTitle className="text-2xl font-bold text-foreground">{avgReliability}%</CardTitle>
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <Progress value={avgReliability} className="h-1.5 bg-emerald-50" />
+                <Progress value={avgReliability} className="h-1.5 bg-emerald-500/10" />
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
               <div className="h-1.5 w-full bg-amber-500" />
               <CardHeader className="pb-2">
-                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-amber-600/60">Top Performers</CardDescription>
+                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-amber-500/70">Top Performers</CardDescription>
                 <div className="flex items-center justify-between mt-1">
-                  <CardTitle className="text-2xl font-bold">{participationRate}%</CardTitle>
-                  <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+                  <CardTitle className="text-2xl font-bold text-foreground">{participationRate}%</CardTitle>
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-500">
                     <Trophy className="w-5 h-5" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-[11px] text-slate-500 font-medium">Have &gt;10 participation history</p>
+                <p className="text-[11px] text-muted-foreground font-medium">Have &gt;10 participation history</p>
               </CardContent>
             </Card>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
+            <Card className="lg:col-span-2 rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Reliability Distribution</CardTitle>
                   <CardDescription>Volunteer accountability tracking across base</CardDescription>
                 </div>
-                <Badge variant="outline" className="bg-indigo-50 border-indigo-100 text-[#293088] rounded-xl px-3">
+                <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary rounded-xl px-3">
                     Healthy Retention
                 </Badge>
               </CardHeader>
@@ -432,24 +432,24 @@ const VolunteerPage: React.FC = () => {
                     <AreaChart data={volunteers.map(v => ({ name: v.name.split(' ')[0], score: v.reliabilityScore }))}>
                       <defs>
                         <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#293088" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#293088" stopOpacity={0}/>
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border) / 0.5)" />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
                       <Tooltip 
-                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--foreground))' }}
                       />
-                      <Area type="monotone" dataKey="score" stroke="#293088" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
+                      <Area type="monotone" dataKey="score" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card">
               <CardHeader>
                 <CardTitle>Top Contributions</CardTitle>
                 <CardDescription>Most active volunteers this season</CardDescription>
@@ -460,52 +460,52 @@ const VolunteerPage: React.FC = () => {
                     <div key={v.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white ${
-                            i === 0 ? 'bg-amber-400' : i === 1 ? 'bg-slate-300' : i === 2 ? 'bg-orange-300' : 'bg-indigo-400'
+                            i === 0 ? 'bg-amber-400' : i === 1 ? 'bg-muted-foreground' : i === 2 ? 'bg-secondary' : 'bg-primary'
                         }`}>
                           {v.name.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-sm font-bold text-slate-800">{v.name}</p>
-                          <p className="text-[10px] text-slate-500 font-medium">{v.skills[0] || 'Volunteer'}</p>
+                          <p className="text-sm font-bold text-foreground">{v.name}</p>
+                          <p className="text-[10px] text-muted-foreground font-medium">{v.skills[0] || 'Volunteer'}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-indigo-600">{v.participationCount}</p>
-                        <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Missions</p>
+                        <p className="text-sm font-bold text-primary">{v.participationCount}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Missions</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-6 text-indigo-600 hover:bg-indigo-50 rounded-xl">View Leaderboard</Button>
+                <Button variant="ghost" className="w-full mt-6 text-primary hover:bg-primary/5 rounded-xl font-bold">View Leaderboard</Button>
               </CardContent>
             </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="directory" className="space-y-6">
-          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
-             <CardHeader className="bg-slate-50/50 pb-6 border-b border-slate-100">
+          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
+             <CardHeader className="bg-muted/30 pb-6 border-b border-border">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <CardTitle>Volunteer Registry</CardTitle>
-                        <CardDescription>Comprehensive database of all registered service members</CardDescription>
+                        <CardTitle className="text-foreground">Volunteer Registry</CardTitle>
+                        <CardDescription className="text-muted-foreground">Comprehensive database of all registered service members</CardDescription>
                     </div>
                     <div className="flex items-center gap-3">
                         <div className="relative w-64">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <Input 
                                 placeholder="Search by name, ID..." 
-                                className="pl-9 rounded-xl border-slate-200"
+                                className="pl-9 rounded-xl border-border bg-background"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        <Button onClick={() => setIsAddVolunteerOpen(true)} className="rounded-xl bg-emerald-600 hover:bg-emerald-700">
+                        <Button onClick={() => setIsAddVolunteerOpen(true)} className="rounded-xl bg-primary hover:opacity-90 text-primary-foreground shadow-sm">
                             <Plus className="w-4 h-4 mr-2" />
                             Add Volunteer
                         </Button>
                         <Select value={skillFilter} onValueChange={setSkillFilter}>
-                            <SelectTrigger className="w-[160px] rounded-xl border-slate-200">
+                            <SelectTrigger className="w-[160px] rounded-xl border-border bg-background text-foreground">
                                 <Filter className="w-3.5 h-3.5 mr-2 opacity-60" />
                                 <SelectValue placeholder="All Skills" />
                             </SelectTrigger>
@@ -523,41 +523,41 @@ const VolunteerPage: React.FC = () => {
              <CardContent className="p-0">
                 <Table>
                     <TableHeader>
-                        <TableRow className="bg-slate-50/80 border-none">
-                            <TableHead className="font-bold py-4 pl-6">Member info</TableHead>
-                            <TableHead className="font-bold">Skills / Experts</TableHead>
-                            <TableHead className="font-bold">Availability</TableHead>
-                            <TableHead className="font-bold">Reliability</TableHead>
-                            <TableHead className="font-bold">Status</TableHead>
-                            <TableHead className="font-bold text-right pr-6">Engagement</TableHead>
+                        <TableRow className="bg-muted/40 border-none">
+                            <TableHead className="font-bold py-4 pl-6 text-muted-foreground">Member info</TableHead>
+                            <TableHead className="font-bold text-muted-foreground">Skills / Experts</TableHead>
+                            <TableHead className="font-bold text-muted-foreground">Availability</TableHead>
+                            <TableHead className="font-bold text-muted-foreground">Reliability</TableHead>
+                            <TableHead className="font-bold text-muted-foreground">Status</TableHead>
+                            <TableHead className="font-bold text-muted-foreground text-right pr-6">Engagement</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {filteredVolunteers.map((v) => (
-                            <TableRow key={v.id} className="hover:bg-slate-50/30 transition-colors border-slate-100 group">
+                            <TableRow key={v.id} className="hover:bg-muted/30 transition-colors border-border group">
                                 <TableCell className="pl-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 text-xs shadow-inner">
+                                        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center font-bold text-muted-foreground text-xs shadow-inner">
                                             {v.name.charAt(0)}
                                         </div>
                                         <div>
-                                            <p className="font-bold text-slate-900 leading-tight">{v.name}</p>
-                                            <p className="text-[10px] text-slate-400 font-medium">#{v.id}</p>
+                                            <p className="font-bold text-foreground leading-tight">{v.name}</p>
+                                            <p className="text-[10px] text-muted-foreground font-medium">#{v.id}</p>
                                         </div>
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex flex-wrap gap-1">
                                         {v.skills.map(s => (
-                                            <Badge key={s} variant="outline" className="text-[9px] px-1.5 py-0 rounded-md border-slate-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)]">
+                                            <Badge key={s} variant="outline" className="text-[9px] px-1.5 py-0 rounded-md border-border bg-background shadow-[0_1px_2px_rgba(0,0,0,0.05)] text-foreground">
                                                 {s}
                                             </Badge>
                                         ))}
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <span className="text-xs font-medium text-slate-600 flex items-center gap-1.5">
-                                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                                    <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                                        <Clock className="w-3.5 h-3.5 text-muted-foreground/60" />
                                         {v.availability}
                                     </span>
                                 </TableCell>
@@ -568,18 +568,18 @@ const VolunteerPage: React.FC = () => {
                                                 {v.reliabilityScore}%
                                             </span>
                                         </div>
-                                        <Progress value={v.reliabilityScore} className={`h-1 ${v.reliabilityScore > 90 ? 'bg-emerald-50' : 'bg-amber-50'}`} />
+                                        <Progress value={v.reliabilityScore} className={`h-1 ${v.reliabilityScore > 90 ? 'bg-emerald-500/10' : 'bg-amber-500/10'}`} />
                                     </div>
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={`rounded-xl text-[10px] font-bold px-2.5 ${
-                                        v.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'
+                                        v.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25' : 'bg-muted text-muted-foreground border border-border'
                                     }`}>
                                         {v.status}
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right pr-6">
-                                    <Button variant="ghost" size="sm" className="rounded-lg text-indigo-600 hover:bg-indigo-50 font-bold text-xs">
+                                    <Button variant="ghost" size="sm" className="rounded-lg text-primary hover:bg-primary/10 font-bold text-xs">
                                         Assign Mission
                                     </Button>
                                 </TableCell>
@@ -594,49 +594,49 @@ const VolunteerPage: React.FC = () => {
         <TabsContent value="campaigns" className="space-y-6">
            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {campaigns.map(campaign => (
-                    <Card key={campaign.id} className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <Card key={campaign.id} className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
                         <div className={`h-1.5 w-full ${
-                            campaign.type === 'Festival Support' ? 'bg-indigo-600' : 
-                            campaign.type === 'Annadhanam' ? 'bg-emerald-600' : 
-                            campaign.type === 'Crowd Control' ? 'bg-red-600' : 'bg-amber-600'
+                            campaign.type === 'Festival Support' ? 'bg-primary' : 
+                            campaign.type === 'Annadhanam' ? 'bg-emerald-500' : 
+                            campaign.type === 'Crowd Control' ? 'bg-destructive' : 'bg-amber-500'
                         }`} />
                         <CardHeader className="pb-3">
-                            <div className="flex items-start justify-between">
-                                <Badge className={`rounded-lg text-[10px] uppercase tracking-wider font-bold ${
-                                    campaign.status === 'Active' ? 'bg-emerald-100 text-emerald-700' :
-                                    campaign.status === 'Draft' ? 'bg-slate-100 text-slate-600' : 'bg-indigo-100 text-indigo-700'
+                             <div className="flex items-start justify-between">
+                                <Badge className={`rounded-lg text-[10px] uppercase tracking-wider font-bold border-none shadow-none ${
+                                    campaign.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400' :
+                                    campaign.status === 'Draft' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'
                                 }`}>
                                     {campaign.status}
                                 </Badge>
-                                <span className="text-[10px] font-bold text-slate-400">#{campaign.id}</span>
+                                <span className="text-[10px] font-bold text-muted-foreground/60">#{campaign.id}</span>
                             </div>
                             <CardTitle className="text-lg font-bold mt-2 leading-tight">{campaign.title}</CardTitle>
                             <CardDescription className="text-xs line-clamp-2 mt-1">{campaign.description}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4 pt-0">
-                            <div className="flex flex-col gap-2 bg-slate-50 rounded-xl p-3 border border-slate-100">
+                             <div className="flex flex-col gap-2 bg-muted/40 rounded-xl p-3 border border-border/50">
                                 <div className="flex items-center justify-between text-[11px] font-bold">
-                                    <span className="text-slate-500">Resource Fulfilled</span>
-                                    <span className="text-slate-900">{campaign.roles.reduce((acc, r) => acc + r.assigned, 0)}/{campaign.roles.reduce((acc, r) => acc + r.required, 0)}</span>
+                                    <span className="text-muted-foreground">Resource Fulfilled</span>
+                                    <span className="text-foreground">{campaign.roles.reduce((acc, r) => acc + r.assigned, 0)}/{campaign.roles.reduce((acc, r) => acc + r.required, 0)}</span>
                                 </div>
                                 <Progress value={Math.round((campaign.roles.reduce((acc, r) => acc + r.assigned, 0) / campaign.roles.reduce((acc, r) => acc + r.required, 0)) * 100)} className="h-1.5" />
                             </div>
                             
                             <div className="space-y-2">
-                                <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
-                                    <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                                    <Calendar className="w-3.5 h-3.5 text-muted-foreground/60" />
                                     {campaign.startDate} {campaign.endDate ? ` - ${campaign.endDate}` : ''}
                                 </div>
-                                <div className="flex items-center gap-2 text-xs text-slate-600 font-medium">
-                                    <Briefcase className="w-3.5 h-3.5 text-slate-400" />
+                                <div className="flex items-center gap-2 text-xs text-muted-foreground font-medium">
+                                    <Briefcase className="w-3.5 h-3.5 text-muted-foreground/60" />
                                     {campaign.roles.length} roles defined
                                 </div>
                             </div>
                         </CardContent>
-                        <CardFooter className="bg-slate-50/50 pt-4">
+                        <CardFooter className="bg-muted/30 pt-4">
                             <Button 
                                 variant="outline" 
-                                className="w-full rounded-xl border-slate-200 text-xs font-bold py-5 hover:bg-white hover:text-indigo-600 transition-all"
+                                className="w-full rounded-xl border-border text-xs font-bold py-5 hover:bg-background hover:text-primary transition-all text-foreground"
                                 onClick={() => {
                                     setSelectedCampaign(campaign);
                                     setSelectedRoleForAssign(campaign.roles[0]?.name || '');
@@ -653,9 +653,9 @@ const VolunteerPage: React.FC = () => {
                 {/* Empty Add Card */}
                 <button 
                   onClick={() => setIsCampaignDialogOpen(true)}
-                  className="rounded-2xl border-2 border-dashed border-slate-200 p-8 flex flex-col items-center justify-center gap-3 text-slate-400 hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/30 transition-all group"
+                  className="rounded-2xl border-2 border-dashed border-border p-8 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all group shadow-sm bg-card"
                 >
-                    <div className="p-4 rounded-full bg-slate-50 group-hover:bg-indigo-100 transition-all">
+                    <div className="p-4 rounded-full bg-muted group-hover:bg-primary/10 transition-all">
                         <Plus className="w-8 h-8" />
                     </div>
                     <span className="font-bold text-sm">Initiate New Mission</span>
@@ -664,23 +664,23 @@ const VolunteerPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="attendance" className="space-y-6">
-           <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
-                <CardHeader className="bg-[#293088] text-white relative">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
+                <CardHeader className="bg-primary text-primary-foreground relative">
                    <div className="absolute top-0 right-0 p-8 opacity-10">
                      <UserCheck className="w-24 h-24" />
                    </div>
                    <CardTitle>Daily Engagement Registry</CardTitle>
-                   <CardDescription className="text-white/70">Check-in volunteers for today's active missions</CardDescription>
+                   <CardDescription className="text-primary-foreground/70">Check-in volunteers for today's active missions</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
                         <TableHeader>
-                            <TableRow className="bg-slate-50 border-none">
-                                <TableHead className="font-bold py-4 pl-6">Volunteer</TableHead>
-                                <TableHead className="font-bold">Assigned Mission</TableHead>
-                                <TableHead className="font-bold">Shift</TableHead>
-                                <TableHead className="font-bold">Current Reliability</TableHead>
-                                <TableHead className="font-bold text-right pr-6">Verification</TableHead>
+                            <TableRow className="bg-muted/40 border-none">
+                                <TableHead className="font-bold py-4 pl-6 text-muted-foreground">Volunteer</TableHead>
+                                <TableHead className="font-bold text-muted-foreground">Assigned Mission</TableHead>
+                                <TableHead className="font-bold text-muted-foreground">Shift</TableHead>
+                                <TableHead className="font-bold text-muted-foreground">Current Reliability</TableHead>
+                                <TableHead className="font-bold text-muted-foreground text-right pr-6">Verification</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -706,8 +706,8 @@ const VolunteerPage: React.FC = () => {
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <Badge variant="outline" className={`rounded-xl border-dashed ${
-                                            v.reliabilityScore > 90 ? 'border-emerald-500 text-emerald-600 bg-emerald-50/50' : 'border-amber-500 text-amber-600 bg-amber-50/50'
+                                        <Badge variant="outline" className={`rounded-xl border-dashed bg-background ${
+                                            v.reliabilityScore > 90 ? 'border-emerald-500 text-emerald-500' : 'border-amber-500 text-amber-500'
                                         }`}>
                                             {v.reliabilityScore}% Index
                                         </Badge>
@@ -730,45 +730,45 @@ const VolunteerPage: React.FC = () => {
            </Card>
 
            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-indigo-500 group">
-                    <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 mb-4 group-hover:scale-110 transition-all">
+                 <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-primary group">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-all">
                         <QrCode className="w-8 h-8" />
                     </div>
-                    <h4 className="font-bold text-slate-900">QR Check-in</h4>
-                    <p className="text-xs text-slate-500 mt-2">Generate instant QR codes for volunteers to self-verify.</p>
+                    <h4 className="font-bold text-foreground">QR Check-in</h4>
+                    <p className="text-xs text-muted-foreground mt-2">Generate instant QR codes for volunteers to self-verify.</p>
                     <Button 
                         variant="outline" 
-                        className="mt-6 w-full rounded-xl border-slate-200"
+                        className="mt-6 w-full rounded-xl border-border bg-background hover:bg-primary/5 hover:text-primary transition-all text-foreground"
                         onClick={() => toast.info("Opening QR Scanner camera...")}
                     >
                         Open QR Scanner
                     </Button>
                 </Card>
 
-                <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-emerald-500 group">
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-all">
+                 <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-emerald-500 group">
+                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-all">
                         <UserCheck className="w-8 h-8" />
                     </div>
-                    <h4 className="font-bold text-slate-900">Auto SMS Notification</h4>
-                    <p className="text-xs text-slate-500 mt-2">Remind assigned volunteers about their upcoming shifts.</p>
+                    <h4 className="font-bold text-foreground">Auto SMS Notification</h4>
+                    <p className="text-xs text-muted-foreground mt-2">Remind assigned volunteers about their upcoming shifts.</p>
                     <Button 
                         variant="outline" 
-                        className="mt-6 w-full rounded-xl border-slate-200"
+                        className="mt-6 w-full rounded-xl border-border bg-background hover:bg-emerald-500/10 hover:text-emerald-600 transition-all text-foreground"
                         onClick={() => toast.success("Reminders dispatched to all assigned volunteers!")}
                     >
                         Dispatch Reminders
                     </Button>
                 </Card>
 
-                <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-red-500 group">
-                    <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center text-red-600 mb-4 group-hover:scale-110 transition-all">
+                 <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-destructive group">
+                    <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center text-destructive mb-4 group-hover:scale-110 transition-all">
                         <AlertTriangle className="w-8 h-8" />
                     </div>
-                    <h4 className="font-bold text-slate-900">Absence Alert</h4>
-                    <p className="text-xs text-slate-500 mt-2">Identify no-shows for the current active shift.</p>
+                    <h4 className="font-bold text-foreground">Absence Alert</h4>
+                    <p className="text-xs text-muted-foreground mt-2">Identify no-shows for the current active shift.</p>
                     <Button 
                         variant="outline" 
-                        className="mt-6 w-full rounded-xl border-slate-200"
+                        className="mt-6 w-full rounded-xl border-border bg-background hover:bg-destructive/10 hover:text-destructive transition-all text-foreground"
                         onClick={() => toast.warning("Scanning for 12 potential no-shows...")}
                     >
                         View Alert List

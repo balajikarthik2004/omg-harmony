@@ -402,15 +402,15 @@ const HrPage: React.FC = () => {
 
   return (
     <div className="hr-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner hr-header bg-gradient-to-r from-violet-50/80 via-background to-sky-50/80">
+      <div className="page-header-banner hr-header">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-violet-600" /> HR & Volunteer Management</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> HR & Volunteer Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage temple staff details, schedules, payroll, and volunteers.</p>
         </div>
         <div className="relative max-w-sm w-full md:w-72 mt-3 md:mt-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
-            className="hr-search-input w-full pl-9 pr-4 h-10 rounded-lg border border-input bg-background/80 text-sm transition-all focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 hover:border-border outline-none shadow-sm"
+            className="hr-search-input w-full pl-9 pr-4 h-10 rounded-lg border border-input bg-card text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 hover:border-border outline-none shadow-sm"
             placeholder="Search staff..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -420,28 +420,28 @@ const HrPage: React.FC = () => {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
         <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/30 group-hover:scale-110 transition-transform" />
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/40 group-hover:scale-110 transition-transform" />
           <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Active Staff</p>
           <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{totals.activeStaff}</p>
         </div>
-        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-orange-100 bg-orange-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-orange-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-orange-800 flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
-          <p className="text-3xl font-display font-bold mt-2 text-orange-700 relative z-10">{totals.priests}</p>
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-secondary flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
+          <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{totals.priests}</p>
         </div>
-        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800 flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Assigned Duties</p>
-          <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{totals.scheduledDuties}</p>
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-500/20 bg-amber-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-500 flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Assigned Duties</p>
+          <p className="text-3xl font-display font-bold mt-2 text-amber-500 relative z-10">{totals.scheduledDuties}</p>
         </div>
-        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Volunteers</p>
-          <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{totals.assignedVolunteers}</p>
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-500/20 bg-emerald-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-500 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Volunteers</p>
+          <p className="text-3xl font-display font-bold mt-2 text-emerald-500 relative z-10">{totals.assignedVolunteers}</p>
         </div>
       </div>
 
-      <div className="hr-tabbar bg-card/80 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
+      <div className="hr-tabbar bg-card/60 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
         {([
           { key: 'staff' as HrSection, label: 'Staff List', icon: Briefcase },
           { key: 'duties' as HrSection, label: 'Duties', icon: CalendarDays },
@@ -463,7 +463,7 @@ const HrPage: React.FC = () => {
       <div className="animate-fade-in relative">
         {activeSection === 'staff' && (
           <section className="section-panel hr-main-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-primary/5 to-transparent">
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> Staff Member List</h2>
               <Button onClick={openAddStaff} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Staff</Button>
             </div>
@@ -484,7 +484,7 @@ const HrPage: React.FC = () => {
                     <tr key={item.id} className="hr-row border-b border-border hover:bg-muted/30 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-border'}`}>
                             {initials(item.name)}
                           </div>
                           <div>
@@ -496,11 +496,11 @@ const HrPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="p-4 text-muted-foreground">
-                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border ${item.role === 'Priest' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>{item.role}</span>
+                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border ${item.role === 'Priest' ? 'bg-primary/10 text-primary border-primary/20 font-display' : 'bg-muted text-muted-foreground border-border'}`}>{item.role}</span>
                         <p className="text-xs font-semibold text-foreground/80">{item.department}</p>
                       </td>
                       <td className="p-4 text-muted-foreground text-xs font-medium">{item.joinedDate}</td>
-                      <td className="p-4 text-right font-display font-bold text-emerald-700 text-lg tracking-tight">{money(item.salary)}</td>
+                      <td className="p-4 text-right font-display font-bold text-primary text-lg tracking-tight">{money(item.salary)}</td>
                       <td className="p-4"><StatusBadge status={item.status} /></td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-1.5">
@@ -517,23 +517,23 @@ const HrPage: React.FC = () => {
         )}
 
         {activeSection === 'payroll' && (
-          <section className="section-panel hr-main-panel bg-gradient-to-b from-background to-slate-50/50 shadow-sm border-l-4 border-slate-500">
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-slate-100/50 to-transparent">
+          <section className="section-panel hr-main-panel shadow-sm border-l-4 border-muted-foreground/30">
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Wallet className="w-4 h-4 text-slate-600" /> Payroll Management</h2>
             </div>
             <div className="p-6">
-              <div className="flex flex-col md:flex-row gap-6 mb-8 bg-background border border-border/70 p-6 rounded-2xl shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-slate-500/5 rounded-bl-full pointer-events-none" />
+              <div className="flex flex-col md:flex-row gap-6 mb-8 bg-card border border-border/70 p-6 rounded-2xl shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full pointer-events-none" />
                 <div className="flex-1 relative z-10">
                   <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Select Month</label>
                   <div className="flex gap-3">
-                    <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-slate-500/20 outline-none hover:border-border transition-all shadow-inner" />
-                    <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-slate-700 hover:bg-slate-800 text-white">Generate Payroll</Button>
+                    <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all shadow-inner" />
+                    <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-primary hover:opacity-90 text-primary-foreground">Generate Payroll</Button>
                   </div>
                 </div>
                 <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
                   <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Monthly Payroll Outflow</p>
-                  <p className="text-4xl font-display font-bold text-slate-800 mt-1">{money(payrollTotal)}</p>
+                  <p className="text-4xl font-display font-bold text-foreground mt-1">{money(payrollTotal)}</p>
                   <p className="text-xs font-semibold text-muted-foreground mt-2">Paid: {paidEntries} | Pending: {unpaidEntries}</p>
                 </div>
               </div>
@@ -562,11 +562,11 @@ const HrPage: React.FC = () => {
 
                           <div className="space-y-2.5 mb-5 text-sm font-semibold bg-muted/20 p-4 rounded-xl border border-border/40 scale-[0.98] group-hover:scale-100 transition-transform origin-center">
                             <div className="flex justify-between text-muted-foreground items-center"><span>Base Pay</span> <span className="text-foreground tracking-tight">{money(entry.basePay)}</span></div>
-                            <div className="flex justify-between text-emerald-700 items-center"><span>HRA</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.hra ?? 0)}</span></div>
-                            <div className="flex justify-between text-emerald-700 items-center"><span>Overtime ({entry.overtimeHours ?? 0}h)</span> <span className="bg-emerald-50 px-1.5 rounded text-emerald-800">+{money(entry.overtimePay ?? 0)}</span></div>
-                            <div className="flex justify-between text-rose-600 items-center"><span>PF Contribution</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.pf ?? 0)}</span></div>
-                            {(entry.professionalTax ?? 0) > 0 && <div className="flex justify-between text-rose-600 items-center"><span>Professional Tax</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.professionalTax ?? 0)}</span></div>}
-                            {(entry.lopDeduction ?? 0) > 0 && <div className="flex justify-between text-rose-600 items-center"><span>LOP Deduction ({entry.absentDays ?? 0}d)</span> <span className="bg-rose-50 px-1.5 rounded text-rose-800">-{money(entry.lopDeduction ?? 0)}</span></div>}
+                            <div className="flex justify-between text-emerald-500 items-center"><span>HRA</span> <span className="bg-emerald-500/15 px-1.5 rounded text-emerald-500 tracking-wide font-display">+{money(entry.hra ?? 0)}</span></div>
+                            <div className="flex justify-between text-emerald-500 items-center"><span>Overtime ({entry.overtimeHours ?? 0}h)</span> <span className="bg-emerald-500/15 px-1.5 rounded text-emerald-500 tracking-wide font-display">+{money(entry.overtimePay ?? 0)}</span></div>
+                            <div className="flex justify-between text-destructive items-center"><span>PF Contribution</span> <span className="bg-destructive/15 px-1.5 rounded text-destructive tracking-wide font-display">-{money(entry.pf ?? 0)}</span></div>
+                            {(entry.professionalTax ?? 0) > 0 && <div className="flex justify-between text-destructive items-center"><span>Professional Tax</span> <span className="bg-destructive/15 px-1.5 rounded text-destructive tracking-wide font-display">-{money(entry.professionalTax ?? 0)}</span></div>}
+                            {(entry.lopDeduction ?? 0) > 0 && <div className="flex justify-between text-destructive items-center"><span>LOP Deduction ({entry.absentDays ?? 0}d)</span> <span className="bg-destructive/15 px-1.5 rounded text-destructive tracking-wide font-display">-{money(entry.lopDeduction ?? 0)}</span></div>}
                           </div>
 
                           <div className="flex items-center justify-between pt-1">
@@ -579,7 +579,7 @@ const HrPage: React.FC = () => {
                                 <Receipt className="w-3.5 h-3.5 mr-1.5" /> Pay Slip
                               </Button>
                               {entry.payoutStatus === 'Unpaid' && (
-                                <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white h-9 font-bold shadow-sm" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Salary</Button>
+                                <Button size="sm" className="bg-emerald-500 hover:bg-emerald-600 text-white h-9 font-bold shadow-sm" onClick={() => updatePayroll(entry.id, { payoutStatus: 'Paid' })}>Pay Salary</Button>
                               )}
                             </div>
                           </div>
@@ -595,9 +595,9 @@ const HrPage: React.FC = () => {
 
         {activeSection === 'duties' && (
           <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--amber))' }}>
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-amber-50/50 to-transparent">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-600" /> Active Duties List</h2>
-              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
+              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-500" /> Active Duties List</h2>
+              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-orange-500 hover:bg-orange-600 text-white"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No duties are currently set up.</p> : filteredDuties.map(item => (
@@ -606,17 +606,17 @@ const HrPage: React.FC = () => {
                   <div className="relative z-10 flex flex-col h-full">
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-700 font-bold text-sm shrink-0 border border-amber-200 shadow-sm">{initials(staffById[item.staffId]?.name ?? 'US')}</div>
+                        <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary font-bold text-sm shrink-0 border border-secondary/20 shadow-sm">{initials(staffById[item.staffId]?.name ?? 'US')}</div>
                         <div>
                           <p className="font-bold text-base leading-tight text-foreground tracking-tight">{staffById[item.staffId]?.name ?? 'Unknown Staff'}</p>
-                          <p className="text-[10px] uppercase tracking-widest text-amber-700 font-bold mt-1 bg-amber-50 inline-flex px-1.5 rounded">{item.dutyType}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-secondary font-bold mt-1 bg-secondary/10 inline-flex px-1.5 rounded">{item.dutyType}</p>
                         </div>
                       </div>
                       <StatusBadge status={item.status} />
                     </div>
                     <div className="space-y-2 text-xs text-muted-foreground font-semibold bg-muted/30 p-3.5 rounded-xl border border-border/50 mb-4 flex-1">
                       <div className="flex items-center gap-2"><CalendarDays className="w-3.5 h-3.5 text-primary/70" /> <span className="text-foreground">{item.dutyDate}</span> • {item.slot}</div>
-                      <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-emerald-600/70" /> <span className="text-foreground">{item.location}</span></div>
+                      <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-emerald-500/70" /> <span className="text-foreground">{item.location}</span></div>
                     </div>
                     {item.notes && <div className="text-xs text-muted-foreground italic mb-5 border-l-2 border-amber-300 pl-2 py-0.5">"{item.notes}"</div>}
 
@@ -633,9 +633,9 @@ const HrPage: React.FC = () => {
 
         {activeSection === 'volunteers' && (
           <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Enlisted Volunteers</h2>
-              <Button onClick={() => { setVolEditId(null); setVolModalOpen(true); }} className="shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
+              <Button onClick={() => { setVolEditId(null); setVolModalOpen(true); }} className="shadow-md hover:shadow-lg bg-primary hover:opacity-90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -653,7 +653,7 @@ const HrPage: React.FC = () => {
                     <tr key={item.id} className="hr-row border-b border-border hover:bg-muted/30 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-700 border-2 border-emerald-200 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                          <div className="w-10 h-10 rounded-full bg-emerald-500/15 text-emerald-500 border-2 border-emerald-500/30 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
                             {initials(item.name)}
                           </div>
                           <div>
@@ -685,9 +685,9 @@ const HrPage: React.FC = () => {
         )}
         {activeSection === 'attendance' && (
           <section className="section-panel hr-main-panel border-l-4 border-rose-500">
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-rose-50/80 to-transparent">
-              <div className="flex-1">
-                <h2 className="text-sm font-semibold flex items-center gap-2 pr-4 border-r border-border/60"><UserX className="w-4 h-4 text-rose-600" /> Attendance Registry</h2>
+            <div className="section-panel-header gap-4 border-b border-border/60 pb-4 items-center">
+              <div className="flex-1 flex gap-4 items-center">
+                <h2 className="text-sm font-semibold flex items-center gap-2 pr-4 border-r border-border/60"><UserX className="w-4 h-4 text-primary" /> Attendance Registry</h2>
                 <div className="flex items-center gap-2 ml-4">
                   <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Daily Duty Checklist • {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
@@ -716,25 +716,25 @@ const HrPage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-white border border-slate-100 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-slate-200 transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 flex items-center justify-center group-hover:scale-110 transition-transform"><Users className="w-6 h-6" /></div>
+                <div className="bg-card border border-border rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:border-primary/20 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-muted text-muted-foreground flex items-center justify-center group-hover:scale-110 transition-transform"><Users className="w-6 h-6" /></div>
                   <div>
                     <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest leading-none mb-1.5 text-center">Total Staff</p>
-                    <p className="text-2xl font-display font-bold text-slate-800 leading-none">{staff.length}</p>
+                    <p className="text-2xl font-display font-bold text-foreground leading-none">{staff.length}</p>
                   </div>
                 </div>
-                <div className="bg-emerald-50 border border-emerald-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-emerald-100/40 transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-white text-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6" /></div>
+                <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-emerald-500/10 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-card text-emerald-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><CheckCircle2 className="w-6 h-6" /></div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest leading-none mb-1.5">Present / On Time</p>
-                    <p className="text-2xl font-display font-bold text-emerald-800 leading-none">{attendanceStats.present}</p>
+                    <p className="text-[10px] uppercase font-bold text-emerald-500 tracking-widest leading-none mb-1.5">Present / On Time</p>
+                    <p className="text-2xl font-display font-bold text-foreground leading-none">{attendanceStats.present}</p>
                   </div>
                 </div>
-                <div className="bg-rose-50 border border-rose-100/60 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-rose-100/40 transition-all">
-                  <div className="w-12 h-12 rounded-2xl bg-white text-rose-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><UserX className="w-6 h-6" /></div>
+                <div className="bg-destructive/5 border border-destructive/10 rounded-2xl p-5 shadow-sm flex items-center gap-4 group hover:bg-destructive/10 transition-all">
+                  <div className="w-12 h-12 rounded-2xl bg-card text-destructive flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform"><UserX className="w-6 h-6" /></div>
                   <div>
-                    <p className="text-[10px] uppercase font-bold text-rose-700 tracking-widest leading-none mb-1.5">Absent / Late</p>
-                    <p className="text-2xl font-display font-bold text-rose-800 leading-none">{attendanceStats.absent} / {attendanceStats.late}</p>
+                    <p className="text-[10px] uppercase font-bold text-destructive tracking-widest leading-none mb-1.5">Absent / Late</p>
+                    <p className="text-2xl font-display font-bold text-foreground leading-none">{attendanceStats.absent} / {attendanceStats.late}</p>
                   </div>
                 </div>
               </div>
@@ -747,19 +747,19 @@ const HrPage: React.FC = () => {
                   const currentStatus = record?.status ?? 'Present';
 
                   return (
-                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group overflow-hidden relative ${isAbsent ? 'bg-rose-50 border-rose-200' : isLate ? 'bg-amber-50 border-amber-200' : 'bg-white border-slate-100 hover:border-slate-300 hover:shadow-lg hover:shadow-slate-200/40'} ${selectedStaffForAttendance === member.id ? 'ring-2 ring-primary/25' : ''}`} onClick={() => setSelectedStaffForAttendance(member.id)}>
-                      {isAbsent && <div className="absolute top-0 right-0 w-16 h-16 bg-rose-200/20 rounded-bl-full pointer-events-none" />}
+                    <div key={member.id} className={`p-5 rounded-2xl border transition-all duration-300 flex items-center justify-between group overflow-hidden relative ${isAbsent ? 'bg-destructive/5 border-destructive/20' : isLate ? 'bg-orange-500/5 border-orange-500/20' : 'bg-card border-border hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5'} ${selectedStaffForAttendance === member.id ? 'ring-2 ring-primary/25' : ''}`} onClick={() => setSelectedStaffForAttendance(member.id)}>
+                      {isAbsent && <div className="absolute top-0 right-0 w-16 h-16 bg-destructive/10 rounded-bl-full pointer-events-none" />}
                       <div className="flex items-center gap-4 relative z-10">
-                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-all duration-300 ${isAbsent ? 'bg-rose-600 text-white shadow-lg shadow-rose-200 ring-4 ring-rose-100' : isLate ? 'bg-amber-500 text-white shadow-lg shadow-amber-200 ring-4 ring-amber-100' : 'bg-slate-50 text-slate-400 group-hover:bg-slate-100 group-hover:text-slate-600'}`}>
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-base transition-all duration-300 ${isAbsent ? 'bg-destructive text-white shadow-lg shadow-destructive/20 ring-4 ring-destructive/10' : isLate ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20 ring-4 ring-orange-500/10' : 'bg-muted text-muted-foreground group-hover:bg-muted/80 group-hover:text-foreground'}`}>
                           {initials(member.name)}
                         </div>
                         <div>
-                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-rose-900 group-hover:text-rose-950' : isLate ? 'text-amber-900 group-hover:text-amber-950' : 'text-slate-800 group-hover:text-black'}`}>
+                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-destructive group-hover:text-destructive/80' : isLate ? 'text-orange-600 group-hover:text-orange-500' : 'text-foreground group-hover:text-primary'}`}>
                             {member.name}
-                            {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-rose-200 text-rose-700 text-[9px] uppercase tracking-tighter rounded font-black">{record.leaveType || 'Absent'}</span>}
-                            {isLate && <span className="ml-2 inline-block px-1.5 py-0.5 bg-amber-200 text-amber-800 text-[9px] uppercase tracking-tighter rounded font-black">Late</span>}
+                            {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-destructive/20 text-destructive text-[9px] uppercase tracking-tighter rounded font-black">{record.leaveType || 'Absent'}</span>}
+                            {isLate && <span className="ml-2 inline-block px-1.5 py-0.5 bg-orange-500/20 text-orange-600 text-[9px] uppercase tracking-tighter rounded font-black">Late</span>}
                           </p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-0.5">{member.role} • {member.department}</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-muted-foreground mt-0.5 font-display">{member.role} • {member.department}</p>
                         </div>
                       </div>
 
@@ -770,7 +770,7 @@ const HrPage: React.FC = () => {
                               <button
                                 key={type}
                                 onClick={() => record && updateAttendance(record.id, { leaveType: type })}
-                                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-tight transition-all border ${record.leaveType === type ? 'bg-rose-600 text-white border-rose-600 shadow-sm' : 'bg-white text-rose-600 border-rose-100 hover:border-rose-300'}`}
+                                className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-tight transition-all border ${record.leaveType === type ? 'bg-destructive text-white border-destructive shadow-sm' : 'bg-card text-destructive border-destructive/20 hover:border-destructive/40'}`}
                               >
                                 {type} Leave
                               </button>

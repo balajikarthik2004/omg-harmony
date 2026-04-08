@@ -1,10 +1,3 @@
-export type LayoutDensity = 'comfortable' | 'compact';
-export type ContentWidth = 'fluid' | 'wide' | 'contained';
-export type CardStyle = 'elevated' | 'glass' | 'minimal';
-export type ChromeStyle = 'gradient' | 'glass' | 'solid';
-export type MotionPreset = 'fluid' | 'reduced';
-export type SidebarPosition = 'left' | 'right' | 'bottom';
-
 export interface ThemeSettings {
   id: string;
   name: string;
@@ -33,16 +26,6 @@ export interface ThemeSettings {
   sidebarGradientAngle: number;
   topbarGradientAngle: number;
   overlayGradientAngle: number;
-  layoutDensity: LayoutDensity;
-  contentWidth: ContentWidth;
-  cardStyle: CardStyle;
-  chromeStyle: ChromeStyle;
-  motionPreset: MotionPreset;
-  sidebarPosition: SidebarPosition;
-  sidebarCollapsedByDefault: boolean;
-  pagePadding: number;
-  topbarHeight: number;
-  sidebarExpandedWidth: number;
   radius: number;
 }
 
@@ -90,16 +73,6 @@ export const DEFAULT_THEME: ThemeSettings = {
   sidebarGradientAngle: 185,
   topbarGradientAngle: 180,
   overlayGradientAngle: 135,
-  layoutDensity: 'comfortable',
-  contentWidth: 'wide',
-  cardStyle: 'elevated',
-  chromeStyle: 'gradient',
-  motionPreset: 'fluid',
-  sidebarPosition: 'left',
-  sidebarCollapsedByDefault: false,
-  pagePadding: 1.5,
-  topbarHeight: 64,
-  sidebarExpandedWidth: 256,
   radius: 0.75,
 };
 
@@ -427,23 +400,6 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 const isHexColor = (value: string) => /^#([0-9a-fA-F]{6})$/.test(value);
 
-const LAYOUT_DENSITY_VALUES: readonly LayoutDensity[] = ['comfortable', 'compact'];
-const CONTENT_WIDTH_VALUES: readonly ContentWidth[] = ['fluid', 'wide', 'contained'];
-const CARD_STYLE_VALUES: readonly CardStyle[] = ['elevated', 'glass', 'minimal'];
-const CHROME_STYLE_VALUES: readonly ChromeStyle[] = ['gradient', 'glass', 'solid'];
-const MOTION_PRESET_VALUES: readonly MotionPreset[] = ['fluid', 'reduced'];
-const SIDEBAR_POSITION_VALUES: readonly SidebarPosition[] = ['left', 'right', 'bottom'];
-
-const asEnum = <T extends string>(value: unknown, options: readonly T[], fallback: T): T => {
-  if (typeof value !== 'string') return fallback;
-  return (options as readonly string[]).includes(value) ? (value as T) : fallback;
-};
-
-const asBoolean = (value: unknown, fallback: boolean) => {
-  if (typeof value === 'boolean') return value;
-  return fallback;
-};
-
 const normalizeHex = (value: string, fallback: string) => {
   const candidate = value.trim().startsWith('#') ? value.trim() : `#${value.trim()}`;
   return isHexColor(candidate) ? candidate.toUpperCase() : fallback;
@@ -533,16 +489,6 @@ export const sanitizeTheme = (value: Partial<ThemeSettings>): ThemeSettings => (
   sidebarGradientAngle: clamp(Number(value.sidebarGradientAngle ?? DEFAULT_THEME.sidebarGradientAngle), 0, 360),
   topbarGradientAngle: clamp(Number(value.topbarGradientAngle ?? DEFAULT_THEME.topbarGradientAngle), 0, 360),
   overlayGradientAngle: clamp(Number(value.overlayGradientAngle ?? DEFAULT_THEME.overlayGradientAngle), 0, 360),
-  layoutDensity: asEnum(value.layoutDensity, LAYOUT_DENSITY_VALUES, DEFAULT_THEME.layoutDensity),
-  contentWidth: asEnum(value.contentWidth, CONTENT_WIDTH_VALUES, DEFAULT_THEME.contentWidth),
-  cardStyle: asEnum(value.cardStyle, CARD_STYLE_VALUES, DEFAULT_THEME.cardStyle),
-  chromeStyle: asEnum(value.chromeStyle, CHROME_STYLE_VALUES, DEFAULT_THEME.chromeStyle),
-  motionPreset: asEnum(value.motionPreset, MOTION_PRESET_VALUES, DEFAULT_THEME.motionPreset),
-  sidebarPosition: asEnum(value.sidebarPosition, SIDEBAR_POSITION_VALUES, DEFAULT_THEME.sidebarPosition),
-  sidebarCollapsedByDefault: asBoolean(value.sidebarCollapsedByDefault, DEFAULT_THEME.sidebarCollapsedByDefault),
-  pagePadding: clamp(Number(value.pagePadding ?? DEFAULT_THEME.pagePadding), 0.75, 2.5),
-  topbarHeight: clamp(Number(value.topbarHeight ?? DEFAULT_THEME.topbarHeight), 56, 84),
-  sidebarExpandedWidth: clamp(Number(value.sidebarExpandedWidth ?? DEFAULT_THEME.sidebarExpandedWidth), 224, 320),
   radius: clamp(Number(value.radius ?? DEFAULT_THEME.radius), 0.4, 1.4),
 });
 
@@ -575,6 +521,8 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   const warning = rgbToHsl(hexToRgb(safeTheme.warning));
   const input = withShift(border, { l: 4, s: -4 });
 
+  const isDark = background.l < 50;
+
   root.style.setProperty('--background', toHslVariable(background));
   root.style.setProperty('--foreground', toHslVariable(foreground));
 
@@ -591,7 +539,11 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--secondary-foreground', readableForeground(secondary));
 
   root.style.setProperty('--muted', toHslVariable(muted));
-  root.style.setProperty('--muted-foreground', toHslVariable(withShift(foreground, { s: -14, l: 22 })));
+
+  // Muted foreground should be higher contrast relative to background than foreground is? No, it's the other way around.
+  // We want it to be closer to background than foreground is.
+  const mutedFg = isDark ? withShift(foreground, { l: -35, s: -10 }) : withShift(foreground, { l: 25, s: -10 });
+  root.style.setProperty('--muted-foreground', toHslVariable(mutedFg));
 
   root.style.setProperty('--accent', toHslVariable(accent));
   root.style.setProperty('--accent-foreground', readableForeground(accent));
@@ -601,130 +553,15 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--ring', toHslVariable(primary));
   root.style.setProperty('--radius', `${safeTheme.radius.toFixed(2)}rem`);
 
-  const contentWidthMap: Record<ContentWidth, string> = {
-    fluid: '100%',
-    wide: '1560px',
-    contained: '1280px',
-  };
-
-  const cardProfiles: Record<CardStyle, {
-    alpha: string;
-    borderAlpha: string;
-    blur: string;
-    shadow: string;
-    shadowHover: string;
-  }> = {
-    elevated: {
-      alpha: '1',
-      borderAlpha: '1',
-      blur: '0px',
-      shadow: '0 10px 26px -22px rgba(15, 23, 42, 0.36), 0 2px 6px -3px rgba(15, 23, 42, 0.2)',
-      shadowHover: '0 16px 38px -22px rgba(15, 23, 42, 0.44), 0 8px 16px -9px rgba(15, 23, 42, 0.24)',
-    },
-    glass: {
-      alpha: '0.78',
-      borderAlpha: '0.72',
-      blur: '10px',
-      shadow: '0 12px 32px -24px rgba(15, 23, 42, 0.45), 0 4px 10px -6px rgba(15, 23, 42, 0.24)',
-      shadowHover: '0 20px 45px -22px rgba(15, 23, 42, 0.5), 0 8px 16px -9px rgba(15, 23, 42, 0.3)',
-    },
-    minimal: {
-      alpha: '1',
-      borderAlpha: '0.88',
-      blur: '0px',
-      shadow: '0 1px 2px rgba(15, 23, 42, 0.06)',
-      shadowHover: '0 4px 12px -8px rgba(15, 23, 42, 0.22)',
-    },
-  };
-
-  const chromeProfiles: Record<ChromeStyle, {
-    shellSpacing: string;
-    topbarRadius: string;
-    sidebarRadius: string;
-    frameBackground: string;
-    frameBorder: string;
-    topbarShadow: string;
-    sidebarShadowLeft: string;
-    sidebarShadowRight: string;
-    backdrop: string;
-  }> = {
-    gradient: {
-      shellSpacing: '0rem',
-      topbarRadius: '0px',
-      sidebarRadius: '0px',
-      frameBackground: 'transparent',
-      frameBorder: 'transparent',
-      topbarShadow: '0 12px 28px -24px var(--topbar-shadow)',
-      sidebarShadowLeft: '10px 0 36px rgba(8, 18, 34, 0.34)',
-      sidebarShadowRight: '-10px 0 36px rgba(8, 18, 34, 0.34)',
-      backdrop: 'blur(0px)',
-    },
-    glass: {
-      shellSpacing: '0.75rem',
-      topbarRadius: `${Math.max(12, Math.round(safeTheme.radius * 24))}px`,
-      sidebarRadius: `${Math.max(14, Math.round(safeTheme.radius * 26))}px`,
-      frameBackground: 'hsl(var(--background) / 0.52)',
-      frameBorder: 'hsl(var(--border) / 0.58)',
-      topbarShadow: '0 24px 44px -30px rgba(15, 23, 42, 0.48), 0 8px 20px -14px rgba(15, 23, 42, 0.32)',
-      sidebarShadowLeft: '0 24px 40px -24px rgba(15, 23, 42, 0.56), 0 8px 20px -12px rgba(15, 23, 42, 0.35)',
-      sidebarShadowRight: '0 24px 40px -24px rgba(15, 23, 42, 0.56), 0 8px 20px -12px rgba(15, 23, 42, 0.35)',
-      backdrop: 'blur(16px)',
-    },
-    solid: {
-      shellSpacing: '0rem',
-      topbarRadius: '0px',
-      sidebarRadius: '0px',
-      frameBackground: 'hsl(var(--card) / 1)',
-      frameBorder: 'hsl(var(--border) / 0.92)',
-      topbarShadow: '0 8px 16px -14px rgba(15, 23, 42, 0.25)',
-      sidebarShadowLeft: '8px 0 18px -14px rgba(15, 23, 42, 0.35)',
-      sidebarShadowRight: '-8px 0 18px -14px rgba(15, 23, 42, 0.35)',
-      backdrop: 'blur(0px)',
-    },
-  };
-
-  const activeCardProfile = cardProfiles[safeTheme.cardStyle];
-  const activeChromeProfile = chromeProfiles[safeTheme.chromeStyle];
-
-  root.style.setProperty('--layout-content-max-width', contentWidthMap[safeTheme.contentWidth]);
-  root.style.setProperty('--layout-page-padding', `${safeTheme.pagePadding.toFixed(2)}rem`);
-  root.style.setProperty('--layout-topbar-height', `${Math.round(safeTheme.topbarHeight)}px`);
-  root.style.setProperty('--layout-sidebar-expanded-width', `${Math.round(safeTheme.sidebarExpandedWidth)}px`);
-  root.style.setProperty('--layout-sidebar-collapsed-width', '80px');
-  root.style.setProperty('--layout-density-scale', safeTheme.layoutDensity === 'compact' ? '0.88' : '1');
-
-  root.style.setProperty('--layout-card-alpha', activeCardProfile.alpha);
-  root.style.setProperty('--layout-card-border-alpha', activeCardProfile.borderAlpha);
-  root.style.setProperty('--layout-card-blur', activeCardProfile.blur);
-  root.style.setProperty('--layout-card-shadow', activeCardProfile.shadow);
-  root.style.setProperty('--layout-card-shadow-hover', activeCardProfile.shadowHover);
-
-  root.style.setProperty('--layout-shell-spacing', activeChromeProfile.shellSpacing);
-  root.style.setProperty('--layout-topbar-radius', activeChromeProfile.topbarRadius);
-  root.style.setProperty('--layout-sidebar-radius', activeChromeProfile.sidebarRadius);
-  root.style.setProperty('--layout-frame-background', activeChromeProfile.frameBackground);
-  root.style.setProperty('--layout-frame-border', activeChromeProfile.frameBorder);
-  root.style.setProperty('--layout-topbar-frame-shadow', activeChromeProfile.topbarShadow);
-  root.style.setProperty('--layout-sidebar-frame-shadow-left', activeChromeProfile.sidebarShadowLeft);
-  root.style.setProperty('--layout-sidebar-frame-shadow-right', activeChromeProfile.sidebarShadowRight);
-  root.style.setProperty('--layout-sidebar-frame-shadow', safeTheme.sidebarPosition === 'right' ? activeChromeProfile.sidebarShadowRight : activeChromeProfile.sidebarShadowLeft);
-  root.style.setProperty('--layout-frame-backdrop', activeChromeProfile.backdrop);
-
-  root.setAttribute('data-layout-density', safeTheme.layoutDensity);
-  root.setAttribute('data-layout-width', safeTheme.contentWidth);
-  root.setAttribute('data-layout-card-style', safeTheme.cardStyle);
-  root.setAttribute('data-layout-chrome-style', safeTheme.chromeStyle);
-  root.setAttribute('data-layout-motion', safeTheme.motionPreset);
-  root.setAttribute('data-layout-sidebar-position', safeTheme.sidebarPosition);
-
-  const sidebarBase = withShift(secondary, { l: -6, s: 4 });
+  const sidebarBase = withShift(secondary, { l: isDark ? -2 : -6, s: isDark ? 2 : 4 });
+  const sidebarFg = readableForeground(sidebarBase);
   root.style.setProperty('--sidebar-background', toHslVariable(sidebarBase));
-  root.style.setProperty('--sidebar-foreground', '0 0% 100%');
+  root.style.setProperty('--sidebar-foreground', sidebarFg);
   root.style.setProperty('--sidebar-primary', toHslVariable(primary));
   root.style.setProperty('--sidebar-primary-foreground', readableForeground(primary));
-  root.style.setProperty('--sidebar-accent', toHslVariable(withShift(sidebarBase, { l: -7 })));
-  root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
-  root.style.setProperty('--sidebar-border', toHslVariable(withShift(sidebarBase, { l: -10, s: -6 })));
+  root.style.setProperty('--sidebar-accent', toHslVariable(withShift(sidebarBase, { l: isDark ? 8 : -7 })));
+  root.style.setProperty('--sidebar-accent-foreground', sidebarFg);
+  root.style.setProperty('--sidebar-border', toHslVariable(withShift(sidebarBase, { l: isDark ? 10 : -10, s: -6 })));
   root.style.setProperty('--sidebar-ring', toHslVariable(primary));
 
   root.style.setProperty('--success', toHslVariable(success));
@@ -732,17 +569,17 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
 
   root.style.setProperty('--brand-primary', safeTheme.primary);
   root.style.setProperty('--brand-secondary', safeTheme.secondary);
-  root.style.setProperty('--brand-blue-50', toHslColor(withShift(secondary, { s: -20, l: 58 })));
-  root.style.setProperty('--brand-blue-100', toHslColor(withShift(secondary, { s: -16, l: 46 })));
-  root.style.setProperty('--brand-blue-200', toHslColor(withShift(secondary, { s: -10, l: 34 })));
-  root.style.setProperty('--brand-blue-300', toHslColor(withShift(secondary, { s: -4, l: 22 })));
-  root.style.setProperty('--brand-blue-400', toHslColor(withShift(secondary, { l: 12 })));
+  root.style.setProperty('--brand-blue-50', toHslColor(withShift(secondary, { s: -20, l: isDark ? 30 : 58 })));
+  root.style.setProperty('--brand-blue-100', toHslColor(withShift(secondary, { s: -16, l: isDark ? 25 : 46 })));
+  root.style.setProperty('--brand-blue-200', toHslColor(withShift(secondary, { s: -10, l: isDark ? 20 : 34 })));
+  root.style.setProperty('--brand-blue-300', toHslColor(withShift(secondary, { s: -4, l: isDark ? 15 : 22 })));
+  root.style.setProperty('--brand-blue-400', toHslColor(withShift(secondary, { l: isDark ? 10 : 12 })));
   root.style.setProperty('--brand-blue-500', toHslColor(withShift(secondary, { l: 6 })));
   root.style.setProperty('--brand-blue-600', toHslColor(withShift(secondary, { l: -2 })));
-  root.style.setProperty('--brand-red-100', toHslColor(withShift(primary, { s: -22, l: 46 })));
-  root.style.setProperty('--brand-red-200', toHslColor(withShift(primary, { s: -18, l: 36 })));
-  root.style.setProperty('--brand-red-300', toHslColor(withShift(primary, { s: -12, l: 24 })));
-  root.style.setProperty('--brand-red-400', toHslColor(withShift(primary, { s: -8, l: 12 })));
+  root.style.setProperty('--brand-red-100', toHslColor(withShift(primary, { s: -22, l: isDark ? 20 : 46 })));
+  root.style.setProperty('--brand-red-200', toHslColor(withShift(primary, { s: -18, l: isDark ? 15 : 36 })));
+  root.style.setProperty('--brand-red-300', toHslColor(withShift(primary, { s: -12, l: isDark ? 10 : 24 })));
+  root.style.setProperty('--brand-red-400', toHslColor(withShift(primary, { s: -8, l: isDark ? 5 : 12 })));
   root.style.setProperty('--brand-red-500', toHslColor(withShift(primary, { l: 4 })));
   root.style.setProperty('--brand-red-600', toHslColor(withShift(primary, { l: -6 })));
 
@@ -754,21 +591,26 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--topbar-bg-start', safeTheme.topbarGradientStart);
   root.style.setProperty('--topbar-bg-end', safeTheme.topbarGradientEnd);
   root.style.setProperty('--topbar-gradient-angle', `${safeTheme.topbarGradientAngle}deg`);
-  root.style.setProperty('--topbar-border', toHslColor(withShift(secondary, { s: -14, l: 38 })));
-  root.style.setProperty('--topbar-shadow', toHslaColor(withShift(secondary, { s: -8, l: -10 }), 0.52));
-  root.style.setProperty('--topbar-title', toHslColor(withShift(secondary, { l: 3 })));
-  root.style.setProperty('--topbar-subtitle', toHslColor(withShift(secondary, { s: -8, l: 24 })));
-  root.style.setProperty('--topbar-icon', toHslColor(withShift(accent, { s: -8, l: 8 })));
+
+  // Adjusted for contrast
+  const topbarBg = rgbToHsl(hexToRgb(safeTheme.topbarGradientStart));
+  const isTopbarDark = topbarBg.l < 50;
+
+  root.style.setProperty('--topbar-border', toHslColor(withShift(topbarBg, { l: isTopbarDark ? 15 : 38 })));
+  root.style.setProperty('--topbar-shadow', toHslaColor(withShift(topbarBg, { l: isTopbarDark ? -5 : -10 }), 0.52));
+  root.style.setProperty('--topbar-title', toHslColor(isTopbarDark ? foreground : withShift(secondary, { l: 3 })));
+  root.style.setProperty('--topbar-subtitle', toHslColor(isTopbarDark ? withShift(foreground, { l: -20 }) : withShift(secondary, { l: 24 })));
+  root.style.setProperty('--topbar-icon', toHslColor(isTopbarDark ? accent : withShift(accent, { l: 8 })));
 
   root.style.setProperty('--sidebar-gradient-start', safeTheme.sidebarGradientStart);
   root.style.setProperty('--sidebar-gradient-mid', safeTheme.sidebarGradientMid);
   root.style.setProperty('--sidebar-gradient-end', safeTheme.sidebarGradientEnd);
   root.style.setProperty('--sidebar-gradient-angle', `${safeTheme.sidebarGradientAngle}deg`);
-  root.style.setProperty('--sidebar-glow-a', toHslaColor(withShift(secondary, { s: -12, l: 28 }), 0.27));
-  root.style.setProperty('--sidebar-glow-b', toHslaColor(withShift(primary, { s: -8, l: 22 }), 0.25));
-  root.style.setProperty('--sidebar-highlight', toHslColor(withShift(accent, { l: 26, s: -18 })));
-  root.style.setProperty('--sidebar-highlight-soft', toHslColor(withShift(accent, { l: 36, s: -24 })));
-  root.style.setProperty('--sidebar-avatar-mid', toHslColor(withShift(secondary, { l: 14 })));
+  root.style.setProperty('--sidebar-glow-a', toHslaColor(withShift(secondary, { s: -12, l: isDark ? 15 : 28 }), 0.27));
+  root.style.setProperty('--sidebar-glow-b', toHslaColor(withShift(primary, { s: -8, l: isDark ? 12 : 22 }), 0.25));
+  root.style.setProperty('--sidebar-highlight', toHslColor(withShift(accent, { l: isDark ? -10 : 26, s: -18 })));
+  root.style.setProperty('--sidebar-highlight-soft', toHslColor(withShift(accent, { l: isDark ? -5 : 36, s: -24 })));
+  root.style.setProperty('--sidebar-avatar-mid', toHslColor(withShift(secondary, { l: isDark ? 10 : 14 })));
 
   root.style.setProperty('--theme-overlay-start', safeTheme.overlayGradientStart);
   root.style.setProperty('--theme-overlay-mid', safeTheme.overlayGradientMid);
@@ -779,6 +621,181 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--chart-accent-b', toHslColor(withShift(primary, { l: 2 })));
   root.style.setProperty('--chart-accent-c', toHslColor(withShift(accent, { l: 0 })));
   root.style.setProperty('--chart-accent-d', toHslColor(withShift(primary, { h: 16, s: -5, l: 8 })));
-  root.style.setProperty('--chart-grid', toHslColor(withShift(border, { l: 8, s: -8 })));
+  root.style.setProperty('--chart-grid', toHslColor(withShift(border, { l: isDark ? -8 : 8, s: -8 })));
   root.style.setProperty('--chart-cursor', toHslColor(withShift(muted, { l: 2 })));
 };
+
+alpha: '1',
+  borderAlpha: '1',
+    blur: '0px',
+      shadow: '0 10px 26px -22px rgba(15, 23, 42, 0.36), 0 2px 6px -3px rgba(15, 23, 42, 0.2)',
+        shadowHover: '0 16px 38px -22px rgba(15, 23, 42, 0.44), 0 8px 16px -9px rgba(15, 23, 42, 0.24)',
+    },
+glass: {
+  alpha: '0.78',
+    borderAlpha: '0.72',
+      blur: '10px',
+        shadow: '0 12px 32px -24px rgba(15, 23, 42, 0.45), 0 4px 10px -6px rgba(15, 23, 42, 0.24)',
+          shadowHover: '0 20px 45px -22px rgba(15, 23, 42, 0.5), 0 8px 16px -9px rgba(15, 23, 42, 0.3)',
+    },
+minimal: {
+  alpha: '1',
+    borderAlpha: '0.88',
+      blur: '0px',
+        shadow: '0 1px 2px rgba(15, 23, 42, 0.06)',
+          shadowHover: '0 4px 12px -8px rgba(15, 23, 42, 0.22)',
+    },
+  };
+
+const chromeProfiles: Record<ChromeStyle, {
+  shellSpacing: string;
+  topbarRadius: string;
+  sidebarRadius: string;
+  frameBackground: string;
+  frameBorder: string;
+  topbarShadow: string;
+  sidebarShadowLeft: string;
+  sidebarShadowRight: string;
+  backdrop: string;
+}> = {
+  gradient: {
+    shellSpacing: '0rem',
+    topbarRadius: '0px',
+    sidebarRadius: '0px',
+    frameBackground: 'transparent',
+    frameBorder: 'transparent',
+    topbarShadow: '0 12px 28px -24px var(--topbar-shadow)',
+    sidebarShadowLeft: '10px 0 36px rgba(8, 18, 34, 0.34)',
+    sidebarShadowRight: '-10px 0 36px rgba(8, 18, 34, 0.34)',
+    backdrop: 'blur(0px)',
+  },
+  glass: {
+    shellSpacing: '0.75rem',
+    topbarRadius: `${Math.max(12, Math.round(safeTheme.radius * 24))}px`,
+    sidebarRadius: `${Math.max(14, Math.round(safeTheme.radius * 26))}px`,
+    frameBackground: 'hsl(var(--background) / 0.52)',
+    frameBorder: 'hsl(var(--border) / 0.58)',
+    topbarShadow: '0 24px 44px -30px rgba(15, 23, 42, 0.48), 0 8px 20px -14px rgba(15, 23, 42, 0.32)',
+    sidebarShadowLeft: '0 24px 40px -24px rgba(15, 23, 42, 0.56), 0 8px 20px -12px rgba(15, 23, 42, 0.35)',
+    sidebarShadowRight: '0 24px 40px -24px rgba(15, 23, 42, 0.56), 0 8px 20px -12px rgba(15, 23, 42, 0.35)',
+    backdrop: 'blur(16px)',
+  },
+  solid: {
+    shellSpacing: '0rem',
+    topbarRadius: '0px',
+    sidebarRadius: '0px',
+    frameBackground: 'hsl(var(--card) / 1)',
+    frameBorder: 'hsl(var(--border) / 0.92)',
+    topbarShadow: '0 8px 16px -14px rgba(15, 23, 42, 0.25)',
+    sidebarShadowLeft: '8px 0 18px -14px rgba(15, 23, 42, 0.35)',
+    sidebarShadowRight: '-8px 0 18px -14px rgba(15, 23, 42, 0.35)',
+    backdrop: 'blur(0px)',
+  },
+};
+
+const activeCardProfile = cardProfiles[safeTheme.cardStyle];
+const activeChromeProfile = chromeProfiles[safeTheme.chromeStyle];
+
+root.style.setProperty('--layout-content-max-width', contentWidthMap[safeTheme.contentWidth]);
+root.style.setProperty('--layout-page-padding', `${safeTheme.pagePadding.toFixed(2)}rem`);
+root.style.setProperty('--layout-topbar-height', `${Math.round(safeTheme.topbarHeight)}px`);
+root.style.setProperty('--layout-sidebar-expanded-width', `${Math.round(safeTheme.sidebarExpandedWidth)}px`);
+root.style.setProperty('--layout-sidebar-collapsed-width', '80px');
+root.style.setProperty('--layout-density-scale', safeTheme.layoutDensity === 'compact' ? '0.88' : '1');
+
+root.style.setProperty('--layout-card-alpha', activeCardProfile.alpha);
+root.style.setProperty('--layout-card-border-alpha', activeCardProfile.borderAlpha);
+root.style.setProperty('--layout-card-blur', activeCardProfile.blur);
+root.style.setProperty('--layout-card-shadow', activeCardProfile.shadow);
+root.style.setProperty('--layout-card-shadow-hover', activeCardProfile.shadowHover);
+
+root.style.setProperty('--layout-shell-spacing', activeChromeProfile.shellSpacing);
+root.style.setProperty('--layout-topbar-radius', activeChromeProfile.topbarRadius);
+root.style.setProperty('--layout-sidebar-radius', activeChromeProfile.sidebarRadius);
+root.style.setProperty('--layout-frame-background', activeChromeProfile.frameBackground);
+root.style.setProperty('--layout-frame-border', activeChromeProfile.frameBorder);
+root.style.setProperty('--layout-topbar-frame-shadow', activeChromeProfile.topbarShadow);
+root.style.setProperty('--layout-sidebar-frame-shadow-left', activeChromeProfile.sidebarShadowLeft);
+root.style.setProperty('--layout-sidebar-frame-shadow-right', activeChromeProfile.sidebarShadowRight);
+root.style.setProperty('--layout-sidebar-frame-shadow', safeTheme.sidebarPosition === 'right' ? activeChromeProfile.sidebarShadowRight : activeChromeProfile.sidebarShadowLeft);
+root.style.setProperty('--layout-frame-backdrop', activeChromeProfile.backdrop);
+
+root.setAttribute('data-layout-density', safeTheme.layoutDensity);
+root.setAttribute('data-layout-width', safeTheme.contentWidth);
+root.setAttribute('data-layout-card-style', safeTheme.cardStyle);
+root.setAttribute('data-layout-chrome-style', safeTheme.chromeStyle);
+root.setAttribute('data-layout-motion', safeTheme.motionPreset);
+root.setAttribute('data-layout-sidebar-position', safeTheme.sidebarPosition);
+
+const sidebarBase = withShift(secondary, { l: -6, s: 4 });
+>>>>>>> d731352180962034e1232637f1e3343306677892
+root.style.setProperty('--sidebar-background', toHslVariable(sidebarBase));
+root.style.setProperty('--sidebar-foreground', sidebarFg);
+root.style.setProperty('--sidebar-primary', toHslVariable(primary));
+root.style.setProperty('--sidebar-primary-foreground', readableForeground(primary));
+root.style.setProperty('--sidebar-accent', toHslVariable(withShift(sidebarBase, { l: isDark ? 8 : -7 })));
+root.style.setProperty('--sidebar-accent-foreground', sidebarFg);
+root.style.setProperty('--sidebar-border', toHslVariable(withShift(sidebarBase, { l: isDark ? 10 : -10, s: -6 })));
+root.style.setProperty('--sidebar-ring', toHslVariable(primary));
+
+root.style.setProperty('--success', toHslVariable(success));
+root.style.setProperty('--warning', toHslVariable(warning));
+
+root.style.setProperty('--brand-primary', safeTheme.primary);
+root.style.setProperty('--brand-secondary', safeTheme.secondary);
+root.style.setProperty('--brand-blue-50', toHslColor(withShift(secondary, { s: -20, l: isDark ? 30 : 58 })));
+root.style.setProperty('--brand-blue-100', toHslColor(withShift(secondary, { s: -16, l: isDark ? 25 : 46 })));
+root.style.setProperty('--brand-blue-200', toHslColor(withShift(secondary, { s: -10, l: isDark ? 20 : 34 })));
+root.style.setProperty('--brand-blue-300', toHslColor(withShift(secondary, { s: -4, l: isDark ? 15 : 22 })));
+root.style.setProperty('--brand-blue-400', toHslColor(withShift(secondary, { l: isDark ? 10 : 12 })));
+root.style.setProperty('--brand-blue-500', toHslColor(withShift(secondary, { l: 6 })));
+root.style.setProperty('--brand-blue-600', toHslColor(withShift(secondary, { l: -2 })));
+root.style.setProperty('--brand-red-100', toHslColor(withShift(primary, { s: -22, l: isDark ? 20 : 46 })));
+root.style.setProperty('--brand-red-200', toHslColor(withShift(primary, { s: -18, l: isDark ? 15 : 36 })));
+root.style.setProperty('--brand-red-300', toHslColor(withShift(primary, { s: -12, l: isDark ? 10 : 24 })));
+root.style.setProperty('--brand-red-400', toHslColor(withShift(primary, { s: -8, l: isDark ? 5 : 12 })));
+root.style.setProperty('--brand-red-500', toHslColor(withShift(primary, { l: 4 })));
+root.style.setProperty('--brand-red-600', toHslColor(withShift(primary, { l: -6 })));
+
+root.style.setProperty('--layout-bg-start', safeTheme.layoutGradientStart);
+root.style.setProperty('--layout-bg-mid', safeTheme.layoutGradientMid);
+root.style.setProperty('--layout-bg-end', safeTheme.layoutGradientEnd);
+root.style.setProperty('--layout-gradient-angle', `${safeTheme.layoutGradientAngle}deg`);
+
+root.style.setProperty('--topbar-bg-start', safeTheme.topbarGradientStart);
+root.style.setProperty('--topbar-bg-end', safeTheme.topbarGradientEnd);
+root.style.setProperty('--topbar-gradient-angle', `${safeTheme.topbarGradientAngle}deg`);
+
+// Adjusted for contrast
+const topbarBg = rgbToHsl(hexToRgb(safeTheme.topbarGradientStart));
+const isTopbarDark = topbarBg.l < 50;
+
+root.style.setProperty('--topbar-border', toHslColor(withShift(topbarBg, { l: isTopbarDark ? 15 : 38 })));
+root.style.setProperty('--topbar-shadow', toHslaColor(withShift(topbarBg, { l: isTopbarDark ? -5 : -10 }), 0.52));
+root.style.setProperty('--topbar-title', toHslColor(isTopbarDark ? foreground : withShift(secondary, { l: 3 })));
+root.style.setProperty('--topbar-subtitle', toHslColor(isTopbarDark ? withShift(foreground, { l: -20 }) : withShift(secondary, { l: 24 })));
+root.style.setProperty('--topbar-icon', toHslColor(isTopbarDark ? accent : withShift(accent, { l: 8 })));
+
+root.style.setProperty('--sidebar-gradient-start', safeTheme.sidebarGradientStart);
+root.style.setProperty('--sidebar-gradient-mid', safeTheme.sidebarGradientMid);
+root.style.setProperty('--sidebar-gradient-end', safeTheme.sidebarGradientEnd);
+root.style.setProperty('--sidebar-gradient-angle', `${safeTheme.sidebarGradientAngle}deg`);
+root.style.setProperty('--sidebar-glow-a', toHslaColor(withShift(secondary, { s: -12, l: isDark ? 15 : 28 }), 0.27));
+root.style.setProperty('--sidebar-glow-b', toHslaColor(withShift(primary, { s: -8, l: isDark ? 12 : 22 }), 0.25));
+root.style.setProperty('--sidebar-highlight', toHslColor(withShift(accent, { l: isDark ? -10 : 26, s: -18 })));
+root.style.setProperty('--sidebar-highlight-soft', toHslColor(withShift(accent, { l: isDark ? -5 : 36, s: -24 })));
+root.style.setProperty('--sidebar-avatar-mid', toHslColor(withShift(secondary, { l: isDark ? 10 : 14 })));
+
+root.style.setProperty('--theme-overlay-start', safeTheme.overlayGradientStart);
+root.style.setProperty('--theme-overlay-mid', safeTheme.overlayGradientMid);
+root.style.setProperty('--theme-overlay-end', safeTheme.overlayGradientEnd);
+root.style.setProperty('--overlay-gradient-angle', `${safeTheme.overlayGradientAngle}deg`);
+
+root.style.setProperty('--chart-accent-a', toHslColor(withShift(secondary, { l: -2 })));
+root.style.setProperty('--chart-accent-b', toHslColor(withShift(primary, { l: 2 })));
+root.style.setProperty('--chart-accent-c', toHslColor(withShift(accent, { l: 0 })));
+root.style.setProperty('--chart-accent-d', toHslColor(withShift(primary, { h: 16, s: -5, l: 8 })));
+root.style.setProperty('--chart-grid', toHslColor(withShift(border, { l: isDark ? -8 : 8, s: -8 })));
+root.style.setProperty('--chart-cursor', toHslColor(withShift(muted, { l: 2 })));
+};
+

@@ -33,36 +33,36 @@ const SettingsPage: React.FC = () => {
 
    return (
       <div className="settings-premium space-y-6 max-w-[1400px] mx-auto animate-fade-in">
-         <div className="page-header-banner settings-header bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
+         <div className="page-header-banner settings-header">
             <div>
-               <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-blue-600" /> Member Access & Roles</h1>
+               <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Member Access & Roles</h1>
                <p className="text-sm text-muted-foreground mt-1">Manage staff entries, grant new access, and set permission levels for the temple ERP.</p>
             </div>
-            <Button onClick={() => setModalOpen(true)} className="settings-cta shadow-md bg-blue-600 hover:bg-blue-700 text-white"><UserPlus className="h-4 w-4 mr-2" />Grant New Access</Button>
+            <Button onClick={() => setModalOpen(true)} className="settings-cta shadow-md"><UserPlus className="h-4 w-4 mr-2" />Grant New Access</Button>
          </div>
 
          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Profile Card */}
             <section className="section-panel settings-profile-panel shadow-sm h-fit">
-               <div className="section-panel-header settings-panel-header gap-3 border-b border-border/60 pb-3 bg-gradient-to-b from-blue-50/50 to-background">
-                  <h2 className="text-sm font-semibold flex items-center gap-2"><BadgeCheck className="w-4 h-4 text-emerald-600" /> My Access Status</h2>
+               <div className="section-panel-header settings-panel-header gap-3 border-b border-border/60 pb-3">
+                  <h2 className="text-sm font-semibold flex items-center gap-2"><BadgeCheck className="w-4 h-4 text-success" /> My Access Status</h2>
                </div>
                <div className="p-6 flex flex-col items-center">
-                  <div className="settings-avatar w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center border-4 border-background shadow-sm mb-4">
-                     <span className="text-2xl font-display font-bold text-blue-700">{user?.name.charAt(0)}</span>
+                  <div className="settings-avatar w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-4 border-background shadow-sm mb-4">
+                     <span className="text-2xl font-display font-bold text-primary">{user?.name.charAt(0)}</span>
                   </div>
                   <h3 className="text-lg font-bold text-foreground">{user?.name}</h3>
-                  <span className="settings-chip mt-2 text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">Full {user?.role} Access</span>
+                  <span className="settings-chip mt-2 text-[10px] font-bold uppercase tracking-widest text-success bg-success/10 px-2.5 py-1 rounded-full border border-success/20">Full {user?.role} Access</span>
                </div>
                <div className="p-4 pt-0">
-                  <Button variant="outline" onClick={logout} className="settings-logout-btn w-full text-xs font-bold border-rose-200 text-rose-600 hover:bg-rose-50 h-10">Logout of System</Button>
+                  <Button variant="outline" onClick={logout} className="settings-logout-btn w-full text-xs font-bold border-destructive/20 text-destructive hover:bg-destructive/10 h-10">Logout of System</Button>
                </div>
             </section>
 
             {/* Member List */}
             <section className="lg:col-span-3 section-panel settings-members-panel shadow-sm">
-               <div className="section-panel-header settings-panel-header border-b border-border/60 pb-4 bg-muted/20">
-                  <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-blue-600" /> Registered Staff & Members</h2>
+               <div className="section-panel-header settings-panel-header border-b border-border/60 pb-4">
+                  <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Registered Staff & Members</h2>
                </div>
                <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -84,7 +84,7 @@ const SettingsPage: React.FC = () => {
                               </td>
                               <td className="p-4">
                                  <div className="flex items-center gap-1.5">
-                                    <ShieldCheck className={`w-3.5 h-3.5 ${m.role === 'Admin' ? 'text-blue-600' : 'text-slate-400'}`} />
+                                    <ShieldCheck className={`w-3.5 h-3.5 ${m.role === 'Admin' ? 'text-primary' : 'text-muted-foreground/60'}`} />
                                     <span className="font-semibold text-xs text-foreground/80">{m.role}</span>
                                  </div>
                               </td>
@@ -130,13 +130,13 @@ const SettingsPage: React.FC = () => {
                      <option>Volunteer</option>
                   </select>
                </div>
-               <div className="settings-note pt-4 flex gap-3 text-sm italic text-muted-foreground bg-blue-50/50 p-3 rounded-lg border border-blue-100/50">
-                  <ShieldAlert className="w-5 h-5 text-blue-600 shrink-0" />
+               <div className="settings-note pt-4 flex gap-3 text-sm italic text-muted-foreground bg-primary/5 p-3 rounded-lg border border-primary/10">
+                  <ShieldAlert className="w-5 h-5 text-primary shrink-0" />
                   <p>New members will be sent a login invitation via email once you grant access.</p>
                </div>
                <div className="flex gap-3 pt-4 border-t mt-2">
                   <Button variant="outline" className="flex-1 h-11" onClick={() => setModalOpen(false)}>Cancel</Button>
-                  <Button onClick={handleAddMember} className="settings-cta flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white shadow-md">Grant Access</Button>
+                  <Button onClick={handleAddMember} className="settings-cta flex-1 h-11 shadow-md">Grant Access</Button>
                </div>
             </div>
          </Modal>

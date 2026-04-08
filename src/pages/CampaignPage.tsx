@@ -19,10 +19,10 @@ type CampaignLog = {
   status: 'Sent' | 'Draft';
 };
 
-const channelConfig: Record<ChannelKey, { label: string; icon: React.ReactNode; colorClass: string }> = {
-  sms: { label: 'SMS', icon: <MessageSquare className="h-4 w-4" />, colorClass: 'text-violet-700 bg-violet-100 border-violet-200' },
-  whatsapp: { label: 'WhatsApp', icon: <MessageCircle className="h-4 w-4" />, colorClass: 'text-emerald-700 bg-emerald-100 border-emerald-200' },
-  email: { label: 'Email', icon: <Mail className="h-4 w-4" />, colorClass: 'text-sky-700 bg-sky-100 border-sky-200' },
+const channelConfig: Record<ChannelKey, { label: string; icon: React.ReactNode; activeClass: string }> = {
+  sms: { label: 'SMS', icon: <MessageSquare className="h-4 w-4" />, activeClass: 'text-primary bg-primary/20 border-primary/30 shadow-sm' },
+  whatsapp: { label: 'WhatsApp', icon: <MessageCircle className="h-4 w-4" />, activeClass: 'text-emerald-500 bg-emerald-500/20 border-emerald-500/30 shadow-sm' },
+  email: { label: 'Email', icon: <Mail className="h-4 w-4" />, activeClass: 'text-sky-500 bg-sky-500/20 border-sky-500/30 shadow-sm' },
 };
 
 const CampaignPage: React.FC = () => {
@@ -167,7 +167,7 @@ const CampaignPage: React.FC = () => {
 
   return (
     <div className="campaign-premium space-y-6 max-w-[1500px] mx-auto">
-      <div className="page-header-banner campaign-header bg-gradient-to-r from-sky-50/70 via-background to-emerald-50/70 py-4 mb-2">
+      <div className="page-header-banner campaign-header bg-gradient-to-r from-primary/10 via-background to-primary/5 py-4 mb-2">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-display font-bold text-foreground">Campaign Manager</h1>
@@ -195,23 +195,23 @@ const CampaignPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 animate-stagger">
-        <div className={`stat-card campaign-stat-card border-l-4 ${viewMode === 'volunteers' ? 'border-l-orange-500' : 'border-l-sky-500'} transition-all duration-300 transform`}>
+        <div className={`stat-card campaign-stat-card border-l-4 border-l-primary transition-all duration-300 transform`}>
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Focus Population</p>
-          <p className={`text-2xl font-bold mt-1 ${viewMode === 'volunteers' ? 'text-orange-600' : 'text-blue-700'}`}>
+          <p className={`text-2xl font-bold mt-1 text-foreground`}>
             {viewMode === 'volunteers' ? volunteerItems.length : mockDevotees.length}
           </p>
         </div>
-        <div className="stat-card campaign-stat-card border-l-4 border-l-indigo-500 shadow-sm">
+        <div className="stat-card campaign-stat-card border-l-4 border-l-primary shadow-sm">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Target Recipients</p>
-          <p className="text-2xl font-bold mt-1 text-blue-700 font-display">{targetUsers.length}</p>
+          <p className="text-2xl font-bold mt-1 text-foreground font-display">{targetUsers.length}</p>
         </div>
-        <div className="stat-card campaign-stat-card border-l-4 border-l-emerald-500 shadow-sm">
+        <div className="stat-card campaign-stat-card border-l-4 border-l-primary shadow-sm">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Active Channels</p>
-          <p className="text-2xl font-bold mt-1 text-emerald-700 font-display">{selectedChannels.length}</p>
+          <p className="text-2xl font-bold mt-1 text-foreground font-display">{selectedChannels.length}</p>
         </div>
-        <div className="stat-card campaign-stat-card border-l-4 border-l-violet-500 shadow-sm">
+        <div className="stat-card campaign-stat-card border-l-4 border-l-primary shadow-sm">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Campaigns Executed</p>
-          <p className="text-2xl font-bold mt-1 text-violet-700 font-display">{logs.length}</p>
+          <p className="text-2xl font-bold mt-1 text-foreground font-display">{logs.length}</p>
         </div>
       </div>
 
@@ -296,12 +296,12 @@ const CampaignPage: React.FC = () => {
 
               <div className="space-y-3">
                 <label className="text-sm font-medium text-foreground">Broadcast Channels</label>
-                <div className="grid grid-cols-3 gap-3">
+                 <div className="grid grid-cols-3 gap-3">
                   {(Object.keys(channelConfig) as ChannelKey[]).map(key => (
                     <button
                       key={key}
                       onClick={() => setChannels(prev => ({ ...prev, [key]: !prev[key] }))}
-                      className={`campaign-channel-btn h-11 rounded-lg border-2 text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${channels[key] ? `border-${channelConfig[key].colorClass.split(' ')[2].split('-')[1]}-300 ${channelConfig[key].colorClass} shadow-sm` : 'border-border text-muted-foreground hover:bg-muted/40 hover:border-border/80 bg-background'}`}
+                      className={`campaign-channel-btn h-11 rounded-lg border-2 text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2 ${channels[key] ? channelConfig[key].activeClass : 'border-border text-muted-foreground hover:bg-muted/40 hover:border-border/80 bg-background'}`}
                     >
                       {channelConfig[key].icon}
                       {channelConfig[key].label}
@@ -312,7 +312,7 @@ const CampaignPage: React.FC = () => {
             </div>
 
             {lastStatus && (
-              <div className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 animate-slide-up ${lastStatus.startsWith('Error') ? 'bg-red-50 text-red-800 border-red-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'}`}>
+              <div className={`p-4 rounded-xl text-sm font-medium border flex items-center gap-3 animate-slide-up ${lastStatus.startsWith('Error') ? 'bg-destructive/10 text-destructive border-destructive/20' : 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30'}`}>
                 {lastStatus.startsWith('Error') ? <AlertCircle className="h-5 w-5 shrink-0" /> : <CheckCircle2 className="h-5 w-5 shrink-0" />}
                 {lastStatus}
               </div>
@@ -377,7 +377,7 @@ const CampaignPage: React.FC = () => {
                 <div key={log.id} className="campaign-log-item rounded-xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/20 transition-all">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <p className="text-sm font-semibold text-foreground leading-tight">{log.title}</p>
-                    <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-emerald-100/80 text-emerald-700 border border-emerald-200 shrink-0">{log.status}</span>
+                    <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 shrink-0">{log.status}</span>
                   </div>
                   <div className="flex items-center gap-3 text-[11px] text-muted-foreground mt-2 font-medium">
                      <span className="flex items-center gap-1 bg-muted px-2 py-1 rounded-md"><Users className="h-3.5 w-3.5" />{log.recipientCount}</span>

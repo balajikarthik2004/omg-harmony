@@ -90,12 +90,12 @@ const TasksPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto animate-fade-in">
-      <div className="page-header-banner bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
+      <div className="page-header-banner bg-gradient-to-r from-primary/10 via-background to-primary/5">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><ListTodo className="w-5 h-5 text-blue-600" /> Duty Center & Logistics</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><ListTodo className="w-5 h-5 text-primary" /> Duty Center & Logistics</h1>
           <p className="text-sm text-muted-foreground mt-1">Orchestrate daily poojas, generic duties, and overall logistical operations.</p>
         </div>
-        <Button onClick={openAdd} className="shadow-md hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"><Plus className="h-4 w-4 mr-2" />Assign Duty</Button>
+        <Button onClick={openAdd} className="shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Assign Duty</Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-stagger">
@@ -104,26 +104,31 @@ const TasksPage: React.FC = () => {
           <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Total Directives</p>
           <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{items.length}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800 flex items-center gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Rituals Assigned</p>
-          <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{poojas.length}</p>
+         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-primary/20 bg-primary/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1.5"><Target className="w-3.5 h-3.5" /> Total Directives</p>
+          <p className="text-3xl font-display font-bold mt-2 text-primary relative z-10">{items.length}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Tasks Achieved</p>
-          <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{completedCount}</p>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-500/20 bg-amber-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-600 flex items-center gap-1.5"><CalendarClock className="w-3.5 h-3.5" /> Rituals Assigned</p>
+          <p className="text-3xl font-display font-bold mt-2 text-amber-600 relative z-10">{poojas.length}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-blue-100 bg-blue-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-blue-800 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Operations Pending</p>
-          <p className="text-3xl font-display font-bold mt-2 text-blue-700 relative z-10">{pendingCount}</p>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-500/20 bg-emerald-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-600 flex items-center gap-1.5"><CheckCircle2 className="w-3.5 h-3.5" /> Tasks Achieved</p>
+          <p className="text-3xl font-display font-bold mt-2 text-emerald-600 relative z-10">{completedCount}</p>
+        </div>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-blue-500/20 bg-blue-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-blue-600 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Operations Pending</p>
+          <p className="text-3xl font-display font-bold mt-2 text-blue-600 relative z-10">{pendingCount}</p>
         </div>
       </div>
 
       <div className="mt-2 space-y-6">
-        {renderTable('Daily Rituals & Poojas Queue', poojas, true, CalendarClock, 'hsl(38 92% 50%)', 'from-amber-50')}
-        {renderTable('General Management & Site Tasks', general, false, Target, 'hsl(233 53% 35%)', 'from-blue-50')}
+        {renderTable('Daily Rituals & Poojas Queue', poojas, true, CalendarClock, 'var(--primary)', 'from-primary/10')}
+        {renderTable('General Management & Site Tasks', general, false, Target, 'var(--primary)', 'from-primary/5')}
       </div>
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Revise Task Directive' : 'Assign New Duty'}>
@@ -157,7 +162,7 @@ const TasksPage: React.FC = () => {
 
           <div className="flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Discard Edits</Button>
-            <Button onClick={handleSave} className="flex-1 py-5 shadow-md bg-blue-600 hover:bg-blue-700 text-white">Deploy Task</Button>
+            <Button onClick={handleSave} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">Deploy Task</Button>
           </div>
         </div>
       </Modal>

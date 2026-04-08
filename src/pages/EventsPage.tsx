@@ -99,7 +99,7 @@ const EventsPage: React.FC = () => {
 
   const handleSave = () => {
     if (!form.name.trim() || !form.date || !form.time) return;
-    
+
     if (editId) {
       update(editId, form);
       setModalOpen(false);
@@ -109,12 +109,12 @@ const EventsPage: React.FC = () => {
     if (form.isRecurring && form.totalDays && form.totalDays > 1) {
       const baseDate = new Date(form.date);
       let count = 0;
-      
+
       for (let i = 0; i < form.totalDays; i++) {
         const d = new Date(baseDate);
         d.setDate(baseDate.getDate() + i);
         const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        
+
         add({
           ...form,
           date: dateStr
@@ -126,7 +126,7 @@ const EventsPage: React.FC = () => {
       add(form);
       toast.success(`${form.name} added successfully.`);
     }
-    
+
     setModalOpen(false);
   };
 
@@ -227,21 +227,21 @@ const EventsPage: React.FC = () => {
             <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground mb-1">Contact</p>
             <p className="text-sm font-bold text-foreground truncate">{templeProfile.contact}</p>
           </div>
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-            <Phone className="h-3.5 w-3.5 text-primary" />
+          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
+            <Phone className="h-3.5 w-3.5 text-foreground" />
           </div>
         </div>
       </div>
 
       {view === 'list' ? (
-        <div className="section-panel events-list-panel animate-slide-up">
-          <div className="section-panel-header gap-4">
+        <section className="section-panel hr-main-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
+          <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
             <h2 className="text-base font-semibold">All Events List</h2>
             <Button onClick={openAdd} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Event</Button>
           </div>
           <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead><tr className="border-b border-border bg-muted/30">
+              <thead><tr className="border-b border-border bg-muted/60">
                 <th className="text-left p-4 font-medium text-muted-foreground text-xs whitespace-nowrap">Event/Pooja</th>
                 <th className="text-left p-4 font-medium text-muted-foreground text-xs whitespace-nowrap">Date & Time</th>
                 <th className="text-left p-4 font-medium text-muted-foreground text-xs whitespace-nowrap">Pooja Type</th>
@@ -253,7 +253,7 @@ const EventsPage: React.FC = () => {
                   <tr key={item.id} className="border-b border-border hover:bg-muted/30 transition-colors">
                     <td className="p-4">
                       <p className="font-semibold text-foreground">{item.name}</p>
-                      {item.festivalName && <p className="text-[11px] text-orange-600 mt-0.5 inline-flex items-center gap-1"><Star className="h-3 w-3" />{item.festivalName}</p>}
+                      {item.festivalName && <p className="text-[11px] text-primary font-bold mt-0.5 inline-flex items-center gap-1"><Star className="h-3 w-3" />{item.festivalName}</p>}
                     </td>
                     <td className="p-4 text-muted-foreground">
                       <p className="font-medium text-foreground text-xs">{formatDateDDMMYYYY(item.date)}</p>
@@ -272,7 +272,7 @@ const EventsPage: React.FC = () => {
               </tbody>
             </table>
           </div></div>
-        </div>
+        </section>
       ) : (
         <div className="flex flex-col lg:flex-row gap-6 animate-slide-up">
           <div className="flex-1 section-panel events-calendar-panel p-5">
@@ -300,7 +300,7 @@ const EventsPage: React.FC = () => {
                   <div
                     key={i}
                     onClick={() => setSelectedDate(cell.date)}
-                    className={`aspect-square p-1.5 rounded-xl transition-all cursor-pointer border ${cell.isCurrentMonth ? 'bg-background hover:bg-muted/30 border-border/40' : 'bg-muted/10 text-muted-foreground/40 border-transparent'} ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-sm border-transparent' : ''} ${hasFestival && cell.isCurrentMonth ? 'bg-gradient-to-br from-orange-50 to-background border-orange-100' : ''}`}
+                    className={`aspect-square p-1.5 rounded-xl transition-all cursor-pointer border ${cell.isCurrentMonth ? 'bg-background hover:bg-muted/30 border-border/40' : 'bg-muted/10 text-muted-foreground/40 border-transparent'} ${isSelected ? 'ring-2 ring-primary ring-offset-2 ring-offset-card shadow-sm border-transparent' : ''} ${hasFestival && cell.isCurrentMonth ? 'bg-gradient-to-br from-primary/10 to-transparent border-primary/20' : ''}`}
                   >
                     <div className="h-full flex flex-col justify-between">
                       <span className={`text-xs font-semibold inline-flex items-center justify-center w-6 h-6 rounded-full self-end ${isToday ? 'bg-primary text-primary-foreground shadow-sm' : ''}`}>
@@ -309,7 +309,7 @@ const EventsPage: React.FC = () => {
                       {cellEvents.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-auto">
                           {cellEvents.slice(0, 3).map(event => (
-                            <div key={event.id} className={`w-1.5 h-1.5 rounded-full shadow-sm ${event.festivalName ? 'bg-orange-500' : statusDotColors[event.status]}`} title={event.name} />
+                            <div key={event.id} className={`w-1.5 h-1.5 rounded-full shadow-sm ${event.festivalName ? 'bg-primary' : statusDotColors[event.status]}`} title={event.name} />
                           ))}
                           {cellEvents.length > 3 && <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" title="More events" />}
                         </div>
@@ -335,16 +335,16 @@ const EventsPage: React.FC = () => {
 
               <div className="flex gap-2 w-full mb-5">
                 {[
-                  { key: 'all' as const, label: 'All', color: 'bg-blue-600 border-blue-700' },
-                  { key: 'festivals' as const, label: 'Festivals', color: 'bg-orange-600 border-orange-700' },
-                  { key: 'daily' as const, label: 'Daily Pooja', color: 'bg-emerald-600 border-emerald-700' },
+                  { key: 'all' as const, label: 'All', color: 'bg-primary border-primary/20' },
+                  { key: 'festivals' as const, label: 'Festivals', color: 'bg-primary/90 border-primary/20' },
+                  { key: 'daily' as const, label: 'Daily Pooja', color: 'bg-primary/80 border-primary/20' },
                 ].map(item => (
                   <button
                     key={item.key}
                     onClick={() => setFilter(item.key)}
                     className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-xl border-2 transition-all duration-200 shadow-sm
-                      ${filter === item.key 
-                        ? `${item.color} text-white shadow-md scale-[1.03]` 
+                      ${filter === item.key
+                        ? `${item.color} text-white shadow-md scale-[1.03]`
                         : 'bg-background border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground hover:bg-muted/40'}`}
                   >
                     {item.label}
@@ -354,11 +354,11 @@ const EventsPage: React.FC = () => {
 
               <div className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin">
                 {filteredEvents.length > 0 ? filteredEvents.map(event => (
-                  <div key={event.id} onClick={() => setDetailEvent(event)} className="events-event-card bg-background border border-border rounded-xl p-4 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden">
-                    {event.festivalName && <div className="absolute top-0 right-0 w-12 h-12 bg-orange-100/50 rounded-bl-full -z-0" />}
+                  <div key={event.id} onClick={() => setDetailEvent(event)} className="events-event-card bg-card border border-border rounded-xl p-4 hover:shadow-md hover:border-primary/30 transition-all cursor-pointer group relative overflow-hidden">
+                    {event.festivalName && <div className="absolute top-0 right-0 w-12 h-12 bg-primary/5 rounded-bl-full -z-0" />}
                     <div className="relative z-10">
                       <div className="flex gap-3 mb-3">
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${event.festivalName ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-primary/10 border-primary/20 text-primary'}`}>
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 border ${event.festivalName ? 'bg-primary/20 border-primary/30 text-foreground' : 'bg-primary/20 border-primary/30 text-foreground'}`}>
                           {event.festivalName ? <Star className="h-4 w-4" /> : <Flower2 className="h-4 w-4" />}
                         </div>
                         <div>
@@ -368,7 +368,7 @@ const EventsPage: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground bg-muted/30 p-2.5 rounded-lg border border-border/50">
+                      <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground bg-muted/60 p-2.5 rounded-lg border border-border/50">
                         <div className="flex items-center gap-1.5"><Bell className="h-3 w-3 shrink-0" /><span className="truncate">{event.poojaType || 'Pooja'}</span></div>
                         <div className="flex items-center gap-1.5"><Utensils className="h-3 w-3 shrink-0" /><span className="truncate">{event.prasadam || 'Annadhanam'}</span></div>
                         <div className="col-span-2 flex items-center gap-1.5"><MapPin className="h-3 w-3 shrink-0" /><span className="truncate">{event.location}</span></div>
@@ -377,7 +377,7 @@ const EventsPage: React.FC = () => {
                   </div>
                 )) : (
                   <div className="h-full flex flex-col items-center justify-center text-center p-6 border-2 border-dashed border-border rounded-xl bg-muted/10">
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                    <div className="w-12 h-12 rounded-full bg-muted/80 flex items-center justify-center mb-3">
                       <CalendarIcon className="h-5 w-5 text-muted-foreground/60" />
                     </div>
                     <p className="text-sm font-semibold text-foreground">No events planned</p>
@@ -394,10 +394,10 @@ const EventsPage: React.FC = () => {
       {detailEvent && (
         <div className="modal-overlay" onClick={() => setDetailEvent(null)}>
           <div className="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="relative p-6 pt-8 bg-gradient-to-br from-primary/5 to-background border-b border-border/60">
+            <div className="page-header-banner hr-header">
               <button onClick={() => setDetailEvent(null)} className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-background/80 hover:bg-muted text-muted-foreground hover:text-foreground transition-all shadow-sm"><X className="h-4 w-4" /></button>
 
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-sm border ${detailEvent.festivalName ? 'bg-orange-100 text-orange-600 border-orange-200' : 'bg-primary text-primary-foreground border-primary'}`}>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-sm border ${detailEvent.festivalName ? 'bg-primary/20 text-primary border-primary/20' : 'bg-primary text-primary-foreground border-primary'}`}>
                 {detailEvent.festivalName ? <Star className="h-6 w-6" /> : <Flower2 className="h-6 w-6" />}
               </div>
               <h3 className="text-xl font-display font-bold text-foreground mb-2 leading-tight">{detailEvent.name}</h3>
@@ -406,14 +406,14 @@ const EventsPage: React.FC = () => {
 
             <div className="p-6 space-y-4">
               {detailEvent.description && (
-                <div className="bg-muted/40 p-3 rounded-lg border border-border/50">
+                <div className="hr-tabbar bg-card/60 backdrop-blur-md rounded-2xl border border-border/80 p-1.5 flex flex-wrap gap-1 md:inline-flex shadow-sm relative z-10">
                   <p className="text-sm text-muted-foreground leading-relaxed italic">"{detailEvent.description}"</p>
                 </div>
               )}
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"><Calendar className="h-4 w-4 text-primary" /></div>
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0"><Calendar className="h-4 w-4 text-foreground" /></div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Date & Time</p>
                     <p className="text-sm font-medium text-foreground">{formatDateDDMMYYYY(detailEvent.date)} at {formatTime(detailEvent.time)}</p>
@@ -421,7 +421,7 @@ const EventsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"><Package className="h-4 w-4 text-emerald-600" /></div>
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0"><Package className="h-4 w-4 text-foreground" /></div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Resources Needed</p>
                     <p className="text-sm font-medium text-foreground">{detailEvent.resourceNeeded || 'None'}</p>
@@ -429,7 +429,7 @@ const EventsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"><User className="h-4 w-4 text-blue-600" /></div>
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0"><User className="h-4 w-4 text-foreground" /></div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Organizer</p>
                     <p className="text-sm font-medium text-foreground">{detailEvent.organizer}</p>
@@ -437,7 +437,7 @@ const EventsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0"><Flower2 className="h-4 w-4 text-accent" /></div>
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0"><Flower2 className="h-4 w-4 text-foreground" /></div>
                   <div>
                     <p className="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">Pooja Type</p>
                     <p className="text-sm font-medium text-foreground">{detailEvent.poojaType || '-'}</p>
@@ -500,24 +500,24 @@ const EventsPage: React.FC = () => {
                   <p className="text-sm font-bold text-foreground">Recurring Schedule</p>
                   <p className="text-[10px] text-muted-foreground font-medium">Auto-schedule for consecutive days</p>
                 </div>
-                <input 
-                  type="checkbox" 
-                  checked={form.isRecurring} 
+                <input
+                  type="checkbox"
+                  checked={form.isRecurring}
                   onChange={e => setField('isRecurring', e.target.checked)}
                   className="w-5 h-5 accent-primary cursor-pointer"
                 />
               </div>
-              
+
               {form.isRecurring && (
                 <div className="pt-2 animate-fade-in divide-y divide-border/40">
                   <div className="flex items-center justify-between py-2">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Days to Schedule</label>
                     <div className="flex items-center gap-3">
-                      <input 
-                        type="number" 
-                        min="2" 
+                      <input
+                        type="number"
+                        min="2"
                         max="30"
-                        value={String(form.totalDays)} 
+                        value={String(form.totalDays)}
                         onChange={e => setField('totalDays', Number(e.target.value) || 2)}
                         className="w-20 h-9 rounded-lg border border-input bg-background font-bold text-center text-sm outline-none focus:ring-2 focus:ring-primary/20"
                       />
