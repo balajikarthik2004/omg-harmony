@@ -1,10 +1,10 @@
 import React from 'react';
-import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns } from 'lucide-react';
+import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns, SlidersHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ThemeSettings } from '@/lib/theme';
+import { CardStyle, ChromeStyle, ContentWidth, LayoutDensity, MotionPreset, SidebarPosition, ThemeSettings } from '@/lib/theme';
 
 type ColorField = keyof Pick<
   ThemeSettings,
@@ -70,6 +70,40 @@ const angleControls: Array<{ key: AngleField; label: string; description: string
   { key: 'overlayGradientAngle', label: 'Overlay Gradient Angle', description: 'Direction of login image overlay gradient.' },
 ];
 
+const layoutDensityOptions: Array<{ value: LayoutDensity; label: string; hint: string }> = [
+  { value: 'comfortable', label: 'Comfortable', hint: 'Balanced spacing for daily operations.' },
+  { value: 'compact', label: 'Compact', hint: 'Denser layout for high-volume data work.' },
+];
+
+const contentWidthOptions: Array<{ value: ContentWidth; label: string; hint: string }> = [
+  { value: 'fluid', label: 'Fluid', hint: 'Stretch to full available width.' },
+  { value: 'wide', label: 'Wide', hint: 'Professional wide canvas with margins.' },
+  { value: 'contained', label: 'Contained', hint: 'Focused reading and cleaner rhythm.' },
+];
+
+const sidebarPositionOptions: Array<{ value: SidebarPosition; label: string; hint: string }> = [
+  { value: 'left', label: 'Sidebar Left', hint: 'Classic enterprise navigation placement.' },
+  { value: 'right', label: 'Sidebar Right', hint: 'Right-oriented workspace for alternate flow.' },
+  { value: 'bottom', label: 'Sidebar Bottom', hint: 'Dock navigation with tooltip-style quick actions.' },
+];
+
+const chromeStyleOptions: Array<{ value: ChromeStyle; label: string; hint: string }> = [
+  { value: 'gradient', label: 'Gradient', hint: 'Signature brand gradients for premium depth.' },
+  { value: 'glass', label: 'Glass', hint: 'Frosted shell with modern executive tone.' },
+  { value: 'solid', label: 'Solid', hint: 'Crisp structural chrome with minimal noise.' },
+];
+
+const cardStyleOptions: Array<{ value: CardStyle; label: string; hint: string }> = [
+  { value: 'elevated', label: 'Elevated', hint: 'Soft shadows and layered hierarchy.' },
+  { value: 'glass', label: 'Glass', hint: 'Translucent cards with blur and depth.' },
+  { value: 'minimal', label: 'Minimal', hint: 'Thin borders and restrained elevation.' },
+];
+
+const motionPresetOptions: Array<{ value: MotionPreset; label: string; hint: string }> = [
+  { value: 'fluid', label: 'Fluid Motion', hint: 'Smooth transitions and animated interactions.' },
+  { value: 'reduced', label: 'Reduced Motion', hint: 'Low-motion mode for focus and accessibility.' },
+];
+
 const ThemeStudioPage: React.FC = () => {
   const { theme, presets, updateTheme, applyPreset, saveCurrentAsPreset, resetTheme } = useTheme();
   const [presetName, setPresetName] = React.useState('');
@@ -95,6 +129,49 @@ const ThemeStudioPage: React.FC = () => {
   const handleAngleChange = (field: AngleField, value: number[]) => {
     const angle = Math.round(value[0] ?? (theme[field] as number));
     applyCustomPatch({ [field]: angle });
+  };
+
+  const handleLayoutDensityChange = (layoutDensity: LayoutDensity) => {
+    applyCustomPatch({ layoutDensity });
+  };
+
+  const handleContentWidthChange = (contentWidth: ContentWidth) => {
+    applyCustomPatch({ contentWidth });
+  };
+
+  const handleSidebarPositionChange = (sidebarPosition: SidebarPosition) => {
+    applyCustomPatch({ sidebarPosition });
+  };
+
+  const handleChromeStyleChange = (chromeStyle: ChromeStyle) => {
+    applyCustomPatch({ chromeStyle });
+  };
+
+  const handleCardStyleChange = (cardStyle: CardStyle) => {
+    applyCustomPatch({ cardStyle });
+  };
+
+  const handleMotionPresetChange = (motionPreset: MotionPreset) => {
+    applyCustomPatch({ motionPreset });
+  };
+
+  const handleSidebarDefaultChange = () => {
+    applyCustomPatch({ sidebarCollapsedByDefault: !theme.sidebarCollapsedByDefault });
+  };
+
+  const handlePagePaddingChange = (value: number[]) => {
+    const pagePadding = Number(value[0]?.toFixed(2) || theme.pagePadding);
+    applyCustomPatch({ pagePadding });
+  };
+
+  const handleTopbarHeightChange = (value: number[]) => {
+    const topbarHeight = Math.round(value[0] ?? theme.topbarHeight);
+    applyCustomPatch({ topbarHeight });
+  };
+
+  const handleSidebarWidthChange = (value: number[]) => {
+    const sidebarExpandedWidth = Math.round(value[0] ?? theme.sidebarExpandedWidth);
+    applyCustomPatch({ sidebarExpandedWidth });
   };
 
   const isPresetActive = (presetId: string) => theme.id === presetId;
@@ -151,7 +228,7 @@ const ThemeStudioPage: React.FC = () => {
   ];
 
   return (
-    <div className="theme-studio-v2 h-[calc(100vh-64px)] flex flex-col animate-fade-in overflow-hidden -m-6">
+    <div className="theme-studio-v2 h-[calc(100vh-var(--layout-topbar-height))] flex flex-col animate-fade-in overflow-hidden -m-6">
       <header className="px-8 py-6 border-b bg-background/80 backdrop-blur-xl z-30 border-border/40 shadow-sm shrink-0">
         <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -186,7 +263,7 @@ const ThemeStudioPage: React.FC = () => {
         <div className="xl:col-span-4 h-full overflow-y-auto border-r border-border/40 bg-background/40 backdrop-blur-sm p-10 space-y-12">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <div className="bg-card/40 backdrop-blur-md rounded-[1rem] border border-border/60 p-2 mb-10 shadow-sm">
-              <TabsList className="h-14 w-full bg-transparent grid grid-cols-4 gap-1 p-0">
+              <TabsList className="h-14 w-full bg-transparent grid grid-cols-5 gap-1 p-0">
                 <TabsTrigger value="palette" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary border-none">
                   <Palette className="h-4 w-4" /> Palette
                 </TabsTrigger>
@@ -198,6 +275,9 @@ const ThemeStudioPage: React.FC = () => {
                 </TabsTrigger>
                 <TabsTrigger value="solid-spectrum" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-emerald-500 border-none">
                   <Layout className="h-4 w-4" /> Solid
+                </TabsTrigger>
+                <TabsTrigger value="layout-system" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-sky-600 border-none">
+                  <SlidersHorizontal className="h-4 w-4" /> Layout
                 </TabsTrigger>
               </TabsList>
             </div>
@@ -294,6 +374,152 @@ const ThemeStudioPage: React.FC = () => {
                 </div>
               </section>
             </TabsContent>
+
+            <TabsContent value="layout-system" className="space-y-10">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-8">
+                <div className="space-y-1">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Workspace Architecture</h3>
+                  <p className="text-[10px] text-muted-foreground/60 font-bold uppercase">Structural controls for premium layout behavior</p>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Density</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {layoutDensityOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleLayoutDensityChange(option.value)}
+                        className={`text-left rounded-2xl border px-4 py-3 transition-all ${theme.layoutDensity === option.value ? 'border-primary/40 bg-primary/[0.06]' : 'border-border/50 hover:border-primary/25 bg-card'}`}
+                      >
+                        <p className="text-[11px] font-black uppercase text-foreground">{option.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{option.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Content Width</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {contentWidthOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleContentWidthChange(option.value)}
+                        className={`text-left rounded-2xl border px-4 py-3 transition-all ${theme.contentWidth === option.value ? 'border-sky-500/40 bg-sky-500/[0.05]' : 'border-border/50 hover:border-sky-500/30 bg-card'}`}
+                      >
+                        <p className="text-[11px] font-black uppercase text-foreground">{option.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{option.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Sidebar Position</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {sidebarPositionOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleSidebarPositionChange(option.value)}
+                        className={`text-left rounded-2xl border px-4 py-3 transition-all ${theme.sidebarPosition === option.value ? 'border-fuchsia-500/40 bg-fuchsia-500/[0.05]' : 'border-border/50 hover:border-fuchsia-500/25 bg-card'}`}
+                      >
+                        <p className="text-[11px] font-black uppercase text-foreground">{option.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{option.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Navigation Chrome</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {chromeStyleOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleChromeStyleChange(option.value)}
+                        className={`text-left rounded-2xl border px-4 py-3 transition-all ${theme.chromeStyle === option.value ? 'border-indigo-500/40 bg-indigo-500/[0.05]' : 'border-border/50 hover:border-indigo-500/30 bg-card'}`}
+                      >
+                        <p className="text-[11px] font-black uppercase text-foreground">{option.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{option.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Card Style</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {cardStyleOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleCardStyleChange(option.value)}
+                        className={`text-left rounded-2xl border px-4 py-3 transition-all ${theme.cardStyle === option.value ? 'border-emerald-500/40 bg-emerald-500/[0.05]' : 'border-border/50 hover:border-emerald-500/25 bg-card'}`}
+                      >
+                        <p className="text-[11px] font-black uppercase text-foreground">{option.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{option.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Motion</p>
+                  <div className="grid grid-cols-1 gap-2">
+                    {motionPresetOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => handleMotionPresetChange(option.value)}
+                        className={`text-left rounded-2xl border px-4 py-3 transition-all ${theme.motionPreset === option.value ? 'border-amber-500/40 bg-amber-500/[0.05]' : 'border-border/50 hover:border-amber-500/25 bg-card'}`}
+                      >
+                        <p className="text-[11px] font-black uppercase text-foreground">{option.label}</p>
+                        <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{option.hint}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleSidebarDefaultChange}
+                  className={`w-full rounded-2xl border px-4 py-3 text-left transition-all ${theme.sidebarCollapsedByDefault ? 'border-violet-500/40 bg-violet-500/[0.05]' : 'border-border/50 hover:border-violet-500/25 bg-card'}`}
+                >
+                  <p className="text-[11px] font-black uppercase text-foreground">Sidebar Starts Collapsed</p>
+                  <p className="text-[10px] text-muted-foreground/70 font-medium mt-0.5">{theme.sidebarCollapsedByDefault ? 'Enabled for focused dashboards.' : 'Disabled for broad menu visibility.'}</p>
+                </button>
+              </section>
+
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Page Padding</p>
+                    <code className="text-[10px] font-black text-sky-600">{theme.pagePadding.toFixed(2)} REM</code>
+                  </div>
+                  <Slider min={0.75} max={2.5} step={0.05} value={[theme.pagePadding]} onValueChange={handlePagePaddingChange} />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Topbar Height</p>
+                    <code className="text-[10px] font-black text-sky-600">{theme.topbarHeight}px</code>
+                  </div>
+                  <Slider min={56} max={84} step={1} value={[theme.topbarHeight]} onValueChange={handleTopbarHeightChange} />
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Sidebar Width</p>
+                    <code className="text-[10px] font-black text-sky-600">{theme.sidebarExpandedWidth}px</code>
+                  </div>
+                  <Slider min={224} max={320} step={2} value={[theme.sidebarExpandedWidth]} onValueChange={handleSidebarWidthChange} />
+                </div>
+              </section>
+            </TabsContent>
           </Tabs>
         </div>
 
@@ -327,28 +553,54 @@ const ThemeStudioPage: React.FC = () => {
                     </div>
                     <div className="h-10 w-10 rounded-full border-2 border-white/40 shadow-xl" style={{ background: 'linear-gradient(135deg, var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
                   </div>
-                  <div className="flex h-[calc(100%-56px)]">
-                    <div className="w-28 p-6 space-y-4 shadow-2xl" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }}>
-                      <div className="h-3 rounded-full bg-white/40 w-full mb-8 shadow-sm" />
-                      <div className="h-3 rounded-full bg-white/30 w-3/4 shadow-sm" />
-                      <div className="h-3 rounded-full bg-white/20 w-1/2 shadow-sm" />
-                      <div className="h-3 rounded-full bg-white/10 w-2/3 shadow-sm" />
-                    </div>
-                    <div className="flex-1 p-8 space-y-8 overflow-hidden relative" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
-                      <div className="h-12 rounded-[1rem] border border-border bg-card shadow-sm flex items-center px-6"><div className="h-2 w-1/4 rounded-full bg-muted/60" /></div>
-                      <div className="grid grid-cols-2 gap-6">
-                        <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
-                          <div className="h-2 rounded-full bg-muted/40 w-1/3" />
-                          <div className="h-8 rounded-lg bg-primary/10 border border-primary/20 w-1/2" />
+                  {theme.sidebarPosition === 'bottom' ? (
+                    <div className="flex h-[calc(100%-56px)] flex-col">
+                      <div className="flex-1 p-8 space-y-8 overflow-hidden relative" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
+                        <div className="h-12 rounded-[1rem] border border-border bg-card shadow-sm flex items-center px-6"><div className="h-2 w-1/4 rounded-full bg-muted/60" /></div>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                            <div className="h-2 rounded-full bg-muted/40 w-1/3" />
+                            <div className="h-8 rounded-lg bg-primary/10 border border-primary/20 w-1/2" />
+                          </div>
+                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                            <div className="h-2 rounded-full bg-muted/40 w-1/3" />
+                            <div className="h-8 rounded-lg bg-secondary/10 border border-secondary/20 w-1/2" />
+                          </div>
                         </div>
-                        <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
-                          <div className="h-2 rounded-full bg-muted/40 w-1/3" />
-                          <div className="h-8 rounded-lg bg-secondary/10 border border-secondary/20 w-1/2" />
-                        </div>
+                        <div className="h-32 rounded-[1.5rem] border border-border bg-card shadow-xl p-8" />
                       </div>
-                      <div className="h-32 rounded-[1.5rem] border border-border bg-card shadow-xl p-8" />
+                      <div className="h-16 mx-6 mb-5 mt-2 rounded-2xl border border-border/70 px-4 flex items-center justify-between" style={{ background: 'linear-gradient(120deg, hsl(var(--background) / 0.96), hsl(var(--card) / 0.92))' }}>
+                        <div className="h-8 w-8 rounded-xl" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
+                        <div className="h-8 w-8 rounded-xl bg-card border border-border/70" />
+                        <div className="h-8 w-8 rounded-xl bg-card border border-border/70" />
+                        <div className="h-8 w-8 rounded-xl bg-card border border-border/70" />
+                        <div className="h-8 w-8 rounded-xl bg-card border border-border/70" />
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className={`flex h-[calc(100%-56px)] ${theme.sidebarPosition === 'right' ? 'flex-row-reverse' : ''}`}>
+                      <div className="w-28 p-6 space-y-4 shadow-2xl" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }}>
+                        <div className="h-3 rounded-full bg-white/40 w-full mb-8 shadow-sm" />
+                        <div className="h-3 rounded-full bg-white/30 w-3/4 shadow-sm" />
+                        <div className="h-3 rounded-full bg-white/20 w-1/2 shadow-sm" />
+                        <div className="h-3 rounded-full bg-white/10 w-2/3 shadow-sm" />
+                      </div>
+                      <div className="flex-1 p-8 space-y-8 overflow-hidden relative" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
+                        <div className="h-12 rounded-[1rem] border border-border bg-card shadow-sm flex items-center px-6"><div className="h-2 w-1/4 rounded-full bg-muted/60" /></div>
+                        <div className="grid grid-cols-2 gap-6">
+                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                            <div className="h-2 rounded-full bg-muted/40 w-1/3" />
+                            <div className="h-8 rounded-lg bg-primary/10 border border-primary/20 w-1/2" />
+                          </div>
+                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                            <div className="h-2 rounded-full bg-muted/40 w-1/3" />
+                            <div className="h-8 rounded-lg bg-secondary/10 border border-secondary/20 w-1/2" />
+                          </div>
+                        </div>
+                        <div className="h-32 rounded-[1.5rem] border border-border bg-card shadow-xl p-8" />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
