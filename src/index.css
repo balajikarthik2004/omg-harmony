@@ -786,6 +786,19 @@
     filter: blur(2px);
   }
 
+  .theme-studio-left-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    overscroll-behavior: contain;
+    scroll-padding-bottom: 1.25rem;
+  }
+
+  .theme-studio-left-scroll::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
   .login-floating-orb {
     position: absolute;
     border-radius: 50%;

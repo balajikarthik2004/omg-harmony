@@ -104,10 +104,37 @@ const motionPresetOptions: Array<{ value: MotionPreset; label: string; hint: str
   { value: 'reduced', label: 'Reduced Motion', hint: 'Low-motion mode for focus and accessibility.' },
 ];
 
+const PREVIEW_CANVAS_WIDTH = 1060;
+const PREVIEW_CANVAS_HEIGHT = 680;
+
 const ThemeStudioPage: React.FC = () => {
   const { theme, presets, updateTheme, applyPreset, saveCurrentAsPreset, resetTheme } = useTheme();
   const [presetName, setPresetName] = React.useState('');
   const [activeTab, setActiveTab] = React.useState('palette');
+  const previewHostRef = React.useRef<HTMLDivElement | null>(null);
+  const leftContentScrollRef = React.useRef<HTMLDivElement | null>(null);
+  const [previewScale, setPreviewScale] = React.useState(1);
+
+  React.useEffect(() => {
+    const host = previewHostRef.current;
+    if (!host) return;
+
+    const updateScale = () => {
+      const { width, height } = host.getBoundingClientRect();
+      const nextScale = Math.min(width / PREVIEW_CANVAS_WIDTH, height / PREVIEW_CANVAS_HEIGHT, 1);
+      setPreviewScale(Number.isFinite(nextScale) && nextScale > 0 ? nextScale : 1);
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(host);
+    window.addEventListener('resize', updateScale);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateScale);
+    };
+  }, []);
 
   const applyCustomPatch = (patch: Partial<ThemeSettings>) => {
     updateTheme({
@@ -227,8 +254,26 @@ const ThemeStudioPage: React.FC = () => {
     { name: 'Oxide', hex: '#27272A' },
   ];
 
+  const scaledPreviewWidth = PREVIEW_CANVAS_WIDTH * previewScale;
+  const scaledPreviewHeight = PREVIEW_CANVAS_HEIGHT * previewScale;
+
+  const handleStudioWheelCapture = (event: React.WheelEvent<HTMLElement>) => {
+    const leftScrollHost = leftContentScrollRef.current;
+    if (!leftScrollHost || Math.abs(event.deltaY) < Math.abs(event.deltaX) || event.deltaY === 0) {
+      return;
+    }
+
+    const canScrollLeftPane = leftScrollHost.scrollHeight > leftScrollHost.clientHeight + 1;
+    if (!canScrollLeftPane) return;
+
+    if (!leftScrollHost.contains(event.target as Node)) {
+      leftScrollHost.scrollTop += event.deltaY;
+      event.preventDefault();
+    }
+  };
+
   return (
-    <div className="theme-studio-v2 h-[calc(100vh-var(--layout-topbar-height))] flex flex-col animate-fade-in overflow-hidden -m-6">
+    <div className="theme-studio-v2 h-full min-h-0 flex flex-col animate-fade-in overflow-hidden">
       <header className="px-8 py-6 border-b bg-background/80 backdrop-blur-xl z-30 border-border/40 shadow-sm shrink-0">
         <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -259,10 +304,10 @@ const ThemeStudioPage: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden grid grid-cols-1 xl:grid-cols-12 bg-muted/5">
-        <div className="xl:col-span-4 h-full overflow-y-auto border-r border-border/40 bg-background/40 backdrop-blur-sm p-10 space-y-12">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <div className="bg-card/40 backdrop-blur-md rounded-[1rem] border border-border/60 p-2 mb-10 shadow-sm">
+      <main onWheelCapture={handleStudioWheelCapture} className="flex-1 min-h-0 overflow-hidden grid grid-cols-1 xl:grid-cols-12 bg-muted/5">
+        <div className="xl:col-span-4 h-full min-h-0 overflow-hidden border-r border-border/40 bg-background/40 backdrop-blur-sm p-4 lg:p-5 xl:p-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full min-h-0 flex flex-col">
+            <div className="bg-card/40 backdrop-blur-md rounded-[1rem] border border-border/60 p-2 mb-4 shadow-sm shrink-0">
               <TabsList className="h-14 w-full bg-transparent grid grid-cols-5 gap-1 p-0">
                 <TabsTrigger value="palette" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary border-none">
                   <Palette className="h-4 w-4" /> Palette
@@ -282,8 +327,9 @@ const ThemeStudioPage: React.FC = () => {
               </TabsList>
             </div>
 
-            <TabsContent value="palette" className="space-y-10">
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm relative overflow-hidden">
+            <div ref={leftContentScrollRef} className="theme-studio-left-scroll flex-1 min-h-0 overflow-y-auto pr-1 pb-8">
+            <TabsContent value="palette" className="space-y-6 mt-0">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-8 px-1">
                   <div className="space-y-1">
                     <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground flex items-center gap-2">Core Identity</h3>
@@ -304,7 +350,7 @@ const ThemeStudioPage: React.FC = () => {
                   ))}
                 </div>
               </section>
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-8 px-1">
                   <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Geometry Curve</h3>
                   <span className="text-[10px] font-black bg-muted px-2 py-1 rounded-md">{theme.radius.toFixed(2)} REM</span>
@@ -313,8 +359,8 @@ const ThemeStudioPage: React.FC = () => {
               </section>
             </TabsContent>
 
-            <TabsContent value="gradients" className="space-y-10">
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm">
+            <TabsContent value="gradients" className="space-y-6 mt-0">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm">
                 <div className="mb-8 px-1">
                   <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Spectral Nodes</h3>
                 </div>
@@ -329,7 +375,7 @@ const ThemeStudioPage: React.FC = () => {
                   ))}
                 </div>
               </section>
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-8">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm space-y-6">
                 {angleControls.map((control) => (
                   <div key={control.key} className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -342,8 +388,8 @@ const ThemeStudioPage: React.FC = () => {
               </section>
             </TabsContent>
 
-            <TabsContent value="presets" className="space-y-10">
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-6">
+            <TabsContent value="presets" className="space-y-6 mt-0">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm space-y-6">
                 <input value={presetName} onChange={(e) => setPresetName(e.target.value)} placeholder="Theme ID..." className="h-14 w-full rounded-2xl border border-border bg-card px-5 text-xs font-black" />
                 <Button className="h-14 w-full rounded-2xl font-black text-[10px] uppercase shadow-lg text-white" onClick={handleSavePreset}>Snapshot Identity</Button>
               </section>
@@ -362,8 +408,8 @@ const ThemeStudioPage: React.FC = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="solid-spectrum" className="space-y-10">
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm">
+            <TabsContent value="solid-spectrum" className="space-y-6 mt-0">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm">
                 <div className="grid grid-cols-2 gap-3">
                   {solidColors.map((color) => (
                     <button key={color.hex} onClick={() => applySolidColor(color.hex, color.name)} className={`p-4 rounded-[1.8rem] border-2 transition-all flex items-center gap-3 ${theme.primary === color.hex ? 'border-emerald-500 bg-emerald-500/[0.03]' : 'border-border/40 hover:border-emerald-500/40'}`}>
@@ -375,8 +421,8 @@ const ThemeStudioPage: React.FC = () => {
               </section>
             </TabsContent>
 
-            <TabsContent value="layout-system" className="space-y-10">
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-8">
+            <TabsContent value="layout-system" className="space-y-6 mt-0">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm space-y-6">
                 <div className="space-y-1">
                   <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Workspace Architecture</h3>
                   <p className="text-[10px] text-muted-foreground/60 font-bold uppercase">Structural controls for premium layout behavior</p>
@@ -494,7 +540,7 @@ const ThemeStudioPage: React.FC = () => {
                 </button>
               </section>
 
-              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-8">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Page Padding</p>
@@ -520,56 +566,99 @@ const ThemeStudioPage: React.FC = () => {
                 </div>
               </section>
             </TabsContent>
+            </div>
           </Tabs>
         </div>
 
-        <div className="xl:col-span-8 h-full overflow-hidden p-12 bg-muted/5 flex items-center justify-center relative">
+        <div className="xl:col-span-8 h-full min-h-0 overflow-hidden p-4 md:p-6 xl:p-8 bg-muted/5 flex items-start justify-center relative">
           <div className="absolute inset-0 bg-grid-slate-200/[0.04] pointer-events-none" />
-          <div className="w-full h-full relative group">
-            <div className="bg-card rounded-[1.5rem] border border-border/80 shadow-2xl relative overflow-hidden h-full flex flex-col transition-all duration-1000">
-              <div className="px-8 py-6 border-b flex items-center justify-between bg-muted/10 backdrop-blur-md shrink-0">
-                <div className="flex items-center gap-3">
+          <div ref={previewHostRef} className="w-full h-full min-h-0 relative group flex items-start justify-center overflow-hidden">
+            <div className="absolute -top-16 left-16 h-56 w-56 rounded-full bg-primary/20 blur-3xl opacity-75 pointer-events-none" />
+            <div className="absolute -bottom-20 right-10 h-64 w-64 rounded-full bg-sky-500/15 blur-3xl opacity-80 pointer-events-none" />
+            <div className="relative" style={{ width: scaledPreviewWidth, height: scaledPreviewHeight }}>
+              <div
+                className="bg-card/90 rounded-[1.75rem] shadow-[0_24px_70px_hsl(var(--foreground)/0.14)] relative overflow-hidden flex flex-col transition-all duration-700 backdrop-blur-xl"
+                style={{
+                  width: PREVIEW_CANVAS_WIDTH,
+                  height: PREVIEW_CANVAS_HEIGHT,
+                  transform: `scale(${previewScale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,hsl(var(--primary)/0.16),transparent_45%),radial-gradient(circle_at_80%_100%,hsl(var(--secondary)/0.14),transparent_50%)]" />
+              <div className="px-8 py-6 border-b flex items-center justify-between bg-background/60 backdrop-blur-md shrink-0 relative">
+                <div className="flex items-center gap-4">
                   <div className="flex gap-1.5 mr-4">
                     <div className="h-3 w-3 rounded-full bg-rose-500/80" />
                     <div className="h-3 w-3 rounded-full bg-amber-500/80" />
                     <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-background border text-[10px] font-black uppercase text-muted-foreground/60 shadow-inner">
-                    <Layout className="h-3 w-3" /> Live Workspace Monitor
+                  <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-r from-primary/15 via-secondary/10 to-transparent shadow-inner">
+                    <Layout className="h-4 w-4 text-primary" />
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.18em] text-foreground/90">Live Workspace Monitor</p>
+                      <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">Executive visual telemetry</p>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
-                  <p className="text-[10px] font-black uppercase text-emerald-500/80">Synchronized</p>
+                <div className="flex items-center gap-3">
+                  <div className="hidden sm:flex items-end gap-1 rounded-lg border border-border/60 bg-background/70 px-2.5 py-2 shadow-sm">
+                    <span className="h-3 w-1 rounded-full bg-primary/40" />
+                    <span className="h-4 w-1 rounded-full bg-primary/60" />
+                    <span className="h-2 w-1 rounded-full bg-primary/30" />
+                    <span className="h-5 w-1 rounded-full bg-emerald-500/70" />
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                    <p className="text-[10px] font-black uppercase text-emerald-600">Synchronized</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex-1 p-10 bg-muted/5 flex items-center justify-center relative overflow-hidden">
-                <div className="w-full h-full rounded-[1rem] border border-border bg-background shadow-2xl overflow-hidden relative isolate">
-                  <div className="h-14 border-b px-8 flex items-center justify-between" style={{ backgroundImage: 'linear-gradient(var(--topbar-gradient-angle, 180deg), var(--topbar-bg-start, #FFFFFF), var(--topbar-bg-end, #EEF1FB))' }}>
+              <div className="flex-1 p-6 md:p-8 bg-muted/[0.07] flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-x-12 top-8 h-24 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+                <div className="w-full h-full rounded-[1.2rem] border border-border/70 bg-background/95 shadow-[0_30px_70px_hsl(var(--foreground)/0.12)] overflow-hidden relative isolate">
+                  <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_90%_5%,hsl(var(--primary)/0.1),transparent_36%),radial-gradient(circle_at_15%_88%,hsl(var(--secondary)/0.09),transparent_44%)]" />
+                  <div className="h-14 border-b px-8 flex items-center justify-between relative" style={{ backgroundImage: 'linear-gradient(var(--topbar-gradient-angle, 180deg), var(--topbar-bg-start, #FFFFFF), var(--topbar-bg-end, #EEF1FB))' }}>
                     <div className="flex items-center gap-4">
                       <div className="h-6 w-6 rounded-lg rotate-12 shadow-xl" style={{ background: 'hsl(var(--primary))' }} />
-                      <div className="h-3 w-40 rounded-full bg-foreground/10" />
+                      <div className="space-y-1.5">
+                        <div className="h-2.5 w-32 rounded-full bg-foreground/15" />
+                        <div className="h-2 w-20 rounded-full bg-foreground/10" />
+                      </div>
                     </div>
-                    <div className="h-10 w-10 rounded-full border-2 border-white/40 shadow-xl" style={{ background: 'linear-gradient(135deg, var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
+                    <div className="flex items-center gap-2">
+                      <div className="h-7 w-16 rounded-full border border-white/40 bg-white/40" />
+                      <div className="h-10 w-10 rounded-full border-2 border-white/40 shadow-xl" style={{ background: 'linear-gradient(135deg, var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
+                    </div>
                   </div>
                   {theme.sidebarPosition === 'bottom' ? (
                     <div className="flex h-[calc(100%-56px)] flex-col">
                       <div className="flex-1 p-8 space-y-8 overflow-hidden relative" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
-                        <div className="h-12 rounded-[1rem] border border-border bg-card shadow-sm flex items-center px-6"><div className="h-2 w-1/4 rounded-full bg-muted/60" /></div>
+                        <div className="absolute top-4 right-10 h-24 w-24 rounded-full bg-primary/20 blur-2xl" />
+                        <div className="h-12 rounded-[1rem] border border-border/70 bg-card/90 shadow-sm flex items-center px-6 justify-between backdrop-blur-sm">
+                          <div className="h-2 w-1/4 rounded-full bg-muted/60" />
+                          <div className="h-6 w-24 rounded-full bg-primary/10 border border-primary/20" />
+                        </div>
                         <div className="grid grid-cols-2 gap-6">
-                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                          <div className="h-28 rounded-[1.25rem] border border-border/70 bg-card/90 shadow-lg p-5 space-y-3 backdrop-blur-sm">
                             <div className="h-2 rounded-full bg-muted/40 w-1/3" />
                             <div className="h-8 rounded-lg bg-primary/10 border border-primary/20 w-1/2" />
+                            <div className="h-2 rounded-full bg-muted/30 w-2/3" />
                           </div>
-                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                          <div className="h-28 rounded-[1.25rem] border border-border/70 bg-card/90 shadow-lg p-5 space-y-3 backdrop-blur-sm">
                             <div className="h-2 rounded-full bg-muted/40 w-1/3" />
                             <div className="h-8 rounded-lg bg-secondary/10 border border-secondary/20 w-1/2" />
+                            <div className="h-2 rounded-full bg-muted/30 w-2/3" />
                           </div>
                         </div>
-                        <div className="h-32 rounded-[1.5rem] border border-border bg-card shadow-xl p-8" />
+                        <div className="h-32 rounded-[1.5rem] border border-border/70 bg-card/90 shadow-xl p-8 backdrop-blur-sm">
+                          <div className="h-2 w-1/3 rounded-full bg-muted/40 mb-4" />
+                          <div className="h-3 w-1/2 rounded-full bg-primary/15 mb-3" />
+                          <div className="h-3 w-2/5 rounded-full bg-secondary/15" />
+                        </div>
                       </div>
-                      <div className="h-16 mx-6 mb-5 mt-2 rounded-2xl border border-border/70 px-4 flex items-center justify-between" style={{ background: 'linear-gradient(120deg, hsl(var(--background) / 0.96), hsl(var(--card) / 0.92))' }}>
+                      <div className="h-16 mx-6 mb-5 mt-2 rounded-2xl border border-border/70 px-4 flex items-center justify-between shadow-lg" style={{ background: 'linear-gradient(120deg, hsl(var(--background) / 0.96), hsl(var(--card) / 0.92))' }}>
                         <div className="h-8 w-8 rounded-xl" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
                         <div className="h-8 w-8 rounded-xl bg-card border border-border/70" />
                         <div className="h-8 w-8 rounded-xl bg-card border border-border/70" />
@@ -579,25 +668,36 @@ const ThemeStudioPage: React.FC = () => {
                     </div>
                   ) : (
                     <div className={`flex h-[calc(100%-56px)] ${theme.sidebarPosition === 'right' ? 'flex-row-reverse' : ''}`}>
-                      <div className="w-28 p-6 space-y-4 shadow-2xl" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }}>
+                      <div className="w-32 p-6 space-y-4 shadow-2xl border-r border-white/10" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }}>
                         <div className="h-3 rounded-full bg-white/40 w-full mb-8 shadow-sm" />
                         <div className="h-3 rounded-full bg-white/30 w-3/4 shadow-sm" />
                         <div className="h-3 rounded-full bg-white/20 w-1/2 shadow-sm" />
                         <div className="h-3 rounded-full bg-white/10 w-2/3 shadow-sm" />
+                        <div className="h-20 rounded-2xl border border-white/20 bg-white/10 mt-8" />
                       </div>
                       <div className="flex-1 p-8 space-y-8 overflow-hidden relative" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
-                        <div className="h-12 rounded-[1rem] border border-border bg-card shadow-sm flex items-center px-6"><div className="h-2 w-1/4 rounded-full bg-muted/60" /></div>
+                        <div className="absolute top-4 right-10 h-24 w-24 rounded-full bg-primary/20 blur-2xl" />
+                        <div className="h-12 rounded-[1rem] border border-border/70 bg-card/90 shadow-sm flex items-center px-6 justify-between backdrop-blur-sm">
+                          <div className="h-2 w-1/4 rounded-full bg-muted/60" />
+                          <div className="h-6 w-24 rounded-full bg-primary/10 border border-primary/20" />
+                        </div>
                         <div className="grid grid-cols-2 gap-6">
-                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                          <div className="h-28 rounded-[1.25rem] border border-border/70 bg-card/90 shadow-lg p-5 space-y-3 backdrop-blur-sm">
                             <div className="h-2 rounded-full bg-muted/40 w-1/3" />
                             <div className="h-8 rounded-lg bg-primary/10 border border-primary/20 w-1/2" />
+                            <div className="h-2 rounded-full bg-muted/30 w-2/3" />
                           </div>
-                          <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                          <div className="h-28 rounded-[1.25rem] border border-border/70 bg-card/90 shadow-lg p-5 space-y-3 backdrop-blur-sm">
                             <div className="h-2 rounded-full bg-muted/40 w-1/3" />
                             <div className="h-8 rounded-lg bg-secondary/10 border border-secondary/20 w-1/2" />
+                            <div className="h-2 rounded-full bg-muted/30 w-2/3" />
                           </div>
                         </div>
-                        <div className="h-32 rounded-[1.5rem] border border-border bg-card shadow-xl p-8" />
+                        <div className="h-32 rounded-[1.5rem] border border-border/70 bg-card/90 shadow-xl p-8 backdrop-blur-sm">
+                          <div className="h-2 w-1/3 rounded-full bg-muted/40 mb-4" />
+                          <div className="h-3 w-1/2 rounded-full bg-primary/15 mb-3" />
+                          <div className="h-3 w-2/5 rounded-full bg-secondary/15" />
+                        </div>
                       </div>
                     </div>
                   )}
@@ -610,6 +710,7 @@ const ThemeStudioPage: React.FC = () => {
                   <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Professional Sandbox Environment</span>
                 </div>
                 <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Zero-Latency Sync Ready</p>
+              </div>
               </div>
             </div>
           </div>

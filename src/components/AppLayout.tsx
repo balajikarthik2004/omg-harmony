@@ -1,15 +1,17 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import AppSidebar from '@/components/AppSidebar';
 import TopNavbar from '@/components/TopNavbar';
 import BottomSidebarDock from '@/components/BottomSidebarDock';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const AppLayout: React.FC = () => {
+  const location = useLocation();
   const { theme } = useTheme();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(theme.sidebarCollapsedByDefault);
   const isBottomSidebar = theme.sidebarPosition === 'bottom';
   const isRightSidebar = theme.sidebarPosition === 'right';
+  const isThemeStudioPage = location.pathname === '/theme-studio';
 
   React.useEffect(() => {
     setIsSidebarCollapsed(theme.sidebarCollapsedByDefault);
@@ -34,7 +36,7 @@ const AppLayout: React.FC = () => {
       <div className="flex-1 flex flex-col min-w-0">
         <TopNavbar />
         <main
-          className="app-main flex-1 overflow-y-auto relative"
+          className={`app-main flex-1 relative ${isThemeStudioPage ? 'overflow-hidden' : 'overflow-y-auto'}`}
           style={{
             padding: 'var(--layout-page-padding)',
             paddingBottom: isBottomSidebar
@@ -47,7 +49,7 @@ const AppLayout: React.FC = () => {
             <div className="absolute -top-24 right-20 h-64 w-64 rounded-full blur-3xl opacity-55" style={{ background: 'hsl(var(--primary) / 0.16)' }} />
             <div className="absolute bottom-10 -left-10 h-56 w-56 rounded-full blur-3xl opacity-45" style={{ background: 'hsl(var(--secondary) / 0.14)' }} />
           </div>
-          <div className="layout-content-shell premium-page-shell animate-fade-in relative z-[1]">
+          <div className={`layout-content-shell premium-page-shell animate-fade-in relative z-[1] ${isThemeStudioPage ? 'h-full min-h-0 overflow-hidden' : ''}`}>
             <Outlet />
           </div>
         </main>
