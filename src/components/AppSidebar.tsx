@@ -1,72 +1,52 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import {
-  LayoutDashboard, Users, CalendarDays, Heart,
-  CalendarCheck, Package, Building2, BarChart3, Briefcase,
-  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car, Hotel
-} from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, LogOut } from 'lucide-react';
+import { getNavigationLinks } from '@/lib/navigation';
 
 import logo from '@/assets/img/logo.png'; 
 import logo1 from '@/assets/img/logo1.png';
 
-const adminLinks = [
-  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/devotees', label: 'Devotees', icon: Users },
-  { to: '/pooja-seva', label: 'Pooja & Seva', icon: CalendarDays },
-  { to: '/annadhanam', label: 'Annadhanam', icon: UtensilsCrossed },
-  { to: '/hr', label: 'HR', icon: Briefcase},
-  // { to: '/procurement', label: 'Procurement', icon: ShoppingCart},
-  { to: '/donations', label: 'Donations', icon: ShoppingCart  },
-  { to: '/hall-booking', label: 'Rental Venue', icon: Hotel },
-  { to: '/events', label: 'Events & Calendar', icon: CalendarCheck },
-  { to: '/campaign', label: 'Campaigns', icon: Megaphone },
-  // { to: '/tasks', label: 'Tasks', icon: CheckSquare },
-  { to: '/inventory', label: 'Inventory', icon: Package },
-  { to: '/assets', label: 'Assets', icon: Building2 },
-  { to: '/parking', label: 'Parking', icon: Car },
-  // { to: '/volunteers', label: 'Volunteers', icon: HeartHandshake },
-  { to: '/reports', label: 'Documents', icon: BarChart3 },
-  { to: '/settings', label: 'Settings', icon: Settings },
-];
-
-const managerLinks = adminLinks.filter(l => !['/reports', '/settings', '/assets'].includes(l.to));
-const devoteeLinks = [
-  { to: '/pooja-seva', label: 'Pooja & Seva Desk', icon: CalendarDays },
-  { to: '/events', label: 'Events', icon: CalendarCheck },
-  { to: '/donate', label: 'Donate', icon: Heart },
-];
-
 interface AppSidebarProps {
+  position: 'left' | 'right';
   isCollapsed: boolean;
   onToggleCollapse: () => void;
 }
 
-const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
+const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const getLinks = () => {
-    if (user?.role === 'admin') return adminLinks;
-    if (user?.role === 'manager') return managerLinks;
-    return devoteeLinks;
-  };
-
-  const links = getLinks();
+  const links = getNavigationLinks(user?.role);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  const isRightPosition = position === 'right';
+  const collapseIcon = isRightPosition
+    ? (isCollapsed ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />)
+    : (isCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />);
+
   return (
     <aside
-      className={`flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden border-r border-white/10 shadow-[10px_0_36px_rgba(8,18,34,0.34)] transition-[width] duration-300 ${
-        isCollapsed ? 'w-20' : 'w-64'
-      }`}
+      className="layout-sidebar hidden lg:flex flex-col h-screen shrink-0 sticky top-0 overflow-hidden border transition-[width,box-shadow,transform] duration-300"
       style={{
+<<<<<<< HEAD
         background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
         color: 'hsl(var(--sidebar-foreground))',
+=======
+        width: isCollapsed ? 'var(--layout-sidebar-collapsed-width)' : 'var(--layout-sidebar-expanded-width)',
+        backgroundImage: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
+        backgroundColor: 'var(--layout-frame-background)',
+        borderColor: 'var(--layout-frame-border)',
+        boxShadow: isRightPosition ? 'var(--layout-sidebar-frame-shadow-right)' : 'var(--layout-sidebar-frame-shadow-left)',
+        borderRadius: 'var(--layout-sidebar-radius)',
+        backdropFilter: 'var(--layout-frame-backdrop)',
+        WebkitBackdropFilter: 'var(--layout-frame-backdrop)',
+        color: 'hsl(0, 0%, 100%)',
+>>>>>>> d731352180962034e1232637f1e3343306677892
       }}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -87,7 +67,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
-            {isCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
+            {collapseIcon}
           </button>
           <div className={isCollapsed ? 'order-2' : 'order-1'}>
             <img
@@ -127,7 +107,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
               {({ isActive }) => (
                 <>
                   <span
-                    className={`absolute inset-y-1 left-1 w-1 rounded-full transition-all duration-200 ${
+                    className={`absolute inset-y-1 ${isRightPosition ? 'right-1' : 'left-1'} w-1 rounded-full transition-all duration-200 ${
                       isActive ? 'shadow-[0_0_12px_rgba(0,0,0,0.28)]' : 'bg-transparent group-hover:bg-white/35'
                     }`}
                     style={isActive ? { background: 'var(--sidebar-highlight)' } : undefined}

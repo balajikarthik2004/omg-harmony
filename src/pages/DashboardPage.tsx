@@ -30,7 +30,7 @@ const recentActivity = [
   { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-primary/10 text-primary border border-primary/20' },
   { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-muted text-muted-foreground border border-border' },
   { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-primary/10 text-primary border border-primary/20' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-success/10 text-success border border-success/20' },
+  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' },
 ];
 
 const upcomingEvents = [
@@ -87,14 +87,14 @@ const DashboardPage: React.FC = () => {
           <div key={kpi.label} className={`dashboard-kpi-card rounded-2xl border p-5 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden ${kpi.bg}`}>
             <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 bg-current ${kpi.color.split(' ')[0]}`} />
             <div className="flex justify-between items-start mb-4 relative z-10">
-              <p className="text-[11px] uppercase tracking-wider font-bold text-foreground/70">{kpi.label}</p>
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center shadow-sm ${kpi.color} bg-background/80 backdrop-blur-sm border border-border/40`}>
+              <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground opacity-80">{kpi.label}</p>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${kpi.color} bg-background`}>
                 <kpi.icon className="w-4 h-4" />
               </div>
             </div>
             <div className="relative z-10">
               <p className="numeric-font text-3xl font-bold text-foreground tracking-tight">{kpi.value}</p>
-              <p className="text-xs font-semibold text-foreground/60 mt-1">{kpi.trend}</p>
+              <p className="text-xs font-semibold text-muted-foreground mt-1">{kpi.trend}</p>
             </div>
           </div>
         ))}

@@ -405,7 +405,7 @@ const HrPage: React.FC = () => {
       <div className="page-header-banner hr-header">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> HR & Volunteer Management</h1>
-          <p className="text-sm text-foreground/60 mt-1">Manage temple staff details, schedules, payroll, and volunteers.</p>
+          <p className="text-sm text-muted-foreground mt-1">Manage temple staff details, schedules, payroll, and volunteers.</p>
         </div>
         <div className="relative max-w-sm w-full md:w-72 mt-3 md:mt-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -421,23 +421,23 @@ const HrPage: React.FC = () => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
         <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/40 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-foreground/60 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Active Staff</p>
+          <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Active Staff</p>
           <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{totals.activeStaff}</p>
         </div>
-        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-accent/20 bg-accent/5">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-accent/10 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-accent flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
-          <p className="text-3xl font-display font-bold mt-2 text-accent relative z-10">{totals.priests}</p>
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-secondary flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
+          <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{totals.priests}</p>
         </div>
-        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-warning/20 bg-warning/5">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-warning/10 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-warning flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Assigned Duties</p>
-          <p className="text-3xl font-display font-bold mt-2 text-warning relative z-10">{totals.scheduledDuties}</p>
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-500/20 bg-amber-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-500 flex items-center gap-1.5"><CalendarDays className="w-3.5 h-3.5" /> Assigned Duties</p>
+          <p className="text-3xl font-display font-bold mt-2 text-amber-500 relative z-10">{totals.scheduledDuties}</p>
         </div>
-        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-success/20 bg-success/5">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-success/10 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-success flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Volunteers</p>
-          <p className="text-3xl font-display font-bold mt-2 text-success relative z-10">{totals.assignedVolunteers}</p>
+        <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-500/20 bg-emerald-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-500 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Total Volunteers</p>
+          <p className="text-3xl font-display font-bold mt-2 text-emerald-500 relative z-10">{totals.assignedVolunteers}</p>
         </div>
       </div>
 
@@ -471,7 +471,7 @@ const HrPage: React.FC = () => {
               <table className="w-full text-sm">
                 <thead className="bg-muted/40">
                   <tr className="border-b border-border">
-                    <th className="text-left p-4 font-medium text-foreground/60 whitespace-nowrap">Employee Info</th>
+                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Employee Info</th>
                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Role & Dept</th>
                     <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Joined Date</th>
                     <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Salary</th>
@@ -596,8 +596,8 @@ const HrPage: React.FC = () => {
         {activeSection === 'duties' && (
           <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--amber))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-warning" /> Active Duties List</h2>
-              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-amber-500" /> Active Duties List</h2>
+              <Button onClick={openAddDuty} className="shadow-md hover:shadow-lg bg-orange-500 hover:bg-orange-600 text-white"><Plus className="h-4 w-4 mr-2" />Add Duty</Button>
             </div>
             <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredDuties.length === 0 ? <p className="col-span-full py-12 text-center text-muted-foreground font-medium border-2 border-dashed border-border rounded-2xl">No duties are currently set up.</p> : filteredDuties.map(item => (
@@ -632,9 +632,9 @@ const HrPage: React.FC = () => {
         )}
 
         {activeSection === 'volunteers' && (
-          <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--success))' }}>
+          <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-success" /> Enlisted Volunteers</h2>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Enlisted Volunteers</h2>
               <Button onClick={() => { setVolEditId(null); setVolModalOpen(true); }} className="shadow-md hover:shadow-lg bg-primary hover:opacity-90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">

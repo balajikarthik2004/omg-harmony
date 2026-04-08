@@ -193,7 +193,8 @@
   }
 
   .erp-card:hover {
-    @apply shadow-lg border-primary/20;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+    border-color: hsl(40, 12%, 85%);
   }
 
   /* ─── Enhanced KPI Card ─── */
@@ -204,7 +205,8 @@
 
   .kpi-card:hover {
     transform: translateY(-2px);
-    @apply shadow-lg border-primary/20;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), 0 2px 6px -2px rgba(0, 0, 0, 0.03);
+    border-color: hsl(40, 12%, 85%);
   }
 
   .kpi-icon {
@@ -227,7 +229,7 @@
   }
 
   .table-container table tbody tr:hover {
-    background-color: hsl(var(--muted) / 0.5);
+    background-color: hsla(40, 20%, 94%, 0.5);
   }
 
   /* ─── Enhanced Modal Overlay ─── */
@@ -514,19 +516,19 @@
   }
 
   .dashboard-kpi-card {
-    @apply border-border/80;
+    border-color: rgba(157, 162, 225, 0.7);
     box-shadow:
-      0 1px 2px hsl(var(--secondary) / 0.06),
-      0 16px 28px -24px hsl(var(--secondary) / 0.4);
+      0 1px 2px rgba(41, 48, 136, 0.06),
+      0 16px 28px -24px rgba(41, 48, 136, 0.4);
     backdrop-filter: saturate(1.03);
   }
 
   .dashboard-kpi-card:hover {
     transform: translateY(-3px);
     box-shadow:
-      0 2px 5px hsl(var(--secondary) / 0.08),
-      0 24px 42px -20px hsl(var(--secondary) / 0.46);
-    @apply border-primary/40;
+      0 2px 5px rgba(41, 48, 136, 0.08),
+      0 24px 42px -20px rgba(41, 48, 136, 0.46);
+    border-color: rgba(41, 48, 136, 0.38);
   }
 
   .dashboard-kpi-amber {
@@ -593,9 +595,7 @@
 
   .donations-premium,
   .events-premium,
-  .devotees-premium,
-  .inventory-premium,
-  .pooja-premium {
+  .devotees-premium {
     position: relative;
   }
 
@@ -2348,16 +2348,65 @@
     color: var(--brand-blue-600) !important;
   }
 
-  .ftree-node[data-rel="spouse"] { --rc:#7F77DD; --rb:#EEEDFE; --rt:#3C3489; }
-  .ftree-node[data-rel="father"] { --rc:#185FA5; --rb:#E6F1FB; --rt:#0C447C; }
-  .ftree-node[data-rel="mother"] { --rc:#D4537E; --rb:#FBEAF0; --rt:#72243E; }
-  .ftree-node[data-rel="brother"] { --rc:#1D9E75; --rb:#E1F5EE; --rt:#085041; }
-  .ftree-node[data-rel="sister"] { --rc:#D85A30; --rb:#FAECE7; --rt:#4A1B0C; }
-  .ftree-node[data-rel="son"] { --rc:#185FA5; --rb:#E6F1FB; --rt:#0C447C; }
-  .ftree-node[data-rel="daughter"] { --rc:#D4537E; --rb:#FBEAF0; --rt:#72243E; }
-  .ftree-node[data-rel="child"] { --rc:#639922; --rb:#EAF3DE; --rt:#27500A; }
-  .ftree-node[data-rel="family"] { --rc:#888780; --rb:#F1EFE8; --rt:#444441; }
-  .ftree-node { --rc:#BA7517; --rb:#FAEEDA; --rt:#633806; }
+  .ftree-node[data-rel="spouse"] {
+    --rc: #7F77DD;
+    --rb: #EEEDFE;
+    --rt: #3C3489;
+  }
+
+  .ftree-node[data-rel="father"] {
+    --rc: #185FA5;
+    --rb: #E6F1FB;
+    --rt: #0C447C;
+  }
+
+  .ftree-node[data-rel="mother"] {
+    --rc: #D4537E;
+    --rb: #FBEAF0;
+    --rt: #72243E;
+  }
+
+  .ftree-node[data-rel="brother"] {
+    --rc: #1D9E75;
+    --rb: #E1F5EE;
+    --rt: #085041;
+  }
+
+  .ftree-node[data-rel="sister"] {
+    --rc: #D85A30;
+    --rb: #FAECE7;
+    --rt: #4A1B0C;
+  }
+
+  .ftree-node[data-rel="son"] {
+    --rc: #185FA5;
+    --rb: #E6F1FB;
+    --rt: #0C447C;
+  }
+
+  .ftree-node[data-rel="daughter"] {
+    --rc: #D4537E;
+    --rb: #FBEAF0;
+    --rt: #72243E;
+  }
+
+  .ftree-node[data-rel="child"] {
+    --rc: #639922;
+    --rb: #EAF3DE;
+    --rt: #27500A;
+  }
+
+  .ftree-node[data-rel="family"] {
+    --rc: #888780;
+    --rb: #F1EFE8;
+    --rt: #444441;
+  }
+
+  .ftree-node {
+    --rc: #BA7517;
+    --rb: #FAEEDA;
+    --rt: #633806;
+  }
 
   .ftree-node {
     width: 188px;
@@ -2679,4 +2728,405 @@
       transform: translateY(0) scale(1);
     }
   }
+}
+
+color: #fff !important;
+border-color: color-mix(in srgb, var(--brand-blue-600) 72%, black) !important;
+}
+
+.dashboard-premium .text-primary,
+.donations-premium .text-primary,
+.events-premium .text-primary,
+.devotees-premium .text-primary,
+.pooja-premium .text-primary,
+.annadhanam-premium .text-primary,
+.hr-premium .text-primary,
+.campaign-premium .text-primary,
+.inventory-premium .text-primary,
+.assets-premium .text-primary,
+.docs-premium .text-primary,
+.settings-premium .text-primary {
+  color: var(--brand-blue-600) !important;
+}
+
+.ftree-node[data-rel="spouse"] {
+  --rc: #7F77DD;
+  --rb: #EEEDFE;
+  --rt: #3C3489;
+}
+
+.ftree-node[data-rel="father"] {
+  --rc: #185FA5;
+  --rb: #E6F1FB;
+  --rt: #0C447C;
+}
+
+.ftree-node[data-rel="mother"] {
+  --rc: #D4537E;
+  --rb: #FBEAF0;
+  --rt: #72243E;
+}
+
+.ftree-node[data-rel="brother"] {
+  --rc: #1D9E75;
+  --rb: #E1F5EE;
+  --rt: #085041;
+}
+
+.ftree-node[data-rel="sister"] {
+  --rc: #D85A30;
+  --rb: #FAECE7;
+  --rt: #4A1B0C;
+}
+
+.ftree-node[data-rel="son"] {
+  --rc: #185FA5;
+  --rb: #E6F1FB;
+  --rt: #0C447C;
+}
+
+.ftree-node[data-rel="daughter"] {
+  --rc: #D4537E;
+  --rb: #FBEAF0;
+  --rt: #72243E;
+}
+
+.ftree-node[data-rel="child"] {
+  --rc: #639922;
+  --rb: #EAF3DE;
+  --rt: #27500A;
+}
+
+.ftree-node[data-rel="family"] {
+  --rc: #888780;
+  --rb: #F1EFE8;
+  --rt: #444441;
+}
+
+.ftree-node {
+  --rc: #BA7517;
+  --rb: #FAEEDA;
+  --rt: #633806;
+}
+
+.ftree-node {
+  width: 188px;
+  min-height: 88px;
+  border-radius: 12px;
+  background: hsl(var(--card));
+  border: 0.5px solid color-mix(in srgb, var(--rc) 30%, transparent);
+  padding: 11px 13px 9px;
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+  opacity: 0.94;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, opacity 0.16s ease;
+  animation: ftree-in 0.32s cubic-bezier(.22, .68, 0, 1.2) both;
+}
+
+.ftree-node::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--rc);
+  border-radius: 12px 12px 0 0;
+  opacity: 0.9;
+}
+
+.ftree-node:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--rc) 18%, transparent);
+  border-color: color-mix(in srgb, var(--rc) 55%, transparent);
+  opacity: 1;
+  z-index: 10;
+}
+
+.ftree-rel-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: var(--rb);
+  color: var(--rt);
+  margin-bottom: 5px;
+}
+
+.ftree-crown {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+}
+
+.ftree-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+}
+
+.ftree-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 6px;
+  font-size: 10px;
+  color: var(--muted-foreground, #888);
+}
+
+.ftree-meta-full {
+  grid-column: 1 / -1;
+}
+
+.ftree-meta span {
+  font-weight: 600;
+  color: var(--foreground, #111);
+}
+
+.ftree-actions {
+  display: flex;
+  gap: 3px;
+  margin-top: 7px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.ftree-node:hover .ftree-actions {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.ftree-actions.ftree-actions-visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.ftree-act {
+  flex: 1;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 5px;
+  border-radius: 6px;
+  border: 0.5px solid oklch(from var(--rc) l c h / 0.3);
+  background: color-mix(in srgb, var(--rc) 6%, transparent);
+  color: var(--rc);
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.12s;
+}
+
+.ftree-act:hover {
+  background: color-mix(in srgb, var(--rc) 16%, transparent);
+}
+
+.ftree-act.ftree-act-del {
+  border-color: rgba(226, 75, 74, 0.3);
+  background: rgba(226, 75, 74, 0.05);
+  color: #E24B4A;
+}
+
+.ftree-act.ftree-act-del:hover {
+  background: rgba(226, 75, 74, 0.12);
+}
+
+.ftree-toggle {
+  position: absolute;
+  bottom: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: hsl(var(--background));
+  border: 1px solid color-mix(in srgb, var(--rc) 40%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--rc);
+  z-index: 20;
+  transition: background 0.14s, transform 0.14s;
+  user-select: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.ftree-toggle:hover {
+  background: var(--rb);
+  transform: translateX(-50%) scale(1.15);
+}
+
+.ftree-root-node {
+  width: 220px;
+  border-radius: 14px;
+  background: hsl(var(--card));
+  border: 1.5px solid #7F77DD;
+  padding: 14px 16px 12px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  box-shadow: 0 0 0 4px rgba(127, 119, 221, 0.1);
+}
+
+.ftree-root-node::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #7F77DD, #AFA9EC);
+}
+
+.ftree-root-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #7F77DD;
+  margin-bottom: 3px;
+}
+
+.ftree-root-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foreground, #111);
+}
+
+.ftree-root-sub {
+  font-size: 11px;
+  color: var(--muted-foreground, #888);
+  margin-top: 2px;
+}
+
+.ftree-tier {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  padding-top: 68px;
+  position: relative;
+}
+
+.ftree-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.ftree-svg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.ftree-connector-path {
+  transition: stroke-opacity 0.2s ease;
+  shape-rendering: geometricPrecision;
+}
+
+.ftree-connector-primary {
+  filter: drop-shadow(0 0 1px color-mix(in srgb, currentColor 35%, transparent));
+}
+
+.ftree-connector-dot {
+  shape-rendering: geometricPrecision;
+}
+
+.ftree-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding: 12px 0 0;
+  border-top: 0.5px solid var(--border, #e5e5e5);
+  margin-top: 16px;
+}
+
+.ftree-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--muted-foreground, #888);
+}
+
+.ftree-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ftree-empty {
+  border: 1.5px dashed var(--border, #e5e5e5);
+  border-radius: 12px;
+  padding: 32px 24px;
+  text-align: center;
+  background: hsl(var(--muted));
+}
+
+.ftree-tooltip {
+  position: fixed;
+  z-index: 9999;
+  background: hsl(var(--card));
+  border: 0.5px solid var(--border, #e5e5e5);
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 12px;
+  pointer-events: none;
+  min-width: 160px;
+  max-width: 220px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.12s;
+}
+
+.ftree-tooltip-name {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.ftree-tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 2px 0;
+  font-size: 11px;
+}
+
+.ftree-tooltip-label {
+  color: var(--muted-foreground, #888);
+}
+
+.ftree-tooltip-val {
+  font-weight: 600;
+  color: var(--foreground, #111);
+}
+
+@keyframes ftree-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 }

@@ -18,11 +18,15 @@ const TopNavbar: React.FC = () => {
 
   return (
     <header
-      className="h-16 backdrop-blur-md border-b flex items-center justify-between px-6 shrink-0 sticky top-0 z-10"
+      className="topbar-shell h-[var(--layout-topbar-height)] min-h-[var(--layout-topbar-height)] border flex items-center justify-between px-6 shrink-0 sticky top-0 z-10"
       style={{
         backgroundImage: 'linear-gradient(var(--topbar-gradient-angle, 180deg), var(--topbar-bg-start, #FFFFFF), var(--topbar-bg-end, #EEF1FB)), linear-gradient(120deg, hsl(var(--primary) / 0.14), hsl(var(--secondary) / 0.1))',
-        borderColor: 'var(--topbar-border, hsl(var(--border)))',
-        boxShadow: '0 12px 28px -24px var(--topbar-shadow), inset 0 -1px 0 hsl(var(--border) / 0.35)',
+        backgroundColor: 'var(--layout-frame-background)',
+        borderColor: 'var(--layout-frame-border)',
+        boxShadow: 'var(--layout-topbar-frame-shadow), inset 0 -1px 0 hsl(var(--border) / 0.35)',
+        borderRadius: 'var(--layout-topbar-radius)',
+        backdropFilter: 'var(--layout-frame-backdrop)',
+        WebkitBackdropFilter: 'var(--layout-frame-backdrop)',
       }}
     >
       <div className="min-w-0">

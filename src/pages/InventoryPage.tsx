@@ -22,7 +22,7 @@ function getStockPercent(quantity: number, name: string): number {
 
 function getProgressColor(pct: number): string {
   if (pct === 0) return 'bg-destructive';
-  if (pct < 30) return 'bg-warning';
+  if (pct < 30) return 'bg-amber-500';
   return 'bg-primary';
 }
 
@@ -177,13 +177,13 @@ const InventoryPage: React.FC = () => {
                       <tr key={i.id} className="inventory-row border-b border-border hover:bg-muted/30 transition-colors">
                         <td className="p-4 font-bold text-foreground">
                           <p>{i.name}</p>
-                          {i.supplier && <p className="text-[10px] text-foreground/60 font-medium mt-0.5" title="Primary Supplier">{i.supplier}</p>}
+                          {i.supplier && <p className="text-[10px] text-muted-foreground font-medium mt-0.5" title="Primary Supplier">{i.supplier}</p>}
                         </td>
                         <td className="p-4">
                           <span className="text-primary text-[11px] font-bold tracking-wider uppercase italic">{i.category}</span>
                         </td>
                         <td className="p-4 text-right font-display font-bold text-xl text-foreground tracking-tight">{i.quantity}</td>
-                        <td className="p-4 text-foreground/70 font-semibold"><Droplets className="w-3.5 h-3.5 inline mr-1 opacity-50" />{i.unit}</td>
+                        <td className="p-4 text-muted-foreground font-semibold"><Droplets className="w-3.5 h-3.5 inline mr-1 opacity-50" />{i.unit}</td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <div className={`w-1.5 h-1.5 rounded-full ${i.stockStatus === 'In Stock' ? 'bg-primary' : 'bg-destructive'}`} />
@@ -198,7 +198,7 @@ const InventoryPage: React.FC = () => {
                                 style={{ width: `${pct}%` }}
                               />
                             </div>
-                            <span className="text-[11px] font-bold text-foreground/60 w-10 text-right">{pct}%</span>
+                            <span className="text-[11px] font-bold text-muted-foreground w-10 text-right">{pct}%</span>
                           </div>
                         </td>
                         <td className="p-4 text-right whitespace-nowrap">

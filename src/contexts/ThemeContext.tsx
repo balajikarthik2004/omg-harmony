@@ -110,8 +110,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const applyPreset = useCallback((presetId: string) => {
     const matched = presets.find(preset => preset.id === presetId);
     if (!matched) return;
-    setTheme(
+    setTheme((prev) =>
       sanitizeTheme({
+        ...prev,
         ...matched.theme,
         id: matched.id,
         name: matched.name,
