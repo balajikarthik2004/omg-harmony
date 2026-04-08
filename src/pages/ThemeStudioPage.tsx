@@ -1,7 +1,7 @@
 import React from 'react';
-import { Check, Palette, RotateCcw, Save, SlidersHorizontal, Sparkles, Trash2 } from 'lucide-react';
+import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ThemeSettings } from '@/lib/theme';
@@ -71,8 +71,9 @@ const angleControls: Array<{ key: AngleField; label: string; description: string
 ];
 
 const ThemeStudioPage: React.FC = () => {
-  const { theme, presets, updateTheme, applyPreset, saveCurrentAsPreset, deletePreset, resetTheme } = useTheme();
+  const { theme, presets, updateTheme, applyPreset, saveCurrentAsPreset, resetTheme } = useTheme();
   const [presetName, setPresetName] = React.useState('');
+  const [activeTab, setActiveTab] = React.useState('palette');
 
   const applyCustomPatch = (patch: Partial<ThemeSettings>) => {
     updateTheme({
@@ -98,290 +99,270 @@ const ThemeStudioPage: React.FC = () => {
 
   const isPresetActive = (presetId: string) => theme.id === presetId;
 
-  const isUserPreset = (presetId: string) => presetId.startsWith('user-preset-');
-
   const handleSavePreset = () => {
+    if (!presetName.trim()) return;
     saveCurrentAsPreset(presetName);
     setPresetName('');
   };
 
+  const applySolidColor = (hex: string, name: string) => {
+    const color = hex;
+    updateTheme({
+      name: `Solid ${name}`,
+      primary: color,
+      secondary: color,
+      accent: color,
+      layoutGradientStart: '#FFFFFF',
+      layoutGradientMid: '#FFFFFF',
+      layoutGradientEnd: '#FFFFFF',
+      sidebarGradientStart: color,
+      sidebarGradientMid: color,
+      sidebarGradientEnd: color,
+      topbarGradientStart: '#FFFFFF',
+      topbarGradientEnd: '#FFFFFF',
+      overlayGradientStart: color,
+      overlayGradientMid: color,
+      overlayGradientEnd: color,
+    });
+  };
+
+  const solidColors = [
+    { name: 'Navy', hex: '#1E3A8A' },
+    { name: 'Emerald', hex: '#065F46' },
+    { name: 'Crimson', hex: '#991B1B' },
+    { name: 'Slate', hex: '#334155' },
+    { name: 'Indigo', hex: '#3730A3' },
+    { name: 'Obsidian', hex: '#09090B' },
+    { name: 'Deep Sea', hex: '#0C4A6E' },
+    { name: 'Forest', hex: '#114232' },
+    { name: 'Midnight', hex: '#020617' },
+    { name: 'Deep Purple', hex: '#4C1D95' },
+    { name: 'Charcoal', hex: '#374151' },
+    { name: 'Ruby', hex: '#881337' },
+    { name: 'Graphite', hex: '#1F2937' },
+    { name: 'Maroon', hex: '#450A0A' },
+    { name: 'Espresso', hex: '#18181B' },
+    { name: 'Royal', hex: '#1E40AF' },
+    { name: 'Vibrant Teal', hex: '#0D9488' },
+    { name: 'Electric Violet', hex: '#7C3AED' },
+    { name: 'Rosewood', hex: '#9F1239' },
+    { name: 'Dark Amber', hex: '#78350F' },
+    { name: 'Oxide', hex: '#27272A' },
+  ];
+
   return (
-    <div className="theme-studio-page space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <section className="theme-studio-hero rounded-2xl border border-border px-6 py-6 sm:px-8 sm:py-8 relative overflow-hidden">
-        <div className="theme-studio-hero-orb absolute -top-16 -left-10 h-44 w-44 rounded-full" />
-        <div className="theme-studio-hero-orb absolute -bottom-20 right-12 h-48 w-48 rounded-full" />
-        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <div className="theme-studio-v2 h-[calc(100vh-64px)] flex flex-col animate-fade-in overflow-hidden -m-6">
+      <header className="px-8 py-6 border-b bg-background/80 backdrop-blur-xl z-30 border-border/40 shadow-sm shrink-0">
+        <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.18em] font-semibold text-white/75">Design Control</p>
-            <h1 className="mt-2 text-2xl md:text-3xl font-bold text-white flex items-center gap-2">
-              <Palette className="h-6 w-6" />
+            <nav className="flex items-center gap-2 mb-2 text-[9px] font-black uppercase tracking-[0.3em] text-primary/60">
+              <span>Studio</span>
+              <span className="opacity-30">/</span>
+              <span className="text-primary font-black">Architecture</span>
+            </nav>
+            <h1 className="text-2xl font-black tracking-tighter text-foreground flex items-center gap-3">
               Theme Studio
+              <span className="px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[9px] font-black uppercase text-primary tracking-widest leading-none">V2.0</span>
             </h1>
-            <p className="mt-2 text-sm text-white/80 max-w-2xl">
-              Craft your workspace identity with premium palette controls. Changes apply instantly across the app and are saved automatically on this device.
-            </p>
           </div>
-          <div className="rounded-xl border border-white/20 bg-white/10 backdrop-blur-md px-4 py-3">
-            <p className="text-[11px] uppercase tracking-[0.15em] text-white/70">Current Theme</p>
-            <p className="text-sm font-semibold text-white mt-1">{theme.name}</p>
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-2 bg-muted/20 border border-border/40 p-1.5 rounded-2xl">
+              <Button variant="ghost" size="sm" onClick={() => applyPreset('solid-light')} className="h-8 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-background">Light</Button>
+              <Button variant="ghost" size="sm" onClick={() => applyPreset('solid-dark')} className="h-8 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-background">Dark</Button>
+            </div>
+            <div className="px-5 py-2.5 rounded-xl border border-border/60 bg-card/50 shadow-sm flex items-center gap-3">
+              <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+              <p className="text-[11px] font-black text-foreground/80 uppercase tracking-tight"><span className="opacity-40">Active:</span> {theme.name}</p>
+            </div>
+            <Button variant="outline" onClick={resetTheme} className="h-11 rounded-2xl px-6 text-[10px] font-black uppercase tracking-[0.2em] border-border/60 hover:bg-destructive hover:text-white transition-all">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
           </div>
         </div>
-      </section>
+      </header>
 
-      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-        <div className="xl:col-span-3 space-y-6">
-          <Card className="border-border/80 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                Premium Presets
-              </CardTitle>
-              <CardDescription>
-                Start with a curated visual direction, then fine-tune every tone.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="mb-4 rounded-xl border border-border/70 bg-background/60 p-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-2">Save Current Colors To Premium Presets</p>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input
-                    value={presetName}
-                    onChange={(event) => setPresetName(event.target.value)}
-                    placeholder="Enter preset name (optional)"
-                    className="h-10 flex-1 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  />
-                  <Button type="button" className="h-10 sm:w-auto w-full" onClick={handleSavePreset}>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save As Preset
-                  </Button>
+      <main className="flex-1 overflow-hidden grid grid-cols-1 xl:grid-cols-12 bg-muted/5">
+        <div className="xl:col-span-4 h-full overflow-y-auto border-r border-border/40 bg-background/40 backdrop-blur-sm p-10 space-y-12">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <div className="bg-card/40 backdrop-blur-md rounded-[1rem] border border-border/60 p-2 mb-10 shadow-sm">
+              <TabsList className="h-14 w-full bg-transparent grid grid-cols-4 gap-1 p-0">
+                <TabsTrigger value="palette" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary border-none">
+                  <Palette className="h-4 w-4" /> Palette
+                </TabsTrigger>
+                <TabsTrigger value="gradients" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-indigo-500 border-none">
+                  <Layers className="h-4 w-4" /> Gradients
+                </TabsTrigger>
+                <TabsTrigger value="presets" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-amber-500 border-none">
+                  <Sparkles className="h-4 w-4" /> Templates
+                </TabsTrigger>
+                <TabsTrigger value="solid-spectrum" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-emerald-500 border-none">
+                  <Layout className="h-4 w-4" /> Solid
+                </TabsTrigger>
+              </TabsList>
+            </div>
+
+            <TabsContent value="palette" className="space-y-10">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm relative overflow-hidden">
+                <div className="flex items-center justify-between mb-8 px-1">
+                  <div className="space-y-1">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground flex items-center gap-2">Core Identity</h3>
+                    <p className="text-[10px] text-muted-foreground/50 font-bold uppercase">Base channel governance</p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {presets.map((preset) => (
-                  <div
-                    key={preset.id}
-                    className={`group relative rounded-xl border p-4 text-left transition-all duration-200 hover:-translate-y-[1px] ${
-                      isPresetActive(preset.id)
-                        ? 'border-primary/60 bg-primary/5 shadow-[0_14px_30px_-22px_hsl(var(--primary))]'
-                        : 'border-border bg-card hover:border-primary/35 hover:bg-primary/[0.04]'
-                    }`}
-                  >
-                    {isUserPreset(preset.id) && (
-                      <button
-                        type="button"
-                        onClick={() => deletePreset(preset.id)}
-                        className="absolute right-3 top-3 h-7 w-7 rounded-md border border-border bg-background text-muted-foreground hover:text-destructive hover:border-destructive/40 transition-colors flex items-center justify-center"
-                        aria-label={`Delete ${preset.name}`}
-                        title="Delete custom preset"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-sm font-semibold text-foreground">{preset.name}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{preset.description}</p>
+                <div className="space-y-3">
+                  {coreColorControls.map((control) => (
+                    <div key={control.key} className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border/30 hover:border-primary/20 transition-all">
+                      <div className="min-w-0 pr-4">
+                        <p className="text-[11px] font-black text-foreground/90 uppercase">{control.label}</p>
+                        <p className="text-[9px] text-muted-foreground/60 font-bold mt-0.5">{control.description}</p>
                       </div>
-                      {isPresetActive(preset.id) && (
-                        <span className="h-6 w-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
-                          <Check className="h-4 w-4" />
-                        </span>
-                      )}
+                      <div className="relative h-10 w-10 rounded-xl border border-border shadow-sm overflow-hidden" style={{ backgroundColor: String(theme[control.key]) }}>
+                        <input type="color" value={String(theme[control.key])} onChange={(e) => handleColorChange(control.key, e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                      </div>
                     </div>
-                    <div className="mt-3 flex items-center gap-2">
-                      {preset.preview.map((color) => (
-                        <span key={color} className="h-6 w-6 rounded-full border border-white/50 shadow-sm" style={{ backgroundColor: color }} />
-                      ))}
-                    </div>
+                  ))}
+                </div>
+              </section>
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm">
+                <div className="flex items-center justify-between mb-8 px-1">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Geometry Curve</h3>
+                  <span className="text-[10px] font-black bg-muted px-2 py-1 rounded-md">{theme.radius.toFixed(2)} REM</span>
+                </div>
+                <Slider min={0.4} max={1.4} step={0.05} value={[theme.radius]} onValueChange={handleRadiusChange} />
+              </section>
+            </TabsContent>
 
-                    <Button
-                      type="button"
-                      variant={isPresetActive(preset.id) ? 'default' : 'outline'}
-                      className="mt-4 h-9 w-full"
-                      onClick={() => applyPreset(preset.id)}
-                    >
-                      {isPresetActive(preset.id) ? 'Applied' : 'Apply Preset'}
-                    </Button>
+            <TabsContent value="gradients" className="space-y-10">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm">
+                <div className="mb-8 px-1">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Spectral Nodes</h3>
+                </div>
+                <div className="grid grid-cols-1 gap-3">
+                  {gradientColorControls.map((control) => (
+                    <div key={control.key} className="flex items-center justify-between p-4 rounded-2xl bg-card border border-border/30 hover:border-indigo-500/20 transition-all">
+                      <p className="text-[11px] font-black text-foreground/90 uppercase">{control.label}</p>
+                      <div className="relative h-10 w-10 rounded-xl border border-border shadow-sm overflow-hidden" style={{ backgroundColor: String(theme[control.key]) }}>
+                        <input type="color" value={String(theme[control.key])} onChange={(e) => handleColorChange(control.key, e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-8">
+                {angleControls.map((control) => (
+                  <div key={control.key} className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">{control.label}</p>
+                      <code className="text-[10px] font-black text-indigo-500">{theme[control.key]}°</code>
+                    </div>
+                    <Slider min={0} max={360} step={1} value={[theme[control.key]]} onValueChange={(v) => handleAngleChange(control.key, v)} />
+                  </div>
+                ))}
+              </section>
+            </TabsContent>
+
+            <TabsContent value="presets" className="space-y-10">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm space-y-6">
+                <input value={presetName} onChange={(e) => setPresetName(e.target.value)} placeholder="Theme ID..." className="h-14 w-full rounded-2xl border border-border bg-card px-5 text-xs font-black" />
+                <Button className="h-14 w-full rounded-2xl font-black text-[10px] uppercase shadow-lg text-white" onClick={handleSavePreset}>Snapshot Identity</Button>
+              </section>
+              <div className="grid grid-cols-1 gap-4">
+                {presets.map((preset) => (
+                  <div key={preset.id} className={`p-6 rounded-[1rem] border transition-all ${isPresetActive(preset.id) ? 'border-primary/30 bg-primary/[0.03]' : 'border-border/60 bg-background hover:border-amber-500/30'}`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-xs font-black uppercase tracking-widest">{preset.name}</p>
+                      {!isPresetActive(preset.id) && <Button variant="ghost" size="sm" onClick={() => applyPreset(preset.id)} className="h-10 rounded-xl px-4 text-[10px] font-black uppercase">Apply</Button>}
+                    </div>
+                    <div className="flex gap-1">
+                      {preset.preview.map((c, i) => <div key={`${preset.id}-${c}-${i}`} className="h-6 w-full rounded-lg border border-white/10" style={{ backgroundColor: c }} />)}
+                    </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            </TabsContent>
 
-          <Card className="border-border/80 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold flex items-center gap-2">
-                <SlidersHorizontal className="h-5 w-5 text-primary" />
-                Manual Theme Controls
-              </CardTitle>
-              <CardDescription>
-                Tune full system palette, gradients, and geometry for complete website control.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Core Colors</p>
-                <div className="space-y-3">
-                  {coreColorControls.map((control) => (
-                    <div key={control.key} className="rounded-xl border border-border/70 bg-background/70 px-4 py-3">
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">{control.label}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{control.description}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="color"
-                            value={theme[control.key] as string}
-                            onChange={(event) => handleColorChange(control.key, event.target.value)}
-                            className="h-11 w-14 rounded-lg border border-border bg-transparent cursor-pointer"
-                            aria-label={control.label}
-                          />
-                          <span className="text-xs font-semibold tracking-[0.12em] uppercase text-muted-foreground min-w-[84px] text-right">
-                            {theme[control.key] as string}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+            <TabsContent value="solid-spectrum" className="space-y-10">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-8 shadow-sm">
+                <div className="grid grid-cols-2 gap-3">
+                  {solidColors.map((color) => (
+                    <button key={color.hex} onClick={() => applySolidColor(color.hex, color.name)} className={`p-4 rounded-[1.8rem] border-2 transition-all flex items-center gap-3 ${theme.primary === color.hex ? 'border-emerald-500 bg-emerald-500/[0.03]' : 'border-border/40 hover:border-emerald-500/40'}`}>
+                      <div className="h-8 w-8 rounded-xl shadow-lg border border-white/20" style={{ backgroundColor: color.hex }} />
+                      <p className="text-[10px] font-black uppercase tracking-widest">{color.name}</p>
+                    </button>
                   ))}
                 </div>
-              </div>
-
-              <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Gradient Colors</p>
-                <div className="space-y-3">
-                  {gradientColorControls.map((control) => (
-                    <div key={control.key} className="rounded-xl border border-border/70 bg-background/70 px-4 py-3">
-                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">{control.label}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{control.description}</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="color"
-                            value={theme[control.key] as string}
-                            onChange={(event) => handleColorChange(control.key, event.target.value)}
-                            className="h-11 w-14 rounded-lg border border-border bg-transparent cursor-pointer"
-                            aria-label={control.label}
-                          />
-                          <span className="text-xs font-semibold tracking-[0.12em] uppercase text-muted-foreground min-w-[84px] text-right">
-                            {theme[control.key] as string}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground mb-3">Gradient Direction</p>
-                <div className="space-y-4">
-                  {angleControls.map((control) => (
-                    <div key={control.key} className="rounded-xl border border-border/70 bg-background/70 px-4 py-4">
-                      <div className="flex items-center justify-between gap-4 mb-3">
-                        <div>
-                          <p className="text-sm font-semibold text-foreground">{control.label}</p>
-                          <p className="text-xs text-muted-foreground mt-1">{control.description}</p>
-                        </div>
-                        <span className="text-xs font-semibold tracking-[0.12em] uppercase text-muted-foreground">
-                          {theme[control.key] as number} deg
-                        </span>
-                      </div>
-                      <Slider
-                        min={0}
-                        max={360}
-                        step={1}
-                        value={[theme[control.key] as number]}
-                        onValueChange={(value) => handleAngleChange(control.key, value)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border/70 bg-background/70 px-4 py-4">
-                <div className="flex items-center justify-between gap-4 mb-3">
-                  <div>
-                    <p className="text-sm font-semibold text-foreground">Corner Radius</p>
-                    <p className="text-xs text-muted-foreground mt-1">Controls card, input, and button curvature across the app.</p>
-                  </div>
-                  <span className="text-xs font-semibold tracking-[0.12em] uppercase text-muted-foreground">{theme.radius.toFixed(2)} rem</span>
-                </div>
-                <Slider min={0.4} max={1.4} step={0.05} value={[theme.radius]} onValueChange={handleRadiusChange} />
-              </div>
-
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-2">
-                <p className="text-xs text-muted-foreground">All changes are instant, applied globally, and saved in local storage for this browser.</p>
-                <Button type="button" variant="outline" onClick={resetTheme} className="sm:w-auto w-full">
-                  <RotateCcw className="h-4 w-4 mr-2" />
-                  Reset to Default
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </section>
+            </TabsContent>
+          </Tabs>
         </div>
 
-        <div className="xl:col-span-2">
-          <Card className="border-border/80 shadow-sm sticky top-20">
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold">Live Preview</CardTitle>
-              <CardDescription>Preview how your current theme feels in the real interface context.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="rounded-xl border border-border overflow-hidden bg-background shadow-[0_20px_38px_-30px_rgba(0,0,0,0.5)]">
-                <div
-                  className="h-11 border-b px-3 flex items-center justify-between"
-                  style={{
-                    backgroundImage: 'linear-gradient(var(--topbar-gradient-angle, 180deg), var(--topbar-bg-start, #FFFFFF), var(--topbar-bg-end, #EEF1FB)), linear-gradient(120deg, hsl(var(--primary) / 0.14), hsl(var(--secondary) / 0.1))',
-                    borderColor: 'var(--topbar-border, hsl(var(--border)))',
-                    boxShadow: 'inset 0 -1px 0 hsl(var(--border) / 0.35)',
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'hsl(var(--primary))' }} />
-                    <span className="h-2 w-16 rounded-full" style={{ background: 'var(--topbar-title, hsl(var(--secondary)))', opacity: 0.75 }} />
+        <div className="xl:col-span-8 h-full overflow-hidden p-12 bg-muted/5 flex items-center justify-center relative">
+          <div className="absolute inset-0 bg-grid-slate-200/[0.04] pointer-events-none" />
+          <div className="w-full h-full relative group">
+            <div className="bg-card rounded-[1.5rem] border border-border/80 shadow-2xl relative overflow-hidden h-full flex flex-col transition-all duration-1000">
+              <div className="px-8 py-6 border-b flex items-center justify-between bg-muted/10 backdrop-blur-md shrink-0">
+                <div className="flex items-center gap-3">
+                  <div className="flex gap-1.5 mr-4">
+                    <div className="h-3 w-3 rounded-full bg-rose-500/80" />
+                    <div className="h-3 w-3 rounded-full bg-amber-500/80" />
+                    <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-10 rounded-full" style={{ background: 'var(--topbar-subtitle, hsl(var(--muted-foreground)))', opacity: 0.75 }} />
-                    <span className="h-6 w-6 rounded-full" style={{ background: 'linear-gradient(135deg, var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-background border text-[10px] font-black uppercase text-muted-foreground/60 shadow-inner">
+                    <Layout className="h-3 w-3" /> Live Workspace Monitor
                   </div>
                 </div>
-                <div className="flex">
-                  <div className="w-20 p-2" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }}>
-                    <div className="h-2.5 rounded-full bg-white/65 mb-2" />
-                    <div className="h-2.5 rounded-full bg-white/45 mb-2" />
-                    <div className="h-2.5 rounded-full bg-white/35" />
-                  </div>
-                  <div className="flex-1 p-3 space-y-2.5" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
-                    <div className="h-7 rounded-md border border-border bg-card" />
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="h-12 rounded-md border border-border bg-card" />
-                      <div className="h-12 rounded-md border border-border bg-card" />
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  <p className="text-[10px] font-black uppercase text-emerald-500/80">Synchronized</p>
+                </div>
+              </div>
+
+              <div className="flex-1 p-10 bg-muted/5 flex items-center justify-center relative overflow-hidden">
+                <div className="w-full h-full rounded-[1rem] border border-border bg-background shadow-2xl overflow-hidden relative isolate">
+                  <div className="h-14 border-b px-8 flex items-center justify-between" style={{ backgroundImage: 'linear-gradient(var(--topbar-gradient-angle, 180deg), var(--topbar-bg-start, #FFFFFF), var(--topbar-bg-end, #EEF1FB))' }}>
+                    <div className="flex items-center gap-4">
+                      <div className="h-6 w-6 rounded-lg rotate-12 shadow-xl" style={{ background: 'hsl(var(--primary))' }} />
+                      <div className="h-3 w-40 rounded-full bg-foreground/10" />
                     </div>
-                    <div className="h-16 rounded-md border border-border bg-card" />
+                    <div className="h-10 w-10 rounded-full border-2 border-white/40 shadow-xl" style={{ background: 'linear-gradient(135deg, var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }} />
+                  </div>
+                  <div className="flex h-[calc(100%-56px)]">
+                    <div className="w-28 p-6 space-y-4 shadow-2xl" style={{ background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start), var(--sidebar-gradient-end))' }}>
+                      <div className="h-3 rounded-full bg-white/40 w-full mb-8 shadow-sm" />
+                      <div className="h-3 rounded-full bg-white/30 w-3/4 shadow-sm" />
+                      <div className="h-3 rounded-full bg-white/20 w-1/2 shadow-sm" />
+                      <div className="h-3 rounded-full bg-white/10 w-2/3 shadow-sm" />
+                    </div>
+                    <div className="flex-1 p-8 space-y-8 overflow-hidden relative" style={{ background: 'linear-gradient(var(--layout-gradient-angle), var(--layout-bg-start), var(--layout-bg-mid), var(--layout-bg-end))' }}>
+                      <div className="h-12 rounded-[1rem] border border-border bg-card shadow-sm flex items-center px-6"><div className="h-2 w-1/4 rounded-full bg-muted/60" /></div>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                          <div className="h-2 rounded-full bg-muted/40 w-1/3" />
+                          <div className="h-8 rounded-lg bg-primary/10 border border-primary/20 w-1/2" />
+                        </div>
+                        <div className="h-28 rounded-[1.25rem] border border-border bg-card shadow-lg p-5 space-y-3">
+                          <div className="h-2 rounded-full bg-muted/40 w-1/3" />
+                          <div className="h-8 rounded-lg bg-secondary/10 border border-secondary/20 w-1/2" />
+                        </div>
+                      </div>
+                      <div className="h-32 rounded-[1.5rem] border border-border bg-card shadow-xl p-8" />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-                <p className="text-sm font-semibold text-foreground">Component Tone Check</p>
-                <div className="flex flex-wrap gap-2">
-                  <Button className="h-9">Primary Action</Button>
-                  <Button variant="secondary" className="h-9">Secondary</Button>
-                  <Button variant="outline" className="h-9">Outline</Button>
+              <div className="px-10 py-5 border-t bg-muted/5 flex items-center justify-between text-muted-foreground/60 shrink-0">
+                <div className="flex items-center gap-2">
+                  <Columns className="h-4 w-4" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary/60">Professional Sandbox Environment</span>
                 </div>
-                <div className="rounded-lg border border-border bg-muted/50 p-3">
-                  <p className="text-xs text-muted-foreground">Typography, gradients, states, and surfaces are now synced from your custom palette.</p>
-                </div>
+                <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Zero-Latency Sync Ready</p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

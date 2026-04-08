@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import {
   LayoutDashboard, Users, CalendarDays, Heart,
   CalendarCheck, Package, Building2, BarChart3, Briefcase,
-  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car, HeartHandshake, Hotel, Palette
+  Settings, LogOut, ShoppingCart, UtensilsCrossed, Megaphone, ChevronsLeft, ChevronsRight, Car, Hotel
 } from 'lucide-react';
 
 import logo from '@/assets/img/logo.png'; 
@@ -27,7 +27,6 @@ const adminLinks = [
   { to: '/parking', label: 'Parking', icon: Car },
   // { to: '/volunteers', label: 'Volunteers', icon: HeartHandshake },
   { to: '/reports', label: 'Documents', icon: BarChart3 },
-  { to: '/theme-studio', label: 'Theme Studio', icon: Palette },
   { to: '/settings', label: 'Settings', icon: Settings },
 ];
 
@@ -35,7 +34,6 @@ const managerLinks = adminLinks.filter(l => !['/reports', '/settings', '/assets'
 const devoteeLinks = [
   { to: '/pooja-seva', label: 'Pooja & Seva Desk', icon: CalendarDays },
   { to: '/events', label: 'Events', icon: CalendarCheck },
-  { to: '/theme-studio', label: 'Theme Studio', icon: Palette },
   { to: '/donate', label: 'Donate', icon: Heart },
 ];
 
@@ -48,7 +46,13 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed, onToggleCollapse }
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const links = user?.role === 'admin' ? adminLinks : user?.role === 'manager' ? managerLinks : devoteeLinks;
+  const getLinks = () => {
+    if (user?.role === 'admin') return adminLinks;
+    if (user?.role === 'manager') return managerLinks;
+    return devoteeLinks;
+  };
+
+  const links = getLinks();
 
   const handleLogout = () => {
     logout();

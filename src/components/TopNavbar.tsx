@@ -1,5 +1,6 @@
 import React from 'react';
-import { Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Bell, Palette } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const TopNavbar: React.FC = () => {
@@ -7,11 +8,13 @@ const TopNavbar: React.FC = () => {
   const today = new Date().toLocaleDateString('en-GB');
   const hour = new Date().getHours();
 
-  const greeting = hour < 12
-    ? 'Good morning. Wishing you a focused day ahead.'
-    : hour < 17
-      ? 'Good afternoon. Everything is on track today.'
-      : 'Good evening. Here is your current operations snapshot.';
+  const getGreeting = (hour: number) => {
+    if (hour < 12) return 'Good morning. Wishing you a focused day ahead.';
+    if (hour < 17) return 'Good afternoon. Everything is on track today.';
+    return 'Good evening. Here is your current operations snapshot.';
+  };
+
+  const greeting = getGreeting(hour);
 
   return (
     <header
@@ -30,9 +33,18 @@ const TopNavbar: React.FC = () => {
       <div className="flex items-center gap-5">
         <span className="text-sm hidden md:block font-semibold" style={{ color: 'var(--topbar-title)' }}>{today}</span>
         
-        <button className="relative transition-all duration-200 hover:scale-105 p-2 rounded-lg border border-transparent hover:bg-white/60" style={{ color: 'var(--topbar-icon)', borderColor: 'transparent' }}>
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 w-4 h-4 rounded-full text-[10px] text-white flex items-center justify-center font-semibold shadow-sm" style={{ background: 'hsl(var(--primary))' }}>3</span>
+        <Link
+          to="/theme-studio"
+          title="Theme Studio"
+          className="relative transition-all duration-300 p-2 rounded-xl border border-border/40 bg-background/50 hover:bg-background hover:border-primary/30 shadow-sm hover:shadow-md group active:scale-95"
+          style={{ color: 'var(--topbar-icon)' }}
+        >
+          <Palette className="h-4 w-4 transition-transform group-hover:rotate-12" />
+          <div className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
+        </Link>
+        <button className="relative transition-all duration-300 p-2 rounded-xl border border-border/40 bg-background/50 hover:bg-background shadow-sm hover:shadow-md group active:scale-95" style={{ color: 'var(--topbar-icon)' }}>
+          <Bell className="h-4 w-4" />
+          <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full text-[9px] text-white flex items-center justify-center font-black shadow-lg" style={{ background: 'hsl(var(--primary))' }}>3</span>
         </button>
         
         <div className="flex items-center gap-3 pl-3 border-l" style={{ borderColor: 'var(--topbar-border)' }}>
