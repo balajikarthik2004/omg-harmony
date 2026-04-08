@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   ReceiptText,
   CheckCircle2,
@@ -162,6 +162,139 @@ function formatCardNumber(val: string) {
 function formatExpiry(val: string) {
   const c = val.replace(/\D/g, '').slice(0, 4);
   return c.length >= 3 ? c.slice(0, 2) + '/' + c.slice(2) : c;
+}
+
+function generateQrBits(payload: string, count: number) {
+  let state = 0x811c9dc5;
+  for (let i = 0; i < payload.length; i++) {
+    state ^= payload.charCodeAt(i);
+    state = Math.imul(state, 16777619);
+    state >>>= 0;
+  }
+
+  const bits: number[] = [];
+  while (bits.length < count) {
+    state ^= state << 13;
+    state ^= state >>> 17;
+    state ^= state << 5;
+    state >>>= 0;
+    bits.push(state & 1);
+  }
+  return bits;
+}
+
+function buildPseudoQrMatrix(payload: string) {
+  const size = 29;
+  const matrix = Array.from({ length: size }, () => Array(size).fill(false));
+  const reserved = Array.from({ length: size }, () => Array(size).fill(false));
+
+  const inBounds = (r: number, c: number) => r >= 0 && c >= 0 && r < size && c < size;
+  const set = (r: number, c: number, dark: boolean, keep = true) => {
+    if (!inBounds(r, c)) return;
+    matrix[r][c] = dark;
+    if (keep) reserved[r][c] = true;
+  };
+
+  const drawFinder = (top: number, left: number) => {
+    for (let r = -1; r <= 7; r++) {
+      for (let c = -1; c <= 7; c++) {
+        const rr = top + r;
+        const cc = left + c;
+        if (!inBounds(rr, cc)) continue;
+        const onRing = r === -1 || r === 7 || c === -1 || c === 7;
+        const outer = r === 0 || r === 6 || c === 0 || c === 6;
+        const inner = r >= 2 && r <= 4 && c >= 2 && c <= 4;
+        set(rr, cc, !onRing && (outer || inner), true);
+      }
+    }
+  };
+
+  drawFinder(0, 0);
+  drawFinder(0, size - 7);
+  drawFinder(size - 7, 0);
+
+  for (let i = 8; i < size - 8; i++) {
+    set(6, i, i % 2 === 0, true);
+    set(i, 6, i % 2 === 0, true);
+  }
+
+  const drawAlignment = (centerR: number, centerC: number) => {
+    for (let r = -2; r <= 2; r++) {
+      for (let c = -2; c <= 2; c++) {
+        const rr = centerR + r;
+        const cc = centerC + c;
+        const border = Math.abs(r) === 2 || Math.abs(c) === 2;
+        const dot = r === 0 && c === 0;
+        set(rr, cc, border || dot, true);
+      }
+    }
+  };
+  drawAlignment(22, 22);
+
+  set(8, size - 8, true, true);
+
+  const formatBits = '101010000010010';
+  const fmtA: Array<[number, number]> = [
+    [8, 0],
+    [8, 1],
+    [8, 2],
+    [8, 3],
+    [8, 4],
+    [8, 5],
+    [8, 7],
+    [8, 8],
+    [7, 8],
+    [5, 8],
+    [4, 8],
+    [3, 8],
+    [2, 8],
+    [1, 8],
+    [0, 8],
+  ];
+  const fmtB: Array<[number, number]> = [
+    [size - 1, 8],
+    [size - 2, 8],
+    [size - 3, 8],
+    [size - 4, 8],
+    [size - 5, 8],
+    [size - 6, 8],
+    [size - 7, 8],
+    [8, size - 8],
+    [8, size - 7],
+    [8, size - 6],
+    [8, size - 5],
+    [8, size - 4],
+    [8, size - 3],
+    [8, size - 2],
+    [8, size - 1],
+  ];
+  for (let i = 0; i < formatBits.length; i++) {
+    const dark = formatBits[i] === '1';
+    set(fmtA[i][0], fmtA[i][1], dark, true);
+    set(fmtB[i][0], fmtB[i][1], dark, true);
+  }
+
+  const freeCount = reserved.flat().filter((v) => !v).length;
+  const bits = generateQrBits(payload, freeCount);
+
+  let bitIdx = 0;
+  let upward = true;
+  for (let col = size - 1; col > 0; col -= 2) {
+    if (col === 6) col -= 1;
+    for (let i = 0; i < size; i++) {
+      const row = upward ? size - 1 - i : i;
+      for (let dc = 0; dc < 2; dc++) {
+        const c = col - dc;
+        if (reserved[row][c]) continue;
+        const mask = (row + c) % 2 === 0;
+        const bit = bits[bitIdx++] === 1;
+        matrix[row][c] = bit !== mask;
+      }
+    }
+    upward = !upward;
+  }
+
+  return matrix;
 }
 
 const ProcessingScreen: React.FC<{ onDone: () => void; pooja: string }> = ({
@@ -418,6 +551,16 @@ const PoojaSevaPaymentFlow: React.FC<PoojaSevaPaymentFlowProps> = ({
   const tax = +(amount * 0.05).toFixed(2);
   const total = +(amount + tax);
 
+  const upiPayload = useMemo(
+    () =>
+      `upi://pay?pa=templetrust@okicici&pn=Shri%20Temple%20Trust&am=${total.toFixed(
+        2,
+      )}&cu=INR&tn=${encodeURIComponent(`${booking.poojaType} ${booking.bookingCode}`)}`,
+    [booking.bookingCode, booking.poojaType, total],
+  );
+
+  const qrMatrix = useMemo(() => buildPseudoQrMatrix(upiPayload), [upiPayload]);
+
   const handleProcessingDone = () => {
     const updated = {
       ...booking,
@@ -661,38 +804,51 @@ const PoojaSevaPaymentFlow: React.FC<PoojaSevaPaymentFlowProps> = ({
                   </div>
 
                   <div className="pseva-upi-qr">
-                    <svg viewBox="0 0 120 120" className="w-28 h-28">
-                      <rect width="120" height="120" fill="white" />
-                      {Array.from({ length: 10 }).map((_, row) =>
-                        Array.from({ length: 10 }).map((_, col) =>
-                          Math.random() > 0.5 ? (
+                    <svg
+                      viewBox="0 0 148 148"
+                      className="w-36 h-36"
+                      shapeRendering="crispEdges"
+                    >
+                      <rect width="148" height="148" fill="#ffffff" />
+                      {qrMatrix.map((row, r) =>
+                        row.map((isDark, c) =>
+                          isDark ? (
                             <rect
-                              key={`${row}-${col}`}
-                              x={col * 12}
-                              y={row * 12}
-                              width="11"
-                              height="11"
-                              fill="#1a1a2e"
-                              rx="1"
+                              key={`${r}-${c}`}
+                              x={(c + 4) * 4}
+                              y={(r + 4) * 4}
+                              width="4"
+                              height="4"
+                              fill="#111827"
                             />
                           ) : null,
                         ),
                       )}
+
+                      <rect x="60" y="60" width="28" height="28" fill="#ffffff" rx="5" />
                       <rect
-                        x="40"
-                        y="40"
-                        width="40"
-                        height="40"
-                        fill="white"
-                        stroke="#1a1a2e"
-                        strokeWidth="2"
+                        x="62"
+                        y="62"
+                        width="24"
+                        height="24"
+                        fill="#ffffff"
+                        stroke="#111827"
+                        strokeWidth="1.5"
                         rx="4"
                       />
-                      <text x="60" y="66" textAnchor="middle" fontSize="16" fill="#293088">
-                        🛕
+                      <text
+                        x="74"
+                        y="77"
+                        textAnchor="middle"
+                        fontSize="10"
+                        fontWeight="700"
+                        fill="#0f172a"
+                        fontFamily="sans-serif"
+                      >
+                        UPI
                       </text>
                     </svg>
-                    <p className="pseva-upi-qr__label">Scan with any UPI app</p>
+                    <p className="pseva-upi-qr__label">Scan with any UPI app · UPI ID: templetrust@okicici</p>
                   </div>
                   <div className="pseva-upi-divider">
                     <span>or enter UPI ID</span>
