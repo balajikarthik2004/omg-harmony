@@ -301,7 +301,7 @@ const DonationsPage: React.FC = () => {
       <div className="page-header-banner donations-header">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><HandHeart className="w-5 h-5 text-primary" /> Donation Ledger & Receipts</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage Hundi, online, and counter donations with integrated digital receipts.</p>
+          <p className="text-sm text-foreground/60 mt-1">Manage Hundi, online, and counter donations with integrated digital receipts.</p>
         </div>
         <Button onClick={openAdd} className="donations-cta shadow-md hover:shadow-lg bg-primary hover:opacity-90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Record Donation</Button>
       </div>
@@ -373,10 +373,10 @@ const DonationsPage: React.FC = () => {
               <p className="text-2xl font-bold text-secondary mt-2">{money(reports.byChannel.Online)}</p>
             </div>
 
-            <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group bg-emerald-500/5 border-emerald-500/20">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-emerald-500/10 rounded-bl-[100%] transition-transform group-hover:scale-110" />
-              <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-500 mb-1">Office Counter</p>
-              <p className="text-2xl font-bold text-emerald-500 mt-2">{money(reports.byChannel.Counter)}</p>
+            <div className="stat-card donations-stat-card flex flex-col justify-between relative overflow-hidden group bg-success/5 border-success/20">
+              <div className="absolute top-0 right-0 w-16 h-16 bg-success/10 rounded-bl-[100%] transition-transform group-hover:scale-110" />
+              <p className="text-[11px] uppercase tracking-widest font-bold text-success mb-1">Office Counter</p>
+              <p className="text-2xl font-bold text-success mt-2">{money(reports.byChannel.Counter)}</p>
             </div>
           </div>
 
@@ -399,10 +399,10 @@ const DonationsPage: React.FC = () => {
                 <table className="w-full text-sm">
                   <thead className="bg-muted/40">
                     <tr className="border-b border-border">
-                      <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[40%] text-xs">Donor & Category</th>
-                      <th className="text-left py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[25%] text-xs">Donation Details</th>
-                      <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[20%] text-xs">Amount</th>
-                      <th className="text-right py-4 px-3 font-medium text-muted-foreground whitespace-nowrap w-[15%] text-xs">Actions</th>
+                      <th className="text-left py-4 px-3 font-medium text-foreground/60 whitespace-nowrap w-[40%] text-xs">Donor & Category</th>
+                      <th className="text-left py-4 px-3 font-medium text-foreground/60 whitespace-nowrap w-[25%] text-xs">Donation Details</th>
+                      <th className="text-right py-4 px-3 font-medium text-foreground/60 whitespace-nowrap w-[20%] text-xs">Amount</th>
+                      <th className="text-right py-4 px-3 font-medium text-foreground/60 whitespace-nowrap w-[15%] text-xs">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-background">
@@ -483,9 +483,9 @@ const DonationsPage: React.FC = () => {
                     <span className="text-xs font-bold text-secondary uppercase tracking-widest">UPI Scan</span>
                     <span className="font-bold text-base text-secondary">{money(reports.byMethod.UPI)}</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 rounded-lg border border-emerald-500/20 bg-emerald-500/10 hover:border-emerald-500/30 transition-colors">
-                    <span className="text-xs font-bold text-emerald-500 uppercase tracking-widest">Card Swipe</span>
-                    <span className="font-bold text-base text-emerald-500">{money(reports.byMethod.Card)}</span>
+                  <div className="flex items-center justify-between p-3 rounded-lg border border-success/20 bg-success/10 hover:border-success/30 transition-colors">
+                    <span className="text-xs font-bold text-success uppercase tracking-widest">Card Swipe</span>
+                    <span className="font-bold text-base text-success">{money(reports.byMethod.Card)}</span>
                   </div>
                 </div>
               </div>
@@ -513,9 +513,9 @@ const DonationsPage: React.FC = () => {
                         {donorProfiles.slice(0, 15).map((profile, idx) => {
                             const tierStyles = {
                               Platinum: 'text-primary bg-primary/10 border-primary/20',
-                              Gold: 'text-amber-500 bg-amber-500/10 border-amber-500/20',
-                              Silver: 'text-muted-foreground bg-muted border-border',
-                              Member: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20'
+                              Gold: 'text-warning bg-warning/10 border-warning/20',
+                              Silver: 'text-foreground/60 bg-muted border-border',
+                              Member: 'text-success bg-success/10 border-success/20'
                             }[profile.tier];
                           const TierIcon = { Platinum: Crown, Gold: Medal, Silver: Award, Member: Users }[profile.tier];
 

@@ -14,10 +14,10 @@ import {
 } from '@/data/mockData';
 
 const kpis = [
-  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-primary', bg: 'bg-primary/5 border-primary/20', trend: '+12% from yesterday' },
-  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-accent', bg: 'bg-accent/10 border-accent/20', trend: '4 pending approval' },
-  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-foreground', bg: 'bg-primary/20 border-primary/30', trend: '+45 this week' },
-  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-emerald-500', bg: 'bg-emerald-500/15 border-emerald-500/30', trend: '' },
+  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-red-500', bg: 'bg-primary/15 border-primary/25', trend: '+12% from yesterday' },
+  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-accent', bg: 'bg-accent/15 border-accent/30', trend: '4 pending approval' },
+  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-foreground', bg: 'bg-foreground/10 border-foreground/20', trend: '+45 this week' },
+  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-success', bg: 'bg-success/15 border-success/30', trend: '' },
 ];
 
 const secondaryKpis = [
@@ -30,7 +30,7 @@ const recentActivity = [
   { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-primary/10 text-primary border border-primary/20' },
   { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-muted text-muted-foreground border border-border' },
   { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-primary/10 text-primary border border-primary/20' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' },
+  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-success/10 text-success border border-success/20' },
 ];
 
 const upcomingEvents = [
@@ -72,13 +72,13 @@ const DashboardPage: React.FC = () => {
           <p className="text-sm text-muted-foreground mt-1">Real-time overview of temple operations, finances, and key metrics.</p>
         </div>
         <div className="flex gap-2">
-           <div className="relative w-full max-w-[200px] hidden sm:block">
-              <Search className="dashboard-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
-                placeholder="Quick search..."
-              />
-           </div>
+          <div className="relative w-full max-w-[200px] hidden sm:block">
+            <Search className="dashboard-search-icon absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              className="h-10 w-full pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm"
+              placeholder="Quick search..."
+            />
+          </div>
         </div>
       </div>
 
@@ -87,14 +87,14 @@ const DashboardPage: React.FC = () => {
           <div key={kpi.label} className={`dashboard-kpi-card rounded-2xl border p-5 transition-all duration-300 shadow-sm hover:shadow-md relative overflow-hidden ${kpi.bg}`}>
             <div className={`absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10 bg-current ${kpi.color.split(' ')[0]}`} />
             <div className="flex justify-between items-start mb-4 relative z-10">
-               <p className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground opacity-80">{kpi.label}</p>
-               <div className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${kpi.color} bg-background`}>
-                  <kpi.icon className="w-4 h-4" />
-               </div>
+              <p className="text-[11px] uppercase tracking-wider font-bold text-foreground/70">{kpi.label}</p>
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center shadow-sm ${kpi.color} bg-background/80 backdrop-blur-sm border border-border/40`}>
+                <kpi.icon className="w-4 h-4" />
+              </div>
             </div>
             <div className="relative z-10">
-               <p className="numeric-font text-3xl font-bold text-foreground tracking-tight">{kpi.value}</p>
-               <p className="text-xs font-semibold text-muted-foreground mt-1">{kpi.trend}</p>
+              <p className="numeric-font text-3xl font-bold text-foreground tracking-tight">{kpi.value}</p>
+              <p className="text-xs font-semibold text-foreground/60 mt-1">{kpi.trend}</p>
             </div>
           </div>
         ))}
@@ -116,17 +116,17 @@ const DashboardPage: React.FC = () => {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="month" fontSize={11} tickLine={false} axisLine={false} dy={10} />
-                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v/1000)}k`} dx={-10} />
-                <Tooltip 
+                <YAxis fontSize={11} tickLine={false} axisLine={false} tickFormatter={v => `₹${(v / 1000)}k`} dx={-10} />
+                <Tooltip
                   formatter={(v: number) => [`₹${v.toLocaleString('en-IN')}`, 'Amount']}
                   separator=": "
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px', padding: '10px 14px' }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="amount" 
+                <Line
+                  type="monotone"
+                  dataKey="amount"
                   stroke={dashboardColors.line}
-                  strokeWidth={3} 
+                  strokeWidth={3}
                   dot={{ r: 4, fill: dashboardColors.line, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
                   activeDot={{ r: 6, fill: dashboardColors.line, strokeWidth: 2, stroke: 'hsl(var(--background))' }}
                   fill="url(#donationGradient)"
@@ -148,7 +148,7 @@ const DashboardPage: React.FC = () => {
                     <Cell key={i} fill={donationCategoryPalette[i % donationCategoryPalette.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                 />
               </PieChart>
@@ -168,7 +168,7 @@ const DashboardPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="service" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                   cursor={{ fill: dashboardColors.chartCursor }}
                 />
@@ -188,7 +188,7 @@ const DashboardPage: React.FC = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="item" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                   cursor={{ fill: dashboardColors.chartCursor }}
                 />
@@ -210,7 +210,7 @@ const DashboardPage: React.FC = () => {
             {recentActivity.map((a, i) => (
               <div key={i} className="flex items-start gap-3 group">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs ${a.color}`}>
-                   {a.initial}
+                  {a.initial}
                 </div>
                 <div className="pt-1.5 flex-1 border-b border-border/40 pb-3 group-last:border-0 group-last:pb-0">
                   <p className="text-[13px] font-medium text-foreground leading-snug">{a.text}</p>

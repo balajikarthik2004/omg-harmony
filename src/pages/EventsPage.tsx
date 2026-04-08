@@ -99,7 +99,7 @@ const EventsPage: React.FC = () => {
 
   const handleSave = () => {
     if (!form.name.trim() || !form.date || !form.time) return;
-    
+
     if (editId) {
       update(editId, form);
       setModalOpen(false);
@@ -109,12 +109,12 @@ const EventsPage: React.FC = () => {
     if (form.isRecurring && form.totalDays && form.totalDays > 1) {
       const baseDate = new Date(form.date);
       let count = 0;
-      
+
       for (let i = 0; i < form.totalDays; i++) {
         const d = new Date(baseDate);
         d.setDate(baseDate.getDate() + i);
         const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        
+
         add({
           ...form,
           date: dateStr
@@ -126,7 +126,7 @@ const EventsPage: React.FC = () => {
       add(form);
       toast.success(`${form.name} added successfully.`);
     }
-    
+
     setModalOpen(false);
   };
 
@@ -234,8 +234,8 @@ const EventsPage: React.FC = () => {
       </div>
 
       {view === 'list' ? (
-          <section className="section-panel hr-main-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
-            <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
+        <section className="section-panel hr-main-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
+          <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
             <h2 className="text-base font-semibold">All Events List</h2>
             <Button onClick={openAdd} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Event</Button>
           </div>
@@ -333,7 +333,7 @@ const EventsPage: React.FC = () => {
                 </Button>
               </div>
 
-               <div className="flex gap-2 w-full mb-5">
+              <div className="flex gap-2 w-full mb-5">
                 {[
                   { key: 'all' as const, label: 'All', color: 'bg-primary border-primary/20' },
                   { key: 'festivals' as const, label: 'Festivals', color: 'bg-primary/90 border-primary/20' },
@@ -343,8 +343,8 @@ const EventsPage: React.FC = () => {
                     key={item.key}
                     onClick={() => setFilter(item.key)}
                     className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-wider rounded-xl border-2 transition-all duration-200 shadow-sm
-                      ${filter === item.key 
-                        ? `${item.color} text-white shadow-md scale-[1.03]` 
+                      ${filter === item.key
+                        ? `${item.color} text-white shadow-md scale-[1.03]`
                         : 'bg-background border-border text-muted-foreground hover:border-foreground/20 hover:text-foreground hover:bg-muted/40'}`}
                   >
                     {item.label}
@@ -500,24 +500,24 @@ const EventsPage: React.FC = () => {
                   <p className="text-sm font-bold text-foreground">Recurring Schedule</p>
                   <p className="text-[10px] text-muted-foreground font-medium">Auto-schedule for consecutive days</p>
                 </div>
-                <input 
-                  type="checkbox" 
-                  checked={form.isRecurring} 
+                <input
+                  type="checkbox"
+                  checked={form.isRecurring}
                   onChange={e => setField('isRecurring', e.target.checked)}
                   className="w-5 h-5 accent-primary cursor-pointer"
                 />
               </div>
-              
+
               {form.isRecurring && (
                 <div className="pt-2 animate-fade-in divide-y divide-border/40">
                   <div className="flex items-center justify-between py-2">
                     <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Days to Schedule</label>
                     <div className="flex items-center gap-3">
-                      <input 
-                        type="number" 
-                        min="2" 
+                      <input
+                        type="number"
+                        min="2"
                         max="30"
-                        value={String(form.totalDays)} 
+                        value={String(form.totalDays)}
                         onChange={e => setField('totalDays', Number(e.target.value) || 2)}
                         className="w-20 h-9 rounded-lg border border-input bg-background font-bold text-center text-sm outline-none focus:ring-2 focus:ring-primary/20"
                       />

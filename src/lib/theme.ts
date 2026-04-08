@@ -542,7 +542,7 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   
   // Muted foreground should be higher contrast relative to background than foreground is? No, it's the other way around.
   // We want it to be closer to background than foreground is.
-  const mutedFg = isDark ? withShift(foreground, { l: -35, s: -10 }) : withShift(foreground, { l: 25, s: -10 });
+  const mutedFg = isDark ? withShift(foreground, { l: -25, s: -10 }) : withShift(foreground, { l: 25, s: -10 });
   root.style.setProperty('--muted-foreground', toHslVariable(mutedFg));
 
   root.style.setProperty('--accent', toHslVariable(accent));

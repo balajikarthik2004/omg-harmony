@@ -1036,7 +1036,7 @@ const DevoteesPage: React.FC = () => {
 
               <div className="grid grid-cols-3 gap-3 mt-8">
                 <div className="devotees-drawer-stat bg-card rounded-xl p-4 border border-border/60 shadow-sm flex flex-col items-center justify-center relative overflow-hidden group">
-                  <div className="absolute top-0 w-full h-[3px] bg-emerald-500" />
+                  <div className="absolute top-0 w-full h-[3px] bg-success" />
                   <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest mb-1.5">Total Donations</p>
                   <p className="text-xl font-bold text-foreground font-display">{fmtAmt(selectedDevotee?.totalDonations ?? 0)}</p>
                 </div>
@@ -1252,11 +1252,11 @@ const DevoteesPage: React.FC = () => {
                           <p className="text-sm font-bold text-foreground">{dn.category}</p>
                           <p className="text-xs font-mono font-semibold text-muted-foreground mt-1 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> ID: {dn.id}</p>
                         </div>
-                        <p className="text-2xl font-bold font-display text-emerald-600">{fmtAmt(dn.amount)}</p>
+                        <p className="text-2xl font-bold font-display text-success">{fmtAmt(dn.amount)}</p>
                       </div>
                       <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/40 relative z-10">
                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(dn.date)}</span>
-                        <span className="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">{dn.paymentMethod}</span>
+                        <span className="text-[10px] uppercase font-bold text-success bg-success/10 px-2 py-1 rounded border border-success/20">{dn.paymentMethod}</span>
                       </div>
                     </div>
                   ))}
@@ -1368,7 +1368,7 @@ const DevoteesPage: React.FC = () => {
                     </div>
 
                     {notifSent && (
-                      <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
+                      <div className="p-4 rounded-xl bg-success/10 border border-success/20 text-success text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
                         <CheckCircle2 className="w-5 h-5" /> {notifSent}
                       </div>
                     )}

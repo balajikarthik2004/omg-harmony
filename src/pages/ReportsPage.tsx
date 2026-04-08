@@ -25,35 +25,35 @@ const DocumentPage: React.FC = () => {
       title: 'Temples In India', 
       description: 'Vivekananda Kendra Patrika - Comprehensive volume on Indian temples.',
       url: pdfUrls.temples,
-      color: 'blue'
+      color: 'primary'
     },
     { 
       id: 'donations', 
       title: 'Donation Report', 
       description: 'Detailed donation history, trends, and analytics with financial summaries.',
       url: pdfUrls.donations,
-      color: 'emerald'
+      color: 'success'
     },
     { 
       id: 'devotees', 
       title: 'Devotee Directory', 
       description: 'Complete devotee registration database with engagement metrics.',
       url: pdfUrls.devotees,
-      color: 'indigo'
+      color: 'accent'
     },
     { 
       id: 'bookings', 
       title: 'Service Bookings', 
       description: 'Service booking trends, revenue analysis, and occupancy rates.',
       url: pdfUrls.bookings,
-      color: 'amber'
+      color: 'warning'
     },
     { 
       id: 'inventory', 
       title: 'Inventory Report', 
       description: 'Stock usage patterns, reorder alerts, and supplier performance.',
       url: pdfUrls.inventory,
-      color: 'orange'
+      color: 'primary'
     },
   ];
 
@@ -114,35 +114,29 @@ const DocumentPage: React.FC = () => {
   const filteredReports = reportTypes.filter(r => r.title.toLowerCase().includes(search.toLowerCase()) || r.description.toLowerCase().includes(search.toLowerCase()));
 
   const colorMap = {
-    blue: {
+    primary: {
       border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
       bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
       lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
       overlay: 'bg-primary/5'
     },
-    emerald: {
-      border: 'border-emerald-500/40', hoverBorder: 'hover:border-emerald-500/60', ring: 'ring-emerald-500/40',
-      bg: 'bg-emerald-500', hoverBg: 'group-hover:bg-emerald-500/10', text: 'text-emerald-600',
-      lightBg: 'bg-emerald-500/10', activeBgText: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/20',
-      overlay: 'bg-emerald-500/5'
+    success: {
+      border: 'border-success/40', hoverBorder: 'hover:border-success/60', ring: 'ring-success/40',
+      bg: 'bg-success', hoverBg: 'group-hover:bg-success/10', text: 'text-success',
+      lightBg: 'bg-success/10', activeBgText: 'bg-success/20 text-success border-success/20',
+      overlay: 'bg-success/5'
     },
-    indigo: {
-      border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
-      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
-      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
-      overlay: 'bg-primary/5'
+    accent: {
+      border: 'border-accent/40', hoverBorder: 'hover:border-accent/60', ring: 'ring-accent/40',
+      bg: 'bg-accent', hoverBg: 'group-hover:bg-accent/10', text: 'text-accent',
+      lightBg: 'bg-accent/10', activeBgText: 'bg-accent/20 text-accent border-accent/20',
+      overlay: 'bg-accent/5'
     },
-    amber: {
-      border: 'border-amber-500/40', hoverBorder: 'hover:border-amber-500/60', ring: 'ring-amber-500/40',
-      bg: 'bg-amber-500', hoverBg: 'group-hover:bg-amber-500/10', text: 'text-amber-600',
-      lightBg: 'bg-amber-500/10', activeBgText: 'bg-amber-500/20 text-amber-600 border-amber-500/20',
-      overlay: 'bg-amber-500/5'
-    },
-    orange: {
-      border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
-      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
-      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
-      overlay: 'bg-primary/5'
+    warning: {
+      border: 'border-warning/40', hoverBorder: 'hover:border-warning/60', ring: 'ring-warning/40',
+      bg: 'bg-warning', hoverBg: 'group-hover:bg-warning/10', text: 'text-warning',
+      lightBg: 'bg-warning/10', activeBgText: 'bg-warning/20 text-warning border-warning/20',
+      overlay: 'bg-warning/5'
     }
   } as const;
 
@@ -199,7 +193,7 @@ const DocumentPage: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="font-bold text-foreground text-lg line-clamp-1">{r.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2 leading-relaxed font-medium">{r.description}</p>
+                      <p className="text-sm text-foreground/60 mt-1 line-clamp-2 leading-relaxed font-medium">{r.description}</p>
                     </div>
                   </div>
                 </div>
