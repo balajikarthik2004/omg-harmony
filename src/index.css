@@ -303,7 +303,7 @@
   /* ─── Page Header Banner ─── */
   .page-header-banner {
     @apply rounded-xl border border-border px-5 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3;
-    background: linear-gradient(135deg, hsla(40, 33%, 98%, 1) 0%, hsla(40, 20%, 96%, 1) 100%);
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
   }
 
@@ -337,7 +337,7 @@
 
   .section-panel-header {
     @apply px-4 py-3 border-b border-border flex flex-col md:flex-row md:items-center md:justify-between gap-2;
-    background: linear-gradient(180deg, hsla(40, 20%, 97%, 1) 0%, hsla(40, 20%, 95%, 0.5) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background) / 0.5) 100%);
   }
 
   /* ─── Enhanced Select Inputs ─── */
@@ -510,9 +510,9 @@
   }
 
   .dashboard-header-banner input {
-    background: rgba(255, 255, 255, 0.96) !important;
+    background: hsl(var(--card) / 0.96) !important;
     border-color: hsla(0, 0%, 100%, 0.24) !important;
-    color: #232647;
+    color: hsl(var(--foreground));
   }
 
   .dashboard-kpi-card {
@@ -532,22 +532,22 @@
   }
 
   .dashboard-kpi-amber {
-    background: linear-gradient(165deg, #fff3f2 0%, #f9d6d4 100%);
+    @apply bg-card/60;
     border-color: rgba(229, 92, 82, 0.58);
   }
 
   .dashboard-kpi-blue {
-    background: linear-gradient(165deg, #f1f2fb 0%, #c4c7ed 100%);
+    @apply bg-card/60;
     border-color: rgba(79, 88, 202, 0.46);
   }
 
   .dashboard-kpi-emerald {
-    background: linear-gradient(165deg, #f7f8ff 0%, #9da2e1 100%);
+    @apply bg-card/60;
     border-color: rgba(41, 48, 136, 0.44);
   }
 
   .dashboard-kpi-slate {
-    background: linear-gradient(165deg, #fff6f5 0%, #f3ada8 100%);
+    @apply bg-card/60;
     border-color: rgba(226, 46, 38, 0.36);
   }
 
@@ -563,7 +563,7 @@
 
   .dashboard-premium .section-panel {
     border-color: rgba(157, 162, 225, 0.54);
-    background: linear-gradient(180deg, #ffffff 0%, #f6f7ff 100%);
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%);
     box-shadow:
       0 1px 2px rgba(41, 48, 136, 0.06),
       0 18px 36px -28px rgba(41, 48, 136, 0.3);
@@ -579,7 +579,7 @@
   }
 
   .dashboard-premium .section-panel-header {
-    background: linear-gradient(180deg, #eef0fb 0%, #e3e7fa 100%);
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background)) 100%);
     border-bottom-color: rgba(157, 162, 225, 0.72);
   }
 
@@ -630,7 +630,7 @@
     border-radius: 0.9rem;
     border: 1px solid hsla(212, 24%, 80%, 0.72);
     box-shadow: 0 18px 34px -28px rgba(15, 23, 42, 0.45);
-    background: linear-gradient(140deg, hsla(210, 42%, 98%, 0.95) 0%, hsla(0, 0%, 100%, 0.95) 45%, hsla(43, 44%, 95%, 0.9) 100%);
+    background: linear-gradient(140deg, hsl(var(--background) / 0.95) 0%, hsl(var(--card) / 0.95) 45%, hsl(var(--muted) / 0.9) 100%);
   }
 
   .donations-cta {
@@ -648,14 +648,14 @@
   .devotees-table-toolbar,
   .events-view-toggle {
     border-color: hsla(214, 20%, 80%, 0.8) !important;
-    background: linear-gradient(180deg, hsla(210, 22%, 98%, 0.96) 0%, hsla(210, 20%, 97%, 0.96) 100%);
+    background: linear-gradient(180deg, hsl(var(--background) / 0.96) 0%, hsl(var(--muted) / 0.96) 100%);
   }
 
   .donations-stat-card,
   .events-stat-card,
   .devotees-stat-card {
     border-color: hsla(214, 22%, 81%, 0.78) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.98) 0%, hsla(210, 18%, 98%, 0.95) 100%);
+    background: linear-gradient(180deg, hsl(var(--card) / 0.98) 0%, hsl(var(--muted) / 0.95) 100%);
     box-shadow: 0 16px 30px -28px rgba(15, 23, 42, 0.45);
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   }
@@ -676,7 +676,7 @@
   .devotees-table-shell {
     border-color: hsla(213, 20%, 79%, 0.78) !important;
     box-shadow: 0 22px 40px -34px rgba(15, 23, 42, 0.55);
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.98) 0%, hsla(210, 20%, 98%, 0.98) 100%);
+    background: linear-gradient(180deg, hsl(var(--card) / 0.98) 0%, hsl(var(--muted) / 0.98) 100%);
   }
 
   .events-view-btn {
@@ -706,12 +706,12 @@
   }
 
   .devotees-drawer {
-    background: linear-gradient(180deg, hsla(210, 24%, 98%, 1) 0%, hsla(0, 0%, 100%, 1) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--card)) 100%);
   }
 
   .devotees-drawer-hero {
     border-bottom-color: hsla(214, 18%, 78%, 0.8) !important;
-    background: linear-gradient(165deg, hsla(212, 74%, 95%, 0.9) 0%, hsla(220, 40%, 97%, 0.96) 65%, hsla(43, 42%, 94%, 0.9) 100%) !important;
+    background: linear-gradient(165deg, hsl(var(--muted) / 0.9) 0%, hsl(var(--card) / 0.96) 65%, hsl(var(--background) / 0.9) 100%) !important;
   }
 
   .devotees-header {
@@ -744,7 +744,7 @@
 
   .devotees-search-input {
     border-color: hsla(215, 20%, 80%, 0.9) !important;
-    background: hsla(0, 0%, 100%, 0.95) !important;
+    background: hsl(var(--card) / 0.95) !important;
   }
 
   .devotees-search-input:focus {
@@ -753,9 +753,9 @@
   }
 
   .devotees-record-chip {
-    background: linear-gradient(180deg, hsla(210, 24%, 95%, 0.95) 0%, hsla(210, 22%, 92%, 0.95) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.95) 0%, hsl(var(--card) / 0.95) 100%) !important;
     border-color: hsla(213, 20%, 75%, 0.8) !important;
-    color: hsl(215, 18%, 30%) !important;
+    color: hsl(var(--foreground)) !important;
   }
 
   .devotees-row {
@@ -768,9 +768,9 @@
   }
 
   .devotees-avatar-chip {
-    background: linear-gradient(135deg, hsla(212, 76%, 92%, 1) 0%, hsla(219, 72%, 88%, 1) 55%, hsla(43, 68%, 90%, 1) 100%) !important;
+    background: linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--card)) 55%, hsl(var(--background)) 100%) !important;
     border-color: hsla(214, 44%, 72%, 0.78) !important;
-    color: hsl(214, 52%, 30%) !important;
+    color: hsl(var(--foreground)) !important;
     box-shadow: 0 8px 16px -12px rgba(15, 23, 42, 0.7);
   }
 
@@ -787,7 +787,7 @@
     border: 1px solid transparent;
     border-radius: 0.9rem;
     padding: 0.85rem;
-    background: linear-gradient(180deg, hsla(210, 25%, 98%, 0.92) 0%, hsla(0, 0%, 100%, 0.96) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.92) 0%, hsl(var(--card) / 0.96) 100%);
     box-shadow: 0 10px 22px -22px rgba(15, 23, 42, 0.42);
   }
 
@@ -795,7 +795,7 @@
   .devotees-form-shell textarea,
   .devotees-form-select {
     border-color: hsla(214, 18%, 76%, 0.78) !important;
-    background: hsla(0, 0%, 100%, 0.95) !important;
+    background: hsl(var(--card) / 0.95) !important;
   }
 
   .devotees-form-shell input:focus,
@@ -822,7 +822,7 @@
 
   .devotees-drawer-stat {
     border-color: hsla(214, 18%, 74%, 0.68) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.97) 0%, hsla(213, 32%, 97%, 0.95) 100%);
+    background: linear-gradient(180deg, hsl(var(--card) / 0.97) 0%, hsl(var(--muted) / 0.95) 100%);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
@@ -832,7 +832,7 @@
   }
 
   .devotees-drawer-tabs {
-    background: linear-gradient(180deg, hsla(213, 34%, 98%, 1) 0%, hsla(0, 0%, 100%, 1) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--card)) 100%) !important;
   }
 
   .devotees-drawer-tab {
@@ -896,7 +896,7 @@
   .pooja-main-panel,
   .pooja-side-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -913,7 +913,7 @@
   .pooja-date-input,
   .pooja-search-input {
     border-color: hsla(210, 22%, 70%, 0.9) !important;
-    background: hsla(0, 0%, 100%, 0.95) !important;
+    background: hsl(var(--card) / 0.95) !important;
   }
 
   .pooja-date-input:focus,
@@ -964,7 +964,7 @@
   }
 
   .pooja-main-panel thead th {
-    color: hsl(212, 26%, 28%) !important;
+    color: hsl(var(--foreground)) !important;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -973,7 +973,7 @@
     border: 1px solid transparent;
     border-radius: 0.95rem;
     padding: 0.85rem;
-    background: linear-gradient(180deg, hsla(210, 34%, 97%, 0.98) 0%, hsla(0, 0%, 100%, 0.98) 70%, hsla(43, 34%, 95%, 0.94) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.98) 0%, hsl(var(--card) / 0.98) 70%, hsl(var(--background) / 0.94) 100%);
     box-shadow: 0 10px 22px -22px rgba(15, 23, 42, 0.45);
   }
 
@@ -981,7 +981,7 @@
   .pooja-form-shell select,
   .pooja-form-shell textarea {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
-    background: hsla(0, 0%, 100%, 0.96) !important;
+    background: hsl(var(--card) / 0.96) !important;
   }
 
   .pooja-form-shell input:focus,
@@ -1052,7 +1052,7 @@
   .annadhanam-side-panel,
   .annadhanam-week-shell .section-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1084,7 +1084,7 @@
   }
 
   .annadhanam-main-panel thead th {
-    color: hsl(212, 26%, 28%) !important;
+    color: hsl(var(--foreground)) !important;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -1167,7 +1167,7 @@
   .hr-main-panel,
   .hr-duty-card {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1200,7 +1200,7 @@
   }
 
   .hr-main-panel thead th {
-    color: hsl(212, 26%, 28%) !important;
+    color: hsl(var(--foreground)) !important;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -1277,7 +1277,7 @@
   .donations-side-panel,
   .donations-stat-card {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1311,7 +1311,7 @@
   }
 
   .donations-premium .section-panel-header {
-    background: linear-gradient(180deg, hsla(210, 34%, 95%, 1) 0%, hsla(210, 30%, 93%, 0.82) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background) / 0.82) 100%) !important;
     border-bottom-color: hsla(210, 18%, 80%, 0.85) !important;
   }
 
@@ -1357,7 +1357,7 @@
   .events-calendar-panel,
   .events-day-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1394,7 +1394,7 @@
   }
 
   .events-premium .section-panel-header {
-    background: linear-gradient(180deg, hsla(210, 34%, 95%, 1) 0%, hsla(210, 30%, 93%, 0.82) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background) / 0.82) 100%) !important;
     border-bottom-color: hsla(210, 18%, 80%, 0.85) !important;
   }
 
@@ -1536,7 +1536,7 @@
   .campaign-main-panel,
   .campaign-side-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1610,7 +1610,7 @@
   .inventory-header h1,
   .inventory-header p,
   .inventory-header svg {
-    color: hsla(0, 0%, 100%, 0.96) !important;
+    color: #ffffff !important;
   }
 
   .inventory-header p {
@@ -1632,7 +1632,7 @@
 
   .inventory-tabbar {
     border-color: hsla(210, 18%, 72%, 0.84) !important;
-    background: linear-gradient(180deg, hsla(210, 34%, 97%, 0.98) 0%, hsla(0, 0%, 100%, 0.98) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.98) 0%, hsl(var(--card) / 0.98) 100%) !important;
     box-shadow: 0 18px 28px -22px rgba(15, 23, 42, 0.4);
   }
 
@@ -1645,7 +1645,7 @@
   .inventory-stat-card,
   .inventory-main-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1666,7 +1666,7 @@
   }
 
   .inventory-main-panel .section-panel-header {
-    background: linear-gradient(180deg, hsla(210, 34%, 95%, 1) 0%, hsla(210, 30%, 93%, 0.82) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background) / 0.82) 100%) !important;
     border-bottom-color: hsla(210, 18%, 80%, 0.85) !important;
   }
 
@@ -1676,7 +1676,7 @@
   .inventory-form-shell select,
   .inventory-form-shell textarea {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
-    background: hsla(0, 0%, 100%, 0.96) !important;
+    background: hsl(var(--card) / 0.96) !important;
   }
 
   .inventory-search-input:focus,
@@ -1693,7 +1693,7 @@
   }
 
   .inventory-premium table thead th {
-    color: hsl(212, 26%, 28%) !important;
+    color: hsl(var(--foreground)) !important;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -1711,7 +1711,7 @@
     border: 1px solid transparent;
     border-radius: 0.95rem;
     padding: 0.85rem;
-    background: linear-gradient(180deg, hsla(210, 34%, 97%, 0.98) 0%, hsla(0, 0%, 100%, 0.98) 70%, hsla(43, 34%, 95%, 0.94) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.98) 0%, hsl(var(--card) / 0.98) 70%, hsl(var(--background) / 0.94) 100%);
     box-shadow: 0 10px 22px -22px rgba(15, 23, 42, 0.45);
   }
 
@@ -1775,7 +1775,7 @@
   .assets-stat-card,
   .assets-main-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1790,7 +1790,7 @@
   }
 
   .assets-main-header {
-    background: linear-gradient(180deg, hsla(210, 34%, 95%, 1) 0%, hsla(210, 30%, 93%, 0.82) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted)) 0%, hsl(var(--background) / 0.82) 100%) !important;
     border-bottom-color: hsla(210, 18%, 80%, 0.85) !important;
   }
 
@@ -1800,7 +1800,7 @@
   .assets-form-shell select,
   .assets-form-shell textarea {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
-    background: hsla(0, 0%, 100%, 0.96) !important;
+    background: hsl(var(--card) / 0.96) !important;
   }
 
   .assets-search-input:focus,
@@ -1817,7 +1817,7 @@
   }
 
   .assets-premium table thead th {
-    color: hsl(212, 26%, 28%) !important;
+    color: hsl(var(--foreground)) !important;
     font-weight: 700;
     letter-spacing: 0.02em;
   }
@@ -1835,7 +1835,7 @@
     border: 1px solid transparent;
     border-radius: 0.95rem;
     padding: 0.85rem;
-    background: linear-gradient(180deg, hsla(210, 34%, 97%, 0.98) 0%, hsla(0, 0%, 100%, 0.98) 70%, hsla(43, 34%, 95%, 0.94) 100%);
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.98) 0%, hsl(var(--card) / 0.98) 70%, hsl(var(--background) / 0.94) 100%);
     box-shadow: 0 10px 22px -22px rgba(15, 23, 42, 0.45);
   }
 
@@ -1883,7 +1883,7 @@
   .docs-header h1,
   .docs-header p,
   .docs-header svg {
-    color: hsla(0, 0%, 100%, 0.96) !important;
+    color: #ffffff !important;
   }
 
   .docs-header p {
@@ -1907,7 +1907,7 @@
 
   .docs-main-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -1917,12 +1917,12 @@
   }
 
   .docs-grid-wrap {
-    background: linear-gradient(180deg, hsla(210, 28%, 98%, 0.9) 0%, hsla(0, 0%, 100%, 0.95) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.9) 0%, hsl(var(--card) / 0.95) 100%) !important;
   }
 
   .docs-search-input {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
-    background: hsla(0, 0%, 100%, 0.96) !important;
+    background: hsl(var(--card) / 0.96) !important;
   }
 
   .docs-search-input:focus {
@@ -1932,7 +1932,7 @@
 
   .docs-card {
     border-color: hsla(210, 22%, 74%, 0.78) !important;
-    background: linear-gradient(170deg, hsla(0, 0%, 100%, 1) 0%, hsla(210, 24%, 98%, 0.98) 60%, hsla(43, 34%, 95%, 0.9) 100%) !important;
+    background: linear-gradient(170deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.98) 60%, hsl(var(--background) / 0.9) 100%) !important;
     box-shadow: 0 20px 34px -28px rgba(15, 23, 42, 0.52);
   }
 
@@ -1943,18 +1943,18 @@
 
   .docs-empty-state {
     border-color: hsla(210, 22%, 74%, 0.68) !important;
-    background: linear-gradient(180deg, hsla(210, 32%, 97%, 0.8) 0%, hsla(0, 0%, 100%, 0.95) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.8) 0%, hsl(var(--card) / 0.95) 100%) !important;
   }
 
   .docs-upload-modal {
     border-color: hsla(210, 20%, 70%, 0.82) !important;
-    background: linear-gradient(180deg, hsla(210, 28%, 98%, 0.98) 0%, hsla(0, 0%, 100%, 0.98) 75%, hsla(43, 34%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.98) 0%, hsl(var(--card) / 0.98) 75%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 30px 48px -22px rgba(9, 18, 33, 0.82);
   }
 
   .docs-upload-head,
   .docs-upload-foot {
-    background: linear-gradient(180deg, hsla(210, 30%, 98%, 0.95) 0%, hsla(0, 0%, 100%, 0.94) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.95) 0%, hsl(var(--card) / 0.94) 100%) !important;
     border-color: hsla(210, 18%, 78%, 0.85) !important;
   }
 
@@ -1966,7 +1966,7 @@
   .docs-stage,
   .docs-guidelines {
     border-color: hsla(210, 20%, 72%, 0.74) !important;
-    background: linear-gradient(180deg, hsla(210, 30%, 98%, 0.86) 0%, hsla(0, 0%, 100%, 0.94) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.86) 0%, hsl(var(--card) / 0.94) 100%) !important;
   }
 
   .docs-stage-item {
@@ -2033,7 +2033,7 @@
   .settings-header h1,
   .settings-header p,
   .settings-header svg {
-    color: hsla(0, 0%, 100%, 0.96) !important;
+    color: #ffffff !important;
   }
 
   .settings-header p {
@@ -2056,7 +2056,7 @@
   .settings-profile-panel,
   .settings-members-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
-    background: linear-gradient(180deg, hsla(0, 0%, 100%, 0.99) 0%, hsla(210, 28%, 97%, 0.95) 62%, hsla(43, 36%, 95%, 0.92) 100%) !important;
+    background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
@@ -2118,7 +2118,7 @@
   .settings-form-shell select,
   .settings-form-shell textarea {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
-    background: hsla(0, 0%, 100%, 0.96) !important;
+    background: hsl(var(--card) / 0.96) !important;
   }
 
   .settings-field:focus,
@@ -2144,8 +2144,8 @@
 
   /* Global palette refresh: strong red-indigo system */
   .page-header-banner {
-    border-color: color-mix(in srgb, var(--brand-blue-600) 26%, white) !important;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-50) 72%, white) 0%, color-mix(in srgb, #ffffff 78%, var(--brand-blue-100)) 55%, color-mix(in srgb, #ffffff 75%, var(--brand-red-100)) 100%) !important;
+    border-color: color-mix(in srgb, var(--brand-blue-600) 26%, hsl(var(--card))) !important;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--brand-blue-50) 72%, hsl(var(--card))) 0%, color-mix(in srgb, hsl(var(--card)) 78%, var(--brand-blue-100)) 55%, color-mix(in srgb, hsl(var(--card)) 75%, var(--brand-red-100)) 100%) !important;
   }
 
   .dashboard-header-banner,
@@ -2279,8 +2279,8 @@
   .docs-main-panel,
   .settings-profile-panel,
   .settings-members-panel {
-    border-color: color-mix(in srgb, var(--brand-blue-300) 38%, white) !important;
-    background: linear-gradient(180deg, #ffffff 0%, color-mix(in srgb, #ffffff 80%, var(--brand-blue-50)) 65%, color-mix(in srgb, #ffffff 86%, var(--brand-red-100)) 100%) !important;
+    border-color: color-mix(in srgb, var(--brand-blue-300) 38%, hsl(var(--card))) !important;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, color-mix(in srgb, hsl(var(--card)) 80%, var(--brand-blue-50)) 65%, color-mix(in srgb, hsl(var(--card)) 86%, var(--brand-red-100)) 100%) !important;
     box-shadow: 0 24px 36px -30px rgba(41, 48, 136, 0.44) !important;
   }
 
@@ -2293,8 +2293,8 @@
   .campaign-side-panel .section-panel-header,
   .donations-premium .section-panel-header,
   .events-premium .section-panel-header {
-    background: linear-gradient(180deg, color-mix(in srgb, #ffffff 62%, var(--brand-blue-50)) 0%, color-mix(in srgb, #ffffff 72%, var(--brand-blue-100)) 100%) !important;
-    border-bottom-color: color-mix(in srgb, var(--brand-blue-300) 45%, white) !important;
+    background: linear-gradient(180deg, color-mix(in srgb, hsl(var(--card)) 62%, var(--brand-blue-50)) 0%, color-mix(in srgb, hsl(var(--card)) 72%, var(--brand-blue-100)) 100%) !important;
+    border-bottom-color: color-mix(in srgb, var(--brand-blue-300) 45%, hsl(var(--muted))) !important;
   }
 
   .dashboard-premium table thead,
@@ -2306,7 +2306,7 @@
   .inventory-premium table thead,
   .assets-premium table thead,
   .settings-table-head {
-    background: linear-gradient(180deg, color-mix(in srgb, #ffffff 58%, var(--brand-blue-100)) 0%, color-mix(in srgb, #ffffff 65%, var(--brand-blue-200)) 100%) !important;
+    background: linear-gradient(180deg, color-mix(in srgb, hsl(var(--card)) 58%, var(--brand-blue-100)) 0%, color-mix(in srgb, hsl(var(--card)) 65%, var(--brand-blue-200)) 100%) !important;
   }
 
   .dashboard-premium table tbody tr:hover,
@@ -2319,7 +2319,7 @@
   .assets-row:hover,
   .settings-row:hover,
   .devotees-row:hover {
-    background: linear-gradient(90deg, color-mix(in srgb, #ffffff 73%, var(--brand-blue-50)) 0%, color-mix(in srgb, #ffffff 78%, var(--brand-blue-100)) 52%, color-mix(in srgb, #ffffff 82%, var(--brand-red-100)) 100%) !important;
+    background: linear-gradient(90deg, color-mix(in srgb, hsl(var(--card)) 73%, var(--brand-blue-50)) 0%, color-mix(in srgb, hsl(var(--card)) 78%, var(--brand-blue-100)) 52%, color-mix(in srgb, hsl(var(--card)) 82%, var(--brand-red-100)) 100%) !important;
     box-shadow: inset 4px 0 0 color-mix(in srgb, var(--brand-primary) 76%, var(--brand-blue-500)) !important;
   }
 
@@ -2363,7 +2363,7 @@
     width: 188px;
     min-height: 88px;
     border-radius: 12px;
-    background: var(--color-background, #fff);
+    background: hsl(var(--card));
     border: 0.5px solid color-mix(in srgb, var(--rc) 30%, transparent);
     padding: 11px 13px 9px;
     position: relative;
@@ -2417,7 +2417,7 @@
   .ftree-name {
     font-size: 13px;
     font-weight: 600;
-    color: var(--foreground, #111);
+    color: hsl(var(--foreground));
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -2498,7 +2498,7 @@
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    background: var(--background, #fff);
+    background: hsl(var(--background));
     border: 1px solid color-mix(in srgb, var(--rc) 40%, transparent);
     display: flex;
     align-items: center;
@@ -2521,7 +2521,7 @@
   .ftree-root-node {
     width: 220px;
     border-radius: 14px;
-    background: var(--background, #fff);
+    background: hsl(var(--card));
     border: 1.5px solid #7F77DD;
     padding: 14px 16px 12px;
     position: relative;
@@ -2627,13 +2627,13 @@
     border-radius: 12px;
     padding: 32px 24px;
     text-align: center;
-    background: var(--muted, #f9f9f9);
+    background: hsl(var(--muted));
   }
 
   .ftree-tooltip {
     position: fixed;
     z-index: 9999;
-    background: var(--background, #fff);
+    background: hsl(var(--card));
     border: 0.5px solid var(--border, #e5e5e5);
     border-radius: 10px;
     padding: 11px 14px;

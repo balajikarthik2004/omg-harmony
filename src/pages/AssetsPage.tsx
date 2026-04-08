@@ -56,12 +56,12 @@ const AssetsPage: React.FC = () => {
 
   return (
     <div className="assets-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner assets-header bg-gradient-to-r from-emerald-50/80 via-background to-teal-50/80">
+      <div className="page-header-banner assets-header">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Landmark className="w-5 h-5 text-emerald-600" /> Temple Assets & Property</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Landmark className="w-5 h-5 text-emerald-500" /> Temple Assets & Property</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage buildings, land, valuable items, and check their maintenance.</p>
         </div>
-        <Button onClick={openAdd} className="assets-cta shadow-md hover:shadow-lg bg-emerald-600 hover:bg-emerald-700 text-white"><Plus className="h-4 w-4 mr-2" />Add New Asset</Button>
+        <Button onClick={openAdd} className="assets-cta shadow-md hover:shadow-lg bg-emerald-500 hover:bg-emerald-600 text-white"><Plus className="h-4 w-4 mr-2" />Add New Asset</Button>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
@@ -70,25 +70,25 @@ const AssetsPage: React.FC = () => {
           <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Building className="w-3.5 h-3.5" /> Total Assets</p>
           <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{items.length}</p>
         </div>
-        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-blue-100 bg-blue-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-blue-800 flex items-center gap-1.5"><Gem className="w-3.5 h-3.5" /> Main Items</p>
-          <p className="text-3xl font-display font-bold mt-2 text-blue-700 relative z-10">{strategicAssetsCount}</p>
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-blue-500/20 bg-blue-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-blue-500 flex items-center gap-1.5"><Gem className="w-3.5 h-3.5" /> Main Items</p>
+          <p className="text-3xl font-display font-bold mt-2 text-blue-500 relative z-10">{strategicAssetsCount}</p>
         </div>
-        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-teal-100 bg-teal-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-teal-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-teal-800 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5" /> Secured Assets</p>
-          <p className="text-3xl font-display font-bold mt-2 text-teal-700 relative z-10">{protectedAssetsCount}</p>
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-500/20 bg-emerald-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-500 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5" /> Secured Assets</p>
+          <p className="text-3xl font-display font-bold mt-2 text-emerald-500 relative z-10">{protectedAssetsCount}</p>
         </div>
-        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-rose-200 bg-rose-50/70 shadow-[0_4px_12px_-4px_rgba(244,63,94,0.3)]">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-rose-200/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-rose-800 flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Need Maintenance</p>
-          <p className="text-3xl font-display font-bold mt-2 text-rose-700 relative z-10">{maintenanceDueCount}</p>
+        <div className="stat-card assets-stat-card flex flex-col justify-between group overflow-hidden relative border-destructive/20 bg-destructive/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-destructive/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-destructive flex items-center gap-1.5"><AlertCircle className="w-3.5 h-3.5" /> Need Maintenance</p>
+          <p className="text-3xl font-display font-bold mt-2 text-destructive relative z-10">{maintenanceDueCount}</p>
         </div>
       </div>
 
       <div className="section-panel assets-main-panel shadow-sm">
-        <div className="section-panel-header assets-main-header gap-4 border-b border-border/60 pb-4 bg-gradient-to-r from-emerald-50/50 to-transparent">
+        <div className="section-panel-header assets-main-header whitespace-nowrap overflow-hidden">
           <h2 className="text-sm font-semibold flex items-center gap-2"><Landmark className="w-4 h-4 text-emerald-600" /> All Asset List</h2>
           <div className="relative flex-1 max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -130,8 +130,8 @@ const AssetsPage: React.FC = () => {
                 </td>
                 <td className="p-4">
                   <div className={cn("inline-flex items-center gap-1.5 text-[11px] font-bold", 
-                    a.maintenanceStatus === 'Up to Date' ? "text-emerald-600" :
-                    a.maintenanceStatus === 'Overdue' ? "text-rose-600" : "text-amber-600"
+                    a.maintenanceStatus === 'Up to Date' ? "text-emerald-500" :
+                    a.maintenanceStatus === 'Overdue' ? "text-rose-500" : "text-amber-500"
                   )}>
                     {a.maintenanceStatus !== 'Up to Date' && <AlertCircle className="w-3.5 h-3.5" />}
                     {a.maintenanceStatus}
@@ -140,7 +140,7 @@ const AssetsPage: React.FC = () => {
                 <td className="p-4 text-right whitespace-nowrap">
                   <div className="flex gap-1.5 justify-end">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(a)} title="Edit Asset"><Pencil className="h-4 w-4 text-muted-foreground group-hover:text-foreground" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(a.id)} className="hover:bg-rose-50 hover:text-rose-700 text-muted-foreground" title="Delete Asset"><Trash2 className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" onClick={() => setDeleteId(a.id)} className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Asset"><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </td>
               </tr>
@@ -177,7 +177,7 @@ const AssetsPage: React.FC = () => {
 
           <div className="space-y-1.5">
              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Maintenance Status</label>
-             <select value={form.maintenanceStatus} onChange={e => set('maintenanceStatus', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input bg-emerald-50/50 hover:border-emerald-200 px-3 text-sm transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30 outline-none shadow-sm font-bold">
+             <select value={form.maintenanceStatus} onChange={e => set('maintenanceStatus', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input transition-all bg-card hover:border-border px-3 text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-bold">
                 <option>Up to Date</option><option>Due Soon</option><option>Overdue</option>
              </select>
           </div>
@@ -189,7 +189,7 @@ const AssetsPage: React.FC = () => {
 
           <div className="flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-            <Button onClick={handleSave} className="assets-cta flex-1 py-5 shadow-md bg-emerald-600 hover:bg-emerald-700 text-white">Save Asset</Button>
+            <Button onClick={handleSave} className="assets-cta flex-1 py-5 shadow-md bg-emerald-500 hover:bg-emerald-600 text-white">Save Asset</Button>
           </div>
         </div>
       </Modal>

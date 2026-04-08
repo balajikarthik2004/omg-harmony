@@ -556,13 +556,13 @@ const ProcurementPage: React.FC = () => {
 
   return (
     <div className="space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="section-panel border-l-4 border-l-indigo-600 overflow-hidden">
-        <div className="section-panel-header bg-gradient-to-r from-indigo-50 via-background to-sky-50 border-b border-border/60">
+      <div className="section-panel border-l-4 border-l-primary overflow-hidden">
+        <div className="section-panel-header bg-gradient-to-r from-primary/10 via-background to-primary/5 border-b border-border/60">
           <div>
-            <h2 className="text-base font-bold flex items-center gap-2"><BrainCircuit className="w-4 h-4 text-indigo-600" /> AI Procurement Agent Console</h2>
+            <h2 className="text-base font-bold flex items-center gap-2"><BrainCircuit className="w-4 h-4 text-primary" /> AI Procurement Agent Console</h2>
             <p className="text-xs text-muted-foreground mt-1">Evaluates all vendors, balances cost vs delivery risk, and produces approval + communication outputs.</p>
           </div>
-          <Button onClick={runAgent} className="bg-indigo-600 hover:bg-indigo-700 text-white"><ShieldCheck className="w-4 h-4 mr-2" />Run AI Evaluation</Button>
+          <Button onClick={runAgent} className="bg-primary hover:bg-primary/90 text-primary-foreground"><ShieldCheck className="w-4 h-4 mr-2" />Run AI Evaluation</Button>
         </div>
         <div className="p-5 space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -647,27 +647,27 @@ const ProcurementPage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-border p-4 bg-muted/10">
-                  <p className="text-xs uppercase font-bold text-muted-foreground mb-2 flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Approval Email</p>
-                  <p className="text-xs font-semibold">{agentResult.approval_email.subject}</p>
+                <div className="rounded-xl border border-border p-4 bg-primary/10">
+                  <p className="text-xs uppercase font-bold text-primary mb-2 flex items-center gap-1"><Mail className="w-3.5 h-3.5" />Approval Email</p>
+                  <p className="text-xs font-semibold text-foreground">{agentResult.approval_email.subject}</p>
                   <p className="text-xs text-muted-foreground mt-2 whitespace-pre-wrap">{agentResult.approval_email.body}</p>
                 </div>
-                <div className="rounded-xl border border-border p-4 bg-muted/10">
-                  <p className="text-xs uppercase font-bold text-muted-foreground mb-2 flex items-center gap-1"><Send className="w-3.5 h-3.5" />Vendor RFP Subject Preview</p>
+                <div className="rounded-xl border border-border p-4 bg-secondary/10">
+                  <p className="text-xs uppercase font-bold text-secondary mb-2 flex items-center gap-1"><Send className="w-3.5 h-3.5" />Vendor RFP Subject Preview</p>
                   {agentResult.vendor_rfp_email.map(v => (
-                    <p key={v.vendor} className="text-xs mt-1"><span className="font-semibold">{v.vendor}:</span> {v.subject}</p>
+                    <p key={v.vendor} className="text-xs mt-1 text-foreground"><span className="font-semibold text-secondary">{v.vendor}:</span> {v.subject}</p>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/70 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-wider font-bold text-emerald-800">Agent Action</p>
-                  <p className="text-sm font-semibold text-emerald-900 mt-0.5">Approve recommendation and push it to Purchase Orders.</p>
+                  <p className="text-xs uppercase tracking-wider font-bold text-emerald-500">Agent Action</p>
+                  <p className="text-sm font-semibold text-foreground/80 mt-0.5">Approve recommendation and push it to Purchase Orders.</p>
                 </div>
                 <Button
                   onClick={createPOFromAgent}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-md"
+                  className="bg-emerald-500 hover:opacity-90 text-white shadow-md border-none"
                   disabled={agentApprovedPRs.includes(agentRequest.pr_id)}
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
@@ -684,16 +684,16 @@ const ProcurementPage: React.FC = () => {
           {bannerMessages.map(message => (
             <div
               key={message.id}
-              className={`rounded-xl border p-3 shadow-lg backdrop-blur-sm animate-fade-in ${message.tone === 'success' ? 'bg-emerald-50/95 border-emerald-200' : 'bg-sky-50/95 border-sky-200'}`}
+              className={`rounded-xl border p-3 shadow-lg backdrop-blur-sm animate-fade-in ${message.tone === 'success' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-primary/10 border-primary/20'}`}
             >
               <div className="flex items-start gap-2">
                 {message.tone === 'success' ? (
-                  <CheckCircle className="w-4 h-4 mt-0.5 text-emerald-700" />
+                  <CheckCircle className="w-4 h-4 mt-0.5 text-emerald-600" />
                 ) : (
-                  <AlertCircle className="w-4 h-4 mt-0.5 text-sky-700" />
+                  <AlertCircle className="w-4 h-4 mt-0.5 text-primary" />
                 )}
                 <div>
-                  <p className={`text-xs font-bold uppercase tracking-wider ${message.tone === 'success' ? 'text-emerald-800' : 'text-sky-800'}`}>{message.title}</p>
+                  <p className={`text-xs font-bold uppercase tracking-wider ${message.tone === 'success' ? 'text-emerald-600' : 'text-primary'}`}>{message.title}</p>
                   <p className="text-sm text-foreground font-medium mt-0.5">{message.detail}</p>
                 </div>
               </div>
@@ -703,25 +703,25 @@ const ProcurementPage: React.FC = () => {
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800 flex items-center gap-1.5"><FileClock className="w-3.5 h-3.5" /> Pending Orders</p>
-          <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{pendingCount}</p>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-500/20 bg-amber-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-amber-500 flex items-center gap-1.5"><FileClock className="w-3.5 h-3.5" /> Pending Orders</p>
+          <p className="text-3xl font-display font-bold mt-2 text-amber-500 relative z-10">{pendingCount}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800 flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Approved Orders</p>
-          <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{approvedCount}</p>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-500/20 bg-emerald-500/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-500 flex items-center gap-1.5"><CheckCircle className="w-3.5 h-3.5" /> Approved Orders</p>
+          <p className="text-3xl font-display font-bold mt-2 text-emerald-500 relative z-10">{approvedCount}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-indigo-100 bg-indigo-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-indigo-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-indigo-800 flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> Total Value</p>
-          <p className="text-3xl font-display font-bold mt-2 text-indigo-700 relative z-10">Rs.{totalValue.toLocaleString('en-IN')}</p>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-primary/20 bg-primary/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1.5"><IndianRupee className="w-3.5 h-3.5" /> Total Value</p>
+          <p className="text-3xl font-display font-bold mt-2 text-primary relative z-10">Rs.{totalValue.toLocaleString('en-IN')}</p>
         </div>
-        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-blue-100 bg-blue-50/40">
-          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-blue-100/50 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-blue-800 flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Today's Requests</p>
-          <p className="text-3xl font-display font-bold mt-2 text-blue-700 relative z-10">{todayRequests}</p>
+        <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
+          <p className="text-[11px] uppercase tracking-widest font-bold text-secondary flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Today's Requests</p>
+          <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{todayRequests}</p>
         </div>
       </div>
 
@@ -779,7 +779,7 @@ const ProcurementPage: React.FC = () => {
                     {isAdmin && <p className="text-[9px] font-medium text-muted-foreground mt-0.5 truncate max-w-[180px]">By: {proc.submittedByName}</p>}
                   </td>
                   <td className="py-4 px-3 text-right whitespace-nowrap">
-                    <p className="text-base font-bold text-emerald-700 font-display tracking-tight">Rs.{proc.amount.toLocaleString('en-IN')}</p>
+                    <p className="text-base font-bold text-emerald-500 font-display tracking-tight">Rs.{proc.amount.toLocaleString('en-IN')}</p>
                   </td>
                   <td className="py-4 px-3">
                     <StatusBadge status={proc.status} />
@@ -805,7 +805,7 @@ const ProcurementPage: React.FC = () => {
                       
                       {isAdmin && proc.status === 'Pending' && (
                         <>
-                          <Button variant="ghost" size="icon" onClick={() => handleApprove(proc.id)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-50" title="Approve">
+                          <Button variant="ghost" size="icon" onClick={() => handleApprove(proc.id)} className="h-8 w-8 text-emerald-600 hover:bg-emerald-500/10" title="Approve">
                             <CheckCircle className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => openRejectModal(proc.id)} className="h-8 w-8 text-destructive hover:bg-destructive/10" title="Reject">
@@ -870,7 +870,7 @@ const ProcurementPage: React.FC = () => {
               <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
                 {form.items.map((item, index) => (
                   <div key={index} className="flex items-center justify-between bg-background border border-border/60 p-3.5 rounded-xl shadow-sm hover:border-primary/30 transition-all">
-                    <div className="flex-1">
+                     <div className="flex-1">
                       <p className="font-bold text-sm">{item.name}</p>
                       <p className="text-xs text-muted-foreground mt-1 font-medium bg-muted/40 inline-flex px-2 py-0.5 rounded">
                         Qty: {item.quantity} x Rs.{item.price.toLocaleString('en-IN')} = <span className="text-foreground font-bold ml-1">Rs.{(item.quantity * item.price).toLocaleString('en-IN')}</span>
@@ -878,8 +878,8 @@ const ProcurementPage: React.FC = () => {
                     </div>
                     {!viewId && (
                       <div className="flex gap-1.5 bg-muted/30 p-1.5 rounded-lg border border-border/50">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-background border border-transparent hover:border-border shadow-sm" onClick={() => editItem(index)}><Pencil className="h-3.5 w-3.5 text-foreground" /></Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-rose-50 border border-transparent hover:border-rose-100 shadow-sm" onClick={() => removeItem(index)}><Trash2 className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-card border border-transparent hover:border-border shadow-sm" onClick={() => editItem(index)}><Pencil className="h-3.5 w-3.5 text-foreground" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20 shadow-sm" onClick={() => removeItem(index)}><Trash2 className="h-3.5 w-3.5" /></Button>
                       </div>
                     )}
                   </div>
@@ -887,9 +887,9 @@ const ProcurementPage: React.FC = () => {
               </div>
             )}
             
-            <div className="mt-5 pt-4 border-t border-border/60 flex justify-between items-center bg-gradient-to-r from-emerald-50/50 to-background p-4 rounded-xl border border-emerald-100 shadow-sm">
-               <span className="text-xs uppercase tracking-widest font-bold text-emerald-800">Total Invoice Valuation</span>
-               <span className="text-2xl font-bold text-emerald-700 font-display tracking-tight">Rs.{Number(form.amount).toLocaleString('en-IN')}</span>
+            <div className="mt-5 pt-4 border-t border-border/60 flex justify-between items-center bg-gradient-to-r from-emerald-500/5 to-transparent p-4 rounded-xl border border-emerald-500/10 shadow-sm">
+               <span className="text-xs uppercase tracking-widest font-bold text-emerald-600">Total Invoice Valuation</span>
+               <span className="text-2xl font-bold text-emerald-600 font-display tracking-tight">Rs.{Number(form.amount).toLocaleString('en-IN')}</span>
             </div>
           </div>
 
@@ -906,17 +906,17 @@ const ProcurementPage: React.FC = () => {
           </div>
 
           {form.status === 'Rejected' && form.rejectionReason && (
-            <div className="col-span-2 bg-rose-50 border border-rose-200 p-5 rounded-2xl mt-4 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/5 rounded-bl-full pointer-events-none" />
-              <label className="text-[11px] uppercase tracking-widest font-bold text-rose-800 flex items-center gap-1.5 mb-2"><XCircle className="w-4 h-4" /> Rejection Directives</label>
-              <p className="text-sm text-rose-900/90 font-medium leading-relaxed">{form.rejectionReason}</p>
+            <div className="col-span-2 bg-destructive/10 border border-destructive/20 p-5 rounded-2xl mt-4 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-destructive/5 rounded-bl-full pointer-events-none" />
+              <label className="text-[11px] uppercase tracking-widest font-bold text-destructive flex items-center gap-1.5 mb-2"><XCircle className="w-4 h-4" /> Rejection Directives</label>
+              <p className="text-sm text-destructive-foreground/80 font-medium leading-relaxed">{form.rejectionReason}</p>
             </div>
           )}
 
           <div className="col-span-2 flex gap-3 pt-6 border-t border-border/60 mt-3">
             <Button variant="outline" onClick={() => { setModalOpen(false); setViewId(null); }} className="flex-1 py-6 font-bold">{viewId ? 'Acknowledge Drossier' : 'Discard Order'}</Button>
             {!viewId && (
-              <Button onClick={handleSave} className="flex-1 py-6 font-bold shadow-md bg-indigo-600 hover:bg-indigo-700 text-white text-base">{editId ? 'Resubmit Authorization' : 'Commit for Approval'}</Button>
+              <Button onClick={handleSave} className="flex-1 py-6 font-bold shadow-md bg-primary hover:bg-primary/90 text-primary-foreground text-base">{editId ? 'Resubmit Authorization' : 'Commit for Approval'}</Button>
             )}
           </div>
         </div>
@@ -929,10 +929,10 @@ const ProcurementPage: React.FC = () => {
           <FormField label="Item Designation" value={currentItem.name} onChange={v => setCurrentItem({ ...currentItem, name: v })} required placeholder="e.g. Pure Ghee 15kg" />
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Volume Wanted" value={currentItem.quantity.toString()} onChange={v => setCurrentItem({ ...currentItem, quantity: Number(v) || 0 })} type="number" required />
-            <FormField label="Quote Unit Price (G�)" value={currentItem.price.toString()} onChange={v => setCurrentItem({ ...currentItem, price: Number(v) || 0 })} type="number" required />
+            <FormField label="Quote Unit Price (G)" value={currentItem.price.toString()} onChange={v => setCurrentItem({ ...currentItem, price: Number(v) || 0 })} type="number" required />
           </div>
-          <div className="bg-gradient-to-r from-sky-50 to-background text-sky-900 p-5 rounded-xl border border-sky-100 flex justify-between items-center shadow-sm">
-            <span className="text-sm font-bold uppercase tracking-widest text-sky-800">Projection Line Total</span>
+          <div className="bg-gradient-to-r from-primary/10 to-transparent text-primary p-5 rounded-xl border border-primary/20 flex justify-between items-center shadow-sm">
+            <span className="text-sm font-bold uppercase tracking-widest text-primary/80">Projection Line Total</span>
             <span className="text-2xl font-bold font-display">Rs.{(currentItem.quantity * currentItem.price).toLocaleString('en-IN')}</span>
           </div>
           <div className="flex gap-3 pt-5 border-t border-border/60">
@@ -945,7 +945,7 @@ const ProcurementPage: React.FC = () => {
       {/* Reject Modal */}
       <Modal open={rejectModalOpen} onClose={() => { setRejectModalOpen(false); setRejectItemId(null); setRejectReason(''); }} title="Decline Authorization">
         <div className="space-y-5 px-1 py-2">
-          <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-800 text-sm font-medium leading-relaxed shadow-sm">
+          <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl text-amber-600 text-sm font-medium leading-relaxed shadow-sm">
              <AlertCircle className="w-5 h-5 inline mr-2 text-amber-600 mb-0.5" />
              Please outline your rejection criterion. The originator will review your directives to amend the proposition.
           </div>
@@ -955,7 +955,7 @@ const ProcurementPage: React.FC = () => {
           </div>
           <div className="flex gap-3 pt-5 border-t border-border/60">
             <Button variant="outline" onClick={() => { setRejectModalOpen(false); setRejectItemId(null); setRejectReason(''); }} className="flex-1 py-5">Cancel Halt</Button>
-            <Button onClick={handleReject} className="flex-1 py-5 bg-rose-600 hover:bg-rose-700 text-white shadow-md font-bold" disabled={!rejectReason.trim()}>Stamp Decline</Button>
+            <Button onClick={handleReject} className="flex-1 py-5 bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-md font-bold" disabled={!rejectReason.trim()}>Stamp Decline</Button>
           </div>
         </div>
       </Modal>

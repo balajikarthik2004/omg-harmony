@@ -118,9 +118,9 @@ interface ParkingSlot {
 }
 
 const INITIAL_ZONES: ParkingZone[] = [
-  { id: '1', name: 'VIP Zone', capacity: 10, color: '#293088', type: 'VIP' },
-  { id: '2', name: 'General', capacity: 30, color: '#353EB0', type: 'General' },
-  { id: '3', name: 'Staff', capacity: 8, color: '#E22E26', type: 'Staff' },
+  { id: '1', name: 'VIP Zone', capacity: 10, color: 'hsl(var(--primary))', type: 'VIP' },
+  { id: '2', name: 'General', capacity: 30, color: 'hsl(var(--secondary-foreground))', type: 'General' },
+  { id: '3', name: 'Staff', capacity: 8, color: 'hsl(var(--destructive))', type: 'Staff' },
 ];
 
 const ParkingPage: React.FC = () => {
@@ -169,7 +169,7 @@ const ParkingPage: React.FC = () => {
     name: '',
     capacity: '10',
     type: 'General',
-    color: '#8B5CF6'
+    color: 'hsl(var(--primary))'
   });
 
   const handleAddZone = () => {
@@ -197,20 +197,20 @@ const ParkingPage: React.FC = () => {
     const zoneCount = zones.filter(z => z.type === newArea.type).length + 1;
     
     for (let i = 1; i <= cap; i++) {
-      newSlots.push({
-        id: `${prefix}-${zoneCount}-${i}`,
-        zone: newArea.name,
-        status: 'available',
-        vehicleNo: '',
-        entryTime: null
-      });
+        newSlots.push({
+            id: `${prefix}-${zoneCount}-${i}`,
+            zone: newArea.name,
+            status: 'available',
+            vehicleNo: '',
+            entryTime: null
+        });
     }
 
     setSlots([...slots, ...newSlots]);
     setAreaDialogOpen(false);
-    setNewArea({ name: '', capacity: '10', type: 'General', color: '#8B5CF6' });
+    setNewArea({ name: '', capacity: '10', type: 'General', color: 'hsl(var(--primary))' });
     toast.success(`Parking Area "${newArea.name}" added with ${cap} slots!`, {
-      icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+      icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />
     });
   };
 
@@ -269,7 +269,7 @@ const ParkingPage: React.FC = () => {
       setSlots(updatedSlots);
       setScanning(false);
       toast.success(`Vehicle ${slot.vehicleNo} exited from ${slot.id}. Fee: ₹50`, {
-        icon: <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+        icon: <CheckCircle2 className="w-5 h-5 text-emerald-400" />
       });
     }, 1500);
   };
@@ -279,15 +279,15 @@ const ParkingPage: React.FC = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Parking Management</h1>
-          <p className="text-slate-500 mt-1">Real-time occupancy monitoring and automated vehicle control.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Parking Management</h1>
+          <p className="text-muted-foreground mt-1">Real-time occupancy monitoring and automated vehicle control.</p>
         </div>
         
         <div className="flex items-center gap-3">
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all duration-300 ${isPeakMode ? 'bg-orange-50 border-orange-200 shadow-orange-100' : 'bg-white border-slate-100'}`}>
+          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border-2 transition-all duration-300 ${isPeakMode ? 'bg-orange-500/10 border-orange-500/20 shadow-orange-500/5' : 'bg-card border-border'}`}>
             <div className="flex flex-col items-end">
-              <Label htmlFor="peak-mode" className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Peak Festival Mode</Label>
-              <span className={`text-[11px] font-medium ${isPeakMode ? 'text-orange-600' : 'text-slate-500'}`}>
+              <Label htmlFor="peak-mode" className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Peak Festival Mode</Label>
+              <span className={`text-[11px] font-medium ${isPeakMode ? 'text-orange-500' : 'text-muted-foreground'}`}>
                 {isPeakMode ? 'High Capacity Active' : 'Normal Operations'}
               </span>
             </div>
@@ -305,7 +305,7 @@ const ParkingPage: React.FC = () => {
           
           <Dialog open={areaDialogOpen} onOpenChange={setAreaDialogOpen}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="rounded-xl border-slate-200">
+              <Button variant="outline" className="rounded-xl border-border">
                 <LayoutGrid className="w-4 h-4 mr-2" />
                 Add Area
               </Button>
@@ -313,7 +313,7 @@ const ParkingPage: React.FC = () => {
             <DialogContent className="sm:max-w-[425px] rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                  <Plus className="w-6 h-6 text-indigo-600" />
+                  <Plus className="w-6 h-6 text-primary" />
                   Add Parking Area
                 </DialogTitle>
                 <DialogDescription>
@@ -357,11 +357,11 @@ const ParkingPage: React.FC = () => {
                 <div className="space-y-2">
                    <Label>Area Theme Color</Label>
                    <div className="flex gap-2">
-                     {['#293088', '#353EB0', '#E22E26', '#8B5CF6', '#10B981', '#F59E0B'].map(c => (
+                     {['hsl(var(--primary))', 'hsl(var(--secondary-foreground))', 'hsl(var(--destructive))', '#8B5CF6', '#10B981', '#F59E0B'].map(c => (
                        <button 
                         key={c}
                         onClick={() => setNewArea({...newArea, color: c})}
-                        className={`w-8 h-8 rounded-full border-2 transition-all ${newArea.color === c ? 'border-indigo-600 scale-110' : 'border-transparent'}`}
+                        className={`w-8 h-8 rounded-full border-2 transition-all ${newArea.color === c ? 'border-primary scale-110' : 'border-transparent'}`}
                         style={{ backgroundColor: c }}
                        />
                      ))}
@@ -371,7 +371,7 @@ const ParkingPage: React.FC = () => {
               <DialogFooter>
                 <Button 
                   onClick={handleAddZone} 
-                  className="w-full py-6 rounded-xl bg-indigo-600 hover:bg-indigo-700"
+                  className="w-full py-6 rounded-xl bg-primary hover:bg-primary/90"
                 >
                   Create Area & Slots
                 </Button>
@@ -381,7 +381,7 @@ const ParkingPage: React.FC = () => {
 
           <Dialog open={entryDialogOpen} onOpenChange={setEntryDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl shadow-lg bg-gradient-to-r from-[#293088] to-[#353EB0] hover:shadow-indigo-200/50 transition-all border-none py-6 h-auto px-6">
+              <Button className="rounded-xl shadow-lg bg-primary hover:bg-primary/90 transition-all border-none py-6 h-auto px-6">
                 <Plus className="w-5 h-5 mr-2" />
                 Capture Entry
               </Button>
@@ -389,7 +389,7 @@ const ParkingPage: React.FC = () => {
             <DialogContent className="sm:max-w-[425px] rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                  <Monitor className="w-6 h-6 text-indigo-600" />
+                  <Monitor className="w-6 h-6 text-primary" />
                   Vehicle Entry Capture
                 </DialogTitle>
                 <DialogDescription>
@@ -402,11 +402,11 @@ const ParkingPage: React.FC = () => {
                   <div className="relative">
                     <Input 
                       placeholder="e.g. TN 01 AB 1234" 
-                      className="rounded-xl uppercase font-mono text-lg py-6 border-slate-200 focus:border-indigo-400"
+                      className="rounded-xl uppercase font-mono text-lg py-6 border-border focus:border-primary/40"
                       value={newVehicle.plate}
                       onChange={(e) => setNewVehicle({...newVehicle, plate: e.target.value.toUpperCase()})}
                     />
-                    <Cpu className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-indigo-400 opacity-50" />
+                    <Cpu className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary opacity-50" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -440,9 +440,9 @@ const ParkingPage: React.FC = () => {
                 </div>
                 
                 {scanning && (
-                  <div className="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border-2 border-dashed border-indigo-200 animate-pulse">
-                    <QrCode className="w-16 h-16 text-indigo-600 mb-2" />
-                    <p className="text-sm font-medium text-indigo-700">AI Slot Optimizer Running...</p>
+                  <div className="flex flex-col items-center justify-center p-6 bg-muted/30 rounded-2xl border-2 border-dashed border-primary/20 animate-pulse">
+                    <QrCode className="w-16 h-16 text-primary mb-2" />
+                    <p className="text-sm font-medium text-primary">AI Slot Optimizer Running...</p>
                   </div>
                 )}
               </div>
@@ -450,7 +450,7 @@ const ParkingPage: React.FC = () => {
                 <Button 
                   onClick={handleEntry} 
                   disabled={scanning}
-                  className="w-full py-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-lg shadow-xl shadow-indigo-100"
+                  className="w-full py-6 rounded-xl bg-primary hover:bg-primary/90 text-lg shadow-xl shadow-primary/10"
                 >
                   {scanning ? 'Processing...' : 'Confirm & Assign Slot'}
                 </Button>
@@ -461,17 +461,17 @@ const ParkingPage: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] rounded-2xl p-1 bg-white/50 backdrop-blur-sm border border-slate-100 shadow-sm mb-6">
-          <TabsTrigger value="dashboard" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] rounded-2xl p-1 bg-muted/50 backdrop-blur-sm border border-border shadow-sm mb-6">
+          <TabsTrigger value="dashboard" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Dashboard
           </TabsTrigger>
-          <TabsTrigger value="slots" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+          <TabsTrigger value="slots" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Slot Matrix
           </TabsTrigger>
-          <TabsTrigger value="vehicles" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+          <TabsTrigger value="vehicles" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Live Traffic
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-md transition-all">
+          <TabsTrigger value="analytics" className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-md transition-all">
             Analytics
           </TabsTrigger>
         </TabsList>
@@ -479,32 +479,32 @@ const ParkingPage: React.FC = () => {
         <TabsContent value="dashboard" className="space-y-6">
           {/* Stats Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden group">
-              <div className="h-1.5 w-full bg-[#293088]" />
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden group">
+              <div className="h-1.5 w-full bg-primary" />
               <CardHeader className="pb-2">
-                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-[#293088]/60">Total Occupancy</CardDescription>
+                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-primary opacity-60">Total Occupancy</CardDescription>
                 <div className="flex items-center justify-between mt-1">
                   <CardTitle className="text-2xl font-bold">{occupancyRate}%</CardTitle>
-                  <div className="p-2 rounded-lg bg-indigo-50 text-[#293088]">
+                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
                     <Activity className="w-5 h-5" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <Progress value={occupancyRate} className="h-1.5 bg-indigo-50" />
-                <p className="text-[11px] text-slate-500 mt-3 font-medium">
+                <Progress value={occupancyRate} className="h-1.5 bg-primary/10" />
+                <p className="text-[11px] text-muted-foreground mt-3 font-medium">
                   <span className="text-emerald-600 font-bold">2.4% lower</span> than last Sunday
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
-              <div className="h-1.5 w-full bg-[#E22E26]" />
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
+              <div className="h-1.5 w-full bg-destructive" />
               <CardHeader className="pb-2">
-                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-red-600/60">Free Slots</CardDescription>
+                <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-destructive opacity-60">Free Slots</CardDescription>
                 <div className="flex items-center justify-between mt-1">
                   <CardTitle className="text-2xl font-bold">{availableSlots}</CardTitle>
-                  <div className="p-2 rounded-lg bg-red-50 text-red-600">
+                  <div className="p-2 rounded-lg bg-destructive/10 text-destructive">
                     <ParkingCircle className="w-5 h-5" />
                   </div>
                 </div>
@@ -512,20 +512,20 @@ const ParkingPage: React.FC = () => {
               <CardContent>
                 <div className="flex gap-1 mt-2">
                   {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className={`h-3 w-3 rounded-sm ${i < 4 ? 'bg-red-500 animate-pulse' : 'bg-slate-200'}`} />
+                    <div key={i} className={`h-3 w-3 rounded-sm ${i < 4 ? 'bg-destructive animate-pulse' : 'bg-muted'}`} />
                   ))}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-3 font-medium">Critical in General Zone (Slot 42-48)</p>
+                <p className="text-[11px] text-muted-foreground mt-3 font-medium">Critical in General Zone (Slot 42-48)</p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
               <div className="h-1.5 w-full bg-emerald-500" />
               <CardHeader className="pb-2">
                 <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-emerald-600/60">Vehicles In Today</CardDescription>
                 <div className="flex items-center justify-between mt-1">
                   <CardTitle className="text-2xl font-bold">342</CardTitle>
-                  <div className="p-2 rounded-lg bg-emerald-50 text-emerald-600">
+                  <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600">
                     <TrendingUp className="w-5 h-5" />
                   </div>
                 </div>
@@ -533,35 +533,35 @@ const ParkingPage: React.FC = () => {
               <CardContent>
                 <div className="flex items-end gap-1 h-6">
                   {[4, 7, 5, 8, 10, 6, 9].map((h, i) => (
-                    <div key={i} className="flex-1 bg-emerald-100 rounded-t-sm" style={{ height: `${h * 10}%` }} />
+                    <div key={i} className="flex-1 bg-emerald-500/20 rounded-t-sm" style={{ height: `${h * 10}%` }} />
                   ))}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-3 font-medium">Avg duration: 3.2 hours</p>
+                <p className="text-[11px] text-muted-foreground mt-3 font-medium">Avg duration: 3.2 hours</p>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
               <div className="h-1.5 w-full bg-amber-500" />
               <CardHeader className="pb-2">
                 <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-amber-600/60">AI Insights</CardDescription>
                 <div className="flex items-center justify-between mt-1">
                   <CardTitle className="text-2xl font-bold">Predictive</CardTitle>
-                  <div className="p-2 rounded-lg bg-amber-50 text-amber-600">
+                  <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600">
                     <ShieldCheck className="w-5 h-5" />
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <Badge variant="outline" className="bg-amber-50 border-amber-100 text-amber-700 text-[10px] rounded-lg">
+                <Badge variant="outline" className="bg-amber-500/10 border-amber-500/20 text-amber-600 text-[10px] rounded-lg">
                   Overflow Predicted: 17:30
                 </Badge>
-                <p className="text-[11px] text-slate-500 mt-2 font-medium">Recommending Zone D activation.</p>
+                <p className="text-[11px] text-muted-foreground mt-2 font-medium">Recommending Zone D activation.</p>
               </CardContent>
             </Card>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2 rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
+            <Card className="lg:col-span-2 rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Hourly Demand Projection</CardTitle>
@@ -587,15 +587,15 @@ const ParkingPage: React.FC = () => {
                       <Tooltip 
                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       />
-                      <Area type="monotone" dataKey="general" stroke="#293088" strokeWidth={3} fillOpacity={1} fill="url(#colorGeneral)" />
-                      <Area type="monotone" dataKey="vip" stroke="#E22E26" strokeWidth={2} fill="transparent" />
+                      <Area type="monotone" dataKey="general" stroke="hsl(var(--primary))" strokeWidth={3} fillOpacity={1} fill="url(#colorGeneral)" />
+                      <Area type="monotone" dataKey="vip" stroke="hsl(var(--destructive))" strokeWidth={2} fill="transparent" />
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card">
               <CardHeader>
                 <CardTitle>Zone Distribution</CardTitle>
                 <CardDescription>Current capacity split</CardDescription>
@@ -635,7 +635,7 @@ const ParkingPage: React.FC = () => {
                       <div key={zone.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
                           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: zone.color }} />
-                          <span className="text-slate-600">{zone.name}</span>
+                          <span className="text-muted-foreground">{zone.name}</span>
                         </div>
                         <span className="font-bold">{percentage}%</span>
                       </div>
@@ -648,7 +648,7 @@ const ParkingPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="slots" className="space-y-6">
-          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
+          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card">
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
               <div>
                 <CardTitle>Interactive Slot Matrix</CardTitle>
@@ -660,17 +660,17 @@ const ParkingPage: React.FC = () => {
                     <div className="w-3 h-3 rounded-sm bg-emerald-500" /> Available
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-sm bg-slate-200" /> Occupied
+                    <div className="w-3 h-3 rounded-sm bg-muted" /> Occupied
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-sm bg-amber-400" /> Reserved
+                    <div className="w-3 h-3 rounded-sm bg-amber-500" /> Reserved
                   </div>
                 </div>
                 <div className="relative w-64">
-                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                    <Input 
                     placeholder="Find Vehicle No." 
-                    className="pl-9 rounded-xl border-slate-200"
+                    className="pl-9 rounded-xl border-border"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                    />
@@ -685,13 +685,13 @@ const ParkingPage: React.FC = () => {
                       <button 
                         className={`aspect-square rounded-xl flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition-all duration-200 hover:scale-105 shadow-sm border-b-4 ${
                           slot.status === 'available' 
-                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' 
-                            : 'bg-white text-slate-500 border-slate-100 shadow-inner'
+                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20' 
+                            : 'bg-muted text-muted-foreground border-border shadow-inner'
                         }`}
                         onClick={() => setSelectedSlot(slot)}
                       >
                         <span className="opacity-60">{slot.id}</span>
-                        {slot.status === 'occupied' ? <Car className="w-5 h-5 text-slate-400" /> : <div className="p-1 rounded-full bg-white shadow-sm"><ParkingCircle className="w-5 h-5 text-emerald-500" /></div>}
+                        {slot.status === 'occupied' ? <Car className="w-5 h-5 text-muted-foreground" /> : <div className="p-1 rounded-full bg-card shadow-sm"><ParkingCircle className="w-5 h-5 text-emerald-400" /></div>}
                         <span className="text-[8px] uppercase tracking-tighter opacity-80">{slot.zone}</span>
                       </button>
                     </DialogTrigger>
@@ -699,7 +699,7 @@ const ParkingPage: React.FC = () => {
                       <DialogHeader>
                         <DialogTitle className="text-xl flex items-center justify-between">
                           Slot Details - {slot.id}
-                          <Badge className={slot.status === 'available' ? 'bg-emerald-500' : 'bg-[#E22E26]'}>
+                          <Badge className={slot.status === 'available' ? 'bg-emerald-500' : 'bg-destructive'}>
                             {slot.status.toUpperCase()}
                           </Badge>
                         </DialogTitle>
@@ -707,34 +707,34 @@ const ParkingPage: React.FC = () => {
                       
                       <div className="py-6 space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-slate-50 p-4 rounded-2xl">
-                            <Label className="text-[10px] uppercase font-bold text-slate-400">Zone</Label>
-                            <p className="text-lg font-bold text-[#293088]">{slot.zone}</p>
+                          <div className="bg-muted/30 p-4 rounded-2xl">
+                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Zone</Label>
+                            <p className="text-lg font-bold text-primary">{slot.zone}</p>
                           </div>
-                          <div className="bg-slate-50 p-4 rounded-2xl">
-                            <Label className="text-[10px] uppercase font-bold text-slate-400">Rate</Label>
-                            <p className="text-lg font-bold text-[#293088]">₹{slot.zone === 'VIP' ? '100' : '50'}/hr</p>
+                          <div className="bg-muted/30 p-4 rounded-2xl">
+                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Rate</Label>
+                            <p className="text-lg font-bold text-primary">₹{slot.zone === 'VIP' ? '100' : '50'}/hr</p>
                           </div>
                         </div>
                         
                         {slot.status === 'occupied' && (
-                          <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 space-y-4">
+                          <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 space-y-4">
                             <div className="flex items-center gap-4">
-                              <div className="p-3 bg-white rounded-xl shadow-sm">
-                                <Car className="w-8 h-8 text-indigo-600" />
+                              <div className="p-3 bg-card rounded-xl shadow-sm">
+                                <Car className="w-8 h-8 text-primary" />
                               </div>
                               <div>
-                                <Label className="text-[10px] uppercase font-bold text-indigo-400">License Plate</Label>
+                                <Label className="text-[10px] uppercase font-bold text-primary opacity-60">License Plate</Label>
                                 <p className="text-2xl font-mono font-bold tracking-wider">{slot.vehicleNo}</p>
                               </div>
                             </div>
-                            <div className="flex items-center justify-between pt-4 border-t border-indigo-100">
+                            <div className="flex items-center justify-between pt-4 border-t border-primary/10">
                               <div>
-                                <Label className="text-[10px] uppercase font-bold text-indigo-400">Entry Time</Label>
+                                <Label className="text-[10px] uppercase font-bold text-primary opacity-60">Entry Time</Label>
                                 <p className="text-sm font-medium">{new Date(slot.entryTime!).toLocaleTimeString()}</p>
                               </div>
                               <div className="text-right">
-                                <Label className="text-[10px] uppercase font-bold text-indigo-400">Duration</Label>
+                                <Label className="text-[10px] uppercase font-bold text-primary opacity-60">Duration</Label>
                                 <p className="text-sm font-medium">2h 45m</p>
                               </div>
                             </div>
@@ -745,7 +745,7 @@ const ParkingPage: React.FC = () => {
                       <DialogFooter>
                         {slot.status === 'occupied' ? (
                           <Button 
-                            className="w-full h-12 rounded-xl bg-orange-600 hover:bg-orange-700"
+                            className="w-full h-12 rounded-xl bg-destructive hover:bg-destructive/90"
                             onClick={() => handleExit(slot.id)}
                             disabled={scanning}
                           >
@@ -753,7 +753,7 @@ const ParkingPage: React.FC = () => {
                           </Button>
                         ) : (
                           <Button 
-                            className="w-full h-12 rounded-xl bg-[#293088]"
+                            className="w-full h-12 rounded-xl bg-primary"
                             onClick={() => {
                               setNewVehicle({...newVehicle, zone: slot.zone});
                               setEntryDialogOpen(true);
@@ -772,8 +772,8 @@ const ParkingPage: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="vehicles" className="space-y-6">
-          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
-            <CardHeader className="bg-slate-50/50">
+          <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
+            <CardHeader className="bg-muted/20">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Live Vehicle Traffic</CardTitle>
@@ -787,7 +787,7 @@ const ParkingPage: React.FC = () => {
             <CardContent className="p-0">
                <Table>
                 <TableHeader>
-                  <TableRow className="bg-slate-50 border-none">
+                  <TableRow className="bg-muted/20 border-none">
                     <TableHead className="font-bold py-4 pl-6">Vehicle No</TableHead>
                     <TableHead className="font-bold">Slot</TableHead>
                     <TableHead className="font-bold">Zone</TableHead>
@@ -798,20 +798,20 @@ const ParkingPage: React.FC = () => {
                 </TableHeader>
                 <TableBody>
                   {slots.filter(s => s.status === 'occupied').map((slot) => (
-                    <TableRow key={slot.id} className="hover:bg-slate-50/50 border-slate-100">
+                    <TableRow key={slot.id} className="hover:bg-muted/30 border-border/60">
                       <TableCell className="font-mono font-bold pl-6">{slot.vehicleNo}</TableCell>
                       <TableCell>
                         <Badge variant="outline" className="rounded-lg">{slot.id}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge className={`${slot.zone === 'VIP' ? 'bg-indigo-600' : slot.zone === 'Staff' ? 'bg-red-600' : 'bg-slate-600'} rounded-lg`}>
+                        <Badge className={`${slot.zone === 'VIP' ? 'bg-primary' : slot.zone === 'Staff' ? 'bg-destructive' : 'bg-secondary'} rounded-lg`}>
                           {slot.zone}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-slate-500 font-medium">{new Date(slot.entryTime!).toLocaleTimeString()}</TableCell>
+                      <TableCell className="text-muted-foreground font-medium">{new Date(slot.entryTime!).toLocaleTimeString()}</TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <History className="w-3 h-3 text-slate-400" />
+                          <History className="w-3 h-3 text-muted-foreground" />
                           <span className="text-sm font-medium">3h 24m</span>
                         </div>
                       </TableCell>
@@ -819,7 +819,7 @@ const ParkingPage: React.FC = () => {
                         <Button 
                           variant="ghost" 
                           size="sm" 
-                          className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg"
                           onClick={() => handleExit(slot.id)}
                         >
                           Checkout
@@ -835,13 +835,13 @@ const ParkingPage: React.FC = () => {
 
         <TabsContent value="analytics" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white overflow-hidden">
-              <CardHeader className="bg-indigo-600 text-white relative">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
+              <CardHeader className="bg-primary text-primary-foreground relative">
                  <div className="absolute top-0 right-0 p-8 opacity-10">
                    <TrendingUp className="w-24 h-24" />
                  </div>
                  <CardTitle>Revenue Analytics</CardTitle>
-                 <CardDescription className="text-indigo-100">Weekly collection trends from paid parking zones</CardDescription>
+                 <CardDescription className="text-primary-foreground/60">Weekly collection trends from paid parking zones</CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="h-[300px] w-full">
@@ -855,10 +855,10 @@ const ParkingPage: React.FC = () => {
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-4 p-4 bg-slate-50 rounded-2xl flex items-center justify-between">
+                <div className="mt-4 p-4 bg-muted/30 rounded-2xl flex items-center justify-between">
                   <div>
-                    <p className="text-xs font-bold text-slate-400 uppercase">Total Weekly Revenue</p>
-                    <p className="text-2xl font-bold text-slate-900">₹14,600</p>
+                    <p className="text-xs font-bold text-muted-foreground uppercase">Total Weekly Revenue</p>
+                    <p className="text-2xl font-bold text-foreground">₹14,600</p>
                   </div>
                   <Badge className="bg-emerald-500 text-white border-none py-1.5 px-3">
                     +18.4% WoW
@@ -874,39 +874,39 @@ const ParkingPage: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-4">
-                  <div className="p-4 bg-red-50 rounded-2xl border border-red-100">
+                  <div className="p-4 bg-destructive/10 rounded-2xl border border-destructive/20">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 bg-white rounded-xl text-red-600 shadow-sm">
+                      <div className="p-2 bg-card rounded-xl text-destructive shadow-sm">
                         <AlertTriangle className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-bold text-red-900">General Zone Saturation</p>
-                        <p className="text-sm text-red-700/80">Predicted occupancy to reach 100% within the next 45 minutes based on current entry rate.</p>
-                        <Button variant="outline" className="mt-3 border-red-200 text-red-700 bg-white hover:bg-red-50 rounded-xl" size="sm">
+                        <p className="font-bold text-destructive">General Zone Saturation</p>
+                        <p className="text-sm text-foreground/80">Predicted occupancy to reach 100% within the next 45 minutes based on current entry rate.</p>
+                        <Button variant="outline" className="mt-3 border-destructive/20 text-destructive bg-card hover:bg-destructive/10 rounded-xl" size="sm">
                           Configure Overflow
                         </Button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
                     <div className="flex items-start gap-3">
-                      <div className="p-2 bg-white rounded-xl text-emerald-600 shadow-sm">
+                      <div className="p-2 bg-card rounded-xl text-emerald-600 shadow-sm">
                         <CheckCircle2 className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="font-bold text-emerald-900">Optimization Result</p>
-                        <p className="text-sm text-emerald-700/80">Staff zone re-allocation saved ~22 minutes of queue time during morning rush (08:00 - 10:00).</p>
+                        <p className="font-bold text-emerald-600">Optimization Result</p>
+                        <p className="text-sm text-foreground/80">Staff zone re-allocation saved ~22 minutes of queue time during morning rush (08:00 - 10:00).</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-col gap-4">
                     <div className="flex items-center justify-between px-2">
-                       <span className="text-sm font-medium text-slate-500">Resource Utilization</span>
-                       <span className="text-sm font-bold text-slate-900">76%</span>
+                       <span className="text-sm font-medium text-muted-foreground">Resource Utilization</span>
+                       <span className="text-sm font-bold text-foreground">76%</span>
                     </div>
-                    <Progress value={76} className="h-2 bg-slate-100" />
+                    <Progress value={76} className="h-2 bg-muted" />
                   </div>
                 </div>
               </CardContent>

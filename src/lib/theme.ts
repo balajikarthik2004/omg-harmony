@@ -521,6 +521,8 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   const warning = rgbToHsl(hexToRgb(safeTheme.warning));
   const input = withShift(border, { l: 4, s: -4 });
 
+  const isDark = background.l < 50;
+
   root.style.setProperty('--background', toHslVariable(background));
   root.style.setProperty('--foreground', toHslVariable(foreground));
 
@@ -537,7 +539,11 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--secondary-foreground', readableForeground(secondary));
 
   root.style.setProperty('--muted', toHslVariable(muted));
-  root.style.setProperty('--muted-foreground', toHslVariable(withShift(foreground, { s: -14, l: 22 })));
+  
+  // Muted foreground should be higher contrast relative to background than foreground is? No, it's the other way around.
+  // We want it to be closer to background than foreground is.
+  const mutedFg = isDark ? withShift(foreground, { l: -35, s: -10 }) : withShift(foreground, { l: 25, s: -10 });
+  root.style.setProperty('--muted-foreground', toHslVariable(mutedFg));
 
   root.style.setProperty('--accent', toHslVariable(accent));
   root.style.setProperty('--accent-foreground', readableForeground(accent));
@@ -547,14 +553,15 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--ring', toHslVariable(primary));
   root.style.setProperty('--radius', `${safeTheme.radius.toFixed(2)}rem`);
 
-  const sidebarBase = withShift(secondary, { l: -6, s: 4 });
+  const sidebarBase = withShift(secondary, { l: isDark ? -2 : -6, s: isDark ? 2 : 4 });
+  const sidebarFg = readableForeground(sidebarBase);
   root.style.setProperty('--sidebar-background', toHslVariable(sidebarBase));
-  root.style.setProperty('--sidebar-foreground', '0 0% 100%');
+  root.style.setProperty('--sidebar-foreground', sidebarFg);
   root.style.setProperty('--sidebar-primary', toHslVariable(primary));
   root.style.setProperty('--sidebar-primary-foreground', readableForeground(primary));
-  root.style.setProperty('--sidebar-accent', toHslVariable(withShift(sidebarBase, { l: -7 })));
-  root.style.setProperty('--sidebar-accent-foreground', '0 0% 100%');
-  root.style.setProperty('--sidebar-border', toHslVariable(withShift(sidebarBase, { l: -10, s: -6 })));
+  root.style.setProperty('--sidebar-accent', toHslVariable(withShift(sidebarBase, { l: isDark ? 8 : -7 })));
+  root.style.setProperty('--sidebar-accent-foreground', sidebarFg);
+  root.style.setProperty('--sidebar-border', toHslVariable(withShift(sidebarBase, { l: isDark ? 10 : -10, s: -6 })));
   root.style.setProperty('--sidebar-ring', toHslVariable(primary));
 
   root.style.setProperty('--success', toHslVariable(success));
@@ -562,17 +569,17 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
 
   root.style.setProperty('--brand-primary', safeTheme.primary);
   root.style.setProperty('--brand-secondary', safeTheme.secondary);
-  root.style.setProperty('--brand-blue-50', toHslColor(withShift(secondary, { s: -20, l: 58 })));
-  root.style.setProperty('--brand-blue-100', toHslColor(withShift(secondary, { s: -16, l: 46 })));
-  root.style.setProperty('--brand-blue-200', toHslColor(withShift(secondary, { s: -10, l: 34 })));
-  root.style.setProperty('--brand-blue-300', toHslColor(withShift(secondary, { s: -4, l: 22 })));
-  root.style.setProperty('--brand-blue-400', toHslColor(withShift(secondary, { l: 12 })));
+  root.style.setProperty('--brand-blue-50', toHslColor(withShift(secondary, { s: -20, l: isDark ? 30 : 58 })));
+  root.style.setProperty('--brand-blue-100', toHslColor(withShift(secondary, { s: -16, l: isDark ? 25 : 46 })));
+  root.style.setProperty('--brand-blue-200', toHslColor(withShift(secondary, { s: -10, l: isDark ? 20 : 34 })));
+  root.style.setProperty('--brand-blue-300', toHslColor(withShift(secondary, { s: -4, l: isDark ? 15 : 22 })));
+  root.style.setProperty('--brand-blue-400', toHslColor(withShift(secondary, { l: isDark ? 10 : 12 })));
   root.style.setProperty('--brand-blue-500', toHslColor(withShift(secondary, { l: 6 })));
   root.style.setProperty('--brand-blue-600', toHslColor(withShift(secondary, { l: -2 })));
-  root.style.setProperty('--brand-red-100', toHslColor(withShift(primary, { s: -22, l: 46 })));
-  root.style.setProperty('--brand-red-200', toHslColor(withShift(primary, { s: -18, l: 36 })));
-  root.style.setProperty('--brand-red-300', toHslColor(withShift(primary, { s: -12, l: 24 })));
-  root.style.setProperty('--brand-red-400', toHslColor(withShift(primary, { s: -8, l: 12 })));
+  root.style.setProperty('--brand-red-100', toHslColor(withShift(primary, { s: -22, l: isDark ? 20 : 46 })));
+  root.style.setProperty('--brand-red-200', toHslColor(withShift(primary, { s: -18, l: isDark ? 15 : 36 })));
+  root.style.setProperty('--brand-red-300', toHslColor(withShift(primary, { s: -12, l: isDark ? 10 : 24 })));
+  root.style.setProperty('--brand-red-400', toHslColor(withShift(primary, { s: -8, l: isDark ? 5 : 12 })));
   root.style.setProperty('--brand-red-500', toHslColor(withShift(primary, { l: 4 })));
   root.style.setProperty('--brand-red-600', toHslColor(withShift(primary, { l: -6 })));
 
@@ -584,21 +591,26 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--topbar-bg-start', safeTheme.topbarGradientStart);
   root.style.setProperty('--topbar-bg-end', safeTheme.topbarGradientEnd);
   root.style.setProperty('--topbar-gradient-angle', `${safeTheme.topbarGradientAngle}deg`);
-  root.style.setProperty('--topbar-border', toHslColor(withShift(secondary, { s: -14, l: 38 })));
-  root.style.setProperty('--topbar-shadow', toHslaColor(withShift(secondary, { s: -8, l: -10 }), 0.52));
-  root.style.setProperty('--topbar-title', toHslColor(withShift(secondary, { l: 3 })));
-  root.style.setProperty('--topbar-subtitle', toHslColor(withShift(secondary, { s: -8, l: 24 })));
-  root.style.setProperty('--topbar-icon', toHslColor(withShift(accent, { s: -8, l: 8 })));
+  
+  // Adjusted for contrast
+  const topbarBg = rgbToHsl(hexToRgb(safeTheme.topbarGradientStart));
+  const isTopbarDark = topbarBg.l < 50;
+
+  root.style.setProperty('--topbar-border', toHslColor(withShift(topbarBg, { l: isTopbarDark ? 15 : 38 })));
+  root.style.setProperty('--topbar-shadow', toHslaColor(withShift(topbarBg, { l: isTopbarDark ? -5 : -10 }), 0.52));
+  root.style.setProperty('--topbar-title', toHslColor(isTopbarDark ? foreground : withShift(secondary, { l: 3 })));
+  root.style.setProperty('--topbar-subtitle', toHslColor(isTopbarDark ? withShift(foreground, { l: -20 }) : withShift(secondary, { l: 24 })));
+  root.style.setProperty('--topbar-icon', toHslColor(isTopbarDark ? accent : withShift(accent, { l: 8 })));
 
   root.style.setProperty('--sidebar-gradient-start', safeTheme.sidebarGradientStart);
   root.style.setProperty('--sidebar-gradient-mid', safeTheme.sidebarGradientMid);
   root.style.setProperty('--sidebar-gradient-end', safeTheme.sidebarGradientEnd);
   root.style.setProperty('--sidebar-gradient-angle', `${safeTheme.sidebarGradientAngle}deg`);
-  root.style.setProperty('--sidebar-glow-a', toHslaColor(withShift(secondary, { s: -12, l: 28 }), 0.27));
-  root.style.setProperty('--sidebar-glow-b', toHslaColor(withShift(primary, { s: -8, l: 22 }), 0.25));
-  root.style.setProperty('--sidebar-highlight', toHslColor(withShift(accent, { l: 26, s: -18 })));
-  root.style.setProperty('--sidebar-highlight-soft', toHslColor(withShift(accent, { l: 36, s: -24 })));
-  root.style.setProperty('--sidebar-avatar-mid', toHslColor(withShift(secondary, { l: 14 })));
+  root.style.setProperty('--sidebar-glow-a', toHslaColor(withShift(secondary, { s: -12, l: isDark ? 15 : 28 }), 0.27));
+  root.style.setProperty('--sidebar-glow-b', toHslaColor(withShift(primary, { s: -8, l: isDark ? 12 : 22 }), 0.25));
+  root.style.setProperty('--sidebar-highlight', toHslColor(withShift(accent, { l: isDark ? -10 : 26, s: -18 })));
+  root.style.setProperty('--sidebar-highlight-soft', toHslColor(withShift(accent, { l: isDark ? -5 : 36, s: -24 })));
+  root.style.setProperty('--sidebar-avatar-mid', toHslColor(withShift(secondary, { l: isDark ? 10 : 14 })));
 
   root.style.setProperty('--theme-overlay-start', safeTheme.overlayGradientStart);
   root.style.setProperty('--theme-overlay-mid', safeTheme.overlayGradientMid);
@@ -609,6 +621,7 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--chart-accent-b', toHslColor(withShift(primary, { l: 2 })));
   root.style.setProperty('--chart-accent-c', toHslColor(withShift(accent, { l: 0 })));
   root.style.setProperty('--chart-accent-d', toHslColor(withShift(primary, { h: 16, s: -5, l: 8 })));
-  root.style.setProperty('--chart-grid', toHslColor(withShift(border, { l: 8, s: -8 })));
+  root.style.setProperty('--chart-grid', toHslColor(withShift(border, { l: isDark ? -8 : 8, s: -8 })));
   root.style.setProperty('--chart-cursor', toHslColor(withShift(muted, { l: 2 })));
 };
+

@@ -115,45 +115,45 @@ const DocumentPage: React.FC = () => {
 
   const colorMap = {
     blue: {
-      border: 'border-blue-500', hoverBorder: 'hover:border-blue-300', ring: 'ring-blue-500/50',
-      bg: 'bg-blue-600', hoverBg: 'group-hover:bg-blue-100', text: 'text-blue-700',
-      lightBg: 'bg-blue-50', activeBgText: 'bg-blue-100 text-blue-700 border-blue-200',
-      overlay: 'bg-blue-50/30'
+      border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
+      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
+      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
+      overlay: 'bg-primary/5'
     },
     emerald: {
-      border: 'border-emerald-500', hoverBorder: 'hover:border-emerald-300', ring: 'ring-emerald-500/50',
-      bg: 'bg-emerald-600', hoverBg: 'group-hover:bg-emerald-100', text: 'text-emerald-700',
-      lightBg: 'bg-emerald-50', activeBgText: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-      overlay: 'bg-emerald-50/30'
+      border: 'border-emerald-500/40', hoverBorder: 'hover:border-emerald-500/60', ring: 'ring-emerald-500/40',
+      bg: 'bg-emerald-500', hoverBg: 'group-hover:bg-emerald-500/10', text: 'text-emerald-600',
+      lightBg: 'bg-emerald-500/10', activeBgText: 'bg-emerald-500/20 text-emerald-600 border-emerald-500/20',
+      overlay: 'bg-emerald-500/5'
     },
     indigo: {
-      border: 'border-indigo-500', hoverBorder: 'hover:border-indigo-300', ring: 'ring-indigo-500/50',
-      bg: 'bg-indigo-600', hoverBg: 'group-hover:bg-indigo-100', text: 'text-indigo-700',
-      lightBg: 'bg-indigo-50', activeBgText: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-      overlay: 'bg-indigo-50/30'
+      border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
+      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
+      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
+      overlay: 'bg-primary/5'
     },
     amber: {
-      border: 'border-amber-500', hoverBorder: 'hover:border-amber-300', ring: 'ring-amber-500/50',
-      bg: 'bg-amber-600', hoverBg: 'group-hover:bg-amber-100', text: 'text-amber-700',
-      lightBg: 'bg-amber-50', activeBgText: 'bg-amber-100 text-amber-700 border-amber-200',
-      overlay: 'bg-amber-50/30'
+      border: 'border-amber-500/40', hoverBorder: 'hover:border-amber-500/60', ring: 'ring-amber-500/40',
+      bg: 'bg-amber-500', hoverBg: 'group-hover:bg-amber-500/10', text: 'text-amber-600',
+      lightBg: 'bg-amber-500/10', activeBgText: 'bg-amber-500/20 text-amber-600 border-amber-500/20',
+      overlay: 'bg-amber-500/5'
     },
     orange: {
-      border: 'border-orange-500', hoverBorder: 'hover:border-orange-300', ring: 'ring-orange-500/50',
-      bg: 'bg-orange-600', hoverBg: 'group-hover:bg-orange-100', text: 'text-orange-700',
-      lightBg: 'bg-orange-50', activeBgText: 'bg-orange-100 text-orange-700 border-orange-200',
-      overlay: 'bg-orange-50/30'
+      border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
+      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
+      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
+      overlay: 'bg-primary/5'
     }
   } as const;
 
   return (
     <div className="docs-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner docs-header bg-gradient-to-r from-blue-50/80 via-background to-indigo-50/80">
+      <div className="page-header-banner docs-header bg-gradient-to-r from-primary/10 via-background to-primary/5">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><FileDown className="w-5 h-5 text-blue-600" /> Document & Reports Center</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><FileDown className="w-5 h-5 text-primary" /> Document & Reports Center</h1>
           <p className="text-sm text-muted-foreground mt-1">Securely access, manage, and upload official temple documents.</p>
         </div>
-        <Button onClick={() => setUploadModalOpen(true)} className="docs-cta shadow-md hover:shadow-lg bg-blue-600 hover:bg-blue-700 text-white"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
+        <Button onClick={() => setUploadModalOpen(true)} className="docs-cta shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
       </div>
 
       <div className="section-panel docs-main-panel shadow-sm">
@@ -274,8 +274,8 @@ const DocumentPage: React.FC = () => {
                   <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
                     {uploadedFiles.map((file, index) => (
                       <div key={index} className="docs-stage-item flex items-center gap-4 p-3.5 bg-muted/20 border border-border/40 rounded-xl hover:border-border transition-colors">
-                        <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center shrink-0 border border-red-100 shadow-sm">
-                          <FileText className="h-5 w-5 text-red-600" />
+                        <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0 border border-destructive/20 shadow-sm">
+                          <FileText className="h-5 w-5 text-destructive" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-2">
@@ -308,10 +308,10 @@ const DocumentPage: React.FC = () => {
                 </div>
               )}
 
-              <div className="info-panel docs-guidelines bg-amber-50/50 border-amber-200">
-                <div className="w-8 h-8 rounded-full bg-amber-100/80 flex items-center justify-center shrink-0 border border-amber-200"><AlertCircle className="h-4 w-4 text-amber-700" /></div>
-                <div className="text-xs text-amber-900/90 leading-relaxed space-y-1">
-                  <p className="font-semibold text-amber-900">Deployment Guidelines</p>
+              <div className="info-panel docs-guidelines bg-amber-500/10 border-amber-500/20">
+                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 border border-amber-500/20"><AlertCircle className="h-4 w-4 text-amber-600" /></div>
+                <div className="text-xs text-foreground/80 leading-relaxed space-y-1">
+                  <p className="font-semibold text-amber-600">Deployment Guidelines</p>
                   <p>• Only PDF format is currently accepted by the processor.</p>
                   <p>• Ensure payloads do not exceed 50MB limits to prevent timeouts.</p>
                   <p>• Verified artifacts automatically sync to the global CDN.</p>

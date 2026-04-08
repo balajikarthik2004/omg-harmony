@@ -294,7 +294,7 @@ const PoojaSevaPage: React.FC = () => {
 
   return (
     <div className="pooja-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in relative">
-      <div className="page-header-banner poojs-header bg-gradient-to-r from-pink-50/70 via-background to-amber-50/70">
+      <div className="page-header-banner poojs-header">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Flower2 className="w-5 h-5 text-pink-600" /> Pooja & Seva Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Configure pooja offerings, manage devotee bookings, assign priests, and issue digital Passes.</p>
@@ -303,25 +303,25 @@ const PoojaSevaPage: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
-        <div className="stat-card pooja-stat-card">
+        <div className="stat-card pooja-stat-card border-border/60">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground">Total Bookings</p>
           <p className="text-2xl font-bold mt-1 text-foreground">{totals.total}</p>
         </div>
-        <div className="stat-card pooja-stat-card">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800">Confirmed Slots</p>
-          <p className="text-2xl font-bold mt-1 text-emerald-700">{totals.confirmed}</p>
+        <div className="stat-card pooja-stat-card border-emerald-500/20 bg-emerald-500/5">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-600">Confirmed Slots</p>
+          <p className="text-2xl font-bold mt-1 text-emerald-600">{totals.confirmed}</p>
         </div>
-        <div className="stat-card pooja-stat-card">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-800">Paid Receipts</p>
-          <p className="text-2xl font-bold mt-1 text-blue-700">{totals.paid}</p>
+        <div className="stat-card pooja-stat-card border-blue-500/20 bg-blue-500/5">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-blue-600">Paid Receipts</p>
+          <p className="text-2xl font-bold mt-1 text-blue-600">{totals.paid}</p>
         </div>
-        <div className="stat-card pooja-stat-card">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-800">Pending Approvals</p>
+        <div className="stat-card pooja-stat-card border-amber-500/20 bg-amber-500/5">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-amber-600">Pending Approvals</p>
           <p className="text-2xl font-bold mt-1 text-amber-600">{totals.pending}</p>
         </div>
-        <div className="stat-card pooja-stat-card md:col-span-3 xl:col-span-1">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-800">Completed Poojas</p>
-          <p className="text-2xl font-bold mt-1 text-emerald-700">{totals.completed}</p>
+        <div className="stat-card pooja-stat-card md:col-span-3 xl:col-span-1 border-emerald-500/20 bg-emerald-500/5">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-600">Completed Poojas</p>
+          <p className="text-2xl font-bold mt-1 text-emerald-600">{totals.completed}</p>
         </div>
       </div>
 
@@ -470,7 +470,7 @@ const PoojaSevaPage: React.FC = () => {
                       </td>
                       <td className="p-4 text-right align-top">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => setReceiptItem(item)} className="text-amber-600 hover:bg-amber-50 hover:text-amber-700" title="Generate E-Seva Pass"><ReceiptText className="h-4 w-4" /></Button>
+                          <Button variant="ghost" size="icon" onClick={() => setReceiptItem(item)} className="text-amber-600 hover:bg-amber-500/10 hover:text-amber-700" title="Generate E-Seva Pass"><ReceiptText className="h-4 w-4" /></Button>
                           <Button variant="ghost" size="icon" onClick={() => openEdit(item)} title="Edit Booking"><Pencil className="h-4 w-4 text-foreground" /></Button>
                           <Button variant="ghost" size="icon" onClick={() => setDeleteId(item.id)} className="hover:text-destructive hover:bg-destructive/10" title="Delete Booking"><Trash2 className="h-4 w-4 text-destructive" /></Button>
                         </div>
@@ -486,7 +486,7 @@ const PoojaSevaPage: React.FC = () => {
         {/* Sidebar Info */}
         <div className="space-y-4 xl:sticky xl:top-4 self-start">
           <div className="section-panel pooja-side-panel shadow-sm">
-            <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-sky-50/50 to-background">
+            <div className="section-panel-header px-4 py-3 border-b border-border/60">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Flower2 className="w-4 h-4 text-primary" /> Pooja & Seva Offerings</h2>
               <span className="text-[10px] py-0.5 px-2 bg-primary/10 text-primary rounded-full font-bold">{eventPoojaCatalog.length} derived</span>
             </div>
@@ -495,7 +495,7 @@ const PoojaSevaPage: React.FC = () => {
                 <div key={item.name} className="pooja-catalog-item rounded-lg border border-border/60 p-3 bg-background shadow-sm hover:border-primary/30 transition-colors">
                   <div className="flex items-center justify-between mb-1">
                     <p className="font-bold text-sm text-foreground truncate max-w-[150px]" title={item.name}>{item.name}</p>
-                    <span className="text-[11px] font-bold bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded border border-emerald-100">{money(item.amount)}</span>
+                    <span className="text-[11px] font-bold bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded border border-emerald-500/20">{money(item.amount)}</span>
                   </div>
                   <p className="text-[10px] font-semibold text-primary uppercase tracking-wide">{item.category} <span className="text-muted-foreground font-medium lowercase">({item.duration})</span></p>
                 </div>
@@ -504,7 +504,7 @@ const PoojaSevaPage: React.FC = () => {
           </div>
 
           <div className="section-panel pooja-side-panel shadow-sm">
-            <div className="section-panel-header px-4 py-3 border-b border-border/60 bg-gradient-to-b from-amber-50/50 to-background">
+            <div className="section-panel-header px-4 py-3 border-b border-border/60">
               <h2 className="text-sm font-semibold flex items-center gap-2"><UserCog className="w-4 h-4 text-primary" /> Priest Duty Pool</h2>
             </div>
             <div className="p-3 space-y-1.5 max-h-[300px] overflow-y-auto">
@@ -562,7 +562,7 @@ const PoojaSevaPage: React.FC = () => {
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-foreground">Assign Purohit (Priest)</label>
-                {!editId && <span className="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold border border-amber-100">Assigned during check-in</span>}
+                {!editId && <span className="text-[10px] bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded font-bold border border-amber-500/20">Assigned during check-in</span>}
               </div>
               <select 
                 className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-sm font-semibold disabled:opacity-60 disabled:cursor-not-allowed" 
@@ -661,7 +661,7 @@ const PoojaSevaPage: React.FC = () => {
 
               <div className="mt-6 pt-5 border-t-2 border-dashed border-border/80 flex justify-between items-center relative z-10">
                 <p className="text-[12px] uppercase tracking-widest font-extrabold text-foreground">Total Paid Amount</p>
-                <p className="text-2xl font-black font-display text-emerald-700 bg-emerald-50 px-4 py-1.5 rounded-lg border border-emerald-200">{money(getPoojaDetails(receiptItem.poojaType, poojaCatalog)?.amount || 0)}</p>
+                <p className="text-2xl font-black font-display text-emerald-600 bg-emerald-500/10 px-4 py-1.5 rounded-lg border border-emerald-500/20">{money(getPoojaDetails(receiptItem.poojaType, poojaCatalog)?.amount || 0)}</p>
               </div>
             </div>
             <div className="flex gap-3 pt-2">

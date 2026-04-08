@@ -78,7 +78,7 @@ const hallUtilization = [
     { name: 'Bhojan Shala', value: 60 }, { name: 'Open Space', value: 30 },
 ];
 
-const COLORS = ['#293088', '#4F58CA', '#767DD6', '#E22E26'];
+const COLORS = ['var(--primary)', 'hsl(var(--primary) / 0.8)', 'hsl(var(--primary) / 0.6)', 'hsl(var(--destructive) / 0.8)'];
 
 type BookingReceipt = {
     id: string;
@@ -101,28 +101,28 @@ type BookingReceipt = {
 type BookingItem = (typeof initialBookings)[number];
 
 // Unified button class: black text default → red bg + white text on hover
-const BTN = "bg-white text-foreground border border-border font-bold transition-all duration-200 hover:bg-[#E22E26] hover:text-white hover:border-[#E22E26] active:scale-[0.98]";
+const BTN = "bg-primary/5 text-foreground border border-border/60 font-bold transition-all duration-200 hover:bg-primary hover:text-primary-foreground hover:border-primary active:scale-[0.98]";
 
 const KPIChart = ({ data }) => (
     <ResponsiveContainer width="100%" height={200}>
         <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-            <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-            <Line type="monotone" dataKey="amount" stroke="#293088" strokeWidth={3} dot={{ r: 4, fill: '#293088' }} activeDot={{ r: 6 }} />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+            <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+            <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', backgroundColor: 'hsl(var(--card))', color: 'hsl(var(--foreground))' }} />
+            <Line type="monotone" dataKey="amount" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--primary))' }} activeDot={{ r: 6 }} />
         </LineChart>
     </ResponsiveContainer>
 );
 
 const StatusBadge = ({ status }) => {
     const map = {
-        Confirmed: 'bg-emerald-100 text-emerald-700',
-        Pending: 'bg-amber-100 text-amber-700',
-        Locked: 'bg-slate-100 text-slate-700',
+        Confirmed: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25',
+        Pending: 'bg-amber-500/15 text-amber-400 border border-amber-500/25',
+        Locked: 'bg-muted text-muted-foreground border border-border',
     };
     return (
-        <Badge className={`${map[status] || 'bg-gray-100 text-gray-700'} border-none px-3 font-bold uppercase text-[9px]`}>
+        <Badge className={`${map[status] || 'bg-muted text-muted-foreground border border-border'} border-none px-3 font-bold uppercase text-[9px]`}>
             {status}
         </Badge>
     );
@@ -449,7 +449,7 @@ const HallBookingPage = () => {
                             { value: 'revenue', label: 'revenue' },
                         ].map(tab => (
                             <TabsTrigger key={tab.value} value={tab.value}
-                                className="data-[state=active]:bg-white data-[state=active]:text-[#293088] data-[state=active]:shadow-md rounded-lg px-3 md:px-5 font-bold transition-all text-[11px] md:text-sm capitalize">
+                                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md rounded-lg px-3 md:px-5 font-bold transition-all text-[11px] md:text-sm capitalize">
                                 {tab.label}
                             </TabsTrigger>
                         ))}
@@ -463,10 +463,10 @@ const HallBookingPage = () => {
                     {/* KPI Cards */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                         {[
-                            { label: 'Total Revenue (MTD)', value: `₹${stats.totalRevenue.toLocaleString()}`, icon: IndianRupee, color: 'text-[#293088]', bg: 'bg-[#EBECF9]', trend: '+12% from last month' },
-                            { label: 'Confirmed Bookings', value: stats.confirmedBookings.toString(), icon: Calendar, color: 'text-[#E22E26]', bg: 'bg-[#F9D6D4]', trend: 'Scheduled this cycle' },
-                            { label: 'Active Halls', value: stats.activeHalls.toString(), icon: Building2, color: 'text-[#4F58CA]', bg: 'bg-[#EBECF9]', trend: 'Active across premises' },
-                            { label: 'Avg. Utilization', value: `${stats.avgUtilization}%`, icon: LayoutDashboard, color: 'text-[#293088]', bg: 'bg-[#EBECF9]', trend: '+5% higher than prev.' },
+                            { label: 'Total Revenue (MTD)', value: `₹${stats.totalRevenue.toLocaleString()}`, icon: IndianRupee, color: 'text-primary', bg: 'bg-primary/10', trend: '+12% from last month' },
+                            { label: 'Confirmed Bookings', value: stats.confirmedBookings.toString(), icon: Calendar, color: 'text-destructive', bg: 'bg-destructive/10', trend: 'Scheduled this cycle' },
+                            { label: 'Active Halls', value: stats.activeHalls.toString(), icon: Building2, color: 'text-primary', bg: 'bg-primary/10', trend: 'Active across premises' },
+                            { label: 'Avg. Utilization', value: `${stats.avgUtilization}%`, icon: LayoutDashboard, color: 'text-primary', bg: 'bg-primary/10', trend: '+5% higher than prev.' },
                         ].map((kpi, i) => (
                             <Card key={i} className="border shadow-sm hover:shadow-md transition-all">
                                 <CardContent className="p-3 md:p-5">
@@ -480,7 +480,7 @@ const HallBookingPage = () => {
                                         </div>
                                     </div>
                                     <p className="mt-2 text-[9px] md:text-[10px] font-semibold text-muted-foreground">
-                                        <span className="text-emerald-600 mr-1">↑</span>{kpi.trend}
+                                        <span className="text-emerald-500 mr-1">↑</span>{kpi.trend}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -492,7 +492,7 @@ const HallBookingPage = () => {
                         <Card className="lg:col-span-2 border shadow-sm overflow-hidden">
                             <CardHeader className="p-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                                 <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-[#293088]" />
+                                    <Clock className="w-4 h-4 text-primary" />
                                     <CardTitle className="text-sm md:text-base font-bold">All Bookings ({bookingsList.length})</CardTitle>
                                 </div>
                                 <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -520,8 +520,8 @@ const HallBookingPage = () => {
                                     </TableHeader>
                                     <TableBody>
                                         {filteredBookings.length > 0 ? filteredBookings.map((booking) => (
-                                            <TableRow key={booking.id} className={`hover:bg-muted/10 transition-colors border-border/40 ${booking.id === newBookingId ? 'bg-emerald-50' : ''}`}>
-                                                <TableCell className="font-bold text-[#293088] text-xs font-mono py-3">{booking.id}</TableCell>
+                                            <TableRow key={booking.id} className={`hover:bg-muted/10 transition-colors border-border/40 ${booking.id === newBookingId ? 'bg-emerald-500/10' : ''}`}>
+                                                <TableCell className="font-bold text-primary text-xs font-mono py-3">{booking.id}</TableCell>
                                                 <TableCell className="py-3">
                                                     <div>
                                                         <p className="font-bold text-xs md:text-sm">{booking.devotee}</p>
@@ -561,7 +561,7 @@ const HallBookingPage = () => {
                                                             <Edit className="w-3 h-3" />
                                                         </Button>
                                                         <Button size="icon"
-                                                            className="h-6 w-6 rounded-md bg-white text-foreground border border-border font-bold hover:bg-[#E22E26] hover:text-white hover:border-[#E22E26] transition-all"
+                                                            className="h-6 w-6 rounded-md bg-background text-foreground border border-border font-bold hover:bg-destructive hover:text-white transition-all"
                                                             onClick={() => setDeleteConfirmId(booking.id)}
                                                             title="Delete booking">
                                                             <Trash2 className="w-3 h-3" />
@@ -586,7 +586,7 @@ const HallBookingPage = () => {
                             <Card className="border shadow-sm">
                                 <CardHeader className="p-4 pb-3 border-b">
                                     <div className="flex items-center gap-2">
-                                        <ClipboardCheck className="w-4 h-4 text-[#293088]" />
+                                        <ClipboardCheck className="w-4 h-4 text-primary" />
                                         <CardTitle className="text-sm font-bold">Operational Status</CardTitle>
                                     </div>
                                 </CardHeader>
@@ -600,7 +600,7 @@ const HallBookingPage = () => {
                                         <div key={i} className="space-y-1.5">
                                             <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider">
                                                 <span>{stat.hall}</span>
-                                                <span className={stat.progress === 100 ? "text-emerald-600" : "text-muted-foreground"}>{stat.status}</span>
+                                                <span className={stat.progress === 100 ? "text-emerald-500" : "text-muted-foreground"}>{stat.status}</span>
                                             </div>
                                             <Progress value={stat.progress} className="h-1.5" />
                                         </div>
@@ -608,14 +608,14 @@ const HallBookingPage = () => {
                                 </CardContent>
                             </Card>
 
-                            <Card className="border bg-indigo-50 border-indigo-100 p-4 md:p-5 relative overflow-hidden">
+                            <Card className="border bg-primary/10 border-primary/20 p-4 md:p-5 relative overflow-hidden">
                                 <div className="relative z-10 space-y-3">
-                                    <div className="w-10 h-10 rounded-full bg-[#293088]/10 flex items-center justify-center">
-                                        <Sparkles className="w-5 h-5 text-[#293088]" />
+                                    <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                                        <Sparkles className="w-5 h-5 text-primary" />
                                     </div>
                                     <div>
-                                        <h4 className="font-bold text-base text-[#293088]">Surge Pricing Active</h4>
-                                        <p className="text-[#293088]/70 text-xs mt-1 font-medium leading-relaxed">Navratri festival surge (20%) is applied to all bookings Apr 6 – Apr 15.</p>
+                                        <h4 className="font-bold text-base text-foreground">Surge Pricing Active</h4>
+                                        <p className="text-muted-foreground text-xs mt-1 font-medium leading-relaxed">Navratri festival surge (20%) is applied to all bookings Apr 6 – Apr 15.</p>
                                     </div>
                                     <button className={`${BTN} w-full justify-center flex items-center gap-2 text-xs h-9 rounded-lg px-4 border`}>
                                         Manage Pricing Rules <ArrowRight className="w-3.5 h-3.5" />
@@ -634,7 +634,7 @@ const HallBookingPage = () => {
                         <CardHeader className="p-4 md:p-6 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <CardTitle className="text-base md:text-xl font-bold flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-full bg-[#293088]/10 flex items-center justify-center text-[#293088] text-sm font-bold">
+                                    <div className="w-7 h-7 rounded-full bg-primary/15 flex items-center justify-center text-primary text-sm font-bold">
                                         {bookingStep}
                                     </div>
                                     New Hall Booking Wizard
@@ -648,7 +648,7 @@ const HallBookingPage = () => {
                             </div>
                             <div className="flex gap-1.5 min-w-[160px] sm:min-w-[200px]">
                                 {[1, 2, 3, 4].map(s => (
-                                    <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 cursor-pointer ${s <= bookingStep ? 'bg-[#293088]' : 'bg-muted'}`}
+                                    <div key={s} className={`h-1.5 flex-1 rounded-full transition-all duration-500 cursor-pointer ${s <= bookingStep ? 'bg-primary' : 'bg-muted'}`}
                                         onClick={() => s < bookingStep && setBookingStep(s)} />
                                 ))}
                             </div>
@@ -683,7 +683,7 @@ const HallBookingPage = () => {
                                         </div>
                                         <Button className={`${BTN} w-full h-10 text-xs`}>Check Availability</Button>
                                         {selectedHall && (
-                                            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-700">
+                                            <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs font-medium text-emerald-500">
                                                 <CheckCircle2 className="w-4 h-4 inline mr-1" />
                                                 Selected: <strong>{selectedHall.name}</strong>
                                             </div>
@@ -691,13 +691,13 @@ const HallBookingPage = () => {
                                     </div>
                                     <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {hallsList.map(hall => (
-                                            <div key={hall.id} className={`group border rounded-2xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md bg-white flex flex-col ${selectedHallId === hall.id ? 'border-[#293088] ring-1 ring-[#293088]/30' : 'border-border hover:border-[#293088]/40'}`}>
+                                            <div key={hall.id} className={`group border rounded-2xl overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md bg-card flex flex-col ${selectedHallId === hall.id ? 'border-primary ring-1 ring-primary/30' : 'border-border hover:border-primary/40'}`}>
                                                 <div className="h-32 md:h-36 overflow-hidden relative">
                                                     <img src={hall.image} alt={hall.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                                                     <div className="absolute top-2 right-2 flex flex-col items-end gap-1.5">
-                                                        <Badge className="bg-white/90 text-[#293088] border-none font-bold shadow text-[10px]">₹{hall.basePrice.toLocaleString()}</Badge>
+                                                        <Badge className="bg-background/90 text-primary border-none font-bold shadow text-[10px]">₹{hall.basePrice.toLocaleString()}</Badge>
                                                         {selectedHallId === hall.id && (
-                                                            <div className="bg-[#293088] text-white p-1 rounded-full shadow">
+                                                            <div className="bg-primary text-primary-foreground p-1 rounded-full shadow">
                                                                 <CheckCircle2 className="w-4 h-4" />
                                                             </div>
                                                         )}
@@ -705,19 +705,16 @@ const HallBookingPage = () => {
                                                 </div>
                                                 <div className="p-4 space-y-3 flex-1 flex flex-col">
                                                     <div className="flex-1">
-                                                        <h4 className="font-bold text-sm text-foreground group-hover:text-[#293088] transition-colors">{hall.name}</h4>
-                                                        <p className="text-[9px] text-[#293088]/60 font-bold uppercase tracking-widest mt-1">{hall.tagline}</p>
-                                                        <p className="text-[10px] text-muted-foreground font-semibold flex items-center gap-1 mt-1">
-                                                            <Users className="w-3 h-3" /> {hall.capacity.toLocaleString()} Guests
-                                                        </p>
+                                                        <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors">{hall.name}</h4>
+                                                        <p className="text-[9px] text-primary/60 font-bold uppercase tracking-widest mt-1">{hall.tagline}</p>
+                                                        <div className="flex flex-wrap gap-1 pt-2 border-t border-border/50">
+                                                            {hall.facilities.slice(0, 3).map(f => (
+                                                                <span key={f} className="text-[9px] bg-muted/50 px-2 py-0.5 rounded-full font-bold text-muted-foreground uppercase">{f}</span>
+                                                            ))}
+                                                            {hall.facilities.length > 3 && <span className="text-[9px] text-primary font-bold">+{hall.facilities.length - 3}</span>}
+                                                        </div>
                                                     </div>
-                                                    <div className="flex flex-wrap gap-1 pt-2 border-t border-border/50">
-                                                        {hall.facilities.slice(0, 3).map(f => (
-                                                            <span key={f} className="text-[9px] bg-muted/50 px-2 py-0.5 rounded-full font-bold text-muted-foreground uppercase">{f}</span>
-                                                        ))}
-                                                        {hall.facilities.length > 3 && <span className="text-[9px] text-[#293088] font-bold">+{hall.facilities.length - 3}</span>}
-                                                    </div>
-                                                    <Button className={`w-full mt-2 font-bold h-9 text-xs transition-all border-2 ${selectedHallId === hall.id ? 'bg-[#293088] text-white border-[#293088]' : `${BTN}`}`}
+                                                    <Button className={`w-full mt-2 font-bold h-9 text-xs transition-all border-2 ${selectedHallId === hall.id ? 'bg-primary text-primary-foreground border-primary' : `${BTN}`}`}
                                                         onClick={() => { setSelectedHallId(hall.id); setBookingStep(2); }}>
                                                         {selectedHallId === hall.id ? "✓ Selected" : "Select Space"}
                                                     </Button>
@@ -732,7 +729,7 @@ const HallBookingPage = () => {
                             {bookingStep === 2 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 max-w-4xl mx-auto">
                                     <div className="space-y-5">
-                                        <h3 className="font-bold text-base flex items-center gap-2 text-[#293088] border-b pb-2">
+                                        <h3 className="font-bold text-base flex items-center gap-2 text-primary border-b border-border/60 pb-2">
                                             <Users className="w-4 h-4" /> Devotee Information
                                         </h3>
                                         <div className="grid grid-cols-2 gap-3">
@@ -789,7 +786,7 @@ const HallBookingPage = () => {
                                                 value={bookingFormData.guests}
                                                 onChange={(e) => setBookingFormData(p => ({ ...p, guests: e.target.value }))} />
                                             {selectedHall && bookingFormData.guests && parseInt(bookingFormData.guests) > selectedHall.capacity && (
-                                                <p className="text-[10px] text-red-500 font-medium flex items-center gap-1">
+                                                <p className="text-[10px] text-destructive font-medium flex items-center gap-1">
                                                     <AlertCircle className="w-3 h-3" /> Exceeds hall capacity of {selectedHall.capacity.toLocaleString()}
                                                 </p>
                                             )}
@@ -802,7 +799,7 @@ const HallBookingPage = () => {
                                         </div>
                                     </div>
                                     {!bookingFormData.firstName && (
-                                        <div className="md:col-span-2 flex items-center gap-2 text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                        <div className="md:col-span-2 flex items-center gap-2 text-amber-600 bg-amber-500/10 border border-amber-500/20 rounded-lg p-3">
                                             <AlertCircle className="w-4 h-4 shrink-0" />
                                             <p className="text-xs font-medium">Please enter at least the first name to proceed.</p>
                                         </div>
@@ -820,14 +817,14 @@ const HallBookingPage = () => {
                                         {ADDONS.map((addon) => {
                                             const active = selectedAddonIds.includes(addon.id);
                                             return (
-                                                <label key={addon.id} className={`flex items-start gap-3 p-4 rounded-2xl border transition-all cursor-pointer bg-white ${active ? 'border-[#293088] bg-[#293088]/5 ring-1 ring-[#293088]/10' : 'border-border shadow-sm hover:border-[#293088]/40'}`}>
-                                                    <Checkbox className="mt-0.5 w-5 h-5 rounded-md data-[state=checked]:bg-[#293088] data-[state=checked]:border-[#293088]"
+                                                 <label key={addon.id} className={`flex items-start gap-3 p-4 rounded-2xl border transition-all cursor-pointer bg-background ${active ? 'border-primary bg-primary/5 ring-1 ring-primary/10' : 'border-border shadow-sm hover:border-primary/40'}`}>
+                                                    <Checkbox className="mt-0.5 w-5 h-5 rounded-md data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                                                         checked={active}
                                                         onCheckedChange={() => setSelectedAddonIds(prev => active ? prev.filter(id => id !== addon.id) : [...prev, addon.id])} />
                                                     <div className="flex-1 space-y-1">
                                                         <div className="flex justify-between items-center">
-                                                            <span className={`font-bold text-xs ${active ? 'text-[#293088]' : 'text-foreground'}`}>{addon.title}</span>
-                                                            <span className="text-[10px] font-bold text-[#293088]">₹{addon.price.toLocaleString()}</span>
+                                                            <span className={`font-bold text-xs ${active ? 'text-primary' : 'text-foreground'}`}>{addon.title}</span>
+                                                            <span className="text-[10px] font-bold text-primary">₹{addon.price.toLocaleString()}</span>
                                                         </div>
                                                         <p className="text-[10px] font-medium text-muted-foreground leading-relaxed">{addon.desc}</p>
                                                     </div>
@@ -857,10 +854,6 @@ const HallBookingPage = () => {
                                 <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                                     <div className="space-y-6">
                                         <div className="border-b pb-4">
-                                            <h3 className="font-bold text-lg text-[#293088]">Booking Summary</h3>
-                                            <p className="text-xs text-muted-foreground mt-1">Review all details before confirming.</p>
-                                        </div>
-                                        <div className="space-y-3">
                                             {[
                                                 { label: 'Devotee', value: `${bookingFormData.firstName} ${bookingFormData.lastName}`.trim() || '(Name TBD)' },
                                                 { label: 'Venue', value: selectedHall?.name || 'No Hall Selected' },
@@ -868,58 +861,52 @@ const HallBookingPage = () => {
                                                 { label: 'Guests', value: bookingFormData.guests ? `${parseInt(bookingFormData.guests).toLocaleString()} people` : 'Not specified' },
                                                 { label: 'Mobile', value: bookingFormData.phone || 'Not provided' },
                                             ].map(({ label, value }) => (
-                                                <div key={label} className="flex justify-between items-center p-3 bg-white rounded-xl border border-border/70 hover:bg-[#E22E26] hover:text-white hover:border-[#E22E26] group transition-all cursor-default">
-                                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide group-hover:text-white/80">{label}</span>
-                                                    <span className="text-sm font-bold text-foreground group-hover:text-white">{value}</span>
+                                                <div key={label} className="flex justify-between items-center p-3 bg-card rounded-xl border border-border/70 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive group transition-all cursor-default text-card-foreground">
+                                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide group-hover:text-destructive-foreground/80">{label}</span>
+                                                    <span className="text-sm font-bold group-hover:text-destructive-foreground">{value}</span>
                                                 </div>
                                             ))}
-                                            <div className="flex justify-between items-center p-3 bg-white rounded-xl border border-border/70 hover:bg-[#E22E26] hover:text-white hover:border-[#E22E26] group transition-all cursor-default">
-                                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide group-hover:text-white/80">Event Purpose</span>
-                                                <Badge className="bg-[#293088] text-white font-bold text-[10px] uppercase group-hover:bg-white group-hover:text-[#293088] transition-all">
+                                            <div className="flex justify-between items-center p-3 bg-card rounded-xl border border-border/70 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive group transition-all cursor-default text-card-foreground">
+                                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide group-hover:text-destructive-foreground/80">Event Purpose</span>
+                                                <Badge className="bg-primary text-primary-foreground font-bold text-[10px] uppercase group-hover:bg-background group-hover:text-primary transition-all">
                                                     {bookingFormData.category}
                                                 </Badge>
                                             </div>
                                         </div>
-                                        <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3">
+                                        <div className="flex items-start gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl p-3">
                                             <AlertCircle className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-                                            <p className="text-[10px] font-medium text-amber-900 leading-relaxed">
+                                            <p className="text-[10px] font-medium text-amber-900 dark:text-amber-200 leading-relaxed">
                                                 <strong>Notice:</strong> Hall booking requires 50% advance payment. Balance due 2 days before the event date.
                                             </p>
                                         </div>
                                     </div>
-
-                                    <div className="space-y-5">
-                                        <h3 className="font-bold text-base text-[#E22E26] border-b pb-2">Payment Ledger</h3>
-                                        <Card className="border shadow-md overflow-hidden">
-                                            <CardContent className="p-0">
-                                                <div className="p-5 space-y-3">
-                                                    {[
-                                                        { label: 'Standard Hall Rental', value: calculateSummary().basePrice, color: '' },
-                                                        { label: `Festival Surge (20%)`, value: calculateSummary().surge, color: 'text-[#E22E26]' },
-                                                        { label: `Selected Add-ons (${selectedAddonIds.length})`, value: calculateSummary().addOnsPrice, color: '' },
-                                                    ].map(({ label, value, color }) => (
-                                                        <div key={label} className="flex justify-between text-xs">
-                                                            <span className={`font-semibold text-muted-foreground uppercase tracking-wide text-[10px] ${color}`}>{label}</span>
-                                                            <span className={`font-bold ${color}`}>₹{value.toLocaleString()}</span>
-                                                        </div>
-                                                    ))}
-                                                    <hr className="border-dashed border-muted-foreground/30 my-2" />
-                                                    <div className="flex justify-between text-base font-bold bg-muted/40 -mx-5 px-5 py-3 border-y border-muted-foreground/5">
-                                                        <span className="text-[#293088] uppercase tracking-widest text-xs">Total Amount</span>
-                                                        <span>₹{calculateSummary().total.toLocaleString()}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm font-bold text-emerald-600 pt-2">
-                                                        <span className="flex items-center gap-1.5 uppercase tracking-wider text-xs">
-                                                            <CheckCircle2 className="w-4 h-4" /> Advance (50%)
-                                                        </span>
-                                                        <span>₹{calculateSummary().advance.toLocaleString()}</span>
-                                                    </div>
+                                    <div className="bg-muted/20 rounded-2xl overflow-hidden border border-border">
+                                        <div className="p-5 space-y-3">
+                                            {[
+                                                { label: 'Standard Hall Rental', value: calculateSummary().basePrice, color: '' },
+                                                { label: `Festival Surge (20%)`, value: calculateSummary().surge, color: 'text-destructive' },
+                                                { label: `Selected Add-ons (${selectedAddonIds.length})`, value: calculateSummary().addOnsPrice, color: '' },
+                                            ].map(({ label, value, color }) => (
+                                                <div key={label} className="flex justify-between text-xs">
+                                                    <span className={`font-semibold text-muted-foreground uppercase tracking-wide text-[10px] ${color}`}>{label}</span>
+                                                    <span className={`font-bold ${color}`}>₹{value.toLocaleString()}</span>
                                                 </div>
-                                                <div className="bg-[#293088] text-white p-2.5 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest">
-                                                    <Receipt className="w-3.5 h-3.5" /> Receipt will be auto-generated
-                                                </div>
-                                            </CardContent>
-                                        </Card>
+                                            ))}
+                                            <hr className="border-dashed border-muted-foreground/30 my-2" />
+                                            <div className="flex justify-between text-base font-bold bg-muted/40 -mx-5 px-5 py-3 border-y border-muted-foreground/5">
+                                                <span className="text-primary uppercase tracking-widest text-xs">Total Amount</span>
+                                                <span>₹{calculateSummary().total.toLocaleString()}</span>
+                                            </div>
+                                            <div className="flex justify-between text-sm font-bold text-emerald-600 pt-2">
+                                                <span className="flex items-center gap-1.5 uppercase tracking-wider text-xs">
+                                                    <CheckCircle2 className="w-4 h-4" /> Advance (50%)
+                                                </span>
+                                                <span>₹{calculateSummary().advance.toLocaleString()}</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-[#293088] text-white p-2.5 flex items-center justify-center gap-2 font-bold text-[10px] uppercase tracking-widest">
+                                            <Receipt className="w-3.5 h-3.5" /> Receipt will be auto-generated
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -1027,12 +1014,12 @@ const HallBookingPage = () => {
                                                 <div key={i} className={`border-r border-b border-border/40 p-1.5 min-h-[80px] md:min-h-[95px] transition-colors hover:bg-muted/10 ${!isCurrentMonth ? 'opacity-30 bg-muted/5' : ''}`}>
                                                     {isCurrentMonth && (
                                                         <>
-                                                            <span className={`text-[10px] md:text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full ${isToday ? 'bg-[#E22E26] text-white' : 'text-foreground'}`}>{day}</span>
+                                                            <span className={`text-[10px] md:text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full ${isToday ? 'bg-destructive text-destructive-foreground' : 'text-foreground'}`}>{day}</span>
                                                             <div className="mt-1 space-y-0.5">
                                                                 {events.slice(0, 2).map(ev => (
                                                                     <button key={ev.id} type="button"
                                                                         onClick={() => handleCalendarBookingClick(ev)}
-                                                                        className={`w-full text-left text-[7px] md:text-[8px] text-white p-0.5 md:p-1 rounded font-bold truncate shadow-sm transition-opacity hover:opacity-90 ${ev.status === 'Confirmed' ? 'bg-[#293088]/90' : ev.status === 'Pending' ? 'bg-amber-500/90' : 'bg-slate-500/90'}`}>
+                                                                        className={`w-full text-left text-[7px] md:text-[8px] text-white p-0.5 md:p-1 rounded font-bold truncate shadow-sm transition-opacity hover:opacity-90 ${ev.status === 'Confirmed' ? 'bg-primary/90' : ev.status === 'Pending' ? 'bg-amber-500/90' : 'bg-muted-foreground/90'}`}>
                                                                         {ev.devotee.split(' ')[0]}: {ev.event}
                                                                     </button>
                                                                 ))}
@@ -1055,9 +1042,8 @@ const HallBookingPage = () => {
                                 </CardHeader>
                                 <CardContent className="p-4 space-y-3">
                                     {[
-                                        { label: 'Confirmed Booking', color: 'bg-[#293088]' },
+                                        { label: 'Confirmed Booking', color: 'bg-primary' },
                                         { label: 'Pending Payment', color: 'bg-amber-500' },
-                                        { label: 'Internal Event', color: 'bg-[#E22E26]' },
                                         { label: 'Locked/Processing', color: 'bg-slate-500' },
                                     ].map((item, i) => (
                                         <div key={i} className="flex items-center gap-3">
@@ -1167,8 +1153,8 @@ const HallBookingPage = () => {
                                             {['Air Conditioning', 'Audio System', 'Kitchen Access', 'Extra Seating', 'Stage Lighting', 'Basement Parking'].map(f => {
                                                 const checked = newHallData.facilities.includes(f);
                                                 return (
-                                                    <label key={f} className="flex items-center gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-[#E22E26] hover:text-white transition-all">
-                                                        <Checkbox className="bg-white data-[state=checked]:bg-[#293088] h-4 w-4 rounded"
+                                                    <label key={f} className="flex items-center gap-2 cursor-pointer group p-1.5 rounded-lg hover:bg-destructive hover:text-destructive-foreground transition-all">
+                                                        <Checkbox className="bg-background data-[state=checked]:bg-primary h-4 w-4 rounded"
                                                             checked={checked}
                                                             onCheckedChange={() => setNewHallData(p => ({ ...p, facilities: checked ? p.facilities.filter(x => x !== f) : [...p.facilities, f] }))} />
                                                         <span className="text-[10px] font-semibold">{f}</span>
@@ -1196,11 +1182,11 @@ const HallBookingPage = () => {
                                     <img src={hall.image} alt={hall.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex flex-col justify-end p-3">
                                         <h4 className="text-white font-bold text-sm leading-tight">{hall.name}</h4>
-                                        <p className="text-[8px] font-bold tracking-[0.15em] uppercase mt-1 bg-white/90 text-[#293088] w-fit px-2 py-0.5 rounded">{hall.tagline}</p>
+                                        <p className="text-[8px] font-bold tracking-[0.15em] uppercase mt-1 bg-background/90 text-primary w-fit px-2 py-0.5 rounded">{hall.tagline}</p>
                                     </div>
-                                    <Badge className="absolute top-3 left-3 bg-white/95 text-[#293088] border-none font-bold text-[9px] h-5 shadow">ID: {hall.id}</Badge>
+                                    <Badge className="absolute top-3 left-3 bg-background/95 text-primary border-none font-bold text-[9px] h-5 shadow">ID: {hall.id}</Badge>
                                     <Button size="icon" variant="ghost"
-                                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all bg-white/95 hover:bg-[#E22E26] hover:text-white rounded-full w-7 h-7 shadow"
+                                        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all bg-background/95 hover:bg-destructive hover:text-destructive-foreground rounded-full w-7 h-7 shadow"
                                         onClick={() => setHallsList(prev => prev.filter(h => h.id !== hall.id))}>
                                         <Trash2 className="w-3.5 h-3.5" />
                                     </Button>
@@ -1213,37 +1199,27 @@ const HallBookingPage = () => {
                                         </div>
                                         <div className="text-center flex-1">
                                             <p className="text-[9px] font-bold text-muted-foreground uppercase mb-0.5">Daily Rate</p>
-                                            <p className="text-sm font-bold text-[#293088]">₹{(hall.basePrice / 1000).toFixed(0)}k</p>
+                                            <p className="text-sm font-bold text-primary">₹{(hall.basePrice / 1000).toFixed(0)}k</p>
                                         </div>
                                     </div>
                                     <div className="space-y-2">
                                         <p className="text-[9px] font-bold text-muted-foreground uppercase text-center tracking-widest">Facilities</p>
                                         <div className="flex flex-wrap gap-1 justify-center">
                                             {hall.facilities.slice(0, 4).map(f => (
-                                                <Badge key={f} variant="secondary" className="px-2 py-0.5 text-[8px] font-bold bg-blue-50 text-[#293088] border-none uppercase">{f}</Badge>
+                                                <Badge key={f} variant="secondary" className="px-2 py-0.5 text-[8px] font-bold bg-primary/10 text-primary border-none uppercase">{f}</Badge>
                                             ))}
                                             {hall.facilities.length > 4 && <Badge variant="outline" className="px-2 py-0.5 text-[8px] font-bold border-dashed">+{hall.facilities.length - 4}</Badge>}
                                         </div>
                                     </div>
                                 </CardContent>
-                                <CardFooter className="p-3 bg-muted/5 rounded-b-xl gap-2">
-                                    <Button className={`${BTN} flex-1 text-[10px] h-9 font-bold`}>
-                                        <Edit className="w-3.5 h-3.5 mr-1" /> Config
-                                    </Button>
-                                    <Button className={`${BTN} flex-1 text-[10px] h-9 font-bold`}>
-                                        <IndianRupee className="w-3.5 h-3.5 mr-1" /> Pricing
-                                    </Button>
-                                </CardFooter>
                             </Card>
                         ))}
-
-                        {/* Add new placeholder */}
-                        <div className="border-2 border-dashed border-muted rounded-xl flex flex-col items-center justify-center p-8 bg-muted/5 group hover:border-[#293088]/40 hover:bg-[#293088]/5 transition-all cursor-pointer min-h-[320px] shadow-sm"
+                        <div className="border-2 border-dashed border-muted rounded-xl flex flex-col items-center justify-center p-8 bg-muted/5 group hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer min-h-[320px] shadow-sm"
                             onClick={() => setAddHallOpen(true)}>
-                            <div className="w-12 h-12 rounded-full border-2 border-dashed border-muted flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-[#293088] group-hover:border-none transition-all duration-300">
-                                <Plus className="w-6 h-6 text-muted-foreground group-hover:text-white" />
+                            <div className="w-12 h-12 rounded-full border-2 border-dashed border-muted flex items-center justify-center mb-5 group-hover:scale-110 group-hover:bg-primary group-hover:border-none transition-all duration-300">
+                                <Plus className="w-6 h-6 text-muted-foreground group-hover:text-primary-foreground" />
                             </div>
-                            <h4 className="font-bold text-sm text-muted-foreground group-hover:text-[#293088] transition-colors text-center leading-relaxed">
+                            <h4 className="font-bold text-sm text-muted-foreground group-hover:text-primary transition-colors text-center leading-relaxed">
                                 Add New Workspace<br />
                                 <span className="text-[11px] font-medium opacity-70 tracking-normal block mt-2 px-4">Meditation Cells, Veda Patashala, or Storage</span>
                             </h4>
@@ -1276,7 +1252,7 @@ const HallBookingPage = () => {
                         <Card className="border shadow-sm">
                             <CardHeader className="p-4 border-b">
                                 <CardTitle className="text-sm font-bold flex items-center gap-2">
-                                    <TrendingUp className="w-4 h-4 text-[#293088]" /> Revenue Growth Trend
+                                    <TrendingUp className="w-4 h-4 text-primary" /> Revenue Growth Trend
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -1287,7 +1263,7 @@ const HallBookingPage = () => {
                         <Card className="border shadow-sm">
                             <CardHeader className="p-4 border-b">
                                 <CardTitle className="text-sm font-bold flex items-center gap-2">
-                                    <PieChart className="w-4 h-4 text-[#E22E26]" /> Income Distribution by Hall
+                                    <PieChart className="w-4 h-4 text-destructive" /> Income Distribution by Hall
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="p-4 min-h-[250px] flex items-center justify-center">
@@ -1338,7 +1314,7 @@ const HallBookingPage = () => {
                                         <TableRow key={i} className="hover:bg-muted/10 border-border/50">
                                             <TableCell className="font-bold text-xs py-4">{row.period}</TableCell>
                                             <TableCell className="text-right font-semibold text-xs py-4">{row.count}</TableCell>
-                                            <TableCell className="text-right font-bold text-[#293088] text-xs py-4">₹{row.amount.toLocaleString()}</TableCell>
+                                            <TableCell className="text-right font-bold text-primary text-xs py-4">₹{row.amount.toLocaleString()}</TableCell>
                                             <TableCell className="font-medium text-xs text-muted-foreground py-4">{row.top}</TableCell>
                                             <TableCell className="py-4">
                                                 <div className="flex flex-col items-center gap-1.5">
@@ -1358,7 +1334,7 @@ const HallBookingPage = () => {
             <Dialog open={calendarDetailsOpen} onOpenChange={setCalendarDetailsOpen}>
                 <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg rounded-2xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="font-bold text-base text-[#293088]">Booking Details</DialogTitle>
+                        <DialogTitle className="font-bold text-base text-primary">Booking Details</DialogTitle>
                         <DialogDescription className="text-xs">
                             View event details from the calendar and review the receipt.
                         </DialogDescription>
@@ -1384,32 +1360,28 @@ const HallBookingPage = () => {
                     )}
                     <DialogFooter>
                         <Button className={`${BTN} w-full h-10 text-xs font-bold`}
-                            onClick={() => selectedCalendarBooking && handleReviewReceiptForBooking(selectedCalendarBooking)}
-                            disabled={!selectedCalendarBooking}>
-                            <FileText className="w-3.5 h-3.5 mr-2" /> Review Receipt
+                            onClick={() => selectedCalendarBooking && handleReviewReceiptForBooking(selectedCalendarBooking)}>
+                            Review Receipt
                         </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={receiptPreviewOpen} onOpenChange={setReceiptPreviewOpen}>
-                <DialogContent overlayClassName="bg-transparent" className="max-w-[calc(100%-2rem)] sm:max-w-2xl rounded-2xl p-6 bg-white/95 backdrop-blur-sm">
+            <Dialog open={!!activeReceipt} onOpenChange={() => setActiveReceipt(null)}>
+                <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg rounded-2xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="font-bold text-base text-[#293088]">Booking Receipt</DialogTitle>
-                        <DialogDescription className="text-xs">
-                            Receipt preview for booking confirmation and review.
-                        </DialogDescription>
+                        <DialogTitle className="font-bold text-base text-primary">Receipt Preview</DialogTitle>
                     </DialogHeader>
                     {activeReceipt && (
-                        <div className="rounded-xl border border-[#293088]/20 bg-[#F7F8FF] p-4 space-y-3 text-xs">
-                            <div className="flex items-center justify-between border-b border-[#293088]/15 pb-2">
+                        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3 text-xs">
+                            <div className="flex items-center justify-between border-b border-primary/15 pb-2">
                                 <div>
-                                    <p className="font-bold text-[#293088]">Temple Harmony ERP</p>
+                                    <p className="font-bold text-primary">Temple Harmony ERP</p>
                                     <p className="text-muted-foreground">Hall Booking Receipt</p>
                                 </div>
-                                <Badge className="bg-[#293088] text-white border-none">RCPT-{activeReceipt.id}</Badge>
+                                <Badge className="bg-primary text-primary-foreground border-none">RCPT-{activeReceipt.id}</Badge>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-foreground">
                                 <div className="rounded-md bg-white border border-border/60 p-2"><strong>Booking ID:</strong> {activeReceipt.id}</div>
                                 <div className="rounded-md bg-white border border-border/60 p-2"><strong>Date:</strong> {activeReceipt.date}</div>
                                 <div className="rounded-md bg-white border border-border/60 p-2"><strong>Devotee:</strong> {activeReceipt.devotee}</div>
@@ -1451,7 +1423,7 @@ const HallBookingPage = () => {
             <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
                 <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-sm rounded-2xl p-6">
                     <DialogHeader>
-                        <DialogTitle className="font-bold text-base text-[#E22E26]">Delete Booking?</DialogTitle>
+                        <DialogTitle className="font-bold text-base text-destructive">Delete Booking?</DialogTitle>
                         <DialogDescription className="text-xs mt-2">
                             Are you sure you want to delete booking <strong>{deleteConfirmId}</strong>? This action cannot be undone.
                         </DialogDescription>

@@ -21,9 +21,9 @@ function getStockPercent(quantity: number, name: string): number {
 }
 
 function getProgressColor(pct: number): string {
-  if (pct === 0) return 'bg-rose-500';
+  if (pct === 0) return 'bg-destructive';
   if (pct < 30) return 'bg-amber-500';
-  return 'bg-emerald-500';
+  return 'bg-primary';
 }
 
 const InventoryPage: React.FC = () => {
@@ -69,12 +69,12 @@ const InventoryPage: React.FC = () => {
 
   return (
     <div className="inventory-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner inventory-header bg-gradient-to-r from-amber-50/80 via-background to-orange-50/80">
+      <div className="page-header-banner inventory-header">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Package className="w-5 h-5 text-amber-600" /> Inventory & Material Central</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Package className="w-5 h-5 text-primary" /> Inventory & Material Central</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage pooja items, food stock, and see what needs to be ordered.</p>
         </div>
-        {activeSection === 'inventory' && <Button onClick={openAdd} className="inventory-cta shadow-md hover:shadow-lg bg-amber-600 hover:bg-amber-700 text-white"><Plus className="h-4 w-4 mr-2" />Add New Item</Button>}
+        {activeSection === 'inventory' && <Button onClick={openAdd} className="inventory-cta shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Add New Item</Button>}
       </div>
 
       <div className="inventory-tabbar rounded-xl border border-border bg-card shadow-sm p-1.5 flex w-full max-w-sm mx-auto md:mx-0">
@@ -85,7 +85,7 @@ const InventoryPage: React.FC = () => {
            <button
              key={key}
              onClick={() => setActiveSection(key)}
-            className={`inventory-tab-btn flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-all duration-300 font-bold ${activeSection === key ? 'bg-amber-600 text-white shadow-md scale-[1.02]' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent'}`}
+            className={`inventory-tab-btn flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-all duration-300 font-bold ${activeSection === key ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent'}`}
            >
              <Icon className="w-4 h-4" /> {label}
            </button>
@@ -102,32 +102,32 @@ const InventoryPage: React.FC = () => {
             <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Items</p>
             <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{items.length}</p>
           </div>
-          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-100 bg-amber-50/30">
-            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-100/50 group-hover:scale-110 transition-transform" />
-            <p className="text-[11px] uppercase tracking-widest font-bold text-amber-800">Pooja Items</p>
-            <p className="text-3xl font-display font-bold mt-2 text-amber-700 relative z-10">{poojaMaterialsCount}</p>
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
+            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
+            <p className="text-[11px] uppercase tracking-widest font-bold text-secondary">Pooja Items</p>
+            <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{poojaMaterialsCount}</p>
           </div>
-          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-emerald-100 bg-emerald-50/30">
-            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-100/50 group-hover:scale-110 transition-transform" />
-            <p className="text-[11px] uppercase tracking-widest font-bold text-emerald-800">Food Stock</p>
-            <p className="text-3xl font-display font-bold mt-2 text-emerald-700 relative z-10">{prasadamStockCount}</p>
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-primary/20 bg-primary/5">
+            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/10 group-hover:scale-110 transition-transform" />
+            <p className="text-[11px] uppercase tracking-widest font-bold text-primary">Food Stock</p>
+            <p className="text-3xl font-display font-bold mt-2 text-primary relative z-10">{prasadamStockCount}</p>
           </div>
-          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-rose-200 bg-rose-50/80 shadow-[0_4px_12px_-4px_rgba(244,63,94,0.3)]">
-            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-rose-200/50 group-hover:scale-110 transition-transform" />
-            <p className="text-[11px] uppercase tracking-widest font-bold text-rose-800 flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Low Stock Warning</p>
-            <p className="text-3xl font-display font-bold mt-2 text-rose-700 relative z-10">{lowStockItems.length}</p>
+          <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-destructive/20 bg-destructive/5">
+            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-destructive/10 group-hover:scale-110 transition-transform" />
+            <p className="text-[11px] uppercase tracking-widest font-bold text-destructive flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Low Stock Warning</p>
+            <p className="text-3xl font-display font-bold mt-2 text-destructive relative z-10">{lowStockItems.length}</p>
           </div>
         </div>
 
         {lowStockItems.length > 0 && (
-          <div className="inventory-alert rounded-xl border border-rose-200 bg-gradient-to-r from-rose-50 to-background p-5 flex items-start gap-4 shadow-sm animate-pulse-slow">
-            <div className="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center shrink-0 border border-rose-200">
-               <AlertTriangle className="w-6 h-6 text-rose-600" />
+          <div className="inventory-alert rounded-xl border border-destructive/20 bg-destructive/5 p-5 flex items-start gap-4 shadow-sm animate-pulse-slow">
+            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0 border border-destructive/20">
+               <AlertTriangle className="w-6 h-6 text-destructive" />
             </div>
             <div>
-              <p className="text-sm font-bold text-rose-900 tracking-wide">Refill Needed Immediately</p>
-              <p className="text-sm text-rose-800/80 mt-1 leading-relaxed">
-                The following items are running very low and need to be ordered: <span className="font-bold bg-rose-100 text-rose-900 px-1.5 rounded">{lowStockItems.map(i => i.name).join(', ')}</span>.
+              <p className="text-sm font-bold text-destructive tracking-wide uppercase">Refill Needed Immediately</p>
+              <p className="text-sm text-foreground/80 mt-1 leading-relaxed">
+                The following items are running very low and need to be ordered: <span className="font-bold bg-destructive/10 text-destructive px-1.5 rounded">{lowStockItems.map(i => i.name).join(', ')}</span>.
               </p>
             </div>
           </div>
@@ -135,7 +135,7 @@ const InventoryPage: React.FC = () => {
 
         <div className="section-panel inventory-main-panel shadow-sm">
           <div className="section-panel-header gap-4 py-4 border-b border-border/60">
-            <h2 className="text-sm font-semibold flex items-center gap-2"><Layers className="w-4 h-4 text-amber-600" /> Main Stock List</h2>
+            <h2 className="text-sm font-semibold flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> Main Stock List</h2>
             <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 flex-wrap">
               <div className="relative flex-1 min-w-[250px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -143,13 +143,13 @@ const InventoryPage: React.FC = () => {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Search items, suppliers..."
-                  className="inventory-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm transition-all focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 outline-none shadow-sm"
+                  className="inventory-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none shadow-sm"
                 />
               </div>
               <select
                 value={categoryFilter}
                 onChange={e => setCategoryFilter(e.target.value)}
-                className="inventory-field h-10 rounded-lg border border-input bg-background/60 px-3 text-sm transition-all focus:border-amber-500 hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
+                className="inventory-field h-10 rounded-lg border border-input bg-background/60 px-3 text-sm transition-all focus:border-primary hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
               >
                 {categories.map(c => <option key={c}>{c}</option>)}
               </select>
@@ -180,13 +180,13 @@ const InventoryPage: React.FC = () => {
                       {i.supplier && <p className="text-[10px] text-muted-foreground font-medium mt-0.5" title="Primary Supplier">{i.supplier}</p>}
                     </td>
                     <td className="p-4">
-                      <span className="text-accent text-[11px] font-bold tracking-wider uppercase italic">{i.category}</span>
+                      <span className="text-primary text-[11px] font-bold tracking-wider uppercase italic">{i.category}</span>
                     </td>
                     <td className="p-4 text-right font-display font-bold text-xl text-foreground tracking-tight">{i.quantity}</td>
                     <td className="p-4 text-muted-foreground font-semibold"><Droplets className="w-3.5 h-3.5 inline mr-1 opacity-50" />{i.unit}</td>
                     <td className="p-4">
                        <div className="flex items-center gap-2">
-                         <div className={`w-1.5 h-1.5 rounded-full ${i.stockStatus === 'In Stock' ? 'bg-emerald-500' : 'bg-rose-500'}`} />
+                         <div className={`w-1.5 h-1.5 rounded-full ${i.stockStatus === 'In Stock' ? 'bg-primary' : 'bg-destructive'}`} />
                          <span className="font-semibold text-xs text-foreground/80">{i.stockStatus}</span>
                        </div>
                     </td>
@@ -204,7 +204,7 @@ const InventoryPage: React.FC = () => {
                     <td className="p-4 text-right whitespace-nowrap">
                       <div className="flex gap-1.5 justify-end">
                         <Button variant="ghost" size="icon" onClick={() => openEdit(i)} title="Modify Stock"><Pencil className="h-4 w-4" /></Button>
-                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(i.id)} className="hover:bg-rose-50 hover:text-rose-700 text-muted-foreground" title="Delete Register"><Trash2 className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" onClick={() => setDeleteId(i.id)} className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Register"><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </td>
                   </tr>
@@ -226,13 +226,13 @@ const InventoryPage: React.FC = () => {
               <FormField label="Item Name" value={form.name} onChange={v => set('name', v)} required placeholder="E.g., Turmeric Powder" />
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Category</label>
-                <input value={form.category} onChange={e => set('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-amber-500/20 outline-none shadow-sm font-medium" placeholder="E.g., Pooja Items" />
+                <input value={form.category} onChange={e => set('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-medium" placeholder="E.g., Pooja Items" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Quantity</label>
-                <input type="number" value={String(form.quantity)} onChange={e => set('quantity', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-amber-50/50 hover:border-amber-200 px-3 text-lg transition-all focus:border-amber-500 font-display font-bold outline-none focus:ring-2 focus:ring-amber-500/30 shadow-sm" />
+                <input type="number" value={String(form.quantity)} onChange={e => set('quantity', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-card hover:border-primary/50 px-3 text-lg transition-all focus:border-primary font-display font-bold outline-none focus:ring-2 focus:ring-primary/10 shadow-sm" />
               </div>
               <FormField label="Unit (kg/ltr/pkt)" value={form.unit} onChange={v => set('unit', v)} placeholder="e.g. Kg, Ltr, Pkt" />
             </div>
@@ -240,7 +240,7 @@ const InventoryPage: React.FC = () => {
             
             <div className="flex gap-3 pt-5 border-t border-border/60">
               <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-              <Button onClick={handleSave} className="flex-1 py-5 shadow-md bg-amber-600 hover:bg-amber-700 text-white">Save Item</Button>
+              <Button onClick={handleSave} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">Save Item</Button>
             </div>
           </div>
         </Modal>
