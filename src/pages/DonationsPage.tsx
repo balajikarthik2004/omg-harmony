@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-  Plus, Pencil, Trash2, ReceiptText, QrCode, CreditCard,
-  ShieldCheck, Smartphone, Target, HandHeart, Search, Filter,
+  Plus, Pencil, Trash2, ReceiptText, CreditCard,
+  ShieldCheck, Target, HandHeart, Search, Filter,
   Crown, Award, Medal, Users, Send, TrendingUp, History,
   UserCheck, AlertTriangle, BarChart3, LayoutList,
   Phone, Mail, Calendar
@@ -14,7 +14,9 @@ import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
-import { toast } from 'sonner';
+import PoojaSevaPaymentFlow, {
+  type SevaPaymentFlowBooking,
+} from '@/components/PoojaSevaPaymentFlow';
 
 type DonorTier = 'Platinum' | 'Gold' | 'Silver' | 'Member';
 
@@ -142,6 +144,11 @@ const DonationsPage: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<DonationRecord | null>(null);
+  const [payTarget, setPayTarget] = useState<{
+    record: DonationRecord;
+    booking: SevaPaymentFlowBooking;
+    amount: number;
+  } | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [reportPeriod, setReportPeriod] = useState<ReportPeriod>('month');
   const [customFrom, setCustomFrom] = useState('');
@@ -272,6 +279,60 @@ const DonationsPage: React.FC = () => {
 
   const setFormField = (key: string, val: string | number) => setForm(prev => ({ ...prev, [key]: val }));
 
+  const buildPaymentBookingFromDonation = (record: DonationRecord): SevaPaymentFlowBooking => ({
+    id: record.id,
+    bookingCode: record.donationCode,
+    devoteeName: record.donorName,
+    poojaType: `Donation - ${record.category}`,
+    date: record.date,
+    slot: record.channel,
+    priestName: record.gateway,
+    paymentStatus: record.paymentStatus === 'Success' ? 'Paid' : 'Pending',
+    bookingStatus: record.paymentStatus === 'Success' ? 'Confirmed' : 'Pending',
+    receiptNumber: record.receiptNumber,
+    notes: record.notes || '',
+  });
+
+  const handleDonationPaymentPaid = (updatedBooking: SevaPaymentFlowBooking) => {
+    const target = payTarget?.record;
+    if (!target) return;
+
+    const paidRecord: DonationRecord = {
+      ...target,
+      paymentStatus: 'Success' as const,
+      notes: updatedBooking.notes,
+    };
+
+    update(target.id, {
+      paymentStatus: 'Success',
+      notes: updatedBooking.notes,
+    });
+
+    setPayTarget(prev => prev ? {
+      ...prev,
+      record: paidRecord,
+      booking: updatedBooking,
+    } : prev);
+  };
+
+  const handleDonationViewReceipt = (updatedBooking: SevaPaymentFlowBooking) => {
+    const target = payTarget?.record;
+    if (!target) {
+      setPayTarget(null);
+      return;
+    }
+
+    const paidRecord: DonationRecord = {
+      ...target,
+      paymentStatus: 'Success' as const,
+      notes: updatedBooking.notes,
+    };
+
+    setPayTarget(null);
+    setSelectedReceipt(paidRecord);
+    setReceiptOpen(true);
+  };
+
   const handleSave = () => {
     if (!form.amount || !form.date || !form.category) return;
     const gatewayNeeded = form.channel === 'Online' && (form.paymentMethod === 'UPI' || form.paymentMethod === 'Card');
@@ -287,12 +348,27 @@ const DonationsPage: React.FC = () => {
       paymentMethod: form.paymentMethod,
       gateway: form.gateway,
       transactionRef: gatewayNeeded ? createTxnRef(form.gateway) : '-',
-      paymentStatus: 'Success' as const,
+      paymentStatus: (form.channel === 'Online' ? 'Pending' : 'Success') as const,
       notes: form.notes,
     };
 
-    if (editId) update(editId, payload);
-    else add({ donationCode: nextDonationCode(items), receiptNumber: nextReceipt(items), ...payload });
+    if (editId) {
+      update(editId, payload);
+    } else {
+      const created = add({
+        donationCode: nextDonationCode(items),
+        receiptNumber: nextReceipt(items),
+        ...payload,
+      });
+
+      if (created.channel === 'Online') {
+        setPayTarget({
+          record: created,
+          booking: buildPaymentBookingFromDonation(created),
+          amount: created.amount,
+        });
+      }
+    }
     setModalOpen(false);
   };
 
@@ -606,8 +682,8 @@ const DonationsPage: React.FC = () => {
 
               <div className="flex items-center justify-between relative z-10">
                 <div>
-                  <p className="text-sm font-bold text-foreground">Secure Payment Processing</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Simulation frame for active payment portal.</p>
+                  <p className="text-sm font-bold text-foreground">Online Payment Flow</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Use the reusable payment modal to complete UPI/Card/Net Banking/Wallet.</p>
                 </div>
                 <span className="text-[10px] px-2.5 py-1 rounded border border-primary/20 bg-primary/10 text-primary font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
                   <ShieldCheck className="h-3.5 w-3.5" /> E2E Secure
@@ -621,39 +697,15 @@ const DonationsPage: React.FC = () => {
                 </select>
               </div>
 
-              {form.paymentMethod === 'UPI' ? (
-                <div className="rounded-xl border border-border/80 bg-background p-5 shadow-sm relative z-10 border-dashed">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm font-bold text-foreground inline-flex items-center gap-2"><Smartphone className="h-4 w-4 text-primary" /> Dynamic QR Code</p>
-                    <span className="text-[9px] font-bold tracking-widest text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded shadow-sm">{form.gateway}</span>
-                  </div>
-                  <div className="flex items-center gap-5">
-                    <div className="w-24 h-24 rounded-xl border border-border/80 flex items-center justify-center bg-muted/20 shadow-sm relative">
-                      <QrCode className="h-10 w-10 text-muted-foreground/40" />
-                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent flex items-center justify-center border-2 border-primary border-t-transparent border-r-transparent animate-spin rounded-xl" style={{ animationDuration: '3s' }} />
-                    </div>
-                    <div className="text-xs text-muted-foreground space-y-2">
-                      <p className="font-semibold text-foreground">Scan via any UPI App</p>
-                      <p className="px-2 py-1.5 bg-muted/40 border border-border/50 rounded-md font-mono text-[10px] text-foreground font-semibold inline-block">tepmle_hash@{form.gateway.toLowerCase()}</p>
-                      <p className="text-[10px] italic pt-1">Awaiting scanner confirmation...</p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="rounded-xl border border-border/80 bg-background p-5 shadow-sm relative z-10">
-                  <div className="flex items-center justify-between mb-4">
-                    <p className="text-sm font-bold text-foreground inline-flex items-center gap-2"><CreditCard className="h-4 w-4 text-primary" /> Credit/Debit Card Details</p>
-                    <span className="text-[9px] font-bold tracking-widest text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded shadow-sm">{form.gateway}</span>
-                  </div>
-                  <div className="space-y-3 text-xs font-mono">
-                    <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground tracking-widest border-dashed">XXXX XXXX XXXX XXXX</div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground border-dashed">MM / YY</div>
-                      <div className="h-11 rounded-lg border border-border bg-muted/10 px-3 flex items-center text-muted-foreground border-dashed">CVV</div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <div className="rounded-xl border border-dashed border-primary/25 bg-primary/5 p-4 relative z-10">
+                <p className="text-xs font-semibold text-foreground flex items-center gap-2">
+                  <CreditCard className="w-4 h-4 text-primary" />
+                  Final payment step opens after you submit this form.
+                </p>
+                <p className="text-[11px] text-muted-foreground mt-2 leading-relaxed">
+                  The payment modal handles secure method selection, real QR display, processing state, and receipt completion in one flow.
+                </p>
+              </div>
             </div>
           )}
 
@@ -664,7 +716,9 @@ const DonationsPage: React.FC = () => {
 
           <div className="flex gap-3 pt-4 border-t border-border/60">
             <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-            <Button onClick={handleSave} className="flex-1 py-5 shadow-md">Complete Transaction & Issue Receipt</Button>
+            <Button onClick={handleSave} className="flex-1 py-5 shadow-md">
+              {form.channel === 'Online' && !editId ? 'Proceed to Payment' : 'Complete Transaction & Issue Receipt'}
+            </Button>
           </div>
         </div>
       </Modal>
@@ -735,6 +789,16 @@ const DonationsPage: React.FC = () => {
           </div>
         )}
       </Modal>
+
+      {payTarget && (
+        <PoojaSevaPaymentFlow
+          booking={payTarget.booking}
+          amount={payTarget.amount}
+          onClose={() => setPayTarget(null)}
+          onPaid={handleDonationPaymentPaid}
+          onViewEsevaPass={handleDonationViewReceipt}
+        />
+      )}
 
       <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Delete Ledger Entry" message="Are you absolutely sure you want to permanently delete this donation record? This will alter financial audit trails." />
 

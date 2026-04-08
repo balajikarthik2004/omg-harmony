@@ -29,6 +29,9 @@ import { Progress } from "@/components/ui/progress";
 import {
     Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
+import PoojaSevaPaymentFlow, {
+    type SevaPaymentFlowBooking,
+} from '@/components/PoojaSevaPaymentFlow';
 
 // --- Mock Data ---
 const initialHalls = [
@@ -150,6 +153,12 @@ const HallBookingPage = () => {
     const [calendarDetailsOpen, setCalendarDetailsOpen] = useState(false);
     const [receiptPreviewOpen, setReceiptPreviewOpen] = useState(false);
     const [activeReceipt, setActiveReceipt] = useState<BookingReceipt | null>(null);
+    const [payTarget, setPayTarget] = useState<{
+        booking: SevaPaymentFlowBooking;
+        amount: number;
+        pendingBooking: BookingItem;
+        pendingReceipt: BookingReceipt;
+    } | null>(null);
 
     // Add New Hall Dialog state
     const [newHallData, setNewHallData] = useState({
@@ -319,7 +328,7 @@ const HallBookingPage = () => {
                 printWindow.print();
         };
 
-    const handleConfirmBooking = () => {
+    const handleStartBookingPayment = () => {
         const summary = calculateSummary();
         const id = `B${Math.floor(Math.random() * 9000) + 1000}`;
         const slotLabel = bookingFormData.slot === 'full' ? 'Full Day' : bookingFormData.slot === 'morning' ? 'Morning Half' : 'Evening Half';
@@ -358,12 +367,37 @@ const HallBookingPage = () => {
             balance: summary.total - summary.advance,
         };
 
-        setBookingsList(prev => [newBooking, ...prev]);
-        setNewBookingId(id);
-        setLatestReceipt(receipt);
-        setReceiptByBookingId(prev => ({ ...prev, [id]: receipt }));
+        setPayTarget({
+            booking: {
+                id,
+                bookingCode: id,
+                devoteeName: newBooking.devotee,
+                poojaType: `${newBooking.event} - ${newBooking.hall}`,
+                date: bookingFormData.date,
+                slot: slotLabel,
+                priestName: 'Hall Booking Desk',
+                paymentStatus: 'Pending',
+                bookingStatus: 'Pending',
+                receiptNumber: `RCPT-${id}`,
+                notes: bookingFormData.notes || '',
+            },
+            amount: summary.advance,
+            pendingBooking: newBooking,
+            pendingReceipt: receipt,
+        });
+    };
+
+    const handleBookingPaymentPaid = () => {
+        if (!payTarget) return;
+        const { pendingBooking, pendingReceipt } = payTarget;
+
+        setBookingsList(prev => [pendingBooking, ...prev]);
+        setNewBookingId(pendingBooking.id);
+        setLatestReceipt(pendingReceipt);
+        setReceiptByBookingId(prev => ({ ...prev, [pendingBooking.id]: pendingReceipt }));
         setIsConfirmed(true);
-        openReceiptPreview(receipt);
+        openReceiptPreview(pendingReceipt);
+        setPayTarget(null);
     };
 
     const handleDeleteBooking = (id) => {
@@ -929,41 +963,10 @@ const HallBookingPage = () => {
                                         Next Step <ChevronRight className="w-4 h-4 ml-1" />
                                     </Button>
                                 ) : (
-                                    <Dialog open={isConfirmed} onOpenChange={setIsConfirmed}>
-                                        <DialogTrigger asChild>
-                                            <Button className={`${BTN} h-10 px-8 md:px-12 text-xs font-bold shadow-lg`}
-                                                onClick={handleConfirmBooking}>
-                                                Confirm & Get Receipt
-                                            </Button>
-                                        </DialogTrigger>
-                                        <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md rounded-2xl p-6 md:p-8">
-                                            <DialogHeader>
-                                                <DialogTitle className="text-center font-bold text-xl text-[#293088]">Booking Confirmed!</DialogTitle>
-                                                <DialogDescription className="text-center py-6" asChild>
-                                                    <div>
-                                                        <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                                            <CheckCircle2 className="w-10 h-10 text-emerald-600" />
-                                                        </div>
-                                                        <p className="font-bold text-foreground text-base">Booking ID: {newBookingId}</p>
-                                                        <p className="text-xs mt-2 px-2 leading-relaxed font-medium text-muted-foreground">
-                                                            <strong>{bookingFormData.firstName}</strong>, your booking for <strong>{selectedHall?.name}</strong> on <strong>{bookingFormData.date}</strong> is successfully secured. Advance payment of <strong>₹{calculateSummary().advance.toLocaleString()}</strong> is due.
-                                                        </p>
-                                                    </div>
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="space-y-2.5">
-                                                <Button className={`${BTN} w-full h-11 text-sm font-bold shadow-md`}
-                                                    onClick={() => latestReceipt && openReceiptPreview(latestReceipt)}
-                                                    disabled={!latestReceipt}>
-                                                    <Receipt className="w-4 h-4 mr-2" /> Review Receipt
-                                                </Button>
-                                                <Button className={`${BTN} w-full h-11 text-sm font-bold`}
-                                                    onClick={() => { resetBooking(); setActiveTab('overview'); }}>
-                                                    Go to Dashboard →
-                                                </Button>
-                                            </div>
-                                        </DialogContent>
-                                    </Dialog>
+                                    <Button className={`${BTN} h-10 px-8 md:px-12 text-xs font-bold shadow-lg`}
+                                        onClick={handleStartBookingPayment}>
+                                        Confirm & Pay Advance
+                                    </Button>
                                 )}
                             </div>
                         </CardFooter>
@@ -1366,6 +1369,46 @@ const HallBookingPage = () => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <Dialog open={isConfirmed} onOpenChange={setIsConfirmed}>
+                <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-md rounded-2xl p-6 md:p-8">
+                    <DialogHeader>
+                        <DialogTitle className="text-center font-bold text-xl text-[#293088]">Booking Confirmed!</DialogTitle>
+                        <DialogDescription className="text-center py-6" asChild>
+                            <div>
+                                <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+                                </div>
+                                <p className="font-bold text-foreground text-base">Booking ID: {newBookingId}</p>
+                                <p className="text-xs mt-2 px-2 leading-relaxed font-medium text-muted-foreground">
+                                    <strong>{bookingFormData.firstName}</strong>, your booking for <strong>{selectedHall?.name}</strong> on <strong>{bookingFormData.date}</strong> is successfully secured. Advance payment of <strong>₹{calculateSummary().advance.toLocaleString()}</strong> has been received.
+                                </p>
+                            </div>
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2.5">
+                        <Button className={`${BTN} w-full h-11 text-sm font-bold shadow-md`}
+                            onClick={() => latestReceipt && openReceiptPreview(latestReceipt)}
+                            disabled={!latestReceipt}>
+                            <Receipt className="w-4 h-4 mr-2" /> Review Receipt
+                        </Button>
+                        <Button className={`${BTN} w-full h-11 text-sm font-bold`}
+                            onClick={() => { resetBooking(); setActiveTab('overview'); }}>
+                            Go to Dashboard →
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {payTarget && (
+                <PoojaSevaPaymentFlow
+                    booking={payTarget.booking}
+                    amount={payTarget.amount}
+                    onClose={() => setPayTarget(null)}
+                    onPaid={handleBookingPaymentPaid}
+                    onViewEsevaPass={() => setPayTarget(null)}
+                />
+            )}
 
             <Dialog open={!!activeReceipt} onOpenChange={() => setActiveReceipt(null)}>
                 <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-lg rounded-2xl p-6">
