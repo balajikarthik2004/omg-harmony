@@ -28,11 +28,13 @@ const LoginPage: React.FC = () => {
   return (
     <div className="min-h-screen flex bg-background relative overflow-hidden">
       <div className="absolute inset-0 lg:hidden">
-        <img src={bg} alt="Temple Background" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 login-image-overlay opacity-80" />
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${bg})` }}
+        />
+        <div className="absolute inset-0 login-image-overlay opacity-55" />
+        <div className="absolute inset-0 bg-background/30 backdrop-blur-[0.5px]" />
       </div>
-
-      <div className="absolute inset-0 lg:hidden bg-background/55 backdrop-blur-[1px]" />
 
       {/* Decorative background orbs for right panel */}
       <div
@@ -54,13 +56,12 @@ const LoginPage: React.FC = () => {
 
       {/* Left side with image + overlay branding */}
       <div className="hidden lg:flex lg:w-[55%] relative">
-        <img
-          src={bg}
-          alt="Temple"
-          className="absolute inset-0 w-full h-full object-cover"
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${bg})` }}
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 login-image-overlay" />
+        <div className="absolute inset-0 login-image-overlay opacity-75" />
 
         {/* Branding content on image */}
         <div className="relative z-10 flex flex-col justify-between p-10 w-full">
