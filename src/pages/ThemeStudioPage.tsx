@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns, SlidersHorizontal } from 'lucide-react';
+import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns, SlidersHorizontal, Sun, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
@@ -202,6 +202,8 @@ const ThemeStudioPage: React.FC = () => {
   };
 
   const isPresetActive = (presetId: string) => theme.id === presetId;
+  const isLightPresetActive = theme.id === 'solid-light';
+  const isDarkPresetActive = theme.id === 'solid-dark';
 
   const handleSavePreset = () => {
     if (!presetName.trim()) return;
@@ -284,13 +286,41 @@ const ThemeStudioPage: React.FC = () => {
             </nav>
             <h1 className="text-2xl font-black tracking-tighter text-foreground flex items-center gap-3">
               Theme Studio
-              <span className="px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[9px] font-black uppercase text-primary tracking-widest leading-none">V2.0</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-2 bg-muted/20 border border-border/40 p-1.5 rounded-2xl">
-              <Button variant="ghost" size="sm" onClick={() => applyPreset('solid-light')} className="h-8 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-background">Light</Button>
-              <Button variant="ghost" size="sm" onClick={() => applyPreset('solid-dark')} className="h-8 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-background">Dark</Button>
+            <div className="hidden sm:flex items-center gap-2 rounded-2xl border border-border/50 bg-card/60 px-2 py-1.5 shadow-sm">
+              <span className="px-2 text-[9px] font-black uppercase tracking-[0.2em] text-foreground/75">Mode</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => applyPreset('solid-light')}
+                aria-label="Apply light preset"
+                title="Light"
+                className={`h-8 w-8 rounded-xl p-0 transition-all ${
+                  isLightPresetActive
+                    ? 'bg-background border border-border/60 text-foreground shadow-sm'
+                    : 'text-foreground/65 hover:bg-background/80 hover:text-foreground'
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+                <span className="sr-only">Light</span>
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => applyPreset('solid-dark')}
+                aria-label="Apply dark preset"
+                title="Dark"
+                className={`h-8 w-8 rounded-xl p-0 transition-all ${
+                  isDarkPresetActive
+                    ? 'bg-background border border-border/60 text-foreground shadow-sm'
+                    : 'text-foreground/65 hover:bg-background/80 hover:text-foreground'
+                }`}
+              >
+                <Moon className="h-4 w-4" />
+                <span className="sr-only">Dark</span>
+              </Button>
             </div>
             <div className="px-5 py-2.5 rounded-xl border border-border/60 bg-card/50 shadow-sm flex items-center gap-3">
               <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
@@ -309,19 +339,19 @@ const ThemeStudioPage: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full min-h-0 flex flex-col">
             <div className="bg-card/40 backdrop-blur-md rounded-[1rem] border border-border/60 p-2 mb-4 shadow-sm shrink-0">
               <TabsList className="h-14 w-full bg-transparent grid grid-cols-5 gap-1 p-0">
-                <TabsTrigger value="palette" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-primary border-none">
+                <TabsTrigger value="palette" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
                   <Palette className="h-4 w-4" /> Palette
                 </TabsTrigger>
-                <TabsTrigger value="gradients" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-indigo-500 border-none">
+                <TabsTrigger value="gradients" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
                   <Layers className="h-4 w-4" /> Gradients
                 </TabsTrigger>
-                <TabsTrigger value="presets" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-amber-500 border-none">
+                <TabsTrigger value="presets" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
                   <Sparkles className="h-4 w-4" /> Templates
                 </TabsTrigger>
-                <TabsTrigger value="solid-spectrum" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-emerald-500 border-none">
+                <TabsTrigger value="solid-spectrum" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
                   <Layout className="h-4 w-4" /> Solid
                 </TabsTrigger>
-                <TabsTrigger value="layout-system" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-sky-600 border-none">
+                <TabsTrigger value="layout-system" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
                   <SlidersHorizontal className="h-4 w-4" /> Layout
                 </TabsTrigger>
               </TabsList>
@@ -380,7 +410,7 @@ const ThemeStudioPage: React.FC = () => {
                   <div key={control.key} className="space-y-4">
                     <div className="flex items-center justify-between">
                       <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">{control.label}</p>
-                      <code className="text-[10px] font-black text-indigo-500">{theme[control.key]}°</code>
+                      <code className="text-[10px] font-black text-foreground rounded-md border border-border/60 bg-muted/40 px-1.5 py-0.5">{theme[control.key]}°</code>
                     </div>
                     <Slider min={0} max={360} step={1} value={[theme[control.key]]} onValueChange={(v) => handleAngleChange(control.key, v)} />
                   </div>
@@ -544,7 +574,7 @@ const ThemeStudioPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Page Padding</p>
-                    <code className="text-[10px] font-black text-sky-600">{theme.pagePadding.toFixed(2)} REM</code>
+                    <code className="text-[10px] font-black text-foreground rounded-md border border-border/60 bg-muted/40 px-1.5 py-0.5">{theme.pagePadding.toFixed(2)} REM</code>
                   </div>
                   <Slider min={0.75} max={2.5} step={0.05} value={[theme.pagePadding]} onValueChange={handlePagePaddingChange} />
                 </div>
@@ -552,7 +582,7 @@ const ThemeStudioPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Topbar Height</p>
-                    <code className="text-[10px] font-black text-sky-600">{theme.topbarHeight}px</code>
+                    <code className="text-[10px] font-black text-foreground rounded-md border border-border/60 bg-muted/40 px-1.5 py-0.5">{theme.topbarHeight}px</code>
                   </div>
                   <Slider min={56} max={84} step={1} value={[theme.topbarHeight]} onValueChange={handleTopbarHeightChange} />
                 </div>
@@ -560,7 +590,7 @@ const ThemeStudioPage: React.FC = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Sidebar Width</p>
-                    <code className="text-[10px] font-black text-sky-600">{theme.sidebarExpandedWidth}px</code>
+                    <code className="text-[10px] font-black text-foreground rounded-md border border-border/60 bg-muted/40 px-1.5 py-0.5">{theme.sidebarExpandedWidth}px</code>
                   </div>
                   <Slider min={224} max={320} step={2} value={[theme.sidebarExpandedWidth]} onValueChange={handleSidebarWidthChange} />
                 </div>
@@ -594,7 +624,7 @@ const ThemeStudioPage: React.FC = () => {
                     <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
                   </div>
                   <div className="flex items-center gap-3 px-4 py-2 rounded-xl bg-gradient-to-r from-primary/15 via-secondary/10 to-transparent shadow-inner">
-                    <Layout className="h-4 w-4 text-primary" />
+                    <Layout className="h-4 w-4 text-foreground/85" />
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-[0.18em] text-foreground/90">Live Workspace Monitor</p>
                       <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">Executive visual telemetry</p>
@@ -610,7 +640,7 @@ const ThemeStudioPage: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                    <p className="text-[10px] font-black uppercase text-emerald-600">Synchronized</p>
+                    <p className="text-[10px] font-black uppercase text-foreground/85">Synchronized</p>
                   </div>
                 </div>
               </div>

@@ -88,22 +88,22 @@ const today = new Date();
 const todayStr = today.toISOString().split('T')[0];
 
 const mealTypeColor: Record<MealType, { chip: string; icon: React.FC<{ className?: string }> }> = {
-  Breakfast: { chip: 'bg-amber-500/10 text-amber-600 border-amber-500/20', icon: Flame },
+  Breakfast: { chip: 'bg-warning/10 text-warning border-warning/25', icon: Flame },
   Lunch: { chip: 'bg-primary/10 text-primary border-primary/20', icon: Soup },
   Dinner: { chip: 'bg-secondary/10 text-secondary border-secondary/20', icon: Wheat },
-  Prasadam: { chip: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20', icon: Star },
+  Prasadam: { chip: 'bg-success/10 text-success border-success/25', icon: Star },
 };
 
 const statusChip: Record<MealStatus, string> = {
   Planned: 'bg-primary/10 text-primary',
-  'In Progress': 'bg-amber-500/10 text-amber-600',
-  Completed: 'bg-emerald-500/10 text-emerald-600',
+  'In Progress': 'bg-warning/10 text-warning',
+  Completed: 'bg-success/10 text-success',
   Cancelled: 'bg-destructive/10 text-destructive',
 };
 
 const distStatusChip: Record<DistributionStatus, string> = {
-  Served: 'bg-emerald-500/10 text-emerald-600',
-  Partial: 'bg-amber-500/10 text-amber-600',
+  Served: 'bg-success/10 text-success',
+  Partial: 'bg-warning/10 text-warning',
   Pending: 'bg-primary/10 text-primary',
   Cancelled: 'bg-destructive/10 text-destructive',
 };
@@ -249,8 +249,8 @@ function WeekCalendar({ plans, selectedDate, onDaySelect }: { plans: MealPlan[];
           return (
             <button key={ds} onClick={() => onDaySelect(ds)} className={`text-left p-3 min-h-[100px] transition-all rounded-xl relative overflow-hidden group ${selected ? 'bg-primary/5 shadow-inner' : 'hover:bg-muted/40'}`}>
               {selected && <div className="absolute top-0 left-0 w-full h-1 bg-primary" />}
-              <p className={`text-[11px] font-semibold tracking-wide uppercase ${selected ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>{dayNames[i]}</p>
-              <p className={`text-xl font-bold mt-0.5 ${selected ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'}`}>{day.getDate()}</p>
+              <p className={`text-[11px] font-semibold tracking-wide uppercase ${selected ? 'text-primary' : 'text-foreground/75 group-hover:text-foreground'}`}>{dayNames[i]}</p>
+              <p className={`text-xl font-bold mt-0.5 ${selected ? 'text-foreground' : 'text-foreground/75 group-hover:text-foreground'}`}>{day.getDate()}</p>
               <div className="mt-2 space-y-1">
                 {entries.slice(0, 2).map(item => {
                   const Icon = mealTypeColor[item.mealType].icon;
@@ -260,7 +260,7 @@ function WeekCalendar({ plans, selectedDate, onDaySelect }: { plans: MealPlan[];
                     </div>
                   );
                 })}
-                {entries.length > 2 && <p className="text-[10px] text-muted-foreground font-semibold px-1">+{entries.length - 2} more</p>}
+                {entries.length > 2 && <p className="text-[10px] text-foreground/70 font-semibold px-1">+{entries.length - 2} more</p>}
               </div>
             </button>
           );
@@ -379,7 +379,7 @@ const AnnadhanamPage: React.FC = () => {
     else meals.setItems(prev => [{ ...payload, id: nextMealPlanId(meals.items) }, ...prev]);
     setMealModalOpen(false);
   };
-  const setMField = <K extends keyof Omit<MealPlan, 'id'>>(k: K, v: any) => setMealForm(p => ({ ...p, [k]: v }));
+  const setMField = <K extends keyof Omit<MealPlan, 'id'>>(k: K, v: Omit<MealPlan, 'id'>[K]) => setMealForm(p => ({ ...p, [k]: v }));
 
   const openAddDistribution = () => {
     const first = meals.items[0];
@@ -394,18 +394,18 @@ const AnnadhanamPage: React.FC = () => {
     else dists.add(distForm);
     setDistModalOpen(false);
   };
-  const setDField = <K extends keyof Omit<DistributionLog, 'id'>>(k: K, v: any) => setDistForm(p => ({ ...p, [k]: v }));
+  const setDField = <K extends keyof Omit<DistributionLog, 'id'>>(k: K, v: Omit<DistributionLog, 'id'>[K]) => setDistForm(p => ({ ...p, [k]: v }));
 
   return (
     <div className="annadhanam-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
       <div className="page-header-banner annadhanam-header">
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><UtensilsCrossed className="w-5 h-5 text-primary" /> Annadhanam Management</h1>
-          <p className="text-sm text-muted-foreground mt-1">Free meal planning, serving logs, volunteer tracking, and ingredients inventory.</p>
+          <p className="text-sm text-foreground/85 mt-1">Free meal planning, serving logs, volunteer tracking, and ingredients inventory.</p>
         </div>
         <div className="flex flex-wrap gap-2 justify-end">
-          {tab === 'planner' && <Button onClick={openAddMeal} className="annadhanam-cta shadow-md bg-primary hover:opacity-90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Plan Meal</Button>}
-          {tab === 'distribution' && <Button onClick={openAddDistribution} className="annadhanam-cta shadow-md bg-emerald-600 hover:opacity-90 text-white"><Plus className="h-4 w-4 mr-2" />Log Distribution</Button>}
+          {tab === 'planner' && <Button onClick={openAddMeal} className="annadhanam-cta shadow-md"><Plus className="h-4 w-4 mr-2" />Plan Meal</Button>}
+          {tab === 'distribution' && <Button onClick={openAddDistribution} className="annadhanam-cta shadow-md"><Plus className="h-4 w-4 mr-2" />Log Distribution</Button>}
         </div>
       </div>
 
@@ -414,9 +414,9 @@ const AnnadhanamPage: React.FC = () => {
           <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Total Meal Plans</p>
           <p className="text-2xl font-bold mt-1 text-foreground">{meals.items.length}</p>
         </div>
-        <div className="stat-card annadhanam-stat-card border-emerald-500/20 bg-emerald-500/5">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-emerald-600 flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Served This Month</p>
-          <p className="text-2xl font-bold mt-1 text-emerald-600">{servedMonth.toLocaleString('en-IN')}</p>
+        <div className="stat-card annadhanam-stat-card border-success/25 bg-success/10">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-success flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Served This Month</p>
+          <p className="text-2xl font-bold mt-1 text-success">{servedMonth.toLocaleString('en-IN')}</p>
         </div>
         <div className="stat-card annadhanam-stat-card border-primary/20 bg-primary/5">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-primary flex items-center gap-1.5"><Utensils className="w-3.5 h-3.5" /> Meals Today</p>
@@ -431,7 +431,7 @@ const AnnadhanamPage: React.FC = () => {
       <div className="flex flex-wrap gap-3 w-full md:w-auto relative z-20">
         {( [
           { key: 'planner' as Tab, label: 'Meal Plan', icon: Calendar, color: 'bg-primary border-primary/20' },
-          { key: 'distribution' as Tab, label: 'Distribution', icon: Users, color: 'bg-emerald-600 border-emerald-500/20' },
+          { key: 'distribution' as Tab, label: 'Distribution', icon: Users, color: 'bg-success border-success/25' },
           { key: 'inventory' as Tab, label: 'Inventory', icon: Package, color: 'bg-secondary border-secondary/20' },
         ]).map(sec => (
           <button
@@ -440,9 +440,9 @@ const AnnadhanamPage: React.FC = () => {
             className={`annadhanam-tab-btn flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 border-2 shadow-sm
               ${tab === sec.key 
                 ? `${sec.color} text-white shadow-lg scale-[1.03]` 
-                : 'bg-background border-border text-muted-foreground hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground'}`}
+                : 'bg-background border-border text-foreground/75 hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground'}`}
           >
-            <sec.icon className={`h-4 w-4 ${tab === sec.key ? 'text-white' : ''}`} />
+            <sec.icon className={`h-4 w-4 ${tab === sec.key ? 'text-white' : 'text-foreground/80'}`} />
             {sec.label}
           </button>
         ))}
@@ -562,7 +562,7 @@ const AnnadhanamPage: React.FC = () => {
                   ) : filteredDistributions.map(log => {
                     const wastedCount = Math.max(log.expectedCount - log.servedCount, 0);
                     const wastePct = log.expectedCount > 0 ? (wastedCount / log.expectedCount) * 100 : 0;
-                    const tone = wastePct >= 15 ? 'bg-destructive/10 text-destructive border-destructive/20 font-bold' : wastePct > 0 ? 'bg-amber-500/10 text-amber-600 border-amber-500/20' : 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+                    const tone = wastePct >= 15 ? 'bg-destructive/10 text-destructive border-destructive/20 font-bold' : wastePct > 0 ? 'bg-warning/10 text-warning border-warning/25' : 'bg-success/10 text-success border-success/25';
                     return (
                       <tr key={log.id} className="annadhanam-row border-b border-border hover:bg-muted/30 transition-colors">
                         <td className="p-4 font-bold text-foreground">{log.id}</td>
@@ -572,13 +572,13 @@ const AnnadhanamPage: React.FC = () => {
                         </td>
                         <td className="p-4">
                           <div className="text-[11px] font-medium text-muted-foreground flex flex-col gap-1">
-                            <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-emerald-600" /> Start: {log.startTime}</span>
+                            <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-success" /> Start: {log.startTime}</span>
                             {log.endTime && <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary" /> End: {log.endTime}</span>}
                           </div>
                         </td>
                         <td className="p-4 text-center">
                           <div className="inline-flex items-end gap-1.5">
-                            <span className="text-2xl font-bold text-emerald-600">{log.servedCount}</span>
+                            <span className="text-2xl font-bold text-success">{log.servedCount}</span>
                             <span className="text-xs text-muted-foreground font-medium pb-1">/ {log.expectedCount} planned</span>
                           </div>
                         </td>
@@ -629,8 +629,8 @@ const AnnadhanamPage: React.FC = () => {
                   <p className="text-2xl font-bold text-foreground mb-6">{inventoryCategoryCount}</p>
 
                   <div className="space-y-4 border-t border-border/80 pt-5 text-sm">
-                    <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Healthy Stock</span> <span className="font-bold text-emerald-600">{stock.items.length - lowStockCount}</span></div>
-                    <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Low / Critical</span> <span className="font-bold text-red-600">{lowStockCount}</span></div>
+                    <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Healthy Stock</span> <span className="font-bold text-success">{stock.items.length - lowStockCount}</span></div>
+                    <div className="flex justify-between items-center"><span className="font-semibold text-muted-foreground">Low / Critical</span> <span className="font-bold text-destructive">{lowStockCount}</span></div>
                   </div>
                 </div>
               </div>
@@ -639,10 +639,10 @@ const AnnadhanamPage: React.FC = () => {
                 {stock.items.map(item => {
                   const level = stockLevel(item);
                   const isCrit = level === 'critical';
-                  const levelColor = isCrit ? 'text-destructive bg-destructive/10 border-destructive/20 ring-2 ring-destructive/10' : level === 'low' ? 'text-amber-600 bg-amber-500/10 border-amber-500/20' : 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20 border-dashed';
+                  const levelColor = isCrit ? 'text-destructive bg-destructive/10 border-destructive/20 ring-2 ring-destructive/10' : level === 'low' ? 'text-warning bg-warning/10 border-warning/25' : 'text-success bg-success/10 border-success/25 border-dashed';
                   return (
                     <div key={item.id} className="annadhanam-inv-card rounded-xl border border-border/60 bg-background shadow-sm hover:shadow-md transition-shadow p-5 flex flex-col items-start relative overflow-hidden group">
-                      {isCrit && <div className="absolute top-0 right-0 w-12 h-12 bg-red-500/5 -z-0 rounded-bl-full" />}
+                      {isCrit && <div className="absolute top-0 right-0 w-12 h-12 bg-destructive/10 -z-0 rounded-bl-full" />}
 
                       <div className="w-full flex items-start justify-between mb-4 z-10 relative">
                         <div>
@@ -696,7 +696,7 @@ const AnnadhanamPage: React.FC = () => {
 
           <div className="border border-border/80 rounded-xl bg-muted/10 p-4">
             <div className="flex items-center justify-between mb-4 border-b border-border/60 pb-3">
-              <label className="text-sm font-semibold text-foreground flex items-center gap-2"><Leaf className="w-4 h-4 text-emerald-600" /> Food Menu items</label>
+              <label className="text-sm font-semibold text-foreground flex items-center gap-2"><Leaf className="w-4 h-4 text-success" /> Food Menu items</label>
               <Button type="button" variant="outline" size="sm" className="h-8 bg-background shadow-sm" onClick={() => setMealForm(prev => ({ ...prev, menu: [...prev.menu, { name: '', qty: '' }] }))}><Plus className="h-3.5 w-3.5 mr-1" />Add Item</Button>
             </div>
             <div className="space-y-2">
@@ -718,9 +718,9 @@ const AnnadhanamPage: React.FC = () => {
                 {aiMealInsights.map((warning, idx) => <p key={`warn-${idx}`} className="text-[11px] font-semibold text-destructive flex items-start gap-1.5"><AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5 opacity-80" /> {warning}</p>)}
               </div>
             ) : (
-              <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
-                <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Operations look good. Expected count fits within typical inventory levels.</p>
+              <div className="rounded-lg border border-success/25 bg-success/10 p-3 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-success" />
+                <p className="text-[11px] font-bold text-success flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Operations look good. Expected count fits within typical inventory levels.</p>
               </div>
             )}
           </div>

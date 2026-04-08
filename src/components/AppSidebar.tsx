@@ -36,7 +36,6 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
 
         background: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
         color: 'hsl(var(--sidebar-foreground))',
-
         width: isCollapsed ? 'var(--layout-sidebar-collapsed-width)' : 'var(--layout-sidebar-expanded-width)',
         backgroundImage: 'linear-gradient(var(--sidebar-gradient-angle), var(--sidebar-gradient-start) 0%, var(--sidebar-gradient-mid) 54%, var(--sidebar-gradient-end) 100%)',
         backgroundColor: 'var(--layout-frame-background)',
@@ -44,9 +43,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
         boxShadow: isRightPosition ? 'var(--layout-sidebar-frame-shadow-right)' : 'var(--layout-sidebar-frame-shadow-left)',
         borderRadius: 'var(--layout-sidebar-radius)',
         backdropFilter: 'var(--layout-frame-backdrop)',
-        WebkitBackdropFilter: 'var(--layout-frame-backdrop)',
-        color: 'hsl(0, 0%, 100%)',
-
+        WebkitBackdropFilter: 'var(--layout-frame-backdrop)'
       }}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -125,7 +122,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
                       className={`ml-auto h-1.5 w-1.5 rounded-full transition-all duration-200 ${
                         isActive ? 'scale-100' : 'bg-transparent scale-75 group-hover:bg-white/70 group-hover:scale-100'
                       }`}
-                      style={isActive ? { background: 'var(--sidebar-highlight)' } : { background: 'currentColor' }}
+                      style={isActive ? { background: 'var(--sidebar-highlight)' } : undefined}
                     />
                   )}
                 </>

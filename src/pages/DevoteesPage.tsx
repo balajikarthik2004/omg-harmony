@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, X, MessageSquare, MessageCircle, Mail, Phone, MapPin, Calendar, Search, Users, ShieldCheck, HeartHandshake, History, CreditCard, Clock, CheckCircle2, Maximize2, UserPlus, Crown, Award, Medal } from 'lucide-react';
 import { mockDevotees, mockDonations, mockBookings, mockEvents } from '@/data/mockData';
@@ -98,9 +99,9 @@ function fmtDate(dateStr?: string) {
 
 const bookingBadgeClass = (status: string) => {
   const map: Record<string, string> = {
-    Confirmed: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
-    Pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
-    Completed: 'bg-primary/10 text-primary border-primary/20',
+    Confirmed: 'bg-success/15 text-success border-success/25',
+    Pending: 'bg-warning/15 text-warning border-warning/25',
+    Completed: 'bg-primary/15 text-foreground border-primary/30',
     Cancelled: 'bg-destructive/10 text-destructive border-destructive/20',
   };
   return map[status] ?? 'bg-muted text-muted-foreground';
@@ -283,8 +284,10 @@ function getDonationTier(total: number) {
   if (total >= 100000) return { label: 'Platinum', icon: Crown, color: 'text-primary bg-primary/10 border-primary/20', fill: 'fill-primary/20' };
   if (total >= 50000) return { label: 'Gold', icon: Award, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20', fill: 'fill-amber-500/20' };
   if (total >= 10000) return { label: 'Silver', icon: Medal, color: 'text-muted-foreground bg-muted border-border', fill: 'fill-muted-foreground/20' };
-  return { label: 'Devotee', icon: HeartHandshake, color: 'text-emerald-600 bg-emerald-500/10 border-emerald-500/20', fill: 'fill-emerald-500/10' };
+  return { label: 'Devotee', icon: HeartHandshake, color: 'text-success bg-success/15 border-success/25', fill: 'fill-success/20' };
 }
+
+const profileMetaIconClass = 'w-4 h-4 text-foreground/80';
 
 const DevoteesPage: React.FC = () => {
   const { items, add, update, remove } = useStore<Devotee>(mockDevotees as any[]);
@@ -996,8 +999,8 @@ const DevoteesPage: React.FC = () => {
 
       <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Delete Devotee Account" message="Are you sure you want to permanently delete this devotee account? Related history and logs might be retained for audit purposes." />
 
-      {drawerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end" onClick={() => setDrawerOpen(false)}>
+      {drawerOpen && createPortal(
+        <div className="fixed inset-0 z-[90] flex items-center justify-end" onClick={() => setDrawerOpen(false)}>
           <div className="devotees-drawer-overlay absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
           <div className="devotees-drawer relative h-[100vh] w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
 
@@ -1107,7 +1110,7 @@ const DevoteesPage: React.FC = () => {
                     <h3 className="text-sm font-bold uppercase tracking-widest text-muted-foreground border-b border-border/50 pb-2">Profile Meta</h3>
                     <div className="bg-muted/10 rounded-2xl border border-border/60 p-1">
                       <div className="flex justify-between items-center p-4 border-b border-border/40">
-                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Date of Birth</span>
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Calendar className={profileMetaIconClass} /> Date of Birth</span>
                         <span className="text-sm font-bold text-foreground">{profileDob ? fmtDate(profileDob) : 'N/A'}</span>
                       </div>
                       <div className="flex justify-between items-center p-4 border-b border-border/40">
@@ -1119,11 +1122,11 @@ const DevoteesPage: React.FC = () => {
                         <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{profileOccupation}</span>
                       </div>
                       <div className="flex justify-between items-center p-4 border-b border-border/40">
-                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Joint Date</span>
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><Users className={profileMetaIconClass} /> Joint Date</span>
                         <span className="text-xs font-bold text-foreground bg-background px-2.5 py-1 rounded shadow-sm border border-border">{devoteeProfile?.memberSince ?? 'N/A'}</span>
                       </div>
                       <div className="flex justify-between items-center p-4">
-                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><HeartHandshake className="w-4 h-4 text-primary" /> Preferred Seva</span>
+                        <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest flex items-center gap-2"><HeartHandshake className={profileMetaIconClass} /> Preferred Seva</span>
                         <span className="text-xs font-bold text-foreground max-w-[180px] break-words text-right">{devoteeProfile?.preferredSeva}</span>
                       </div>
                     </div>
@@ -1245,18 +1248,18 @@ const DevoteesPage: React.FC = () => {
                       <p className="text-sm text-muted-foreground mt-1">There are no financial logs for this devotee.</p>
                     </div>
                   ) : devDonations.map(dn => (
-                    <div key={dn.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-emerald-300 transition-all hover:shadow-md relative overflow-hidden group">
-                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-emerald-500/10 to-transparent pointer-events-none" />
+                    <div key={dn.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-success/35 transition-all hover:shadow-md relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-success/15 to-transparent pointer-events-none" />
                       <div className="flex justify-between items-start mb-4 relative z-10">
                         <div>
                           <p className="text-sm font-bold text-foreground">{dn.category}</p>
                           <p className="text-xs font-mono font-semibold text-muted-foreground mt-1 flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5" /> ID: {dn.id}</p>
                         </div>
-                        <p className="text-2xl font-bold font-display text-emerald-600">{fmtAmt(dn.amount)}</p>
+                        <p className="text-2xl font-bold font-display text-success">{fmtAmt(dn.amount)}</p>
                       </div>
                       <div className="flex justify-between items-center mt-3 pt-3 border-t border-border/40 relative z-10">
                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(dn.date)}</span>
-                        <span className="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">{dn.paymentMethod}</span>
+                        <span className="text-[10px] uppercase font-bold text-success bg-success/15 px-2 py-1 rounded border border-success/25">{dn.paymentMethod}</span>
                       </div>
                     </div>
                   ))}
@@ -1272,15 +1275,15 @@ const DevoteesPage: React.FC = () => {
                       <p className="text-sm text-muted-foreground mt-1">There are no service bookings or history.</p>
                     </div>
                   ) : devBookings.map(bk => (
-                    <div key={bk.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-blue-300 transition-all hover:shadow-md relative overflow-hidden grid">
-                      <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500/20" />
+                    <div key={bk.id} className="rounded-xl border border-border/80 bg-background p-5 shadow-sm hover:border-primary/35 transition-all hover:shadow-md relative overflow-hidden grid">
+                      <div className="absolute top-0 left-0 w-1.5 h-full bg-primary/25" />
                       <div className="flex justify-between items-start mb-4 relative z-10 pl-2">
                         <p className="text-sm font-bold text-foreground max-w-[70%] leading-relaxed">{bk.serviceName}</p>
                         <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${bookingBadgeClass(bk.bookingStatus)}`}>{bk.bookingStatus}</span>
                       </div>
                       <div className="flex justify-between items-center mt-2 pt-4 border-t border-border/40 relative z-10 pl-2">
                         <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5 bg-muted/50 px-2 py-1 rounded"><Calendar className="w-3.5 h-3.5" />{fmtDate(bk.date)}</span>
-                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary" />{bk.time}</span>
+                        <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-foreground/75" />{bk.time}</span>
                       </div>
                     </div>
                   ))}
@@ -1298,7 +1301,7 @@ const DevoteesPage: React.FC = () => {
                       <button onClick={() => setChannels(p => ({ ...p, email: !p.email }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.email ? 'bg-primary/10 text-primary border-primary/30 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
                         <Mail className="w-5 h-5" /> <span className="text-[10px]">EMAIL</span>
                       </button>
-                      <button onClick={() => setChannels(p => ({ ...p, whatsapp: !p.whatsapp }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.whatsapp ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
+                      <button onClick={() => setChannels(p => ({ ...p, whatsapp: !p.whatsapp }))} className={`flex flex-col items-center justify-center gap-2.5 p-3 rounded-lg font-bold transition-all border-2 ${channels.whatsapp ? 'bg-success/15 text-success border-success/25 shadow-sm' : 'bg-background border-border text-muted-foreground hover:bg-muted/40'}`}>
                         <MessageCircle className="w-5 h-5" /> <span className="text-[10px]">WHATSAPP</span>
                       </button>
                     </div>
@@ -1368,7 +1371,7 @@ const DevoteesPage: React.FC = () => {
                     </div>
 
                     {notifSent && (
-                      <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
+                      <div className="p-4 rounded-xl bg-success/15 border border-success/25 text-success text-sm font-bold text-center shadow-sm flex items-center justify-center gap-2">
                         <CheckCircle2 className="w-5 h-5" /> {notifSent}
                       </div>
                     )}
@@ -1387,7 +1390,8 @@ const DevoteesPage: React.FC = () => {
             )}
 
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       <Modal
@@ -1436,8 +1440,8 @@ const DevoteesPage: React.FC = () => {
         </div>
       </Modal>
 
-      {familyFullViewOpen && selectedDevotee && !familyFormOpen && (
-        <div className="modal-overlay z-[70]" onClick={() => setFamilyFullViewOpen(false)}>
+      {familyFullViewOpen && selectedDevotee && !familyFormOpen && createPortal(
+        <div className="modal-overlay z-[120]" onClick={() => setFamilyFullViewOpen(false)}>
           <div className="bg-card rounded-2xl shadow-2xl w-[min(94vw,1200px)] h-[min(90vh,850px)] border border-border/60 overflow-hidden" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-5 border-b border-border/70">
               <div>
@@ -1467,7 +1471,8 @@ const DevoteesPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

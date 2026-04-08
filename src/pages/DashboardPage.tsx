@@ -1,11 +1,11 @@
 import React from 'react';
 import {
   Heart, CalendarDays, Users, TrendingUp, CalendarCheck,
-  LayoutDashboard, Search, Activity, Package, AlertTriangle
+  LayoutDashboard, Search, Activity, Package, AlertTriangle, PieChart as PieChartIcon
 } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, BarChart, Bar, Legend
+  PieChart as RechartsPieChart, Pie, Cell, BarChart, Bar, Legend
 } from 'recharts';
 
 import {
@@ -53,6 +53,8 @@ const dashboardColors = {
   tooltipBg: 'hsl(var(--card))',
   chartCursor: 'var(--chart-cursor)',
 };
+
+const sectionIconClassName = 'w-4 h-4 text-foreground/85';
 
 
 
@@ -103,7 +105,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <section className="section-panel shadow-sm lg:col-span-2 flex flex-col">
           <div className="section-panel-header">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><TrendingUp className="w-4 h-4 text-primary" /> Donation Trend</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2"><TrendingUp className={sectionIconClassName} /> Donation Trend</h3>
           </div>
           <div className="p-5 flex-1 relative">
             <ResponsiveContainer width="100%" height={280}>
@@ -138,11 +140,11 @@ const DashboardPage: React.FC = () => {
 
         <section className="section-panel shadow-sm flex flex-col">
           <div className="section-panel-header">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><PieChart className="w-4 h-4 text-primary" /> Donation Categories</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2"><PieChartIcon className={sectionIconClassName} /> Donation Categories</h3>
           </div>
           <div className="p-5 flex-1 flex flex-col justify-center relative">
             <ResponsiveContainer width="100%" height={230}>
-              <PieChart>
+              <RechartsPieChart>
                 <Pie data={donationCategoryData} cx="50%" cy="50%" fontSize={12} outerRadius={85} innerRadius={45} dataKey="value" label={({ name, value }) => `${name} ${value}%`} labelLine={{ stroke: 'hsl(var(--muted-foreground))' }} strokeWidth={2} stroke="hsl(var(--background))">
                   {donationCategoryData.map((entry, i) => (
                     <Cell key={i} fill={donationCategoryPalette[i % donationCategoryPalette.length]} />
@@ -151,7 +153,7 @@ const DashboardPage: React.FC = () => {
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                 />
-              </PieChart>
+              </RechartsPieChart>
             </ResponsiveContainer>
           </div>
         </section>
@@ -160,7 +162,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <section className="section-panel shadow-sm">
           <div className="section-panel-header">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className="w-4 h-4 text-primary" /> Service Bookings Distribution</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2"><CalendarDays className={sectionIconClassName} /> Service Bookings Distribution</h3>
           </div>
           <div className="p-5">
             <ResponsiveContainer width="100%" height={220}>
@@ -180,7 +182,7 @@ const DashboardPage: React.FC = () => {
 
         <section className="section-panel shadow-sm">
           <div className="section-panel-header">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><Package className="w-4 h-4 text-primary" /> Inventory Usage Trends</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2"><Package className={sectionIconClassName} /> Inventory Usage Trends</h3>
           </div>
           <div className="p-5">
             <ResponsiveContainer width="100%" height={220}>
@@ -204,7 +206,7 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <section className="section-panel shadow-sm">
           <div className="section-panel-header">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><Activity className="w-4 h-4 text-primary" /> Recent Activity Feed</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2"><Activity className={sectionIconClassName} /> Recent Activity Feed</h3>
           </div>
           <div className="p-4 space-y-4 max-h-[300px] overflow-y-auto">
             {recentActivity.map((a, i) => (
@@ -223,7 +225,7 @@ const DashboardPage: React.FC = () => {
 
         <section className="section-panel shadow-sm">
           <div className="section-panel-header">
-            <h3 className="text-sm font-semibold flex items-center gap-2"><CalendarCheck className="w-4 h-4 text-primary" /> Upcoming Events</h3>
+            <h3 className="text-sm font-semibold flex items-center gap-2"><CalendarCheck className={sectionIconClassName} /> Upcoming Events</h3>
           </div>
           <div className="p-4 space-y-3 max-h-[300px] overflow-y-auto">
             {upcomingEvents.map((e, i) => (
