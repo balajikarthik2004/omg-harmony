@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth, UserRole } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +14,15 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<UserRole>('admin');
   const { login } = useAuth();
+  const { logoUrl } = useTheme();
   const navigate = useNavigate();
+  const [isLogoBroken, setIsLogoBroken] = useState(false);
+
+  React.useEffect(() => {
+    setIsLogoBroken(false);
+  }, [logoUrl]);
+
+  const loginLogoSrc = !isLogoBroken && logoUrl ? logoUrl : logo;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,8 +109,13 @@ const LoginPage: React.FC = () => {
         <div className="w-full max-w-[400px] animate-slide-in-right">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2.5 mb-8">
-            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Heart className="h-5 w-5 text-primary" />
+            <div className="w-10 h-10 rounded-lg bg-white/80 border border-border/40 p-1.5 flex items-center justify-center">
+              <img
+                src={loginLogoSrc}
+                alt="OMG Temple"
+                className="max-h-full max-w-full object-contain"
+                onError={() => setIsLogoBroken(true)}
+              />
             </div>
             <span className="text-lg font-display font-bold text-foreground">OMG Temple</span>
           </div>

@@ -13,7 +13,9 @@ import {
 interface ThemeContextValue {
   theme: ThemeSettings;
   presets: ThemePreset[];
+  logoUrl: string | null;
   updateTheme: (patch: Partial<ThemeSettings>) => void;
+  updateLogo: (nextLogoUrl: string | null) => void;
   applyPreset: (presetId: string) => void;
   saveCurrentAsPreset: (name?: string) => void;
   deletePreset: (presetId: string) => void;
@@ -23,6 +25,7 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const CUSTOM_PRESET_STORAGE_KEY = 'omg_theme_custom_presets_v1';
+const CUSTOM_LOGO_STORAGE_KEY = 'omg_theme_logo_v1';
 
 const isHex = (value: string) => /^#([0-9a-fA-F]{6})$/.test(value);
 
@@ -82,6 +85,17 @@ const loadCustomPresets = (): ThemePreset[] => {
   }
 };
 
+const loadCustomLogo = (): string | null => {
+  try {
+    const raw = localStorage.getItem(CUSTOM_LOGO_STORAGE_KEY);
+    if (!raw) return null;
+    const trimmed = raw.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  } catch {
+    return null;
+  }
+};
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<ThemeSettings>(() => {
     if (typeof window === 'undefined') return DEFAULT_THEME;
@@ -90,6 +104,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [customPresets, setCustomPresets] = useState<ThemePreset[]>(() => {
     if (typeof window === 'undefined') return [];
     return loadCustomPresets();
+  });
+  const [logoUrl, setLogoUrl] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return loadCustomLogo();
   });
 
   const presets = useMemo(() => [...customPresets, ...THEME_PRESETS], [customPresets]);
@@ -103,8 +121,26 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     localStorage.setItem(CUSTOM_PRESET_STORAGE_KEY, JSON.stringify(customPresets));
   }, [customPresets]);
 
+  useEffect(() => {
+    if (!logoUrl) {
+      localStorage.removeItem(CUSTOM_LOGO_STORAGE_KEY);
+      return;
+    }
+    localStorage.setItem(CUSTOM_LOGO_STORAGE_KEY, logoUrl);
+  }, [logoUrl]);
+
   const updateTheme = useCallback((patch: Partial<ThemeSettings>) => {
     setTheme(prev => sanitizeTheme({ ...prev, ...patch }));
+  }, []);
+
+  const updateLogo = useCallback((nextLogoUrl: string | null) => {
+    if (!nextLogoUrl) {
+      setLogoUrl(null);
+      return;
+    }
+
+    const trimmed = nextLogoUrl.trim();
+    setLogoUrl(trimmed || null);
   }, []);
 
   const applyPreset = useCallback((presetId: string) => {
@@ -157,13 +193,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     () => ({
       theme,
       presets,
+      logoUrl,
       updateTheme,
+      updateLogo,
       applyPreset,
       saveCurrentAsPreset,
       deletePreset,
       resetTheme,
     }),
-    [theme, presets, updateTheme, applyPreset, saveCurrentAsPreset, deletePreset, resetTheme],
+    [theme, presets, logoUrl, updateTheme, updateLogo, applyPreset, saveCurrentAsPreset, deletePreset, resetTheme],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

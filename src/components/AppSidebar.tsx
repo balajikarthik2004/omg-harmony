@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { ChevronsLeft, ChevronsRight, LogOut } from 'lucide-react';
 import { getNavigationLinks } from '@/lib/navigation';
 
@@ -15,7 +16,13 @@ interface AppSidebarProps {
 
 const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggleCollapse }) => {
   const { user, logout } = useAuth();
+  const { logoUrl } = useTheme();
   const navigate = useNavigate();
+  const [isLogoBroken, setIsLogoBroken] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsLogoBroken(false);
+  }, [logoUrl, isCollapsed]);
 
   const links = getNavigationLinks(user?.role);
 
@@ -25,6 +32,7 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
   };
 
   const isRightPosition = position === 'right';
+  const activeLogoSrc = !isLogoBroken && logoUrl ? logoUrl : (isCollapsed ? logo1 : logo);
   const collapseIcon = isRightPosition
     ? (isCollapsed ? <ChevronsLeft className="h-4 w-4" /> : <ChevronsRight className="h-4 w-4" />)
     : (isCollapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />);
@@ -68,11 +76,12 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
           </button>
           <div className={isCollapsed ? 'order-2' : 'order-1'}>
             <img
-              src={isCollapsed ? logo1 : logo}
+              src={activeLogoSrc}
               alt="OMG Temple"
               className={`object-contain bg-white rounded-lg shadow-sm transition-all duration-200 ${
                 isCollapsed ? 'h-10 w-10 px-1 mx-auto' : 'h-[50px] px-4'
               }`}
+              onError={() => setIsLogoBroken(true)}
             />
           </div>
         </div>

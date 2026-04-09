@@ -14,6 +14,7 @@ import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
+import { toast } from 'sonner';
 import PoojaSevaPaymentFlow, {
   type SevaPaymentFlowBooking,
 } from '@/components/PoojaSevaPaymentFlow';
@@ -155,6 +156,7 @@ const DonationsPage: React.FC = () => {
   const [customTo, setCustomTo] = useState('');
   const [activeTab, setActiveTab] = useState<'ledger' | 'analytics'>('ledger');
   const [selectedProfile, setSelectedProfile] = useState<DonorProfile | null>(null);
+  const [formError, setFormError] = useState('');
 
   const donorProfiles = useMemo(() => {
     const profiles: DonorProfile[] = [];
@@ -241,6 +243,7 @@ const DonationsPage: React.FC = () => {
 
   const openAdd = () => {
     setForm({ ...emptyForm, date: new Date().toISOString().split('T')[0] });
+    setFormError('');
     setEditId(null);
     setModalOpen(true);
   };
@@ -258,6 +261,7 @@ const DonationsPage: React.FC = () => {
       gateway: item.gateway,
       notes: item.notes,
     });
+    setFormError('');
     setEditId(item.id);
     setModalOpen(true);
   };
@@ -334,21 +338,31 @@ const DonationsPage: React.FC = () => {
   };
 
   const handleSave = () => {
-    if (!form.amount || !form.date || !form.category) return;
+    const amount = Number(form.amount);
+    if (!form.date || !form.category || !Number.isFinite(amount) || amount <= 0) {
+      setFormError('Enter a valid donation amount and receipt date to continue.');
+      toast.error('Cannot proceed to payment', {
+        description: 'Enter a valid donation amount and receipt date first.',
+      });
+      return;
+    }
+
+    setFormError('');
     const gatewayNeeded = form.channel === 'Online' && (form.paymentMethod === 'UPI' || form.paymentMethod === 'Card');
+    const paymentStatus: DonationRecord['paymentStatus'] = form.channel === 'Online' ? 'Pending' : 'Success';
 
     const payload = {
       donorName: form.donorName.trim() || 'Anonymous Donor',
       phone: form.phone,
       email: form.email,
       category: form.category,
-      amount: Number(form.amount),
+      amount,
       date: form.date,
       channel: form.channel,
       paymentMethod: form.paymentMethod,
       gateway: form.gateway,
       transactionRef: gatewayNeeded ? createTxnRef(form.gateway) : '-',
-      paymentStatus: (form.channel === 'Online' ? 'Pending' : 'Success') as const,
+      paymentStatus,
       notes: form.notes,
     };
 
@@ -714,8 +728,10 @@ const DonationsPage: React.FC = () => {
             <textarea value={form.notes} onChange={e => setFormField('notes', e.target.value)} className="w-full rounded-lg border border-input bg-background/60 hover:border-border p-3 text-sm min-h-[90px] resize-none transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm" placeholder="Any specific wishes or instructions from the donor..." />
           </div>
 
+          {formError && <p className="text-xs font-semibold text-destructive">{formError}</p>}
+
           <div className="flex gap-3 pt-4 border-t border-border/60">
-            <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>
+            <Button variant="outline" onClick={() => { setFormError(''); setModalOpen(false); }} className="flex-1 py-5">Cancel</Button>
             <Button onClick={handleSave} className="flex-1 py-5 shadow-md">
               {form.channel === 'Online' && !editId ? 'Proceed to Payment' : 'Complete Transaction & Issue Receipt'}
             </Button>

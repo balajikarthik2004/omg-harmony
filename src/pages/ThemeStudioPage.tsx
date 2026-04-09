@@ -1,9 +1,11 @@
 import React from 'react';
-import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns, SlidersHorizontal, Sun, Moon } from 'lucide-react';
+import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns, SlidersHorizontal, Sun, Moon, ImageUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
 import { useTheme } from '@/contexts/ThemeContext';
+import { toast } from 'sonner';
+import defaultLogo from '@/assets/img/logo.png';
 import { CardStyle, ChromeStyle, ContentWidth, LayoutDensity, MotionPreset, SidebarPosition, ThemeSettings } from '@/lib/theme';
 
 type ColorField = keyof Pick<
@@ -106,10 +108,18 @@ const motionPresetOptions: Array<{ value: MotionPreset; label: string; hint: str
 
 const PREVIEW_CANVAS_WIDTH = 1060;
 const PREVIEW_CANVAS_HEIGHT = 680;
+const MAX_LOGO_FILE_SIZE = 1024 * 1024;
+
+const isSupportedLogoSource = (value: string) => {
+  const trimmed = value.trim();
+  return /^https?:\/\//i.test(trimmed) || trimmed.startsWith('/') || /^data:image\//i.test(trimmed);
+};
 
 const ThemeStudioPage: React.FC = () => {
-  const { theme, presets, updateTheme, applyPreset, saveCurrentAsPreset, resetTheme } = useTheme();
+  const { theme, presets, logoUrl, updateTheme, updateLogo, applyPreset, saveCurrentAsPreset, resetTheme } = useTheme();
   const [presetName, setPresetName] = React.useState('');
+  const [logoInputValue, setLogoInputValue] = React.useState(logoUrl ?? '');
+  const [logoError, setLogoError] = React.useState('');
   const [activeTab, setActiveTab] = React.useState('palette');
   const previewHostRef = React.useRef<HTMLDivElement | null>(null);
   const leftContentScrollRef = React.useRef<HTMLDivElement | null>(null);
@@ -135,6 +145,10 @@ const ThemeStudioPage: React.FC = () => {
       window.removeEventListener('resize', updateScale);
     };
   }, []);
+
+  React.useEffect(() => {
+    setLogoInputValue(logoUrl ?? '');
+  }, [logoUrl]);
 
   const applyCustomPatch = (patch: Partial<ThemeSettings>) => {
     updateTheme({
@@ -209,6 +223,75 @@ const ThemeStudioPage: React.FC = () => {
     if (!presetName.trim()) return;
     saveCurrentAsPreset(presetName);
     setPresetName('');
+  };
+
+  const handleLogoUrlApply = () => {
+    const next = logoInputValue.trim();
+    if (!next) {
+      setLogoError('Enter a valid logo URL or upload an image.');
+      toast.error('Logo not updated', {
+        description: 'Enter a valid logo URL or upload an image file.',
+      });
+      return;
+    }
+
+    if (!isSupportedLogoSource(next)) {
+      setLogoError('Use an absolute URL, app-relative path, or data image URL.');
+      toast.error('Logo URL format is not supported');
+      return;
+    }
+
+    setLogoError('');
+    updateLogo(next);
+    toast.success('Logo updated successfully');
+  };
+
+  const handleLogoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setLogoError('Please upload a valid image file.');
+      toast.error('Only image files are supported');
+      return;
+    }
+
+    if (file.size > MAX_LOGO_FILE_SIZE) {
+      setLogoError('Image is too large. Use a file up to 1 MB.');
+      toast.error('Image is too large', {
+        description: 'Please upload an image up to 1 MB.',
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = typeof reader.result === 'string' ? reader.result : '';
+      if (!result.startsWith('data:image/')) {
+        setLogoError('Unable to read image. Please try a different file.');
+        toast.error('Failed to process selected image');
+        return;
+      }
+
+      setLogoError('');
+      setLogoInputValue(result);
+      updateLogo(result);
+      toast.success('Logo uploaded and saved');
+    };
+    reader.onerror = () => {
+      setLogoError('Unable to read image. Please try again.');
+      toast.error('Failed to read image file');
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const handleLogoReset = () => {
+    setLogoError('');
+    setLogoInputValue('');
+    updateLogo(null);
+    toast.success('Logo reset to default');
   };
 
   const applySolidColor = (hex: string, name: string) => {
@@ -288,7 +371,7 @@ const ThemeStudioPage: React.FC = () => {
               Theme Studio
             </h1>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-3 md:justify-end">
             <div className="hidden sm:flex items-center gap-2 rounded-2xl border border-border/50 bg-card/60 px-2 py-1.5 shadow-sm">
               <span className="px-2 text-[9px] font-black uppercase tracking-[0.2em] text-foreground/75">Mode</span>
               <Button
@@ -326,7 +409,7 @@ const ThemeStudioPage: React.FC = () => {
               <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
               <p className="text-[11px] font-black text-foreground/80 uppercase tracking-tight"><span className="opacity-40">Active:</span> {theme.name}</p>
             </div>
-            <Button variant="outline" onClick={resetTheme} className="h-11 rounded-2xl px-6 text-[10px] font-black uppercase tracking-[0.2em] border-border/60 hover:bg-destructive hover:text-white transition-all">
+            <Button variant="outline" onClick={resetTheme} className="h-11 rounded-2xl px-6 text-[10px] font-black uppercase tracking-[0.2em] border-border/60 hover:bg-destructive hover:text-white transition-all shrink-0">
               <RotateCcw className="h-4 w-4 mr-2" />
               Reset
             </Button>
@@ -359,6 +442,42 @@ const ThemeStudioPage: React.FC = () => {
 
             <div ref={leftContentScrollRef} className="theme-studio-left-scroll flex-1 min-h-0 overflow-y-auto pr-1 pb-8">
             <TabsContent value="palette" className="space-y-6 mt-0">
+              <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm space-y-4">
+                <div className="space-y-1">
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Brand Logo</h3>
+                  <p className="text-[10px] text-muted-foreground/60 font-bold uppercase">Upload or link a custom logo. Saved in browser local storage.</p>
+                </div>
+
+                <div className="rounded-2xl border border-border/50 bg-card/70 p-4 flex items-center gap-4">
+                  <div className="h-16 w-16 rounded-xl border border-border/50 bg-white/80 p-2 flex items-center justify-center">
+                    <img
+                      src={logoUrl || defaultLogo}
+                      alt="Current logo preview"
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
+                  <div className="space-y-2 flex-1 min-w-0">
+                    <label className="inline-flex items-center gap-2 rounded-xl border border-border/60 bg-background px-3 py-2 text-[10px] font-black uppercase tracking-[0.12em] cursor-pointer hover:bg-muted/40 transition-colors">
+                      <ImageUp className="h-3.5 w-3.5" /> Upload Image
+                      <input type="file" accept="image/*" className="hidden" onChange={handleLogoFileChange} />
+                    </label>
+                    <p className="text-[10px] text-muted-foreground/70 font-medium">PNG, JPG, SVG supported. Max file size: 1 MB.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto_auto] gap-2">
+                  <input
+                    value={logoInputValue}
+                    onChange={(e) => setLogoInputValue(e.target.value)}
+                    placeholder="https://example.com/logo.png or /logo.png"
+                    className="h-11 min-w-0 rounded-xl border border-border bg-card px-3 text-xs font-semibold"
+                  />
+                  <Button type="button" variant="outline" onClick={handleLogoUrlApply} className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.16em] md:whitespace-nowrap">Apply URL</Button>
+                  <Button type="button" variant="outline" onClick={handleLogoReset} className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.16em] md:whitespace-nowrap">Reset</Button>
+                </div>
+                {logoError && <p className="text-[11px] font-semibold text-destructive">{logoError}</p>}
+              </section>
+
               <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between mb-8 px-1">
                   <div className="space-y-1">
