@@ -89,13 +89,13 @@ const todayStr = today.toISOString().split('T')[0];
 
 const mealTypeColor: Record<MealType, { chip: string; icon: React.FC<{ className?: string }> }> = {
   Breakfast: { chip: 'bg-warning/10 text-warning border-warning/25', icon: Flame },
-  Lunch: { chip: 'bg-primary/10 text-primary border-primary/20', icon: Soup },
-  Dinner: { chip: 'bg-secondary/10 text-secondary border-secondary/20', icon: Wheat },
+  Lunch: { chip: 'bg-warning/10 text-warning border-warning/25', icon: Soup },
+  Dinner: { chip: 'bg-warning/10 text-warning border-warning/25', icon: Wheat },
   Prasadam: { chip: 'bg-success/10 text-success border-success/25', icon: Star },
 };
 
 const statusChip: Record<MealStatus, string> = {
-  Planned: 'bg-primary/10 text-primary',
+  Planned: 'bg-primary/10 text-foreground',
   'In Progress': 'bg-warning/10 text-warning',
   Completed: 'bg-success/10 text-success',
   Cancelled: 'bg-destructive/10 text-destructive',
@@ -104,7 +104,7 @@ const statusChip: Record<MealStatus, string> = {
 const distStatusChip: Record<DistributionStatus, string> = {
   Served: 'bg-success/10 text-success',
   Partial: 'bg-warning/10 text-warning',
-  Pending: 'bg-primary/10 text-primary',
+  Pending: 'bg-primary/10 text-foreground',
   Cancelled: 'bg-destructive/10 text-destructive',
 };
 
@@ -232,12 +232,13 @@ function WeekCalendar({ plans, selectedDate, onDaySelect }: { plans: MealPlan[];
   const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   return (
-    <div className="section-panel mb-4 shadow-sm pb-0 relative z-10 backdrop-blur-md bg-background/90">
+    <div className="section-panel mb-4 shadow-sm pb-0 relative z-10 backdrop-blur-md bg-background/
+    90">
       <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
-        <h2 className="text-sm font-semibold flex items-center gap-2"><Calendar className="w-4 h-4 text-primary" /> Weekly Planner</h2>
+        <h2 className="text-sm font-semibold flex items-center gap-2"><Calendar className="w-4 h-4 text-foreground" /> Weekly Planner</h2>
         <div className="flex items-center gap-1.5">
           <Button variant="outline" size="icon" onClick={() => setWeekOffset(p => p - 1)} className="w-8 h-8 rounded-full"><ChevronLeft className="w-4 h-4" /></Button>
-          <Button variant="ghost" onClick={() => setWeekOffset(0)} className="text-xs font-semibold px-3 h-8 rounded-full hover:bg-primary/10 hover:text-primary">Today</Button>
+          <Button variant="ghost" onClick={() => setWeekOffset(0)} className="text-xs font-semibold px-3 h-8 rounded-full hover:bg-primary/10 hover:text-foreground">Today</Button>
           <Button variant="outline" size="icon" onClick={() => setWeekOffset(p => p + 1)} className="w-8 h-8 rounded-full"><ChevronRight className="w-4 h-4" /></Button>
         </div>
       </div>
@@ -249,7 +250,7 @@ function WeekCalendar({ plans, selectedDate, onDaySelect }: { plans: MealPlan[];
           return (
             <button key={ds} onClick={() => onDaySelect(ds)} className={`text-left p-3 min-h-[100px] transition-all rounded-xl relative overflow-hidden group ${selected ? 'bg-primary/5 shadow-inner' : 'hover:bg-muted/40'}`}>
               {selected && <div className="absolute top-0 left-0 w-full h-1 bg-primary" />}
-              <p className={`text-[11px] font-semibold tracking-wide uppercase ${selected ? 'text-primary' : 'text-foreground/75 group-hover:text-foreground'}`}>{dayNames[i]}</p>
+              <p className={`text-[11px] font-semibold tracking-wide uppercase ${selected ? 'text-foreground' : 'text-foreground/75 group-hover:text-foreground'}`}>{dayNames[i]}</p>
               <p className={`text-xl font-bold mt-0.5 ${selected ? 'text-foreground' : 'text-foreground/75 group-hover:text-foreground'}`}>{day.getDate()}</p>
               <div className="mt-2 space-y-1">
                 {entries.slice(0, 2).map(item => {
@@ -400,7 +401,7 @@ const AnnadhanamPage: React.FC = () => {
     <div className="annadhanam-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
       <div className="page-header-banner annadhanam-header">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><UtensilsCrossed className="w-5 h-5 text-primary" /> Annadhanam Management</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><UtensilsCrossed className="w-5 h-5 text-foreground" /> Annadhanam Management</h1>
           <p className="text-sm text-foreground/85 mt-1">Free meal planning, serving logs, volunteer tracking, and ingredients inventory.</p>
         </div>
         <div className="flex flex-wrap gap-2 justify-end">
@@ -418,9 +419,9 @@ const AnnadhanamPage: React.FC = () => {
           <p className="text-[11px] uppercase tracking-wider font-semibold text-success flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Served This Month</p>
           <p className="text-2xl font-bold mt-1 text-success">{servedMonth.toLocaleString('en-IN')}</p>
         </div>
-        <div className="stat-card annadhanam-stat-card border-primary/20 bg-primary/5">
-          <p className="text-[11px] uppercase tracking-wider font-semibold text-primary flex items-center gap-1.5"><Utensils className="w-3.5 h-3.5" /> Meals Today</p>
-          <p className="text-2xl font-bold mt-1 text-primary">{mealByDate.length}</p>
+        <div className="stat-card annadhanam-stat-card">
+          <p className="text-[11px] uppercase tracking-wider font-semibold text-muted-foreground flex items-center gap-1.5"><Utensils className="w-3.5 h-3.5" /> Meals Today</p>
+          <p className="text-2xl font-bold mt-1 text-foreground">{mealByDate.length}</p>
         </div>
         <div className="stat-card annadhanam-stat-card border-destructive/20 bg-destructive/5">
           <p className="text-[11px] uppercase tracking-wider font-semibold text-destructive flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Low Stock Items</p>
@@ -429,7 +430,7 @@ const AnnadhanamPage: React.FC = () => {
       </div>
 
       <div className="flex flex-wrap gap-3 w-full md:w-auto relative z-20">
-        {( [
+        {([
           { key: 'planner' as Tab, label: 'Meal Plan', icon: Calendar, color: 'bg-primary border-primary/20' },
           { key: 'distribution' as Tab, label: 'Distribution', icon: Users, color: 'bg-success border-success/25' },
           { key: 'inventory' as Tab, label: 'Inventory', icon: Package, color: 'bg-secondary border-secondary/20' },
@@ -438,8 +439,8 @@ const AnnadhanamPage: React.FC = () => {
             key={sec.key}
             onClick={() => setTab(sec.key)}
             className={`annadhanam-tab-btn flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-bold transition-all duration-200 border-2 shadow-sm
-              ${tab === sec.key 
-                ? `${sec.color} text-white shadow-lg scale-[1.03]` 
+              ${tab === sec.key
+                ? `${sec.color} text-white shadow-lg scale-[1.03]`
                 : 'bg-background border-border text-foreground/75 hover:border-foreground/20 hover:bg-muted/40 hover:text-foreground'}`}
           >
             <sec.icon className={`h-4 w-4 ${tab === sec.key ? 'text-white' : 'text-foreground/80'}`} />
@@ -468,7 +469,7 @@ const AnnadhanamPage: React.FC = () => {
 
             <section className="section-panel annadhanam-main-panel">
               <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
-                <h2 className="text-sm font-semibold flex items-center gap-2"><ClipboardList className="w-4 h-4 text-primary" /> Active Meal Plans</h2>
+                <h2 className="text-sm font-semibold flex items-center gap-2"><ClipboardList className="w-4 h-4 text-foreground" /> Active Meal Plans</h2>
                 <div className="relative w-full sm:max-w-xs ml-auto">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input
@@ -499,7 +500,7 @@ const AnnadhanamPage: React.FC = () => {
                         <tr key={plan.id} className="annadhanam-row border-b border-border hover:bg-muted/30 transition-colors">
                           <td className="p-4">
                             <p className="font-bold text-foreground">{plan.id}</p>
-                            <p className="text-[11px] text-muted-foreground mt-0.5 font-medium"><Calendar className="w-3 h-3 inline mr-1" />{formatDateDDMMYYYY(plan.date)}</p>
+                            <p className="text-[11px] text-foreground mt-0.5 font-medium"><Calendar className="w-3 h-3 inline mr-1" />{formatDateDDMMYYYY(plan.date)}</p>
                           </td>
                           <td className="p-4">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[11px] font-bold tracking-wide uppercase ${mealTypeColor[plan.mealType].chip}`}>
@@ -513,10 +514,10 @@ const AnnadhanamPage: React.FC = () => {
                               {plan.menu.length > 2 && <span className="text-xs text-muted-foreground font-medium pl-1">+{plan.menu.length - 2} more</span>}
                             </div>
                           </td>
-                          <td className="p-4 font-bold text-primary text-lg flex items-center gap-1.5 pt-5"><Users className="w-4 h-4" />{plan.expectedCount}</td>
+                          <td className="p-4 font-bold text-foreground text-lg flex items-center gap-1.5 pt-5"><Users className="w-4 h-4" />{plan.expectedCount}</td>
                           <td className="p-4">
                             <p className="font-semibold text-sm text-foreground">{plan.organizer || '-'}</p>
-                            {plan.sponsor && <p className="text-[10px] uppercase font-bold text-primary mt-1">Sponsor: {plan.sponsor}</p>}
+                            {plan.sponsor && <p className="text-[10px] uppercase font-bold text-foreground mt-1">Sponsor: {plan.sponsor}</p>}
                           </td>
                           <td className="p-4"><StatusBadge status={plan.status} /></td>
                           <td className="p-4 text-right">
@@ -538,7 +539,7 @@ const AnnadhanamPage: React.FC = () => {
         {tab === 'distribution' && (
           <section className="section-panel annadhanam-main-panel">
             <div className="section-panel-header gap-4 border-b border-border/60 pb-3">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><MapPin className="w-4 h-4 text-primary" /> Distribution Logs Overview</h2>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><MapPin className="w-4 h-4 text-foreground" /> Distribution Logs Overview</h2>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -573,7 +574,8 @@ const AnnadhanamPage: React.FC = () => {
                         <td className="p-4">
                           <div className="text-[11px] font-medium text-muted-foreground flex flex-col gap-1">
                             <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-success" /> Start: {log.startTime}</span>
-                            {log.endTime && <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-primary" /> End: {log.endTime}</span>}
+                            {log.endTime && <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-foreground
+                            " /> End: {log.endTime}</span>}
                           </div>
                         </td>
                         <td className="p-4 text-center">
@@ -702,8 +704,8 @@ const AnnadhanamPage: React.FC = () => {
             <div className="space-y-2">
               {mealForm.menu.map((menuItem, idx) => (
                 <div key={`menu-${idx}`} className="flex gap-2 items-center bg-background p-2 rounded-lg border border-border shadow-sm">
-                  <input className="h-9 flex-1 min-w-[150px] rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Dish name (e.g. Sambar)" value={menuItem.name} onChange={e => { const val = e.target.value; setMealForm(prev => ({ ...prev, menu: prev.menu.map((m, i) => i === idx ? { ...m, name: val } : m) })); }} />
-                  <input className="h-9 w-24 sm:w-32 rounded-md border border-input px-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Qty (e.g. 15L)" value={menuItem.qty} onChange={e => { const val = e.target.value; setMealForm(prev => ({ ...prev, menu: prev.menu.map((m, i) => i === idx ? { ...m, qty: val } : m) })); }} />
+                  <input className="h-9 flex-1 min-w-[150px] rounded-md border border-input bg-background/60 px-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Dish name (e.g. Sambar)" value={menuItem.name} onChange={e => { const val = e.target.value; setMealForm(prev => ({ ...prev, menu: prev.menu.map((m, i) => i === idx ? { ...m, name: val } : m) })); }} />
+                  <input className="h-9 w-24 sm:w-32 rounded-md border border-input bg-background/60 px-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Qty (e.g. 15L)" value={menuItem.qty} onChange={e => { const val = e.target.value; setMealForm(prev => ({ ...prev, menu: prev.menu.map((m, i) => i === idx ? { ...m, qty: val } : m) })); }} />
                   <Button type="button" variant="ghost" size="icon" className="h-9 w-9 text-destructive hover:bg-destructive/10 shrink-0" onClick={() => setMealForm(prev => ({ ...prev, menu: prev.menu.length === 1 ? prev.menu : prev.menu.filter((_, i) => i !== idx) }))}><Trash2 className="h-4 w-4" /></Button>
                 </div>
               ))}
@@ -711,7 +713,7 @@ const AnnadhanamPage: React.FC = () => {
           </div>
 
           <div className="rounded-xl border border-border bg-gradient-to-br from-primary/5 to-secondary/5 p-4 space-y-3 shadow-sm">
-            <h4 className="text-[11px] uppercase tracking-widest font-bold text-primary flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> AI Inventory Insights</h4>
+            <h4 className="text-[11px] uppercase tracking-widest font-bold text-foreground flex items-center gap-1.5"><Star className="w-3.5 h-3.5" /> AI Inventory Insights</h4>
             {aiMealInsights.length > 0 ? (
               <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 space-y-2 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1 h-full bg-destructive" />

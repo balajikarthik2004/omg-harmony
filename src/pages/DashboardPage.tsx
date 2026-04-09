@@ -26,11 +26,11 @@ const secondaryKpis = [
 ];
 
 const recentActivity = [
-  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-primary/10 text-primary border border-primary/20' },
-  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-primary/10 text-primary border border-primary/20' },
-  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-muted text-muted-foreground border border-border' },
-  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-primary/10 text-primary border border-primary/20' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' },
+  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
+  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
+  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
+  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
+  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
 ];
 
 const upcomingEvents = [
@@ -123,6 +123,8 @@ const DashboardPage: React.FC = () => {
                   formatter={(v: number) => [`₹${v.toLocaleString('en-IN')}`, 'Amount']}
                   separator=": "
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px', padding: '10px 14px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
                 <Line
                   type="monotone"
@@ -152,6 +154,8 @@ const DashboardPage: React.FC = () => {
                 </Pie>
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
               </RechartsPieChart>
             </ResponsiveContainer>
@@ -173,6 +177,8 @@ const DashboardPage: React.FC = () => {
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                   cursor={{ fill: dashboardColors.chartCursor }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
                 <Bar dataKey="bookings" fill={dashboardColors.chartAccentA} radius={[6, 6, 0, 0]} barSize={32} />
               </BarChart>
@@ -193,6 +199,8 @@ const DashboardPage: React.FC = () => {
                 <Tooltip
                   contentStyle={{ borderRadius: '12px', border: dashboardColors.tooltipBorder, boxShadow: dashboardColors.tooltipShadow, background: dashboardColors.tooltipBg, fontSize: '13px' }}
                   cursor={{ fill: dashboardColors.chartCursor }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
+                  itemStyle={{ color: 'hsl(var(--foreground))' }}
                 />
                 <Legend iconSize={10} wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }} />
                 <Bar dataKey="used" fill={dashboardColors.chartAccentD} radius={[4, 4, 0, 0]} barSize={24} />
@@ -232,7 +240,7 @@ const DashboardPage: React.FC = () => {
               <div key={i} className="dashboard-event-card flex flex-col p-3.5 bg-background border border-border/60 shadow-sm rounded-xl hover:border-primary/30 transition-colors duration-200 gap-2">
                 <div className="flex justify-between items-center">
                   <p className="text-sm font-bold text-foreground">{e.name}</p>
-                  <span className="text-[10px] text-primary bg-primary/10 rounded-full px-2.5 py-1 font-bold uppercase tracking-wider">{e.date}</span>
+                  <span className="text-[10px] text-foreground bg-muted border border-border/50 rounded-full px-2.5 py-1 font-bold uppercase tracking-wider">{e.date}</span>
                 </div>
                 <p className="text-xs text-muted-foreground font-semibold flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Expected: {e.attendees.toLocaleString('en-IN')}</p>
               </div>

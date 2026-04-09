@@ -657,15 +657,18 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.style.setProperty('--sidebar-highlight-soft', toHslColor(withShift(accent, { l: isDark ? -5 : 36, s: -24 })));
   root.style.setProperty('--sidebar-avatar-mid', toHslColor(withShift(secondary, { l: isDark ? 10 : 14 })));
 
-  root.style.setProperty('--theme-overlay-start', safeTheme.overlayGradientStart);
-  root.style.setProperty('--theme-overlay-mid', safeTheme.overlayGradientMid);
-  root.style.setProperty('--theme-overlay-end', safeTheme.overlayGradientEnd);
+  const overlayStart = rgbToHsl(hexToRgb(safeTheme.overlayGradientStart));
+  const overlayMid = rgbToHsl(hexToRgb(safeTheme.overlayGradientMid));
+  const overlayEnd = rgbToHsl(hexToRgb(safeTheme.overlayGradientEnd));
+  root.style.setProperty('--theme-overlay-start', toHslaColor(overlayStart, 0.85));
+  root.style.setProperty('--theme-overlay-mid', toHslaColor(overlayMid, 0.72));
+  root.style.setProperty('--theme-overlay-end', toHslaColor(overlayEnd, 0.5));
   root.style.setProperty('--overlay-gradient-angle', `${safeTheme.overlayGradientAngle}deg`);
 
-  root.style.setProperty('--chart-accent-a', toHslColor(withShift(secondary, { l: -2 })));
-  root.style.setProperty('--chart-accent-b', toHslColor(withShift(primary, { l: 2 })));
-  root.style.setProperty('--chart-accent-c', toHslColor(withShift(accent, { l: 0 })));
-  root.style.setProperty('--chart-accent-d', toHslColor(withShift(primary, { h: 16, s: -5, l: 8 })));
+  root.style.setProperty('--chart-accent-a', toHslColor(withShift(secondary, { l: isDark ? 35 : -2 })));
+  root.style.setProperty('--chart-accent-b', toHslColor(withShift(primary, { l: isDark ? 15 : 2 })));
+  root.style.setProperty('--chart-accent-c', toHslColor(withShift(accent, { l: isDark ? 15 : 0 })));
+  root.style.setProperty('--chart-accent-d', toHslColor(withShift(primary, { h: 16, s: -5, l: isDark ? 25 : 8 })));
   root.style.setProperty('--chart-grid', toHslColor(withShift(border, { l: isDark ? -8 : 8, s: -8 })));
   root.style.setProperty('--chart-cursor', toHslColor(withShift(muted, { l: 2 })));
   const contentWidthMap: Record<ContentWidth, string> = {
@@ -783,5 +786,12 @@ export const applyThemeToDocument = (theme: ThemeSettings, root: HTMLElement = d
   root.setAttribute('data-layout-chrome-style', safeTheme.chromeStyle);
   root.setAttribute('data-layout-motion', safeTheme.motionPreset);
   root.setAttribute('data-layout-sidebar-position', safeTheme.sidebarPosition);
+
+  // Enable Tailwind 'dark:' utility classes
+  if (isDark) {
+    root.classList.add('dark');
+  } else {
+    root.classList.remove('dark');
+  }
 };
 

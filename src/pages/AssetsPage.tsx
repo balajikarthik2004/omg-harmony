@@ -169,7 +169,7 @@ const AssetsPage: React.FC = () => {
              <FormField label="Date Bought" value={form.purchaseDate} onChange={v => set('purchaseDate', v)} type="date" />
              <div className="space-y-1.5">
                <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Current Condition</label>
-               <select value={form.condition} onChange={e => set('condition', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border shadow-sm font-semibold">
+               <select value={form.condition} onChange={e => set('condition', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm text-foreground transition-all focus:ring-2 focus:ring-emerald-500/20 outline-none hover:border-border shadow-sm font-semibold">
                  <option>Excellent</option><option>Good</option><option>Fair</option><option>Poor</option>
                </select>
              </div>
@@ -177,7 +177,7 @@ const AssetsPage: React.FC = () => {
 
           <div className="space-y-1.5">
              <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Maintenance Status</label>
-             <select value={form.maintenanceStatus} onChange={e => set('maintenanceStatus', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input transition-all bg-card hover:border-border px-3 text-sm focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-bold">
+             <select value={form.maintenanceStatus} onChange={e => set('maintenanceStatus', e.target.value)} className="assets-field w-full h-11 rounded-lg border border-input transition-all bg-card hover:border-border px-3 text-sm text-foreground focus:ring-2 focus:ring-emerald-500/20 outline-none shadow-sm font-bold">
                 <option>Up to Date</option><option>Due Soon</option><option>Overdue</option>
              </select>
           </div>

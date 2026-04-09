@@ -568,7 +568,7 @@ const ParkingPage: React.FC = () => {
                   <CardDescription>AI-enhanced traffic analysis for the last 24 hours</CardDescription>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge className="bg-emerald-50 text-emerald-700 border-none hover:bg-emerald-100 cursor-default">Real-time</Badge>
+                  <Badge className="bg-emerald-500/10 text-emerald-500 border-none hover:bg-emerald-500/20 cursor-default">Real-time</Badge>
                 </div>
               </CardHeader>
               <CardContent>
@@ -804,7 +804,7 @@ const ParkingPage: React.FC = () => {
                         <Badge variant="outline" className="rounded-lg">{slot.id}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge className={`${slot.zone === 'VIP' ? 'bg-primary' : slot.zone === 'Staff' ? 'bg-destructive' : 'bg-secondary'} rounded-lg`}>
+                        <Badge className={`${slot.zone === 'VIP' ? 'bg-primary text-primary-foreground' : slot.zone === 'Staff' ? 'bg-destructive text-destructive-foreground' : 'bg-secondary text-secondary-foreground'} rounded-lg`}>
                           {slot.zone}
                         </Badge>
                       </TableCell>
@@ -867,7 +867,7 @@ const ParkingPage: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
+            <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card">
               <CardHeader>
                  <CardTitle>Peak Usage Insights</CardTitle>
                  <CardDescription>AI-generated report on bottleneck areas</CardDescription>
