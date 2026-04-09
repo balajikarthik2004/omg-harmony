@@ -116,8 +116,8 @@ const DocumentPage: React.FC = () => {
   const colorMap = {
     blue: {
       border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
-      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
-      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
+      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-foreground',
+      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-foreground border-primary/20',
       overlay: 'bg-primary/5'
     },
     emerald: {
@@ -128,8 +128,8 @@ const DocumentPage: React.FC = () => {
     },
     indigo: {
       border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
-      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
-      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
+      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-foreground',
+      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-foreground border-primary/20',
       overlay: 'bg-primary/5'
     },
     amber: {
@@ -140,8 +140,8 @@ const DocumentPage: React.FC = () => {
     },
     orange: {
       border: 'border-primary/40', hoverBorder: 'hover:border-primary/60', ring: 'ring-primary/40',
-      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-primary',
-      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-primary border-primary/20',
+      bg: 'bg-primary', hoverBg: 'group-hover:bg-primary/10', text: 'text-foreground',
+      lightBg: 'bg-primary/10', activeBgText: 'bg-primary/20 text-foreground border-primary/20',
       overlay: 'bg-primary/5'
     }
   } as const;
@@ -150,15 +150,15 @@ const DocumentPage: React.FC = () => {
     <div className="docs-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
       <div className="page-header-banner docs-header bg-gradient-to-r from-primary/10 via-background to-primary/5">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><FileDown className="w-5 h-5 text-primary" /> Document & Reports Center</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><FileDown className="w-5 h-5 text-foreground" /> Document & Reports Center</h1>
           <p className="text-sm text-muted-foreground mt-1">Securely access, manage, and upload official temple documents.</p>
         </div>
-        <Button onClick={() => setUploadModalOpen(true)} className="docs-cta shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
+        <Button onClick={() => setUploadModalOpen(true)} className="docs-cta shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-foreground"><Upload className="h-4 w-4 mr-2" />Upload Document</Button>
       </div>
 
       <div className="section-panel docs-main-panel shadow-sm">
         <div className="section-panel-header docs-main-header gap-3 flex-wrap bg-gradient-to-r from-slate-50 to-background border-b border-border/60">
-          <h2 className="text-sm font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-primary" /> Curated Repository</h2>
+          <h2 className="text-sm font-semibold flex items-center gap-2"><FileText className="w-4 h-4 text-foreground" /> Curated Repository</h2>
           <div className="relative w-full max-w-sm ml-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
@@ -203,7 +203,7 @@ const DocumentPage: React.FC = () => {
                   </div>
                   <div className={`mt-6 pt-4 border-t border-border/60 flex items-center justify-between transition-opacity relative z-10 ${selected === r.id ? 'opacity-100' : 'opacity-60 group-hover:opacity-100'}`}>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/60 px-2 py-0.5 rounded">PDF Standard</span>
-                    <div className={`flex items-center gap-1.5 text-xs font-bold ${selected === r.id ? colors.text : 'text-primary'}`}>
+                    <div className={`flex items-center gap-1.5 text-xs font-bold ${selected === r.id ? colors.text : 'text-foreground'}`}>
                       Access Media <ExternalLink className="h-3.5 w-3.5" />
                     </div>
                   </div>
@@ -229,7 +229,7 @@ const DocumentPage: React.FC = () => {
 
             <div className="docs-upload-head flex items-center justify-between p-6 border-b border-border/60 shrink-0 relative z-10 bg-background/50 backdrop-blur-sm">
               <div>
-                <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2"><Upload className="w-5 h-5 text-primary" /> Upload Documents</h2>
+                <h2 className="text-xl font-display font-bold text-foreground flex items-center gap-2"><Upload className="w-5 h-5 text-foreground" /> Upload Documents</h2>
                 <p className="text-[11px] text-muted-foreground font-bold tracking-widest uppercase mt-1">Secure Media Pipeline</p>
               </div>
               <Button
@@ -251,7 +251,7 @@ const DocumentPage: React.FC = () => {
                 onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}
               >
                 <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-5 border border-primary/20 shadow-sm">
-                  <Upload className="h-8 w-8 text-primary" />
+                  <Upload className="h-8 w-8 text-foreground" />
                 </div>
                 <p className="text-lg font-bold mb-1 text-foreground">Click to upload or drag & drop</p>
                 <p className="text-sm text-muted-foreground mb-6 font-medium">Strictly PDF documents supported (Max 50MB per chunk)</p>

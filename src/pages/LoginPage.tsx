@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Heart, Lock, Mail, ArrowRight } from 'lucide-react';
 import bg from '@/assets/img/temple.webp';
-import logo from '@/assets/img/logo.svg';
+import logo from '@/assets/img/logo1.png';
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -41,7 +41,7 @@ const LoginPage: React.FC = () => {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${bg})` }}
         />
-        <div className="absolute inset-0 login-image-overlay opacity-55" />
+        <div className="absolute inset-0 login-image-overlay " />
         <div className="absolute inset-0 bg-background/30 backdrop-blur-[0.5px]" />
       </div>
 
@@ -70,13 +70,18 @@ const LoginPage: React.FC = () => {
           style={{ backgroundImage: `url(${bg})` }}
         />
         {/* Gradient overlay */}
-        <div className="absolute inset-0 login-image-overlay opacity-75" />
+        <div className="absolute inset-0 login-image-overlay " />
 
         {/* Branding content on image */}
         <div className="relative z-10 flex flex-col justify-between p-10 w-full">
           {/* Top: Logo */}
-          {/* <div className="animate-fade-in">
-            <img src={logo} alt="OMG Temple" className="h-14"  />
+          {/* <div className="animate-fade-in rounded-2xl border border-white/25 bg-white/85 backdrop-blur-sm p-3 w-fit shadow-sm">
+            <img
+              src={loginLogoSrc}
+              alt="OMG Temple"
+              className="h-14 object-contain"
+              onError={() => setIsLogoBroken(true)}
+            />
           </div> */}
 
           {/* Bottom: Welcome copy */}
@@ -109,7 +114,7 @@ const LoginPage: React.FC = () => {
         <div className="w-full max-w-[400px] animate-slide-in-right">
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-2.5 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-white/80 border border-border/40 p-1.5 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-lg bg-white/90 dark:bg-card/90 border border-border/50 p-1.5 flex items-center justify-center shadow-sm">
               <img
                 src={loginLogoSrc}
                 alt="OMG Temple"

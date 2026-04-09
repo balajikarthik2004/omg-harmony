@@ -1406,7 +1406,7 @@ const DevoteesPage: React.FC = () => {
             <FormField label="Date of Birth" value={familyMemberForm.dob} onChange={v => setFamilyMemberForm(prev => ({ ...prev, dob: v }))} type="date" />
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-foreground">Gender</label>
-              <select value={familyMemberForm.gender} onChange={e => setFamilyMemberForm(prev => ({ ...prev, gender: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+              <select value={familyMemberForm.gender} onChange={e => setFamilyMemberForm(prev => ({ ...prev, gender: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                 <option value="">Select</option>
                 <option>Male</option>
                 <option>Female</option>
@@ -1419,7 +1419,7 @@ const DevoteesPage: React.FC = () => {
             <FormField label="Nakshatra" value={familyMemberForm.nakshatra} onChange={v => setFamilyMemberForm(prev => ({ ...prev, nakshatra: v }))} />
             <div className="space-y-1.5 md:col-span-2">
               <label className="text-xs font-semibold text-foreground">Parent Node</label>
-              <select value={familyMemberForm.parentId} onChange={e => setFamilyMemberForm(prev => ({ ...prev, parentId: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
+              <select value={familyMemberForm.parentId} onChange={e => setFamilyMemberForm(prev => ({ ...prev, parentId: e.target.value }))} className="devotees-form-select w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground transition-colors focus:border-primary focus:ring-1 focus:ring-primary outline-none">
                 <option value="root">Primary Devotee</option>
                 {familyMembersData.filter(member => member.id !== familyMemberForm.id).map(member => (
                   <option key={member.id} value={member.id}>{member.relation}: {member.name}</option>

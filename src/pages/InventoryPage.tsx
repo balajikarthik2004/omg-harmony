@@ -104,8 +104,8 @@ const InventoryPage: React.FC = () => {
             </div>
             <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
               <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
-              <p className="text-[11px] uppercase tracking-widest font-bold text-secondary">Pooja Items</p>
-              <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{poojaMaterialsCount}</p>
+              <p className="text-[11px] uppercase tracking-widest font-bold text-amber-500">Pooja Items</p>
+              <p className="text-3xl font-display font-bold mt-2 text-amber-500 relative z-10">{poojaMaterialsCount}</p>
             </div>
             <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-primary/20 bg-primary/5">
               <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/10 group-hover:scale-110 transition-transform" />
@@ -149,7 +149,7 @@ const InventoryPage: React.FC = () => {
                 <select
                   value={categoryFilter}
                   onChange={e => setCategoryFilter(e.target.value)}
-                  className="inventory-field h-10 rounded-lg border border-input bg-background/60 px-3 text-sm transition-all focus:border-primary hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
+                  className="inventory-field h-10 rounded-lg border border-input bg-background/60 px-3 text-sm text-foreground transition-all focus:border-primary hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
                 >
                   {categories.map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -226,7 +226,7 @@ const InventoryPage: React.FC = () => {
                 <FormField label="Item Name" value={form.name} onChange={v => set('name', v)} required placeholder="E.g., Turmeric Powder" />
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Category</label>
-                  <input value={form.category} onChange={e => set('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-medium" placeholder="E.g., Pooja Items" />
+                  <input value={form.category} onChange={e => set('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm text-foreground transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-medium" placeholder="E.g., Pooja Items" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">

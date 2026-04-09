@@ -416,13 +416,8 @@ const PoojaSevaPage: React.FC = () => {
       {/* Header */}
       <div className="page-header-banner poojs-header">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2">
-            <Flower2 className="w-5 h-5 text-primary" /> Pooja & Seva Management
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configure pooja offerings, manage devotee bookings, assign priests,
-            and issue digital Passes.
-          </p>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Flower2 className="w-5 h-5 text-primary" /> Pooja & Seva Management</h1>
+          <p className="text-sm text-muted-foreground mt-1">Configure pooja offerings, manage devotee bookings, assign priests, and issue digital Passes.</p>
         </div>
         <Button onClick={openAdd} className="pooja-cta shadow-md">
           <Plus className="h-4 w-4 mr-2" />
@@ -602,12 +597,7 @@ const PoojaSevaPage: React.FC = () => {
                   onClick={() => setActiveCategory(item.category)}
                   className={`pooja-filter-chip px-4 py-1.5 flex items-center gap-1.5 rounded-full text-[11px] font-bold tracking-wide uppercase border transition-all duration-200 ${activeCategory === item.category ? 'bg-primary border-primary text-primary-foreground shadow-md scale-[1.02]' : 'text-foreground/85 border-border bg-background hover:text-foreground hover:bg-muted/50'}`}
                 >
-                  {item.category}
-                  <span
-                    className={`min-w-5 px-1.5 py-0.5 rounded-full text-[10px] text-center font-extrabold ${activeCategory === item.category ? 'bg-primary-foreground/20 text-primary-foreground border border-primary-foreground/30' : 'bg-muted/80 text-foreground/85 border border-border/60'}`}
-                  >
-                    {item.count}
-                  </span>
+                  {item.category} <span className={`min-w-5 px-1.5 py-0.5 rounded-full text-[10px] text-center font-extrabold ${activeCategory === item.category ? 'bg-primary-foreground/20 text-primary-foreground border border-primary-foreground/30' : 'bg-muted/80 text-foreground/85 border border-border/60'}`}>{item.count}</span>
                 </button>
               ))}
             </div>
@@ -1045,78 +1035,34 @@ const PoojaSevaPage: React.FC = () => {
         open={!!receiptItem}
         onClose={() => setReceiptItem(null)}
         title="Temple E-Seva Pass"
+        bodyClassName="pooja-receipt-context p-6"
       >
         {receiptItem && (
           <div className="space-y-5 px-1 pb-1">
-            <div className="pooja-receipt-shell rounded-2xl border border-border p-6 bg-gradient-to-br from-card to-muted/30 relative overflow-hidden shadow-sm">
+            <div className="pooja-receipt-shell rounded-2xl border border-border p-6 bg-gradient-to-br from-card to-muted/30 relative overflow-hidden shadow-sm text-slate-900">
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-bl-[100px] -z-0 pointer-events-none" />
               <div className="flex items-center justify-between border-b border-border/60 pb-5 mb-5 relative z-10">
                 <div>
-                  <p className="text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-1">
-                    E-Seva Pass
-                  </p>
-                  <p className="text-2xl font-display font-black text-slate-900 tracking-tight">
-                    {receiptItem.receiptNumber}
-                  </p>
+                  <p className="text-[10px] uppercase tracking-widest font-bold text-slate-500 mb-1">Booking Receipt</p>
+                  <p className="text-2xl font-display font-black text-slate-900 tracking-tight">{receiptItem.receiptNumber}</p>
                 </div>
                 <StatusBadge status={receiptItem.paymentStatus} />
               </div>
               <div className="grid grid-cols-2 gap-y-5 gap-x-6 text-sm relative z-10">
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">
-                    Booking Ref
-                  </p>
-                  <p className="font-bold text-slate-900">
-                    {receiptItem.bookingCode}
-                  </p>
+                <div><p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Booking Ref</p><p className="font-bold text-slate-900">{receiptItem.bookingCode}</p></div>
+                <div><p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Date of Seva</p><p className="font-bold text-slate-900">{formatDateDDMMYYYY(receiptItem.date)}</p></div>
+                <div className="col-span-2 bg-white/90 p-4 rounded-xl border border-slate-200 shadow-sm group hover:border-slate-300 transition-colors">
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-600 mb-1">Pooja Configuration</p>
+                  <p className="font-bold text-lg text-slate-900 mb-1">{receiptItem.poojaType}</p>
+                  <p className="text-xs text-slate-600 font-semibold flex items-center gap-1.5"><Ticket className="w-3.5 h-3.5 text-slate-500" /> For Devotee: <span className="text-slate-900">{receiptItem.devoteeName}</span></p>
                 </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">
-                    Date of Seva
-                  </p>
-                  <p className="font-bold text-slate-900">
-                    {formatDateDDMMYYYY(receiptItem.date)}
-                  </p>
-                </div>
-                <div className="col-span-2 bg-white/90 p-4 rounded-xl border border-slate-200 shadow-sm">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-600 mb-1">
-                    Pooja Configuration
-                  </p>
-                  <p className="font-bold text-lg text-slate-900 mb-1">
-                    {receiptItem.poojaType}
-                  </p>
-                  <p className="text-xs text-slate-600 font-semibold flex items-center gap-1.5">
-                    <Ticket className="w-3.5 h-3.5 text-slate-500" /> Devotee:{' '}
-                    <span className="text-slate-900">
-                      {receiptItem.devoteeName}
-                    </span>
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">
-                    Reporting Time
-                  </p>
-                  <p className="font-bold text-slate-900">{receiptItem.slot}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">
-                    Assigned Purohit
-                  </p>
-                  <p className="font-bold text-slate-900">
-                    {receiptItem.priestName}
-                  </p>
-                </div>
+                <div><p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Reporting Time</p><p className="font-bold text-slate-900">{receiptItem.slot}</p></div>
+                <div><p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1">Assigned Purohit</p><p className="font-bold text-slate-900">{receiptItem.priestName}</p></div>
               </div>
+
               <div className="mt-6 pt-5 border-t-2 border-dashed border-border/80 flex justify-between items-center relative z-10">
-                <p className="text-[12px] uppercase tracking-widest font-extrabold text-slate-800">
-                  Total Paid
-                </p>
-                <p className="text-2xl font-black font-display text-emerald-700 bg-emerald-50 px-4 py-1.5 rounded-lg border border-emerald-200">
-                  {money(
-                    getPoojaDetails(receiptItem.poojaType, poojaCatalog)
-                      ?.amount || 0,
-                  )}
-                </p>
+                <p className="text-[12px] uppercase tracking-widest font-extrabold text-slate-800">Total Paid Amount</p>
+                <p className="text-2xl font-black font-display text-emerald-700 bg-emerald-50 px-4 py-1.5 rounded-lg border border-emerald-200">{money(getPoojaDetails(receiptItem.poojaType, poojaCatalog)?.amount || 0)}</p>
               </div>
             </div>
             <div className="flex gap-3 pt-2">

@@ -35,7 +35,7 @@ const SettingsPage: React.FC = () => {
       <div className="settings-premium space-y-6 max-w-[1400px] mx-auto animate-fade-in">
          <div className="page-header-banner settings-header">
             <div>
-               <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-primary" /> Member Access & Roles</h1>
+               <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Users className="w-6 h-6 text-foreground" /> Member Access & Roles</h1>
                <p className="text-sm text-muted-foreground mt-1">Manage staff entries, grant new access, and set permission levels for the temple ERP.</p>
             </div>
             <Button onClick={() => setModalOpen(true)} className="settings-cta shadow-md"><UserPlus className="h-4 w-4 mr-2" />Grant New Access</Button>
@@ -49,7 +49,7 @@ const SettingsPage: React.FC = () => {
                </div>
                <div className="p-6 flex flex-col items-center">
                   <div className="settings-avatar w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center border-4 border-background shadow-sm mb-4">
-                     <span className="text-2xl font-display font-bold text-primary">{user?.name.charAt(0)}</span>
+                     <span className="text-2xl font-display font-bold text-foreground">{user?.name.charAt(0)}</span>
                   </div>
                   <h3 className="text-lg font-bold text-foreground">{user?.name}</h3>
                   <span className="settings-chip mt-2 text-[10px] font-bold uppercase tracking-widest text-success bg-success/10 px-2.5 py-1 rounded-full border border-success/20">Full {user?.role} Access</span>
@@ -62,7 +62,7 @@ const SettingsPage: React.FC = () => {
             {/* Member List */}
             <section className="lg:col-span-3 section-panel settings-members-panel shadow-sm">
                <div className="section-panel-header settings-panel-header border-b border-border/60 pb-4">
-                  <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-primary" /> Registered Staff & Members</h2>
+                  <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-foreground" /> Registered Staff & Members</h2>
                </div>
                <div className="overflow-x-auto">
                   <table className="w-full text-sm">
@@ -84,7 +84,7 @@ const SettingsPage: React.FC = () => {
                               </td>
                               <td className="p-4">
                                  <div className="flex items-center gap-1.5">
-                                    <ShieldCheck className={`w-3.5 h-3.5 ${m.role === 'Admin' ? 'text-primary' : 'text-muted-foreground/60'}`} />
+                                    <ShieldCheck className={`w-3.5 h-3.5 ${m.role === 'Admin' ? 'text-foreground' : 'text-muted-foreground/60'}`} />
                                     <span className="font-semibold text-xs text-foreground/80">{m.role}</span>
                                  </div>
                               </td>
@@ -114,15 +114,15 @@ const SettingsPage: React.FC = () => {
          <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Grant New System Access">
             <div className="settings-form-shell space-y-4 px-1 py-1">
                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Member Full Name</label>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-foreground">Member Full Name</label>
                   <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className="settings-field w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="Enter member name" />
                </div>
                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Email Address</label>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-foreground">Email Address</label>
                   <input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} className="settings-field w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="member@temple.org" />
                </div>
                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Permission Level (Role)</label>
+                  <label className="text-[11px] font-bold uppercase tracking-wider text-foreground">Permission Level (Role)</label>
                   <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} className="settings-field w-full h-11 rounded-lg border border-input bg-background px-3 text-sm focus:ring-2 focus:ring-blue-500/20 outline-none font-medium">
                      <option>Admin</option>
                      <option>Manager</option>
@@ -131,7 +131,7 @@ const SettingsPage: React.FC = () => {
                   </select>
                </div>
                <div className="settings-note pt-4 flex gap-3 text-sm italic text-muted-foreground bg-primary/5 p-3 rounded-lg border border-primary/10">
-                  <ShieldAlert className="w-5 h-5 text-primary shrink-0" />
+                  <ShieldAlert className="w-5 h-5 text-foreground shrink-0" />
                   <p>New members will be sent a login invitation via email once you grant access.</p>
                </div>
                <div className="flex gap-3 pt-4 border-t mt-2">

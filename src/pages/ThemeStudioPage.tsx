@@ -109,6 +109,8 @@ const motionPresetOptions: Array<{ value: MotionPreset; label: string; hint: str
 const PREVIEW_CANVAS_WIDTH = 1060;
 const PREVIEW_CANVAS_HEIGHT = 680;
 const MAX_LOGO_FILE_SIZE = 1024 * 1024;
+const STUDIO_TAB_TRIGGER_CLASS =
+  'rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-foreground/70 hover:bg-muted/70 hover:text-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none';
 
 const isSupportedLogoSource = (value: string) => {
   const trimmed = value.trim();
@@ -422,19 +424,19 @@ const ThemeStudioPage: React.FC = () => {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full min-h-0 flex flex-col">
             <div className="bg-card/40 backdrop-blur-md rounded-[1rem] border border-border/60 p-2 mb-4 shadow-sm shrink-0">
               <TabsList className="h-14 w-full bg-transparent grid grid-cols-5 gap-1 p-0">
-                <TabsTrigger value="palette" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
+                <TabsTrigger value="palette" className={STUDIO_TAB_TRIGGER_CLASS}>
                   <Palette className="h-4 w-4" /> Palette
                 </TabsTrigger>
-                <TabsTrigger value="gradients" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
+                <TabsTrigger value="gradients" className={STUDIO_TAB_TRIGGER_CLASS}>
                   <Layers className="h-4 w-4" /> Gradients
                 </TabsTrigger>
-                <TabsTrigger value="presets" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
+                <TabsTrigger value="presets" className={STUDIO_TAB_TRIGGER_CLASS}>
                   <Sparkles className="h-4 w-4" /> Templates
                 </TabsTrigger>
-                <TabsTrigger value="solid-spectrum" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
+                <TabsTrigger value="solid-spectrum" className={STUDIO_TAB_TRIGGER_CLASS}>
                   <Layout className="h-4 w-4" /> Solid
                 </TabsTrigger>
-                <TabsTrigger value="layout-system" className="rounded-[1rem] flex flex-col items-center justify-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground transition-all data-[state=active]:bg-background data-[state=active]:shadow-lg data-[state=active]:text-foreground border-none">
+                <TabsTrigger value="layout-system" className={STUDIO_TAB_TRIGGER_CLASS}>
                   <SlidersHorizontal className="h-4 w-4" /> Layout
                 </TabsTrigger>
               </TabsList>

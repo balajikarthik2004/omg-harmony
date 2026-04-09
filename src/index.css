@@ -241,6 +241,119 @@
     animation: overlay-fade 0.2s ease-out;
   }
 
+  html.dark .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  /* ─── Modal Dark Mode Enhancements ─── */
+  html.dark .modal-overlay > div {
+    background-color: hsl(220, 13%, 18%) !important;
+    border-color: hsla(210, 15%, 40%, 0.7) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay > div > div:first-child {
+    background-color: hsl(220, 13%, 18%) !important;
+    border-color: hsla(210, 15%, 40%, 0.7) !important;
+  }
+
+  html.dark .modal-overlay > div > div:first-child h2 {
+    color: hsl(210, 40%, 96%) !important;
+  }
+
+  html.dark .modal-overlay > div > div:not(:first-child) {
+    background-color: hsl(220, 13%, 18%) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay p,
+  html.dark .modal-overlay span,
+  html.dark .modal-overlay div {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay input,
+  html.dark .modal-overlay textarea,
+  html.dark .modal-overlay select,
+  html.dark .modal-overlay label {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay input::placeholder,
+  html.dark .modal-overlay textarea::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  /* ─── Additional Dark Mode Modal Styling ─── */
+  html.dark .modal-overlay * {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay button {
+    color: inherit;
+  }
+
+  html.dark .modal-overlay .FormField {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay input[type="text"],
+  html.dark .modal-overlay input[type="email"],
+  html.dark .modal-overlay input[type="number"],
+  html.dark .modal-overlay input[type="date"],
+  html.dark .modal-overlay input[type="password"],
+  html.dark .modal-overlay textarea,
+  html.dark .modal-overlay select {
+    background-color: hsl(220, 13%, 20%) !important;
+    color: hsl(var(--foreground)) !important;
+    border-color: hsla(210, 15%, 40%, 0.7) !important;
+  }
+
+  html.dark .modal-overlay input[type="text"]:focus,
+  html.dark .modal-overlay input[type="email"]:focus,
+  html.dark .modal-overlay input[type="number"]:focus,
+  html.dark .modal-overlay input[type="date"]:focus,
+  html.dark .modal-overlay input[type="password"]:focus,
+  html.dark .modal-overlay textarea:focus,
+  html.dark .modal-overlay select:focus {
+    background-color: hsl(220, 13%, 22%) !important;
+    border-color: hsla(210, 72%, 50%, 0.8) !important;
+    box-shadow: 0 0 0 3px hsla(210, 72%, 50%, 0.2) !important;
+  }
+
+  /* ─── Comprehensive Dark Mode for All Modal Content ─── */
+  html.dark .modal-overlay .grid {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay .space-y-1\.5 > label {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay h2,
+  html.dark .modal-overlay h3,
+  html.dark .modal-overlay h4 {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  html.dark .modal-overlay .text-foreground {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay option {
+    background-color: hsl(220, 13%, 20%) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .modal-overlay option:checked {
+    background: hsl(210, 66%, 34%) !important;
+    color: hsl(0, 0%, 100%) !important;
+  }
+
   @keyframes overlay-fade {
     from {
       opacity: 0;
@@ -1075,21 +1188,21 @@
     box-shadow: 0 20px 30px -24px rgba(15, 23, 42, 0.58);
   }
 
-  .annadhanam-search-input {
+  html:not(.dark) .annadhanam-search-input {
     border-color: hsla(210, 22%, 70%, 0.9) !important;
     background: hsla(0, 0%, 100%, 0.95) !important;
   }
 
-  .annadhanam-search-input:focus {
+  html:not(.dark) .annadhanam-search-input:focus {
     border-color: hsla(210, 72%, 34%, 0.95) !important;
     box-shadow: 0 0 0 3px hsla(210, 72%, 34%, 0.16), 0 4px 10px rgba(15, 23, 42, 0.12);
   }
 
-  .annadhanam-main-panel thead {
+  html:not(.dark) .annadhanam-main-panel thead {
     background: linear-gradient(180deg, hsla(210, 34%, 94%, 0.95) 0%, hsla(210, 22%, 92%, 0.88) 100%) !important;
   }
 
-  .annadhanam-main-panel thead th {
+  html:not(.dark) .annadhanam-main-panel thead th {
     color: hsl(var(--foreground)) !important;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -1099,12 +1212,12 @@
     transition: background-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .annadhanam-row:hover {
+  html:not(.dark) .annadhanam-row:hover {
     background: linear-gradient(90deg, hsla(210, 56%, 94%, 0.93) 0%, hsla(210, 40%, 97%, 0.97) 50%, hsla(42, 70%, 94%, 0.9) 100%) !important;
     box-shadow: inset 4px 0 0 hsla(210, 70%, 36%, 0.78);
   }
 
-  .annadhanam-form-shell {
+  html:not(.dark) .annadhanam-form-shell {
     border: 1px solid transparent;
     border-radius: 0.95rem;
     padding: 0.85rem;
@@ -1112,16 +1225,16 @@
     box-shadow: 0 10px 22px -22px rgba(15, 23, 42, 0.45);
   }
 
-  .annadhanam-form-shell input,
-  .annadhanam-form-shell select,
-  .annadhanam-form-shell textarea {
+  html:not(.dark) .annadhanam-form-shell input,
+  html:not(.dark) .annadhanam-form-shell select,
+  html:not(.dark) .annadhanam-form-shell textarea {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
     background: hsla(0, 0%, 100%, 0.96) !important;
   }
 
-  .annadhanam-form-shell input:focus,
-  .annadhanam-form-shell select:focus,
-  .annadhanam-form-shell textarea:focus {
+  html:not(.dark) .annadhanam-form-shell input:focus,
+  html:not(.dark) .annadhanam-form-shell select:focus,
+  html:not(.dark) .annadhanam-form-shell textarea:focus {
     border-color: hsla(210, 68%, 34%, 0.95) !important;
     box-shadow: 0 0 0 3px hsla(210, 68%, 34%, 0.14) !important;
   }
@@ -1240,6 +1353,44 @@
   .hr-form-shell textarea:focus {
     border-color: hsla(210, 68%, 34%, 0.95) !important;
     box-shadow: 0 0 0 3px hsla(210, 68%, 34%, 0.14) !important;
+  }
+
+  /* ─── Dark Mode for HR Form Shell ─── */
+  html.dark .hr-form-shell {
+    background: linear-gradient(180deg, hsl(220, 13%, 18%) 0%, hsl(220, 13%, 16%) 70%, hsl(220, 13%, 17%) 100%) !important;
+    border-color: hsla(210, 15%, 40%, 0.7) !important;
+    box-shadow: 0 10px 22px -22px rgba(0, 0, 0, 0.8);
+  }
+
+  html.dark .hr-form-shell input,
+  html.dark .hr-form-shell select,
+  html.dark .hr-form-shell textarea {
+    border-color: hsla(210, 15%, 40%, 0.7) !important;
+    background-color: hsl(220, 13%, 20%) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .hr-form-shell input::placeholder,
+  html.dark .hr-form-shell textarea::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  html.dark .hr-form-shell input:focus,
+  html.dark .hr-form-shell select:focus,
+  html.dark .hr-form-shell textarea:focus {
+    border-color: hsla(210, 72%, 50%, 0.8) !important;
+    box-shadow: 0 0 0 3px hsla(210, 72%, 50%, 0.2) !important;
+    background-color: hsl(220, 13%, 22%) !important;
+  }
+
+  html.dark .hr-form-shell input:hover,
+  html.dark .hr-form-shell select:hover,
+  html.dark .hr-form-shell textarea:hover {
+    border-color: hsla(210, 15%, 50%, 0.8) !important;
+  }
+
+  html.dark .hr-form-shell label {
+    color: hsl(var(--foreground)) !important;
   }
 
   /* Strong Donations theme aligned to new navy-gold palette */
@@ -1546,6 +1697,14 @@
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
+  html.dark .campaign-stat-card,
+  html.dark .campaign-main-panel,
+  html.dark .campaign-side-panel {
+    border-color: hsla(210, 22%, 30%, 0.64) !important;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.6) 62%, hsl(var(--background)) 100%) !important;
+    box-shadow: 0 24px 36px -28px rgba(0, 0, 0, 0.8);
+  }
+
   .campaign-stat-card,
   .campaign-mode-card,
   .campaign-user-item,
@@ -1561,10 +1720,21 @@
     box-shadow: 0 20px 30px -24px rgba(15, 23, 42, 0.58);
   }
 
+  .campaign-log-item,
+  .campaign-log-item:hover {
+    box-shadow: none !important;
+  }
+
   .campaign-main-panel .section-panel-header,
   .campaign-side-panel .section-panel-header {
     background: linear-gradient(180deg, hsla(210, 34%, 95%, 1) 0%, hsla(210, 30%, 93%, 0.82) 100%) !important;
     border-bottom-color: hsla(210, 18%, 80%, 0.85) !important;
+  }
+
+  html.dark .campaign-main-panel .section-panel-header,
+  html.dark .campaign-side-panel .section-panel-header {
+    background: linear-gradient(180deg, hsl(var(--muted) / 0.8) 0%, hsl(var(--muted) / 0.6) 100%) !important;
+    border-bottom-color: hsla(210, 18%, 35%, 0.65) !important;
   }
 
   .campaign-event-box {
@@ -1572,9 +1742,15 @@
     background: linear-gradient(180deg, hsla(210, 34%, 97%, 0.98) 0%, hsla(0, 0%, 100%, 0.98) 100%) !important;
   }
 
+  html.dark .campaign-event-box {
+    border-color: hsla(210, 22%, 30%, 0.64) !important;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.8) 100%) !important;
+  }
+
   .campaign-field {
     border-color: hsla(210, 18%, 70%, 0.84) !important;
     background: hsla(0, 0%, 100%, 0.96) !important;
+    color: hsla(0, 0%, 10%, 0.95) !important;
   }
 
   .campaign-field:focus {
@@ -1582,21 +1758,42 @@
     box-shadow: 0 0 0 3px hsla(210, 68%, 34%, 0.14) !important;
   }
 
+  html.dark .campaign-field {
+    border-color: hsla(210, 18%, 40%, 0.64) !important;
+    background: hsl(var(--card)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .campaign-field:focus {
+    border-color: hsl(210, 68%, 54%) !important;
+    box-shadow: 0 0 0 3px hsla(210, 68%, 54%, 0.24) !important;
+  }
+
   .campaign-channel-btn {
     border-color: hsla(210, 18%, 72%, 0.84) !important;
+  }
+
+  html.dark .campaign-channel-btn {
+    border-color: hsla(210, 18%, 40%, 0.64) !important;
+    background: hsl(var(--card)) !important;
+  }
+
+  html.dark .campaign-channel-btn:hover {
+    border-color: hsla(210, 68%, 54%, 0.64) !important;
+    background: hsl(var(--muted)) !important;
   }
 
   .campaign-send-btn {
     background: linear-gradient(135deg, hsl(210, 66%, 34%) 0%, hsl(219, 58%, 30%) 100%) !important;
     color: hsl(0, 0%, 100%) !important;
     border: 1px solid hsla(212, 64%, 24%, 0.95);
-    box-shadow: 0 18px 30px -16px rgba(15, 32, 58, 0.92);
+    box-shadow: none !important;
     font-weight: 800;
   }
 
   .campaign-send-btn:hover {
     transform: translateY(-1px) scale(1.01);
-    box-shadow: 0 22px 34px -16px rgba(15, 32, 58, 1);
+    box-shadow: none !important;
   }
 
   /* Strong Inventory page overrides aligned to new palette */
@@ -1648,6 +1845,31 @@
     box-shadow: 0 12px 20px -14px rgba(15, 32, 58, 0.9);
   }
 
+  .inventory-field {
+    background-color: hsla(0, 0%, 100%, 0.96) !important;
+    border-color: hsla(210, 18%, 70%, 0.84) !important;
+    color: hsla(0, 0%, 10%, 0.95) !important;
+  }
+
+  html.dark .inventory-field {
+    background-color: hsl(var(--card)) !important;
+    border-color: hsla(210, 18%, 40%, 0.64) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .inventory-field:focus {
+    border-color: hsl(210, 68%, 54%) !important;
+    box-shadow: 0 0 0 3px hsla(210, 68%, 54%, 0.24) !important;
+  }
+
+  .inventory-search-input {
+    color: hsla(0, 0%, 10%, 0.95) !important;
+  }
+
+  html.dark .inventory-search-input {
+    color: hsl(var(--foreground)) !important;
+  }
+
   .inventory-stat-card,
   .inventory-main-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
@@ -1669,6 +1891,20 @@
     border-color: hsla(0, 72%, 51%, 0.3) !important;
     background: linear-gradient(135deg, hsla(0, 100%, 98%, 1) 0%, hsla(40, 80%, 97%, 1) 100%) !important;
     box-shadow: 0 18px 32px -30px rgba(127, 29, 29, 0.5);
+  }
+
+  html.dark .inventory-alert {
+    border-color: hsla(0, 68%, 58%, 0.4) !important;
+    background: linear-gradient(135deg, hsla(0, 38%, 16%, 0.95) 0%, hsla(10, 34%, 14%, 0.96) 100%) !important;
+    box-shadow: 0 18px 30px -24px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  html.dark .inventory-alert [class*="bg-destructive/10"] {
+    background: hsla(0, 74%, 58%, 0.22) !important;
+  }
+
+  html.dark .inventory-alert [class*="text-destructive"] {
+    color: hsl(0 85% 74%) !important;
   }
 
   .inventory-main-panel .section-panel-header {
@@ -1969,6 +2205,19 @@
     background: linear-gradient(180deg, hsla(210, 30%, 98%, 0.72) 0%, hsla(0, 0%, 100%, 0.9) 100%) !important;
   }
 
+  html.dark .docs-dropzone {
+    border-color: hsla(210, 22%, 36%, 0.72) !important;
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.7) 100%) !important;
+  }
+
+  html.dark .docs-dropzone .text-foreground {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .docs-dropzone .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
   .docs-stage,
   .docs-guidelines {
     border-color: hsla(210, 20%, 72%, 0.74) !important;
@@ -2140,6 +2389,45 @@
     background: linear-gradient(135deg, hsla(210, 34%, 97%, 0.96) 0%, hsla(43, 38%, 95%, 0.96) 100%) !important;
   }
 
+  html.dark .settings-form-shell {
+    background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted) / 0.7) 100%) !important;
+    border-color: hsl(var(--border)) !important;
+    box-shadow: 0 10px 22px -18px rgba(0, 0, 0, 0.55) !important;
+  }
+
+  html.dark .settings-field,
+  html.dark .settings-form-shell input,
+  html.dark .settings-form-shell select,
+  html.dark .settings-form-shell textarea {
+    background: hsl(var(--card)) !important;
+    border-color: hsl(var(--border)) !important;
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .settings-field::placeholder,
+  html.dark .settings-form-shell input::placeholder,
+  html.dark .settings-form-shell textarea::placeholder {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
+  html.dark .settings-field:focus,
+  html.dark .settings-form-shell input:focus,
+  html.dark .settings-form-shell select:focus,
+  html.dark .settings-form-shell textarea:focus {
+    border-color: hsl(var(--primary)) !important;
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.2) !important;
+  }
+
+  html.dark .settings-form-shell label,
+  html.dark .settings-form-shell p {
+    color: hsl(var(--foreground)) !important;
+  }
+
+  html.dark .settings-note {
+    border-color: hsl(var(--border)) !important;
+    background: linear-gradient(135deg, hsl(var(--muted) / 0.6) 0%, hsl(var(--card) / 0.9) 100%) !important;
+  }
+
   .settings-premium .text-blue-600,
   .settings-premium .text-blue-700,
   .settings-premium .text-emerald-600,
@@ -2216,7 +2504,7 @@
     background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-red-600) 100%) !important;
     color: #fff !important;
     border-color: color-mix(in srgb, var(--brand-red-600) 72%, black) !important;
-    box-shadow: 0 16px 28px -16px rgba(188, 31, 30, 0.65) !important;
+    box-shadow: none !important;
   }
 
   .donations-cta:hover,
@@ -2231,7 +2519,7 @@
   .hall-booking-cta:hover,
   .settings-cta:hover {
     background: linear-gradient(135deg, var(--brand-red-600) 0%, var(--brand-primary) 100%) !important;
-    box-shadow: 0 22px 34px -18px rgba(188, 31, 30, 0.76) !important;
+    box-shadow: none !important;
   }
 
   /* Keep original CTA style and add a clear outline for contrast on banner CTAs */
@@ -3192,3 +3480,1217 @@
   background: none !important;
   filter: none !important;
 }
+
+/* Dark mode styles for select dropdowns and options */
+html.dark select {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsla(210, 15%, 40%, 0.7) !important;
+}
+
+html.dark select option {
+  background-color: hsl(220, 13%, 20%) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark select option:checked {
+  background: hsl(210, 66%, 34%) !important;
+  color: hsl(0, 0%, 100%) !important;
+}
+
+html.dark select:focus {
+  border-color: hsla(210, 72%, 50%, 0.8) !important;
+  box-shadow: 0 0 0 3px hsla(210, 72%, 50%, 0.2) !important;
+}
+
+html.dark select:hover {
+  border-color: hsla(210, 15%, 50%, 0.8) !important;
+}
+
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="number"],
+html.dark input[type="date"],
+html.dark input[type="password"],
+html.dark textarea {
+  background-color: hsl(220, 13%, 18%) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsla(210, 15%, 40%, 0.7) !important;
+}
+
+html.dark input[type="text"]::placeholder,
+html.dark input[type="email"]::placeholder,
+html.dark input[type="number"]::placeholder,
+html.dark input[type="date"]::placeholder,
+html.dark input[type="password"]::placeholder,
+html.dark textarea::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark input[type="text"]:focus,
+html.dark input[type="email"]:focus,
+html.dark input[type="number"]:focus,
+html.dark input[type="date"]:focus,
+html.dark input[type="password"]:focus,
+html.dark textarea:focus {
+  border-color: hsla(210, 72%, 50%, 0.8) !important;
+  box-shadow: 0 0 0 3px hsla(210, 72%, 50%, 0.2) !important;
+  background-color: hsl(220, 13%, 20%) !important;
+}
+
+html.dark input[type="text"]:hover,
+html.dark input[type="email"]:hover,
+html.dark input[type="number"]:hover,
+html.dark input[type="date"]:hover,
+html.dark input[type="password"]:hover,
+html.dark textarea:hover {
+  border-color: hsla(210, 15%, 50%, 0.8) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* ═══ COMPREHENSIVE DARK MODE VISIBILITY FIX FOR ALL PAGES ═══ */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Universal Dark Mode Base ─── */
+html.dark {
+  color: hsl(var(--foreground));
+  color-scheme: dark;
+}
+
+/*
+ * DEFAULT text color for elements that have NO explicit Tailwind color class.
+ * We use attribute selectors to skip elements that already carry an intentional
+ * color utility such as text-primary, text-accent, text-emerald-*, etc.
+ * This prevents the blanket override from killing those colored utilities.
+ */
+html.dark p:not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-secondary"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-red"]):not([class*="text-green"]):not([class*="text-blue"]):not([class*="text-indigo"]):not([class*="text-yellow"]):not([class*="text-orange"]):not([class*="text-white"]):not([class*="text-muted"]):not([class*="text-destructive"]):not([class*="text-success"]):not([class*="text-warning"]):not([class*="text-purple"]):not([class*="text-teal"]):not([class*="text-cyan"]):not([class*="text-amber"]),
+html.dark label:not([class*="text-primary"]):not([class*="text-accent"]):not([class*="text-muted"]):not([class*="text-secondary"]):not([class*="text-white"]),
+html.dark h1:not([class*="text-"]),
+html.dark h2:not([class*="text-"]),
+html.dark h3:not([class*="text-"]),
+html.dark h4:not([class*="text-"]),
+html.dark h5:not([class*="text-"]),
+html.dark h6:not([class*="text-"]) {
+  color: hsl(var(--foreground));
+}
+
+/* ─── Preserve text-primary / text-accent in dark mode ─── */
+html.dark .text-primary {
+  color: hsl(var(--primary)) !important;
+}
+
+html.dark .text-primary-foreground {
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+html.dark .text-accent {
+  color: hsl(var(--accent)) !important;
+}
+
+html.dark .text-accent-foreground {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+html.dark .text-secondary {
+  color: hsl(var(--secondary)) !important;
+}
+
+html.dark .text-secondary-foreground {
+  color: hsl(var(--secondary-foreground)) !important;
+}
+
+html.dark .text-foreground {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .text-destructive {
+  color: hsl(var(--destructive)) !important;
+}
+
+html.dark .text-card-foreground {
+  color: hsl(var(--card-foreground)) !important;
+}
+
+html.dark .text-popover-foreground {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+/* ─── Dark Mode Page Container Fixes ─── */
+html.dark [class*="-premium"] {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Table Dark Mode Fixes ─── */
+html.dark table {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark table thead {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark table thead th {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark table tbody tr {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark table tbody tr td {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark table tbody tr:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* ─── Card/Container Dark Mode Fixes ─── */
+/* Only override cards that do NOT already have an intentional colored bg */
+html.dark .card:not([class*="bg-primary"]):not([class*="bg-secondary"]):not([class*="bg-accent"]):not([class*="bg-destructive"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="bg-success"]):not([class*="bg-warning"]):not([class*="bg-foreground"]),
+html.dark [class*="card"]:not([class*="text-card"]):not([class*="bg-primary"]):not([class*="bg-secondary"]):not([class*="bg-accent"]):not([class*="bg-destructive"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="bg-success"]):not([class*="bg-warning"]):not([class*="bg-foreground"]):not([class*="stat-card"]):not([class*="kpi-card"]) {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Badge Dark Mode Fixes — only target generic badges, not colored ones ─── */
+html.dark [class*="badge"]:not([class*="bg-"]):not([class*="text-emerald"]):not([class*="text-rose"]):not([class*="text-red"]):not([class*="text-green"]):not([class*="text-blue"]):not([class*="text-yellow"]):not([class*="text-orange"]):not([class*="text-indigo"]):not([class*="text-purple"]):not([class*="text-primary"]) {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Stat Card / KPI Card Dark Mode — preserve intentional bg colors ─── */
+/* Use `background` shorthand to override light-mode linear-gradient !important */
+html.dark .stat-card:not([class*="bg-primary"]):not([class*="bg-secondary"]):not([class*="bg-emerald"]):not([class*="bg-amber"]):not([class*="bg-blue"]):not([class*="bg-success"]):not([class*="bg-warning"]):not([class*="bg-destructive"]):not([class*="bg-foreground"]),
+html.dark .dashboard-kpi-card:not([class*="bg-primary"]):not([class*="bg-accent"]):not([class*="bg-foreground"]):not([class*="bg-success"]) {
+  background: hsl(var(--card)) !important;
+}
+
+html.dark .stat-card,
+html.dark .dashboard-kpi-card {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Module-specific stat card dark overrides (kills light-mode gradients) ─── */
+html.dark .donations-stat-card,
+html.dark .events-stat-card,
+html.dark .devotees-stat-card,
+html.dark .pooja-stat-card,
+html.dark .annadhanam-stat-card,
+html.dark .hr-stat-card,
+html.dark .campaign-stat-card,
+html.dark .assets-stat-card,
+html.dark .inventory-stat-card {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Cards WITHOUT an explicit bg-* class get card background */
+html.dark .donations-stat-card:not([class*="bg-primary"]):not([class*="bg-emerald"]):not([class*="bg-secondary"]):not([class*="bg-success"]),
+html.dark .events-stat-card:not([class*="bg-primary"]):not([class*="bg-emerald"]):not([class*="bg-secondary"]):not([class*="bg-success"]),
+html.dark .devotees-stat-card:not([class*="bg-primary"]):not([class*="bg-emerald"]):not([class*="bg-secondary"]):not([class*="bg-success"]) {
+  background: hsl(var(--card)) !important;
+}
+
+/* Cards WITH an explicit bg-* class keep their intended tint on dark card base */
+html.dark .donations-stat-card[class*="bg-primary"],
+html.dark .events-stat-card[class*="bg-primary"],
+html.dark .devotees-stat-card[class*="bg-primary"] {
+  background: hsl(var(--primary) / 0.08) !important;
+  border-color: hsl(var(--primary) / 0.25) !important;
+}
+
+html.dark .donations-stat-card[class*="bg-emerald"],
+html.dark .events-stat-card[class*="bg-emerald"],
+html.dark .devotees-stat-card[class*="bg-emerald"] {
+  background: hsla(142, 71%, 45%, 0.08) !important;
+  border-color: hsla(142, 71%, 45%, 0.25) !important;
+}
+
+html.dark .donations-stat-card[class*="bg-secondary"],
+html.dark .events-stat-card[class*="bg-secondary"],
+html.dark .devotees-stat-card[class*="bg-secondary"] {
+  background: hsl(var(--secondary) / 0.08) !important;
+  border-color: hsl(var(--secondary) / 0.25) !important;
+}
+
+html.dark .donations-stat-card[class*="bg-success"],
+html.dark .events-stat-card[class*="bg-success"] {
+  background: hsl(var(--success) / 0.08) !important;
+  border-color: hsl(var(--success) / 0.25) !important;
+}
+
+html.dark .donations-stat-card:hover,
+html.dark .events-stat-card:hover,
+html.dark .devotees-stat-card:hover {
+  border-color: hsl(var(--primary) / 0.35) !important;
+  box-shadow: 0 8px 24px -12px hsla(0, 0%, 0%, 0.5) !important;
+}
+
+/* ─── Module Ledger/Panel Dark Overrides ─── */
+html.dark .donations-ledger-panel,
+html.dark .donations-side-panel,
+html.dark .events-list-panel,
+html.dark .events-calendar-panel,
+html.dark .events-day-panel,
+html.dark .devotees-table-shell {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  box-shadow: 0 8px 24px -12px hsla(0, 0%, 0%, 0.3) !important;
+}
+
+html.dark .donations-ledger-panel thead,
+html.dark .devotees-table-shell thead {
+  background: hsl(var(--muted)) !important;
+}
+
+html.dark .donations-ledger-panel thead th,
+html.dark .devotees-table-shell thead th {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .donations-ledger-panel tbody tr:hover {
+  background: hsl(var(--muted)) !important;
+  box-shadow: inset 4px 0 0 hsl(var(--primary)) !important;
+}
+
+html.dark .donations-filter-bar {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .donations-premium .section-panel-header,
+html.dark .events-premium .section-panel-header {
+  background: hsl(var(--card)) !important;
+  border-bottom-color: hsl(var(--border)) !important;
+}
+
+html.dark .donations-premium input,
+html.dark .donations-premium select,
+html.dark .donations-premium textarea,
+html.dark .events-premium input,
+html.dark .events-premium select,
+html.dark .events-premium textarea {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .donations-premium input:focus,
+html.dark .donations-premium select:focus,
+html.dark .donations-premium textarea:focus {
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.2) !important;
+}
+
+/* ─── Pooja Module Dark Mode Overrides ─── */
+html.dark .pooja-receipt-shell {
+  background: linear-gradient(145deg, hsl(var(--card)) 0%, hsl(var(--muted)) 55%, hsl(var(--card)) 100%) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .pooja-receipt-shell [class*="bg-white"] {
+  background: hsl(var(--card)) !important;
+}
+
+html.dark .pooja-receipt-shell [class*="bg-emerald-50"] {
+  background: hsl(152 45% 18% / 0.65) !important;
+  border-color: hsl(152 42% 42% / 0.55) !important;
+}
+
+html.dark .pooja-receipt-shell [class*="border-slate-200"],
+html.dark .pooja-receipt-shell [class*="border-emerald-200"] {
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .pooja-receipt-shell [class*="text-slate-900"] {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .pooja-receipt-shell [class*="text-slate-800"],
+html.dark .pooja-receipt-shell [class*="text-slate-600"],
+html.dark .pooja-receipt-shell [class*="text-slate-500"] {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .pooja-receipt-shell [class*="text-emerald-700"] {
+  color: hsl(152 65% 72%) !important;
+}
+
+html.dark .pooja-row:hover {
+  background: hsl(var(--muted)) !important;
+  box-shadow: inset 4px 0 0 hsl(var(--primary)) !important;
+}
+
+html.dark .pooja-main-panel thead {
+  background: hsl(var(--muted)) !important;
+}
+
+html.dark .pooja-main-panel thead th {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .pooja-form-shell {
+  background: linear-gradient(180deg, hsl(var(--card)) 0%, hsl(var(--muted)) 100%) !important;
+}
+
+html.dark .pooja-form-shell input,
+html.dark .pooja-form-shell select,
+html.dark .pooja-form-shell textarea {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .pooja-form-shell input:focus,
+html.dark .pooja-form-shell select:focus,
+html.dark .pooja-form-shell textarea:focus {
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.2) !important;
+}
+
+html.dark .pooja-form-shell button {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .pooja-form-shell button[class*="bg-primary"] {
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+html.dark .pooja-form-shell button[class*="outline"] {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .pooja-cta {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary) / 0.8) 100%) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border-color: hsl(var(--primary) / 0.5) !important;
+}
+
+html.dark .pooja-receipt-shell button[class*="outline"] {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .pooja-receipt-context button[class*="bg-foreground"],
+html.dark .pooja-receipt-context button[class*="bg-foreground"] * {
+  background: hsl(var(--foreground)) !important;
+  color: hsl(var(--background)) !important;
+}
+
+html.dark .donations-receipt-context button[class*="bg-foreground"],
+html.dark .donations-receipt-context button[class*="bg-foreground"] * {
+  background: hsl(var(--foreground)) !important;
+  color: hsl(var(--background)) !important;
+}
+
+html.dark .pooja-main-panel,
+html.dark .pooja-side-panel,
+html.dark .pooja-date-panel {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .pooja-catalog-item,
+html.dark .pooja-priest-item,
+html.dark .pooja-event-chip,
+html.dark .pooja-date-stat {
+  background: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+
+html.dark input[type="search"],
+html.dark [class*="search-input"] {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark input[type="search"]::placeholder,
+html.dark [class*="search-input"]::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* ─── Form and Modal Text Dark Mode Fixes ─── */
+html.dark .space-y-1\.5 label,
+html.dark .space-y-2 label,
+html.dark .space-y-3 label {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Button Text Dark Mode Fixes ─── */
+html.dark button {
+  color: inherit;
+}
+
+html.dark button.text-foreground {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark button.text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* ─── Tab Bar Dark Mode Fixes ─── */
+html.dark [class*="tab-btn"],
+html.dark [class*="tabbar"] {
+  background-color: transparent;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark [class*="tab-btn"]:hover {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark [class*="tab-btn"].active {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* ─── HR Tabbar Dark Mode Readability Fix ─── */
+html.dark .hr-tabbar {
+  background: hsl(var(--card) / 0.75) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .hr-tab-btn {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .hr-tab-btn:hover {
+  background: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .hr-tab-btn.bg-primary,
+html.dark .hr-tab-btn.bg-primary:hover {
+  background: linear-gradient(135deg, var(--brand-blue-500) 0%, var(--brand-blue-600) 100%) !important;
+  border-color: color-mix(in srgb, var(--brand-blue-600) 72%, black) !important;
+  color: #fff !important;
+}
+
+/* ─── Panel Header Dark Mode Fixes ─── */
+html.dark [class*="panel-header"],
+html.dark [class*="section-panel-header"] {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark [class*="panel-header"] h2,
+html.dark [class*="section-panel-header"] h2 {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Muted Text Dark Mode Fixes ─── */
+html.dark .text-muted,
+html.dark [class*="text-muted-foreground"] {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* ─── Hardcoded Slate / Gray Color Overrides ─── */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700 {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .text-slate-400,
+html.dark .text-slate-300 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700 {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-gray-400,
+html.dark .text-gray-300 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* ─── Hardcoded Indigo Color Overrides (Volunteers, Buttons etc.) ─── */
+html.dark .text-indigo-600,
+html.dark .text-indigo-700 {
+  color: hsl(224, 76%, 68%) !important;
+}
+
+html.dark .text-indigo-500 {
+  color: hsl(224, 76%, 72%) !important;
+}
+
+html.dark .text-indigo-100 {
+  color: hsl(224, 68%, 82%) !important;
+}
+
+html.dark .bg-indigo-50 {
+  background-color: hsla(224, 76%, 48%, 0.15) !important;
+}
+
+html.dark .bg-indigo-100 {
+  background-color: hsla(224, 76%, 48%, 0.2) !important;
+}
+
+html.dark .bg-indigo-600 {
+  background-color: hsl(224, 76%, 48%) !important;
+}
+
+html.dark .border-indigo-100,
+html.dark .border-indigo-200 {
+  border-color: hsla(224, 50%, 50%, 0.35) !important;
+}
+
+html.dark .border-indigo-500 {
+  border-color: hsla(224, 76%, 60%, 0.5) !important;
+}
+
+/* ─── Hardcoded Background Overrides ─── */
+html.dark .bg-slate-50,
+html.dark .bg-slate-100,
+html.dark .bg-slate-200 {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .bg-gray-50,
+html.dark .bg-gray-100,
+html.dark .bg-gray-200 {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .bg-white {
+  background-color: hsl(var(--card)) !important;
+}
+
+html.dark .bg-rose-50 {
+  background-color: hsla(0, 84%, 60%, 0.12) !important;
+}
+
+/* ─── Hardcoded Border Overrides ─── */
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-300 {
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .border-rose-100,
+html.dark .border-rose-200 {
+  border-color: hsla(0, 70%, 50%, 0.3) !important;
+}
+
+/* ─── Dark Mode Filter/Dropdown List Fixes ─── */
+html.dark .dropdown-content,
+html.dark [class*="dropdown"] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Pagination Dark Mode Fixes ─── */
+html.dark [class*="pagination"] button {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark [class*="pagination"] button.active {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* ─── Empty State Dark Mode Fixes ─── */
+html.dark [class*="empty"],
+html.dark [class*="no-data"] {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark [class*="empty"] h3,
+html.dark [class*="no-data"] h3 {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Tooltip Dark Mode Fixes ─── */
+html.dark [role="tooltip"],
+html.dark [class*="tooltip"] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Status Indicator Colors (Bright for Dark Mode) ─── */
+html.dark .text-success,
+html.dark .text-emerald-600,
+html.dark .text-emerald-500 {
+  color: hsl(142, 71%, 45%) !important;
+}
+
+html.dark .text-warning,
+html.dark .text-yellow-600,
+html.dark .text-yellow-500 {
+  color: hsl(45, 93%, 47%) !important;
+}
+
+html.dark .text-red-500,
+html.dark .text-red-600 {
+  color: hsl(0, 84%, 60%) !important;
+}
+
+html.dark .text-rose-600,
+html.dark .text-rose-500 {
+  color: hsl(0, 84%, 60%) !important;
+}
+
+html.dark .text-rose-400 {
+  color: hsl(0, 84%, 65%) !important;
+}
+
+html.dark .text-orange-500,
+html.dark .text-orange-600 {
+  color: hsl(25, 95%, 53%) !important;
+}
+
+html.dark .text-blue-500,
+html.dark .text-blue-600 {
+  color: hsl(217, 91%, 60%) !important;
+}
+
+html.dark .text-amber-500,
+html.dark .text-amber-600 {
+  color: hsl(38, 92%, 50%) !important;
+}
+
+html.dark .text-teal-500,
+html.dark .text-teal-600 {
+  color: hsl(168, 76%, 42%) !important;
+}
+
+html.dark .text-purple-500,
+html.dark .text-purple-600 {
+  color: hsl(270, 76%, 65%) !important;
+}
+
+html.dark .text-cyan-500,
+html.dark .text-cyan-600 {
+  color: hsl(190, 95%, 39%) !important;
+}
+
+/* ─── Zinc Color Overrides (SalarySlip / Payslip) ─── */
+html.dark .text-zinc-900,
+html.dark .text-zinc-800,
+html.dark .text-zinc-700 {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .text-zinc-600,
+html.dark .text-zinc-500 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .text-zinc-400,
+html.dark .text-zinc-300 {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .bg-zinc-50,
+html.dark .bg-zinc-100 {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .bg-zinc-800 {
+  background-color: hsl(220, 13%, 25%) !important;
+}
+
+html.dark .border-zinc-100,
+html.dark .border-zinc-200,
+html.dark .border-zinc-300,
+html.dark .border-zinc-400 {
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .hover\:bg-zinc-100:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .hover\:bg-zinc-800:hover {
+  background-color: hsl(220, 13%, 30%) !important;
+}
+
+html.dark .hover\:text-zinc-900:hover {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Salary Slip Root — force dark background/borders ─── */
+html.dark .salary-slip-root,
+html.dark .salary-slip-root > div {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .salary-slip-root table thead tr {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .salary-slip-root table thead th {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .salary-slip-root table tbody td {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark .salary-slip-root table tr {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Recharts / SVG Chart Dark Mode ─── */
+html.dark .recharts-text,
+html.dark .recharts-cartesian-axis-tick-value,
+html.dark .recharts-legend-item-text {
+  fill: hsl(var(--muted-foreground)) !important;
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .recharts-cartesian-grid-horizontal line,
+html.dark .recharts-cartesian-grid-vertical line {
+  stroke: hsl(var(--border)) !important;
+}
+
+html.dark .recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .recharts-tooltip-label {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .recharts-tooltip-item {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Section Panel Dark Mode ─── */
+html.dark .section-panel {
+  background-color: hsl(var(--card)) !important;
+  border-color: hsl(var(--border)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .section-panel-header {
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Explicit dark: prefix utilities ─── */
+html.dark .dark\:text-foreground {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .dark\:text-muted-foreground {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .dark\:bg-card {
+  background-color: hsl(var(--card)) !important;
+}
+
+html.dark .dark\:bg-background {
+  background-color: hsl(var(--background)) !important;
+}
+
+html.dark .dark\:border-border {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Hover: bg-slate/indigo overrides ─── */
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-100:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+html.dark .hover\:bg-indigo-100:hover {
+  background-color: hsla(224, 76%, 48%, 0.2) !important;
+}
+
+html.dark .hover\:bg-red-50:hover,
+html.dark .hover\:bg-rose-50:hover {
+  background-color: hsla(0, 84%, 60%, 0.15) !important;
+}
+
+html.dark .hover\:bg-rose-100:hover {
+  background-color: hsla(0, 70%, 50%, 0.18) !important;
+}
+
+html.dark .hover\:bg-emerald-500\/10:hover {
+  background-color: hsla(142, 71%, 45%, 0.12) !important;
+}
+
+html.dark .hover\:bg-indigo-700:hover {
+  background-color: hsl(224, 76%, 42%) !important;
+}
+
+/* ─── Hover: text overrides ─── */
+html.dark .hover\:text-red-500:hover {
+  color: hsl(0, 84%, 60%) !important;
+}
+
+html.dark .hover\:text-rose-600:hover,
+html.dark .hover\:text-rose-700:hover {
+  color: hsl(0, 76%, 60%) !important;
+}
+
+html.dark .hover\:text-emerald-600:hover {
+  color: hsl(142, 71%, 45%) !important;
+}
+
+html.dark .hover\:text-indigo-600:hover {
+  color: hsl(224, 76%, 68%) !important;
+}
+
+/* ─── Group-hover overrides ─── */
+html.dark .group:hover .group-hover\:text-foreground {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark .group:hover .group-hover\:text-primary {
+  color: hsl(var(--primary)) !important;
+}
+
+html.dark .group:hover .group-hover\:text-destructive {
+  color: hsl(var(--destructive)) !important;
+}
+
+html.dark .group:hover .group-hover\:bg-primary\/10 {
+  background-color: hsl(var(--primary) / 0.1) !important;
+}
+
+html.dark .group:hover .group-hover\:bg-muted\/80 {
+  background-color: hsl(var(--muted) / 0.8) !important;
+}
+
+/* ─── SVG / Icon Visibility Fix ─── */
+html.dark svg:not([class*="text-"]):not([fill]):not([class*="lucide"]) {
+  color: hsl(var(--foreground));
+}
+
+/* Lucide icons inherit color from parent by default; ensure parent contrast */
+html.dark [class*="lucide"] {
+  color: inherit;
+}
+
+/* ═══════════════════════════════════════════════════════════════════ */
+/* ═══ DARK MODE: HOVER, SELECT, FOCUS & ACTIVE STATE VISIBILITY ═══ */
+/* ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Radix Select / Dropdown / Popover — Panel backgrounds ─── */
+html.dark [data-radix-popper-content-wrapper] [role="listbox"],
+html.dark [data-radix-popper-content-wrapper] [role="menu"],
+html.dark [data-radix-menu-content],
+html.dark [cmdk-list],
+html.dark [data-radix-select-viewport] {
+  background-color: hsl(var(--popover)) !important;
+  color: hsl(var(--popover-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Radix Select Items — hover / focus / selected ─── */
+html.dark [role="option"],
+html.dark [data-radix-collection-item] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+html.dark [role="option"]:hover,
+html.dark [role="option"][data-highlighted],
+html.dark [role="option"]:focus,
+html.dark [data-radix-collection-item]:hover,
+html.dark [data-radix-collection-item][data-highlighted] {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+html.dark [role="option"][data-state="checked"],
+html.dark [role="option"][aria-selected="true"] {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* Check icon in selected option */
+html.dark [role="option"][data-state="checked"] svg,
+html.dark [role="option"][aria-selected="true"] svg {
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* ─── Radix Dropdown / Context Menu Items ─── */
+html.dark [role="menuitem"] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+html.dark [role="menuitem"]:hover,
+html.dark [role="menuitem"][data-highlighted],
+html.dark [role="menuitem"]:focus {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+html.dark [role="menuitemcheckbox"],
+html.dark [role="menuitemradio"] {
+  color: hsl(var(--popover-foreground)) !important;
+}
+
+html.dark [role="menuitemcheckbox"]:hover,
+html.dark [role="menuitemcheckbox"][data-highlighted],
+html.dark [role="menuitemradio"]:hover,
+html.dark [role="menuitemradio"][data-highlighted] {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* ─── Native <select> & <option> dark mode ─── */
+html.dark select option {
+  background-color: hsl(var(--card)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark select option:hover,
+html.dark select option:checked {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* ─── Table Row Hover & Selected ─── */
+html.dark table tbody tr:hover {
+  background-color: hsl(var(--muted)) !important;
+  transition: background-color 0.15s ease-in-out;
+}
+
+html.dark table tbody tr:hover td {
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark [data-state="selected"],
+html.dark tr[data-state="selected"],
+html.dark table tbody tr[data-state="selected"] {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+/* ─── Active Tab / Filter Chip State ─── */
+html.dark [class*="tab-btn"].active,
+html.dark [class*="filter-chip"].active,
+html.dark button[data-state="active"],
+html.dark [role="tab"][data-state="active"],
+html.dark [role="tab"][aria-selected="true"] {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* ─── Toggle / Switch States ─── */
+html.dark [data-state="checked"] {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+html.dark [data-state="on"] {
+  background-color: hsl(var(--accent)) !important;
+  color: hsl(var(--accent-foreground)) !important;
+}
+
+/* ─── Button Hover States ─── */
+html.dark button:hover,
+html.dark a:hover,
+html.dark [role="button"]:hover {
+  transition: all 0.15s ease-in-out;
+}
+
+html.dark button:focus-visible,
+html.dark a:focus-visible,
+html.dark [role="button"]:focus-visible {
+  outline: 2px solid hsl(var(--primary)) !important;
+  outline-offset: 2px;
+}
+
+/* Ghost button hover */
+html.dark button.hover\:bg-muted\/30:hover {
+  background-color: hsl(var(--muted) / 0.3) !important;
+}
+
+/* Primary button hover */
+html.dark button.bg-primary:hover,
+html.dark button.hover\:bg-primary\/90:hover {
+  background-color: hsl(var(--primary)) !important;
+  filter: brightness(1.15);
+}
+
+/* Destructive button hover */
+html.dark button.bg-destructive:hover,
+html.dark button.hover\:bg-destructive\/90:hover {
+  background-color: hsl(var(--destructive)) !important;
+  filter: brightness(1.15);
+}
+
+html.dark button.hover\:bg-destructive\/10:hover,
+html.dark .hover\:bg-destructive\/10:hover {
+  background-color: hsl(var(--destructive) / 0.12) !important;
+}
+
+html.dark button.hover\:text-destructive:hover,
+html.dark .hover\:text-destructive:hover {
+  color: hsl(var(--destructive)) !important;
+}
+
+/* Secondary button hover */
+html.dark button.bg-secondary:hover {
+  background-color: hsl(var(--secondary)) !important;
+  filter: brightness(1.15);
+}
+
+/* Outline / bordered button hover */
+html.dark button[class*="border"]:hover:not(.bg-primary):not(.bg-destructive):not(.bg-secondary) {
+  border-color: hsl(var(--primary)) !important;
+  background-color: hsl(var(--primary) / 0.06) !important;
+}
+
+/* ─── Input/Textarea/Select Hover & Focus ─── */
+html.dark input:hover,
+html.dark textarea:hover,
+html.dark select:hover {
+  border-color: hsla(210, 15%, 50%, 0.8) !important;
+}
+
+html.dark input:focus-visible,
+html.dark textarea:focus-visible,
+html.dark select:focus-visible,
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: hsl(var(--primary)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.2) !important;
+}
+
+/* ─── Card Hover ─── */
+html.dark .card:hover,
+html.dark [class*="card"]:hover:not(button):not(a) {
+  box-shadow: 0 4px 12px hsla(0, 0%, 0%, 0.3) !important;
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+/* ─── Badge Hover ─── */
+html.dark [class*="badge"]:hover {
+  filter: brightness(1.1);
+  transition: filter 0.15s ease-in-out;
+}
+
+/* ─── Link Color ─── */
+html.dark a:not([class*="text-"]):not([class*="bg-"]) {
+  color: hsl(var(--primary));
+}
+
+html.dark a:hover {
+  opacity: 0.85;
+}
+
+/* ─── Sidebar Menu Item Hover/Active ─── */
+html.dark [data-sidebar="menu-button"]:hover {
+  background-color: hsl(var(--sidebar-accent)) !important;
+  color: hsl(var(--sidebar-accent-foreground)) !important;
+}
+
+html.dark [data-sidebar="menu-button"][data-active="true"] {
+  background-color: hsl(var(--sidebar-accent)) !important;
+  color: hsl(var(--sidebar-accent-foreground)) !important;
+}
+
+/* ─── Dialog / Sheet Overlay ─── */
+html.dark [data-state="open"].bg-black\/80 {
+  background-color: rgba(0, 0, 0, 0.85) !important;
+}
+
+/* Dialog content */
+html.dark [role="dialog"] {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+html.dark [role="alertdialog"] {
+  background-color: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* ─── Calendar Day Hover/Selected ─── */
+html.dark [role="gridcell"] button:hover {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+html.dark [role="gridcell"] button[aria-selected="true"] {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+/* ─── Transition Helpers ─── */
+html.dark button,
+html.dark a,
+html.dark input,
+html.dark textarea,
+html.dark select,
+html.dark [role="option"],
+html.dark [role="menuitem"],
+html.dark [role="tab"] {
+  transition: all 0.15s ease-in-out;
+}
+
+/* ─── Theme Studio Tabs: Dark Hover/Active Contrast Fix ─── */
+html.dark .theme-studio-v2 [role="tab"] {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+html.dark .theme-studio-v2 [role="tab"] svg {
+  color: inherit !important;
+}
+
+html.dark .theme-studio-v2 [role="tab"]:hover,
+html.dark .theme-studio-v2 [role="tab"][data-state="active"],
+html.dark .theme-studio-v2 [role="tab"][aria-selected="true"] {
+  background: linear-gradient(135deg, var(--brand-blue-500) 0%, var(--brand-blue-600) 100%) !important;
+  color: #fff !important;
+}
+
+html.dark .theme-studio-v2 [role="tab"]:hover svg,
+html.dark .theme-studio-v2 [role="tab"][data-state="active"] svg,
+html.dark .theme-studio-v2 [role="tab"][aria-selected="true"] svg {
+  color: #fff !important;
+}
+

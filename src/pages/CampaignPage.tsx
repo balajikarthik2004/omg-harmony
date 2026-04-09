@@ -174,17 +174,17 @@ const CampaignPage: React.FC = () => {
             <p className="text-sm text-muted-foreground mt-0.5">Send bulk announcements to devotees and volunteers through SMS, WhatsApp, and Email.</p>
           </div>
           <div className="campaign-view-toggle-wrap">
-            <div className="campaign-view-toggle">
+            <div className="flex bg-muted/50 p-1 rounded-xl border border-border/60 gap-1">
             <button
               onClick={() => { setViewMode('devotees'); setRecipientMode('all'); }}
-              className={`campaign-view-btn ${viewMode === 'devotees' ? 'campaign-view-btn-active-devotees' : ''}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 ${viewMode === 'devotees' ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
             >
               <Users className="h-4.5 w-4.5" />
               Devotees
             </button>
             <button
               onClick={() => { setViewMode('volunteers'); setRecipientMode('volunteers'); }}
-              className={`campaign-view-btn ${viewMode === 'volunteers' ? 'campaign-view-btn-active-volunteers' : ''}`}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold transition-all duration-200 ${viewMode === 'volunteers' ? 'bg-emerald-500 text-white shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
             >
               <UserCheck className="h-4.5 w-4.5" />
               Volunteers
@@ -263,7 +263,7 @@ const CampaignPage: React.FC = () => {
                    <select
                      value={selectedEventId}
                      onChange={e => setSelectedEventId(e.target.value)}
-                    className="campaign-field w-full h-11 rounded-lg border border-input bg-background/60 px-3 text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none hover:border-border"
+                    className="campaign-field w-full h-11 rounded-lg border border-input bg-background/60 px-3 text-sm text-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none hover:border-border"
                    >
                      <option value="">No event selected</option>
                      {mockEvents.map(event => (
@@ -289,7 +289,7 @@ const CampaignPage: React.FC = () => {
                 <textarea
                   value={message}
                   onChange={e => setMessage(e.target.value)}
-                  className="campaign-field w-full min-h-[160px] rounded-lg border border-input bg-background/60 hover:border-border px-4 py-3 text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-none leading-relaxed"
+                  className="campaign-field w-full min-h-[160px] rounded-lg border border-input bg-background/60 hover:border-border px-4 py-3 text-sm text-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none resize-none leading-relaxed"
                   placeholder="Draft your announcement message here..."
                 />
               </div>
@@ -318,7 +318,7 @@ const CampaignPage: React.FC = () => {
               </div>
             )}
 
-            <Button className="campaign-send-btn w-full h-12 text-base font-semibold shadow-md hover:shadow-lg" onClick={handleSend} disabled={isSending}>
+            <Button className="campaign-send-btn w-full h-12 text-base font-semibold" onClick={handleSend} disabled={isSending}>
               <Send className="h-5 w-5 mr-2" />
               {isSending ? 'Sending...' : 'Launch Campaign'}
             </Button>
@@ -337,7 +337,7 @@ const CampaignPage: React.FC = () => {
                   <input
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    className="campaign-field w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border pl-9 pr-3 text-sm transition-all focus:border-primary outline-none focus:ring-2 focus:ring-primary/20"
+                    className="campaign-field w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border pl-9 pr-3 text-sm text-foreground transition-all focus:border-primary outline-none focus:ring-2 focus:ring-primary/20"
                     placeholder="Search by name or phone..."
                   />
                 </div>
@@ -374,7 +374,7 @@ const CampaignPage: React.FC = () => {
                   <p className="text-xs font-medium text-muted-foreground">No campaigns launched yet.</p>
                 </div>
               ) : logs.map(log => (
-                <div key={log.id} className="campaign-log-item rounded-xl border border-border bg-card p-3 shadow-sm hover:shadow-md hover:border-primary/20 transition-all">
+                <div key={log.id} className="campaign-log-item rounded-xl border border-border bg-card p-3 hover:border-primary/20 transition-all">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <p className="text-sm font-semibold text-foreground leading-tight">{log.title}</p>
                     <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 shrink-0">{log.status}</span>

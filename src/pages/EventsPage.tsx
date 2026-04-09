@@ -475,7 +475,7 @@ const EventsPage: React.FC = () => {
             <FormField label="Organizer Name" value={form.organizer} onChange={v => setField('organizer', v)} />
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground">Status</label>
-              <select value={form.status} onChange={e => setField('status', e.target.value as EventForm['status'])} className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none">
+              <select value={form.status} onChange={e => setField('status', e.target.value as EventForm['status'])} className="w-full h-10 rounded-lg border border-input bg-background/60 hover:border-border px-3 text-sm text-foreground transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none">
                 <option>Planned</option><option>Scheduled</option><option>In Progress</option><option>Completed</option>
               </select>
             </div>

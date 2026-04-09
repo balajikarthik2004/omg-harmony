@@ -404,7 +404,7 @@ const HrPage: React.FC = () => {
     <div className="hr-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
       <div className="page-header-banner hr-header">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-primary" /> HR & Volunteer Management</h1>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Briefcase className="w-5 h-5 text-foreground" /> HR & Volunteer Management</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage temple staff details, schedules, payroll, and volunteers.</p>
         </div>
         <div className="relative max-w-sm w-full md:w-72 mt-3 md:mt-0">
@@ -426,8 +426,8 @@ const HrPage: React.FC = () => {
         </div>
         <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
-          <p className="text-[11px] uppercase tracking-widest font-bold text-secondary flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
-          <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{totals.priests}</p>
+          <p className="text-[11px] upper tracking-widest font-bold text-muted-foreground flex items-center gap-1.5"><Briefcase className="w-3.5 h-3.5" /> Priests</p>
+          <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{totals.priests}</p>
         </div>
         <div className="stat-card hr-stat-card flex flex-col justify-between group overflow-hidden relative border-amber-500/20 bg-amber-500/5">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-500/10 group-hover:scale-110 transition-transform" />
@@ -452,7 +452,7 @@ const HrPage: React.FC = () => {
           <button
             key={sec.key}
             onClick={() => setActiveSection(sec.key)}
-            className={`hr-tab-btn flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 flex-1 md:flex-none ${activeSection === sec.key ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
+            className={`hr-tab-btn flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold transition-all duration-300 flex-1 md:flex-none ${activeSection === sec.key ? 'bg-primary text-foreground shadow-md scale-[1.02]' : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}
           >
             <sec.icon className="h-4 w-4" />
             {sec.label}
@@ -464,7 +464,7 @@ const HrPage: React.FC = () => {
         {activeSection === 'staff' && (
           <section className="section-panel hr-main-panel shadow-sm border-l-4" style={{ borderLeftColor: 'hsl(var(--primary))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-primary" /> Staff Member List</h2>
+              <h2 className="text-sm font-semibold flex items-center gap-2"><Briefcase className="w-4 h-4 text-foreground" /> Staff Member List</h2>
               <Button onClick={openAddStaff} className="shadow-md hover:shadow-lg"><Plus className="h-4 w-4 mr-2" />Add Staff</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
@@ -484,7 +484,7 @@ const HrPage: React.FC = () => {
                     <tr key={item.id} className="hr-row border-b border-border hover:bg-muted/30 transition-colors group">
                       <td className="p-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-muted text-muted-foreground border-border'}`}>
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs shrink-0 shadow-sm border-2 ${item.role === 'Priest' ? 'bg-primary/10 text-foreground border-primary/20' : 'bg-muted text-muted-foreground border-border'}`}>
                             {initials(item.name)}
                           </div>
                           <div>
@@ -496,11 +496,11 @@ const HrPage: React.FC = () => {
                         </div>
                       </td>
                       <td className="p-4 text-muted-foreground">
-                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border ${item.role === 'Priest' ? 'bg-primary/10 text-primary border-primary/20 font-display' : 'bg-muted text-muted-foreground border-border'}`}>{item.role}</span>
+                        <span className={`inline-flex px-2 py-0.5 rounded text-[10px] uppercase tracking-widest font-bold mb-1.5 shadow-[inset_0_1px_2px_rgba(0,0,0,0.05)] border ${item.role === 'Priest' ? 'bg-primary/10 text-foreground border-primary/20 font-display' : 'bg-muted text-muted-foreground border-border'}`}>{item.role}</span>
                         <p className="text-xs font-semibold text-foreground/80">{item.department}</p>
                       </td>
                       <td className="p-4 text-muted-foreground text-xs font-medium">{item.joinedDate}</td>
-                      <td className="p-4 text-right font-display font-bold text-primary text-lg tracking-tight">{money(item.salary)}</td>
+                      <td className="p-4 text-right font-display font-bold text-foreground text-lg tracking-tight">{money(item.salary)}</td>
                       <td className="p-4"><StatusBadge status={item.status} /></td>
                       <td className="p-4 text-right whitespace-nowrap">
                         <div className="flex justify-end gap-1.5">
@@ -528,7 +528,7 @@ const HrPage: React.FC = () => {
                   <label className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground block mb-2">Select Month</label>
                   <div className="flex gap-3">
                     <input type="month" value={payrollMonth} onChange={e => setPayrollMonth(e.target.value)} className="h-12 w-48 rounded-lg border border-input bg-background px-4 text-sm font-bold text-foreground focus:ring-2 focus:ring-primary/20 outline-none hover:border-border transition-all shadow-inner" />
-                    <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-primary hover:opacity-90 text-primary-foreground">Generate Payroll</Button>
+                    <Button onClick={generatePayrollForMonth} className="h-12 px-6 shadow-md font-bold bg-primary hover:opacity-90 text-foreground">Generate Payroll</Button>
                   </div>
                 </div>
                 <div className="md:border-l md:border-border/60 md:pl-8 flex flex-col justify-center relative z-10">
@@ -615,7 +615,7 @@ const HrPage: React.FC = () => {
                       <StatusBadge status={item.status} />
                     </div>
                     <div className="space-y-2 text-xs text-muted-foreground font-semibold bg-muted/30 p-3.5 rounded-xl border border-border/50 mb-4 flex-1">
-                      <div className="flex items-center gap-2"><CalendarDays className="w-3.5 h-3.5 text-primary/70" /> <span className="text-foreground">{item.dutyDate}</span> • {item.slot}</div>
+                      <div className="flex items-center gap-2"><CalendarDays className="w-3.5 h-3.5 text-foreground/70" /> <span className="text-foreground">{item.dutyDate}</span> • {item.slot}</div>
                       <div className="flex items-center gap-2"><Briefcase className="w-3.5 h-3.5 text-emerald-500/70" /> <span className="text-foreground">{item.location}</span></div>
                     </div>
                     {item.notes && <div className="text-xs text-muted-foreground italic mb-5 border-l-2 border-amber-300 pl-2 py-0.5">"{item.notes}"</div>}
@@ -635,7 +635,7 @@ const HrPage: React.FC = () => {
           <section className="section-panel hr-main-panel border-l-4" style={{ borderLeftColor: 'hsl(var(--emerald))' }}>
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4">
               <h2 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-emerald-600" /> Enlisted Volunteers</h2>
-              <Button onClick={() => { setVolEditId(null); setVolModalOpen(true); }} className="shadow-md hover:shadow-lg bg-primary hover:opacity-90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
+              <Button onClick={() => { setVolEditId(null); setVolModalOpen(true); }} className="shadow-md hover:shadow-lg bg-primary hover:opacity-90 text-foreground"><Plus className="h-4 w-4 mr-2" />Add Volunteer</Button>
             </div>
             <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -687,7 +687,7 @@ const HrPage: React.FC = () => {
           <section className="section-panel hr-main-panel border-l-4 border-rose-500">
             <div className="section-panel-header gap-4 border-b border-border/60 pb-4 items-center">
               <div className="flex-1 flex gap-4 items-center">
-                <h2 className="text-sm font-semibold flex items-center gap-2 pr-4 border-r border-border/60"><UserX className="w-4 h-4 text-primary" /> Attendance Registry</h2>
+                <h2 className="text-sm font-semibold flex items-center gap-2 pr-4 border-r border-border/60"><UserX className="w-4 h-4 text-foreground" /> Attendance Registry</h2>
                 <div className="flex items-center gap-2 ml-4">
                   <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Daily Duty Checklist • {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
@@ -754,7 +754,7 @@ const HrPage: React.FC = () => {
                           {initials(member.name)}
                         </div>
                         <div>
-                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-destructive group-hover:text-destructive/80' : isLate ? 'text-orange-600 group-hover:text-orange-500' : 'text-foreground group-hover:text-primary'}`}>
+                          <p className={`font-bold text-base tracking-tight transition-colors ${isAbsent ? 'text-destructive group-hover:text-destructive/80' : isLate ? 'text-orange-600 group-hover:text-orange-500' : 'text-foreground group-hover:text-foreground'}`}>
                             {member.name}
                             {isAbsent && <span className="ml-2 inline-block px-1.5 py-0.5 bg-destructive/20 text-destructive text-[9px] uppercase tracking-tighter rounded font-black">{record.leaveType || 'Absent'}</span>}
                             {isLate && <span className="ml-2 inline-block px-1.5 py-0.5 bg-orange-500/20 text-orange-600 text-[9px] uppercase tracking-tighter rounded font-black">Late</span>}
@@ -859,7 +859,7 @@ const HrPage: React.FC = () => {
           <FormField label="Full Name" value={staffForm.name} onChange={v => setSField('name', v)} required />
           <div className="space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Staff Role</label>
-            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value as StaffRole)}>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm text-foreground transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.role} onChange={e => setSField('role', e.target.value as StaffRole)}>
               <option value="Priest">Priest</option><option value="Staff">Support Staff</option>
             </select>
           </div>
@@ -868,7 +868,7 @@ const HrPage: React.FC = () => {
           <FormField label="Salary (₹)" value={String(staffForm.salary)} onChange={v => setSField('salary', Number(v) || 0)} type="number" />
           <div className="space-y-1.5">
             <label className="text-[11px] uppercase tracking-wider font-bold text-muted-foreground">Status</label>
-            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value as StaffStatus)}>
+            <select className="w-full h-11 rounded-lg border border-input bg-background/80 px-3 text-sm text-foreground transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-semibold" value={staffForm.status} onChange={e => setSField('status', e.target.value as StaffStatus)}>
               <option value="Active">Active</option><option value="Inactive">Inactive</option>
             </select>
           </div>
@@ -876,7 +876,7 @@ const HrPage: React.FC = () => {
           <FormField label="Email Address" value={staffForm.email} onChange={v => setSField('email', v)} type="email" />
           <div className="col-span-2 flex gap-3 pt-5 border-t border-border/60 mt-2">
             <Button variant="outline" onClick={() => setStaffModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-            <Button onClick={saveStaff} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Save Details</Button>
+            <Button onClick={saveStaff} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-foreground font-bold">Save Details</Button>
           </div>
         </div>
       </Modal>

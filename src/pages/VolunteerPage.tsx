@@ -260,7 +260,7 @@ const VolunteerPage: React.FC = () => {
         <div className="flex items-center gap-3">
           <Dialog open={isCampaignDialogOpen} onOpenChange={setIsCampaignDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="rounded-xl shadow-lg bg-primary hover:opacity-90 transition-all border-none py-6 h-auto px-6 text-primary-foreground">
+              <Button className="rounded-xl shadow-lg bg-primary hover:opacity-90 transition-all border-none py-6 h-auto px-6 text-foreground">
                 <Plus className="w-5 h-5 mr-2" />
                 New Campaign
               </Button>
@@ -268,7 +268,7 @@ const VolunteerPage: React.FC = () => {
             <DialogContent className="sm:max-w-[500px] rounded-2xl">
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-                  <ShieldCheck className="w-6 h-6 text-primary" />
+                  <ShieldCheck className="w-6 h-6 text-foreground" />
                   Initiate Campaign
                 </DialogTitle>
                 <DialogDescription>
@@ -319,7 +319,7 @@ const VolunteerPage: React.FC = () => {
               <DialogFooter>
                 <Button 
                     onClick={handleCreateCampaign}
-                    className="w-full py-6 rounded-xl bg-primary hover:opacity-90 text-primary-foreground text-lg shadow-xl shadow-primary/10"
+                    className="w-full py-6 rounded-xl bg-primary hover:opacity-90 text-foreground text-lg shadow-xl shadow-primary/10"
                 >
                   Confirm Mission Launch
                 </Button>
@@ -354,7 +354,7 @@ const VolunteerPage: React.FC = () => {
                 <CardDescription className="uppercase text-[10px] font-bold tracking-widest text-primary/60">Total Base</CardDescription>
                 <div className="flex items-center justify-between mt-1">
                   <CardTitle className="text-2xl font-bold text-foreground">{totalVolunteers}</CardTitle>
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                  <div className="p-2 rounded-lg bg-primary/10 text-foreground">
                     <Users className="w-5 h-5" />
                   </div>
                 </div>
@@ -422,7 +422,7 @@ const VolunteerPage: React.FC = () => {
                   <CardTitle>Reliability Distribution</CardTitle>
                   <CardDescription>Volunteer accountability tracking across base</CardDescription>
                 </div>
-                <Badge variant="outline" className="bg-primary/10 border-primary/20 text-primary rounded-xl px-3">
+                <Badge variant="outline" className="bg-primary/10 border-primary/20 text-foreground rounded-xl px-3">
                     Healthy Retention
                 </Badge>
               </CardHeader>
@@ -470,13 +470,13 @@ const VolunteerPage: React.FC = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-primary">{v.participationCount}</p>
+                        <p className="text-sm font-bold text-foreground">{v.participationCount}</p>
                         <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Missions</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-6 text-primary hover:bg-primary/5 rounded-xl font-bold">View Leaderboard</Button>
+                <Button variant="ghost" className="w-full mt-6 text-foreground hover:bg-primary/5 rounded-xl font-bold">View Leaderboard</Button>
               </CardContent>
             </Card>
           </div>
@@ -500,7 +500,7 @@ const VolunteerPage: React.FC = () => {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        <Button onClick={() => setIsAddVolunteerOpen(true)} className="rounded-xl bg-primary hover:opacity-90 text-primary-foreground shadow-sm">
+                        <Button onClick={() => setIsAddVolunteerOpen(true)} className="rounded-xl bg-primary hover:opacity-90 text-foreground shadow-sm">
                             <Plus className="w-4 h-4 mr-2" />
                             Add Volunteer
                         </Button>
@@ -579,7 +579,7 @@ const VolunteerPage: React.FC = () => {
                                     </Badge>
                                 </TableCell>
                                 <TableCell className="text-right pr-6">
-                                    <Button variant="ghost" size="sm" className="rounded-lg text-primary hover:bg-primary/10 font-bold text-xs">
+                                    <Button variant="ghost" size="sm" className="rounded-lg text-foreground hover:bg-primary/10 font-bold text-xs">
                                         Assign Mission
                                     </Button>
                                 </TableCell>
@@ -604,7 +604,7 @@ const VolunteerPage: React.FC = () => {
                              <div className="flex items-start justify-between">
                                 <Badge className={`rounded-lg text-[10px] uppercase tracking-wider font-bold border-none shadow-none ${
                                     campaign.status === 'Active' ? 'bg-emerald-500/15 text-emerald-400' :
-                                    campaign.status === 'Draft' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-primary'
+                                    campaign.status === 'Draft' ? 'bg-muted text-muted-foreground' : 'bg-primary/20 text-foreground'
                                 }`}>
                                     {campaign.status}
                                 </Badge>
@@ -636,7 +636,7 @@ const VolunteerPage: React.FC = () => {
                         <CardFooter className="bg-muted/30 pt-4">
                             <Button 
                                 variant="outline" 
-                                className="w-full rounded-xl border-border text-xs font-bold py-5 hover:bg-background hover:text-primary transition-all text-foreground"
+                                className="w-full rounded-xl border-border text-xs font-bold py-5 hover:bg-background hover:text-foreground transition-all text-foreground"
                                 onClick={() => {
                                     setSelectedCampaign(campaign);
                                     setSelectedRoleForAssign(campaign.roles[0]?.name || '');
@@ -653,7 +653,7 @@ const VolunteerPage: React.FC = () => {
                 {/* Empty Add Card */}
                 <button 
                   onClick={() => setIsCampaignDialogOpen(true)}
-                  className="rounded-2xl border-2 border-dashed border-border p-8 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-all group shadow-sm bg-card"
+                  className="rounded-2xl border-2 border-dashed border-border p-8 flex flex-col items-center justify-center gap-3 text-muted-foreground hover:border-primary/50 hover:text-foreground hover:bg-primary/5 transition-all group shadow-sm bg-card"
                 >
                     <div className="p-4 rounded-full bg-muted group-hover:bg-primary/10 transition-all">
                         <Plus className="w-8 h-8" />
@@ -665,12 +665,12 @@ const VolunteerPage: React.FC = () => {
 
         <TabsContent value="attendance" className="space-y-6">
             <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden">
-                <CardHeader className="bg-primary text-primary-foreground relative">
+                <CardHeader className="bg-primary text-foreground relative">
                    <div className="absolute top-0 right-0 p-8 opacity-10">
                      <UserCheck className="w-24 h-24" />
                    </div>
                    <CardTitle>Daily Engagement Registry</CardTitle>
-                   <CardDescription className="text-primary-foreground/70">Check-in volunteers for today's active missions</CardDescription>
+                   <CardDescription className="text-foreground/70">Check-in volunteers for today's active missions</CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
                     <Table>
@@ -731,14 +731,14 @@ const VolunteerPage: React.FC = () => {
 
            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                  <Card className="rounded-2xl border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-card overflow-hidden flex flex-col items-center justify-center p-8 text-center border-b-4 border-primary group">
-                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-all">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-foreground mb-4 group-hover:scale-110 transition-all">
                         <QrCode className="w-8 h-8" />
                     </div>
                     <h4 className="font-bold text-foreground">QR Check-in</h4>
                     <p className="text-xs text-muted-foreground mt-2">Generate instant QR codes for volunteers to self-verify.</p>
                     <Button 
                         variant="outline" 
-                        className="mt-6 w-full rounded-xl border-border bg-background hover:bg-primary/5 hover:text-primary transition-all text-foreground"
+                        className="mt-6 w-full rounded-xl border-border bg-background hover:bg-primary/5 hover:text-foreground transition-all text-foreground"
                         onClick={() => toast.info("Opening QR Scanner camera...")}
                     >
                         Open QR Scanner
