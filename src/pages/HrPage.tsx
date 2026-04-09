@@ -812,12 +812,12 @@ const HrPage: React.FC = () => {
                 })}
               </div>
 
-              <div className="mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 border-none rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-indigo-100 overflow-hidden relative">
+              <div className="mt-8 bg-gradient-to-r from-indigo-600 to-violet-600 border-none rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32" />
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -ml-16 -mb-16" />
 
                 <div className="flex items-center gap-6 relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center shadow-inner">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md text-white flex items-center justify-center">
                     <Wallet className="w-8 h-8" />
                   </div>
                   <div>

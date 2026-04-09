@@ -3,8 +3,19 @@ import { Layers, Palette, RotateCcw, Sparkles, Layout, Columns, SlidersHorizonta
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Slider } from '@/components/ui/slider';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useTheme } from '@/contexts/ThemeContext';
 import { toast } from 'sonner';
+import { extractColors } from 'extract-colors';
 import defaultLogo from '@/assets/img/logo.png';
 import { CardStyle, ChromeStyle, ContentWidth, LayoutDensity, MotionPreset, SidebarPosition, ThemeSettings } from '@/lib/theme';
 
@@ -117,11 +128,367 @@ const isSupportedLogoSource = (value: string) => {
   return /^https?:\/\//i.test(trimmed) || trimmed.startsWith('/') || /^data:image\//i.test(trimmed);
 };
 
+type ExtractedPaletteColor = {
+  hex: string;
+  area: number;
+  saturation: number;
+  lightness: number;
+  hue: number;
+  saturationPercent: number;
+  lightnessPercent: number;
+};
+
+const LOGO_PALETTE_SLOT_LABELS = [
+  'Primary',
+  'Secondary',
+  'Accent',
+  'Muted',
+  'Background',
+  'Depth',
+] as const;
+
+const isHexColor = (value: string) => /^#([0-9a-fA-F]{6})$/.test(value);
+
+const clampNumber = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+
+const normalizeHexColor = (value: string, fallback = '#000000') => {
+  const candidate = value.trim().startsWith('#') ? value.trim() : `#${value.trim()}`;
+  return isHexColor(candidate) ? candidate.toUpperCase() : fallback;
+};
+
+const hexToRgb = (hex: string) => {
+  const clean = normalizeHexColor(hex).slice(1);
+  return {
+    r: parseInt(clean.slice(0, 2), 16),
+    g: parseInt(clean.slice(2, 4), 16),
+    b: parseInt(clean.slice(4, 6), 16),
+  };
+};
+
+const rgbToHex = (r: number, g: number, b: number) => `#${[r, g, b]
+  .map((value) => clampNumber(Math.round(value), 0, 255).toString(16).padStart(2, '0'))
+  .join('')
+  .toUpperCase()}`;
+
+const rgbToHsl = ({ r, g, b }: { r: number; g: number; b: number }) => {
+  const rr = r / 255;
+  const gg = g / 255;
+  const bb = b / 255;
+  const max = Math.max(rr, gg, bb);
+  const min = Math.min(rr, gg, bb);
+  const delta = max - min;
+
+  let h = 0;
+  if (delta !== 0) {
+    if (max === rr) h = ((gg - bb) / delta) % 6;
+    else if (max === gg) h = (bb - rr) / delta + 2;
+    else h = (rr - gg) / delta + 4;
+  }
+
+  h = Math.round(h * 60);
+  if (h < 0) h += 360;
+
+  const l = (max + min) / 2;
+  const s = delta === 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+
+  return {
+    h,
+    s: Math.round(s * 100),
+    l: Math.round(l * 100),
+  };
+};
+
+const hslToRgb = ({ h, s, l }: { h: number; s: number; l: number }) => {
+  const saturation = clampNumber(s, 0, 100) / 100;
+  const lightness = clampNumber(l, 0, 100) / 100;
+  const hue = ((h % 360) + 360) % 360;
+
+  const c = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const x = c * (1 - Math.abs(((hue / 60) % 2) - 1));
+  const m = lightness - c / 2;
+
+  let rr = 0;
+  let gg = 0;
+  let bb = 0;
+
+  if (hue < 60) {
+    rr = c;
+    gg = x;
+  } else if (hue < 120) {
+    rr = x;
+    gg = c;
+  } else if (hue < 180) {
+    gg = c;
+    bb = x;
+  } else if (hue < 240) {
+    gg = x;
+    bb = c;
+  } else if (hue < 300) {
+    rr = x;
+    bb = c;
+  } else {
+    rr = c;
+    bb = x;
+  }
+
+  return {
+    r: Math.round((rr + m) * 255),
+    g: Math.round((gg + m) * 255),
+    b: Math.round((bb + m) * 255),
+  };
+};
+
+const shiftHexColor = (hex: string, shift: { h?: number; s?: number; l?: number }) => {
+  const base = rgbToHsl(hexToRgb(hex));
+  const next = {
+    h: (base.h + (shift.h ?? 0) + 360) % 360,
+    s: clampNumber(base.s + (shift.s ?? 0), 0, 100),
+    l: clampNumber(base.l + (shift.l ?? 0), 0, 100),
+  };
+  const rgb = hslToRgb(next);
+  return rgbToHex(rgb.r, rgb.g, rgb.b);
+};
+
+const getRelativeLuminance = (hex: string) => {
+  const { r, g, b } = hexToRgb(hex);
+  const channels = [r, g, b].map((value) => {
+    const normalized = value / 255;
+    return normalized <= 0.03928
+      ? normalized / 12.92
+      : Math.pow((normalized + 0.055) / 1.055, 2.4);
+  });
+
+  return channels[0] * 0.2126 + channels[1] * 0.7152 + channels[2] * 0.0722;
+};
+
+const getReadableTextColor = (background: string) => (getRelativeLuminance(background) > 0.5 ? '#111827' : '#F8FAFC');
+
+const hueDistance = (hexA: string, hexB: string) => {
+  const first = rgbToHsl(hexToRgb(hexA)).h;
+  const second = rgbToHsl(hexToRgb(hexB)).h;
+  const delta = Math.abs(first - second);
+  return Math.min(delta, 360 - delta);
+};
+
+const loadImageForPaletteExtraction = (source: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+
+    if (/^https?:\/\//i.test(source.trim())) {
+      image.crossOrigin = 'anonymous';
+      image.referrerPolicy = 'no-referrer';
+    }
+
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error('Image load failed'));
+    image.src = source;
+  });
+
+const getLogoSourceName = (source: string, fallback = 'Custom Logo') => {
+  const trimmed = source.trim();
+  if (!trimmed || /^data:image\//i.test(trimmed)) return fallback;
+
+  try {
+    const parsed = /^https?:\/\//i.test(trimmed)
+      ? new URL(trimmed)
+      : new URL(trimmed, window.location.origin);
+
+    const filename = decodeURIComponent(parsed.pathname.split('/').filter(Boolean).pop() ?? '')
+      .replace(/\.[^/.?#]+$/, '')
+      .trim();
+
+    return filename || fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const buildLogoPalettePreview = (colors: Awaited<ReturnType<typeof extractColors>>): string[] => {
+  const seen = new Set<string>();
+  const normalized = colors
+    .map((color): ExtractedPaletteColor => {
+      const normalizedHex = normalizeHexColor(color.hex);
+      const hsl = rgbToHsl(hexToRgb(normalizedHex));
+
+      return {
+        hex: normalizedHex,
+        area: Number(color.area) || 0,
+        saturation: hsl.s / 100,
+        lightness: hsl.l / 100,
+        hue: hsl.h,
+        saturationPercent: hsl.s,
+        lightnessPercent: hsl.l,
+      };
+    })
+    .filter((color) => isHexColor(color.hex))
+    .filter((color) => {
+      if (seen.has(color.hex)) return false;
+      seen.add(color.hex);
+      return true;
+    });
+
+  if (normalized.length === 0) return [];
+
+  const sortedByStrength = [...normalized].sort((a, b) => {
+    const firstVisibilityBoost = a.lightnessPercent >= 18 && a.lightnessPercent <= 78 ? 0.35 : 0;
+    const secondVisibilityBoost = b.lightnessPercent >= 18 && b.lightnessPercent <= 78 ? 0.35 : 0;
+    const firstScore = a.area * 1.45 + a.saturation * 0.95 + firstVisibilityBoost;
+    const secondScore = b.area * 1.45 + b.saturation * 0.95 + secondVisibilityBoost;
+    return secondScore - firstScore;
+  });
+
+  const primary =
+    sortedByStrength.find((color) => color.saturationPercent >= 30 && color.lightnessPercent >= 22 && color.lightnessPercent <= 70) ??
+    sortedByStrength[0];
+
+  const secondary =
+    sortedByStrength.find(
+      (color) =>
+        color.hex !== primary.hex &&
+        color.lightnessPercent >= 18 &&
+        color.lightnessPercent <= 72 &&
+        hueDistance(color.hex, primary.hex) >= 18,
+    ) ??
+    sortedByStrength.find((color) => color.hex !== primary.hex) ?? {
+      hex: shiftHexColor(primary.hex, { h: 24, l: -14, s: 10 }),
+      area: 0,
+      saturation: 0,
+      lightness: 0,
+      hue: 0,
+      saturationPercent: 0,
+      lightnessPercent: 0,
+    };
+
+  const accent =
+    sortedByStrength.find(
+      (color) =>
+        color.hex !== primary.hex &&
+        color.hex !== secondary.hex &&
+        color.saturationPercent >= 40 &&
+        color.lightnessPercent >= 18 &&
+        color.lightnessPercent <= 76 &&
+        hueDistance(color.hex, primary.hex) >= 28,
+    ) ??
+    sortedByStrength.find(
+      (color) =>
+        color.hex !== primary.hex &&
+        color.hex !== secondary.hex &&
+        hueDistance(color.hex, primary.hex) >= 20,
+    ) ?? {
+      hex: shiftHexColor(primary.hex, { h: 32, s: 14, l: 4 }),
+      area: 0,
+      saturation: 0,
+      lightness: 0,
+      hue: 0,
+      saturationPercent: 0,
+      lightnessPercent: 0,
+    };
+
+  const muted =
+    sortedByStrength.find(
+      (color) =>
+        color.hex !== primary.hex &&
+        color.hex !== secondary.hex &&
+        color.hex !== accent.hex &&
+        color.saturationPercent <= 24 &&
+        color.lightnessPercent >= 34 &&
+        color.lightnessPercent <= 78,
+    ) ?? {
+      hex: shiftHexColor(primary.hex, { s: -54, l: 36 }),
+      area: 0,
+      saturation: 0,
+      lightness: 0,
+      hue: 0,
+      saturationPercent: 0,
+      lightnessPercent: 0,
+    };
+
+  const background =
+    sortedByStrength.find(
+      (color) =>
+        color.hex !== primary.hex &&
+        color.hex !== secondary.hex &&
+        color.hex !== accent.hex &&
+        color.hex !== muted.hex &&
+        color.lightnessPercent >= 80,
+    ) ?? {
+      hex: shiftHexColor(primary.hex, { s: -66, l: 52 }),
+      area: 0,
+      saturation: 0,
+      lightness: 0,
+      hue: 0,
+      saturationPercent: 0,
+      lightnessPercent: 0,
+    };
+
+  const depth =
+    sortedByStrength.find(
+      (color) =>
+        color.hex !== primary.hex &&
+        color.hex !== secondary.hex &&
+        color.hex !== accent.hex &&
+        color.hex !== muted.hex &&
+        color.hex !== background.hex &&
+        color.lightnessPercent <= 28,
+    ) ?? {
+      hex: shiftHexColor(secondary.hex, { l: -18, s: 8 }),
+      area: 0,
+      saturation: 0,
+      lightness: 0,
+      hue: 0,
+      saturationPercent: 0,
+      lightnessPercent: 0,
+    };
+
+  const palette = [primary.hex, secondary.hex, accent.hex, muted.hex, background.hex, depth.hex];
+
+  return Array.from(new Set(palette.map((color) => normalizeHexColor(color))));
+};
+
+const buildThemePatchFromLogoPalette = (palette: string[]): Partial<ThemeSettings> => {
+  const primary = palette[0] ?? '#2563EB';
+  const secondary = palette[1] ?? shiftHexColor(primary, { l: -16, s: 8 });
+  const accent = palette[2] ?? shiftHexColor(primary, { h: 24, s: 10, l: 2 });
+  const background = palette[4] ?? shiftHexColor(primary, { s: -62, l: 48 });
+  const surface = shiftHexColor(background, { l: 3, s: -4 });
+  const muted = palette[3] ?? shiftHexColor(primary, { s: -54, l: 36 });
+  const border = shiftHexColor(muted, { l: -12, s: 8 });
+
+  return {
+    primary,
+    secondary,
+    accent,
+    background,
+    surface,
+    muted,
+    border,
+    foreground: getReadableTextColor(background),
+    success: shiftHexColor(accent, { h: 90, s: 8, l: -8 }),
+    warning: shiftHexColor(primary, { h: 35, s: 14, l: -4 }),
+    layoutGradientStart: shiftHexColor(background, { l: 6, s: -4 }),
+    layoutGradientMid: background,
+    layoutGradientEnd: shiftHexColor(background, { l: -4, s: 6 }),
+    sidebarGradientStart: shiftHexColor(secondary, { l: -20, s: 10 }),
+    sidebarGradientMid: secondary,
+    sidebarGradientEnd: primary,
+    topbarGradientStart: shiftHexColor(background, { l: 8, s: -8 }),
+    topbarGradientEnd: shiftHexColor(background, { l: -3, s: 4 }),
+    overlayGradientStart: shiftHexColor(secondary, { l: -16, s: 8 }),
+    overlayGradientMid: shiftHexColor(secondary, { l: -6, s: 4 }),
+    overlayGradientEnd: shiftHexColor(primary, { l: -8, s: 10 }),
+  };
+};
+
 const ThemeStudioPage: React.FC = () => {
-  const { theme, presets, logoUrl, updateTheme, updateLogo, applyPreset, saveCurrentAsPreset, resetTheme } = useTheme();
+  const { theme, presets, logoUrl, updateTheme, updateLogo, applyPreset, saveCurrentAsPreset, savePresetFromTheme, resetTheme } = useTheme();
   const [presetName, setPresetName] = React.useState('');
   const [logoInputValue, setLogoInputValue] = React.useState(logoUrl ?? '');
   const [logoError, setLogoError] = React.useState('');
+  const [logoPalettePreview, setLogoPalettePreview] = React.useState<string[]>([]);
+  const [logoThemePatchCandidate, setLogoThemePatchCandidate] = React.useState<Partial<ThemeSettings> | null>(null);
+  const [logoPalettePresetName, setLogoPalettePresetName] = React.useState('');
+  const [showLogoPaletteDialog, setShowLogoPaletteDialog] = React.useState(false);
+  const [isLogoPaletteProcessing, setIsLogoPaletteProcessing] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('palette');
   const previewHostRef = React.useRef<HTMLDivElement | null>(null);
   const leftContentScrollRef = React.useRef<HTMLDivElement | null>(null);
@@ -227,7 +594,36 @@ const ThemeStudioPage: React.FC = () => {
     setPresetName('');
   };
 
-  const handleLogoUrlApply = () => {
+  const detectPaletteFromLogoSource = async (logoSource: string, logoName: string) => {
+    setIsLogoPaletteProcessing(true);
+    try {
+      const image = await loadImageForPaletteExtraction(logoSource);
+      const extracted = await extractColors(image, {
+        pixels: 16000,
+        distance: 0.18,
+        saturationDistance: 0.18,
+        lightnessDistance: 0.16,
+      });
+
+      const previewPalette = buildLogoPalettePreview(extracted);
+      if (previewPalette.length < 3) {
+        throw new Error('Not enough colors extracted from logo.');
+      }
+
+      setLogoPalettePresetName(`Logo Palette - ${logoName}`);
+      setLogoPalettePreview(previewPalette);
+      setLogoThemePatchCandidate(buildThemePatchFromLogoPalette(previewPalette));
+      setShowLogoPaletteDialog(true);
+    } catch {
+      toast.error('Palette detection failed', {
+        description: 'Logo was saved, but we could not generate a color template from this image.',
+      });
+    } finally {
+      setIsLogoPaletteProcessing(false);
+    }
+  };
+
+  const handleLogoUrlApply = async () => {
     const next = logoInputValue.trim();
     if (!next) {
       setLogoError('Enter a valid logo URL or upload an image.');
@@ -246,6 +642,9 @@ const ThemeStudioPage: React.FC = () => {
     setLogoError('');
     updateLogo(next);
     toast.success('Logo updated successfully');
+
+    const logoName = getLogoSourceName(next, 'Linked Logo');
+    await detectPaletteFromLogoSource(next, logoName);
   };
 
   const handleLogoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -268,7 +667,7 @@ const ThemeStudioPage: React.FC = () => {
     }
 
     const reader = new FileReader();
-    reader.onload = () => {
+    reader.onload = async () => {
       const result = typeof reader.result === 'string' ? reader.result : '';
       if (!result.startsWith('data:image/')) {
         setLogoError('Unable to read image. Please try a different file.');
@@ -280,6 +679,9 @@ const ThemeStudioPage: React.FC = () => {
       setLogoInputValue(result);
       updateLogo(result);
       toast.success('Logo uploaded and saved');
+
+      const logoName = file.name.replace(/\.[^/.]+$/, '').trim() || 'Custom Logo';
+      await detectPaletteFromLogoSource(result, logoName);
     };
     reader.onerror = () => {
       setLogoError('Unable to read image. Please try again.');
@@ -292,8 +694,39 @@ const ThemeStudioPage: React.FC = () => {
   const handleLogoReset = () => {
     setLogoError('');
     setLogoInputValue('');
+    setLogoPalettePreview([]);
+    setLogoThemePatchCandidate(null);
+    setShowLogoPaletteDialog(false);
     updateLogo(null);
     toast.success('Logo reset to default');
+  };
+
+  const handleApplyLogoPalette = () => {
+    if (!logoThemePatchCandidate || logoPalettePreview.length === 0) {
+      setShowLogoPaletteDialog(false);
+      return;
+    }
+
+    savePresetFromTheme(
+      logoPalettePresetName || `Logo Palette ${new Date().toLocaleDateString('en-GB')}`,
+      logoThemePatchCandidate,
+      {
+        description: 'Auto-generated from uploaded logo colors.',
+        preview: logoPalettePreview,
+      },
+    );
+
+    toast.success('Logo palette applied and added to Templates');
+    setShowLogoPaletteDialog(false);
+    setLogoThemePatchCandidate(null);
+    setLogoPalettePreview([]);
+  };
+
+  const handleDismissLogoPaletteDialog = () => {
+    setShowLogoPaletteDialog(false);
+    setLogoThemePatchCandidate(null);
+    setLogoPalettePreview([]);
+    toast.message('Kept current theme settings');
   };
 
   const applySolidColor = (hex: string, name: string) => {
@@ -447,7 +880,7 @@ const ThemeStudioPage: React.FC = () => {
               <section className="bg-background rounded-[1rem] border border-border/40 p-6 shadow-sm space-y-4">
                 <div className="space-y-1">
                   <h3 className="text-xs font-black uppercase tracking-[0.2em] text-foreground">Brand Logo</h3>
-                  <p className="text-[10px] text-muted-foreground/60 font-bold uppercase">Upload or link a custom logo. Saved in browser local storage.</p>
+                  <p className="text-[10px] text-muted-foreground/60 font-bold uppercase">Upload or link a custom logo. We auto-detect a role-based palette for cleaner results.</p>
                 </div>
 
                 <div className="rounded-2xl border border-border/50 bg-card/70 p-4 flex items-center gap-4">
@@ -474,9 +907,10 @@ const ThemeStudioPage: React.FC = () => {
                     placeholder="https://example.com/logo.png or /logo.png"
                     className="h-11 min-w-0 rounded-xl border border-border bg-card px-3 text-xs font-semibold"
                   />
-                  <Button type="button" variant="outline" onClick={handleLogoUrlApply} className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.16em] md:whitespace-nowrap">Apply URL</Button>
+                  <Button type="button" variant="outline" onClick={handleLogoUrlApply} disabled={isLogoPaletteProcessing} className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.16em] md:whitespace-nowrap">Apply URL</Button>
                   <Button type="button" variant="outline" onClick={handleLogoReset} className="h-11 rounded-xl px-4 text-[10px] font-black uppercase tracking-[0.16em] md:whitespace-nowrap">Reset</Button>
                 </div>
+                {isLogoPaletteProcessing && <p className="text-[11px] font-semibold text-foreground/70">Analyzing logo colors and organizing palette...</p>}
                 {logoError && <p className="text-[11px] font-semibold text-destructive">{logoError}</p>}
               </section>
 
@@ -867,6 +1301,43 @@ const ThemeStudioPage: React.FC = () => {
           </div>
         </div>
       </main>
+
+      <AlertDialog open={showLogoPaletteDialog} onOpenChange={setShowLogoPaletteDialog}>
+        <AlertDialogContent className="sm:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Apply logo-based color palette?</AlertDialogTitle>
+            <AlertDialogDescription>
+              We detected colors from your uploaded logo. Can I switch the app to this palette and save it in Templates?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="space-y-2">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Detected Palette (Organized)</p>
+            <div className="grid grid-cols-2 gap-2">
+              {logoPalettePreview.slice(0, 6).map((color, index) => (
+                <div key={`${color}-${index}`} className="rounded-lg border border-border/60 bg-card/60 p-2">
+                  <div
+                    className="h-9 rounded-md border border-border/50"
+                    style={{ backgroundColor: color }}
+                    title={color}
+                  />
+                  <div className="mt-1.5 flex items-center justify-between gap-2">
+                    <span className="text-[9px] font-black uppercase tracking-[0.12em] text-foreground/75">
+                      {LOGO_PALETTE_SLOT_LABELS[index] ?? `Color ${index + 1}`}
+                    </span>
+                    <span className="text-[9px] font-semibold uppercase text-muted-foreground">{color}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleDismissLogoPaletteDialog}>Keep Current Theme</AlertDialogCancel>
+            <AlertDialogAction onClick={handleApplyLogoPalette}>Apply and Save Template</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

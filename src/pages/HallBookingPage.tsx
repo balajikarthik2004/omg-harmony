@@ -852,7 +852,7 @@ const HallBookingPage = () => {
                                             const active = selectedAddonIds.includes(addon.id);
                                             return (
                                                  <label key={addon.id} className={`flex items-start gap-3 p-4 rounded-2xl border transition-all cursor-pointer bg-background ${active ? 'border-primary bg-primary/5 ring-1 ring-primary/10' : 'border-border shadow-sm hover:border-primary/40'}`}>
-                                                    <Checkbox className="mt-0.5 w-5 h-5 rounded-md data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                                    <Checkbox className="mt-0.5 h-5 w-5 rounded-full border-2 border-primary/40 data-[state=checked]:bg-primary data-[state=checked]:border-primary [&_svg]:h-3 [&_svg]:w-3 [&_svg]:stroke-[3]"
                                                         checked={active}
                                                         onCheckedChange={() => setSelectedAddonIds(prev => active ? prev.filter(id => id !== addon.id) : [...prev, addon.id])} />
                                                     <div className="flex-1 space-y-1">
@@ -866,19 +866,19 @@ const HallBookingPage = () => {
                                             );
                                         })}
                                     </div>
-                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                    <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 dark:bg-blue-950/30 dark:border-blue-900/70">
                                         <div className="flex items-center gap-3">
-                                            <div className="bg-blue-100 p-2.5 rounded-xl">
-                                                <Info className="w-5 h-5 text-[#293088]" />
+                                            <div className="bg-blue-100 p-2.5 rounded-xl dark:bg-blue-900/50">
+                                                <Info className="w-5 h-5 text-[#293088] dark:text-blue-200" />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-bold uppercase text-[#293088]/60 tracking-widest">Add-on Total</p>
+                                                <p className="text-[10px] font-bold uppercase text-[#293088]/60 tracking-widest dark:text-blue-200/80">Add-on Total</p>
                                                 <p className="text-xl font-bold text-foreground">₹{calculateSummary().addOnsPrice.toLocaleString()}
-                                                    <span className="text-xs font-medium text-muted-foreground ml-2">({selectedAddonIds.length} selected)</span>
+                                                    <span className="text-xs font-medium text-muted-foreground ml-2 dark:text-blue-100/80">({selectedAddonIds.length} selected)</span>
                                                 </p>
                                             </div>
                                         </div>
-                                        <p className="text-[10px] text-muted-foreground italic sm:text-right max-w-xs">Festival surcharges will be applied in the final summary step.</p>
+                                        <p className="text-[10px] text-muted-foreground italic sm:text-right max-w-xs dark:text-blue-100/70">Festival surcharges will be applied in the final summary step.</p>
                                     </div>
                                 </div>
                             )}

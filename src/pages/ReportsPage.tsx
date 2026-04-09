@@ -320,7 +320,7 @@ const DocumentPage: React.FC = () => {
             <div className="docs-upload-foot flex items-center justify-end gap-3 border-t border-border/60 p-5 bg-background shrink-0 rounded-b-2xl relative z-10">
               <Button variant="outline" className="h-11 px-6 font-bold" onClick={() => { setUploadModalOpen(false); setUploadedFiles([]); setUploadProgress({}); }}>Discard</Button>
               <Button
-                className="docs-sync-btn h-11 px-6 font-bold shadow-md"
+                className="docs-sync-btn h-11 px-6 font-bold shadow-md !text-white dark:!text-white disabled:!text-white/85 disabled:opacity-80"
                 disabled={uploadedFiles.length === 0 || Object.values(uploadProgress).some(p => p < 100)}
                 onClick={() => { alert(`${uploadedFiles.length} files successfully securely uploaded!`); setUploadModalOpen(false); setUploadedFiles([]); setUploadProgress({}); }}
               >

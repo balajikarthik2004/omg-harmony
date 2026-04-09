@@ -235,6 +235,7 @@
   /* ─── Enhanced Modal Overlay ─── */
   .modal-overlay {
     @apply fixed inset-0 z-50 flex items-center justify-center;
+    margin: 0 !important;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
@@ -2145,6 +2146,19 @@
   .docs-sync-btn:hover {
     transform: translateY(-1px) scale(1.01);
     box-shadow: 0 22px 34px -16px rgba(15, 32, 58, 1);
+  }
+
+  html.dark .modal-overlay button.docs-sync-btn,
+  html.dark .modal-overlay button.docs-sync-btn span,
+  html.dark .modal-overlay button.docs-sync-btn svg {
+    color: #fff !important;
+    -webkit-text-fill-color: #fff !important;
+  }
+
+  html.dark .modal-overlay button.docs-sync-btn:disabled {
+    color: rgba(255, 255, 255, 0.9) !important;
+    -webkit-text-fill-color: rgba(255, 255, 255, 0.9) !important;
+    opacity: 0.85 !important;
   }
 
   .docs-main-panel {

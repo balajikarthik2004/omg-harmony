@@ -173,7 +173,7 @@ const VolunteerForm: React.FC<VolunteerFormProps> = ({ initialData, onSave, onCa
 
       <div className="flex gap-3 pt-6 border-t border-slate-100">
         <Button type="button" variant="ghost" onClick={onCancel} className="flex-1 rounded-xl h-12 font-bold text-slate-500">Cancel</Button>
-        <Button type="submit" className="flex-1 rounded-xl h-12 font-bold bg-[#293088] hover:bg-[#1e246a] text-white shadow-lg shadow-indigo-100">
+        <Button type="submit" className="flex-1 rounded-xl h-12 font-bold bg-[#293088] hover:bg-[#1e246a] text-white ">
           {initialData ? <Save className="w-4 h-4 mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
           {initialData ? 'Update Profile' : 'Register Volunteer'}
         </Button>

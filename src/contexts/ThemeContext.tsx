@@ -18,6 +18,14 @@ interface ThemeContextValue {
   updateLogo: (nextLogoUrl: string | null) => void;
   applyPreset: (presetId: string) => void;
   saveCurrentAsPreset: (name?: string) => void;
+  savePresetFromTheme: (
+    name: string,
+    themePatch: Partial<ThemeSettings>,
+    options?: {
+      description?: string;
+      preview?: string[];
+    },
+  ) => void;
   deletePreset: (presetId: string) => void;
   resetTheme: () => void;
 }
@@ -177,6 +185,35 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     setTheme(savedTheme);
   }, [theme, customPresets.length]);
 
+  const savePresetFromTheme = useCallback((
+    name: string,
+    themePatch: Partial<ThemeSettings>,
+    options?: {
+      description?: string;
+      preview?: string[];
+    },
+  ) => {
+    const presetId = `user-preset-${Date.now()}`;
+    const presetName = name.trim() || `My Theme ${customPresets.length + 1}`;
+    const savedTheme = sanitizeTheme({
+      ...theme,
+      ...themePatch,
+      id: presetId,
+      name: presetName,
+    });
+
+    const preset: ThemePreset = {
+      id: presetId,
+      name: presetName,
+      description: options?.description?.trim() || 'Custom palette saved by user.',
+      preview: sanitizePreview(options?.preview, savedTheme),
+      theme: savedTheme,
+    };
+
+    setCustomPresets(prev => [preset, ...prev]);
+    setTheme(savedTheme);
+  }, [theme, customPresets.length]);
+
   const deletePreset = useCallback((presetId: string) => {
     setCustomPresets(prev => prev.filter(preset => preset.id !== presetId));
     setTheme(prev => {
@@ -198,10 +235,11 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       updateLogo,
       applyPreset,
       saveCurrentAsPreset,
+      savePresetFromTheme,
       deletePreset,
       resetTheme,
     }),
-    [theme, presets, logoUrl, updateTheme, updateLogo, applyPreset, saveCurrentAsPreset, deletePreset, resetTheme],
+    [theme, presets, logoUrl, updateTheme, updateLogo, applyPreset, saveCurrentAsPreset, savePresetFromTheme, deletePreset, resetTheme],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
