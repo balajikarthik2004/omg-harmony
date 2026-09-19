@@ -10,34 +10,49 @@ import {
 
 import {
   donationTrendData, donationCategoryData, serviceBookingData,
-  inventoryUsageData
+  inventoryUsageData, mockBookings, mockDevotees, mockDonations, mockEvents,
+  mockInventory, mockLedgerEntries
 } from '@/data/mockData';
+import { getLedgerTotals, formatRupees } from '@/lib/finance';
+import { formatDateDDMMYYYY, toISODate } from '@/lib/utils';
+
+// Every figure below is derived from the registers. These were hard-coded and
+// had drifted badly - the devotee count alone read 2,347 against 34 records.
+const successfulDonations = mockDonations.filter(d => d.paymentStatus === 'Success');
+const donationTotal = successfulDonations.reduce((sum, d) => sum + d.amount, 0);
+const pendingBookings = mockBookings.filter(b => b.paymentStatus === 'Pending').length;
+const lowStockCount = mockInventory.filter(i => i.stockStatus === 'Low Stock').length;
+const ledgerTotals = getLedgerTotals(mockLedgerEntries);
+const today = toISODate(new Date());
+const futureEvents = mockEvents.filter(e => e.date >= today);
 
 const kpis = [
-  { label: "Today's Donations", value: '₹1,90,000', icon: Heart, color: 'text-red-500', bg: 'bg-primary/15 border-primary/25', trend: '+12% from yesterday' },
-  { label: "Today's Bookings", value: '24', icon: CalendarDays, color: 'text-accent', bg: 'bg-accent/15 border-accent/30', trend: '4 pending approval' },
-  { label: 'Total Devotees', value: '2,347', icon: Users, color: 'text-foreground', bg: 'bg-foreground/10 border-foreground/20', trend: '+45 this week' },
-  { label: 'Revenue (MTD)', value: '₹12,40,000', icon: TrendingUp, color: 'text-success', bg: 'bg-success/15 border-success/30', trend: '' },
+  { label: 'Total Donations', value: formatRupees(donationTotal), icon: Heart, color: 'text-red-500', bg: 'bg-primary/15 border-primary/25', trend: `${successfulDonations.length} receipts issued` },
+  { label: 'Service Bookings', value: String(mockBookings.length), icon: CalendarDays, color: 'text-accent', bg: 'bg-accent/15 border-accent/30', trend: `${pendingBookings} pending approval` },
+  { label: 'Total Devotees', value: mockDevotees.length.toLocaleString('en-IN'), icon: Users, color: 'text-foreground', bg: 'bg-foreground/10 border-foreground/20', trend: `${mockDevotees.filter(d => d.status === 'Active').length} active` },
+  { label: 'Net Balance', value: formatRupees(ledgerTotals.net), icon: TrendingUp, color: 'text-success', bg: 'bg-success/15 border-success/30', trend: `${formatRupees(ledgerTotals.expense)} spent` },
 ];
 
 const secondaryKpis = [
-  { label: 'Upcoming Events', value: '4', icon: CalendarCheck, color: 'text-primary font-bold bg-primary/10 border border-primary/20' },
-  { label: 'Inventory Alerts', value: '3', icon: AlertTriangle, color: 'text-destructive font-bold bg-destructive/10 border border-destructive/20 ring-2 ring-destructive/20' },
+  { label: futureEvents.length > 0 ? 'Upcoming Events' : 'Events On Record', value: String(futureEvents.length || mockEvents.length), icon: CalendarCheck, color: 'text-primary font-bold bg-primary/10 border border-primary/20' },
+  { label: 'Inventory Alerts', value: String(lowStockCount), icon: AlertTriangle, color: 'text-destructive font-bold bg-destructive/10 border border-destructive/20 ring-2 ring-destructive/20' },
 ];
 
-const recentActivity = [
-  { text: 'Donation received from Rajesh Kumar ₹25,000', time: '10 min ago', initial: 'R', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
-  { text: 'Evening Aarti completed', time: '1 hour ago', initial: 'E', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
-  { text: 'Camphor issued to temple kitchen', time: '2 hours ago', initial: 'C', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
-  { text: 'New booking: Ganesh Pooja by Priya Sharma', time: '3 hours ago', initial: 'N', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
-  { text: 'Maintenance request approved', time: '4 hours ago', initial: 'M', color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border' },
-];
+const recentActivity = [...successfulDonations]
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .slice(0, 5)
+  .map(donation => ({
+    text: `Donation received from ${donation.donorName} ${formatRupees(donation.amount)}`,
+    time: formatDateDDMMYYYY(donation.date),
+    initial: donation.donorName.charAt(0),
+    color: 'bg-muted text-foreground dark:bg-muted/50 dark:text-white border border-border',
+  }));
 
-const upcomingEvents = [
-  { name: 'Maha Shivaratri', date: 'Mar 20', attendees: 1200 },
-  { name: 'Satyanarayana Pooja', date: 'Mar 25', attendees: 150 },
-  { name: 'Navratri Festival', date: 'Apr 6', attendees: 3400 },
-];
+const upcomingEvents = (futureEvents.length > 0 ? futureEvents : mockEvents)
+  .slice()
+  .sort((a, b) => a.date.localeCompare(b.date))
+  .slice(0, 3)
+  .map(event => ({ name: event.name, date: formatDateDDMMYYYY(event.date), location: event.location }));
 
 const dashboardColors = {
   line: 'hsl(var(--primary))',
@@ -242,7 +257,7 @@ const DashboardPage: React.FC = () => {
                   <p className="text-sm font-bold text-foreground">{e.name}</p>
                   <span className="text-[10px] text-foreground bg-muted border border-border/50 rounded-full px-2.5 py-1 font-bold uppercase tracking-wider">{e.date}</span>
                 </div>
-                <p className="text-xs text-muted-foreground font-semibold flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> Expected: {e.attendees.toLocaleString('en-IN')}</p>
+                <p className="text-xs text-muted-foreground font-semibold flex items-center gap-1.5"><Users className="w-3.5 h-3.5" /> {e.location}</p>
               </div>
             ))}
           </div>

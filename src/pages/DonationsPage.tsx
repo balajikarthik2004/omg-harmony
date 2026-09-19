@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { mockDonations } from '@/data/mockData';
 import { useStore } from '@/hooks/useStore';
-import { formatDateDDMMYYYY } from '@/lib/utils';
+import { formatDateDDMMYYYY, toISODate } from '@/lib/utils';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
@@ -151,7 +151,9 @@ const DonationsPage: React.FC = () => {
     amount: number;
   } | null>(null);
   const [form, setForm] = useState(emptyForm);
-  const [reportPeriod, setReportPeriod] = useState<ReportPeriod>('month');
+  // 'all' so the ledger is populated on arrival; 'month' showed an empty page
+  // whenever the current month had no receipts.
+  const [reportPeriod, setReportPeriod] = useState<ReportPeriod>('all');
   const [customFrom, setCustomFrom] = useState('');
   const [customTo, setCustomTo] = useState('');
   const [activeTab, setActiveTab] = useState<'ledger' | 'analytics'>('ledger');
@@ -242,7 +244,7 @@ const DonationsPage: React.FC = () => {
   }, [periodItems]);
 
   const openAdd = () => {
-    setForm({ ...emptyForm, date: new Date().toISOString().split('T')[0] });
+    setForm({ ...emptyForm, date: toISODate(new Date()) });
     setFormError('');
     setEditId(null);
     setModalOpen(true);

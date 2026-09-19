@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import StatusBadge from '@/components/StatusBadge';
 import { toast } from 'sonner';
 import FormField from '@/components/FormField';
+import { toISODate } from '@/lib/utils';
 
 type StaffRole = 'Priest' | 'Staff';
 type StaffStatus = 'Active' | 'Inactive';
@@ -88,8 +89,8 @@ interface AttendanceRecord {
   remarks?: string;
 }
 
-const todayIso = new Date().toISOString().split('T')[0];
-const yesterdayIso = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+const todayIso = toISODate(new Date());
+const yesterdayIso = toISODate(new Date(Date.now() - 86400000));
 
 const initialAttendance: AttendanceRecord[] = [
   {

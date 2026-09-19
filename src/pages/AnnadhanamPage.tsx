@@ -30,7 +30,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
 import { useStore } from '@/hooks/useStore';
-import { formatDateDDMMYYYY } from '@/lib/utils';
+import { formatDateDDMMYYYY, toISODate } from '@/lib/utils';
 
 type MealType = 'Breakfast' | 'Lunch' | 'Dinner' | 'Prasadam';
 type MealStatus = 'Planned' | 'In Progress' | 'Completed' | 'Cancelled';
@@ -85,7 +85,7 @@ type SuggestedNeed = {
 };
 
 const today = new Date();
-const todayStr = today.toISOString().split('T')[0];
+const todayStr = toISODate(today);
 
 const mealTypeColor: Record<MealType, { chip: string; icon: React.FC<{ className?: string }> }> = {
   Breakfast: { chip: 'bg-warning/10 text-warning border-warning/25', icon: Flame },
@@ -244,7 +244,7 @@ function WeekCalendar({ plans, selectedDate, onDaySelect }: { plans: MealPlan[];
       </div>
       <div className="grid grid-cols-7 divide-x divide-border/60 p-2">
         {weekDays.map((day, i) => {
-          const ds = day.toISOString().split('T')[0];
+          const ds = toISODate(day);
           const entries = plansByDate[ds] || [];
           const selected = ds === selectedDate;
           return (

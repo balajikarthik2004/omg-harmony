@@ -16,7 +16,7 @@ import {
   Printer,
 } from 'lucide-react';
 import { mockBookings } from '@/data/mockData';
-import { formatDateDDMMYYYY } from '@/lib/utils';
+import { formatDateDDMMYYYY, toISODate } from '@/lib/utils';
 import { useStore } from '@/hooks/useStore';
 import {
   useTempleEventsStore,
@@ -216,7 +216,7 @@ const initialBookings: SevaBooking[] = mockBookings.map((item, idx) => ({
 const emptyForm: Omit<SevaBooking, 'id' | 'bookingCode' | 'receiptNumber'> = {
   devoteeName: '',
   poojaType: 'Archana',
-  date: new Date().toISOString().split('T')[0],
+  date: toISODate(new Date()),
   slot: slotOptions[0],
   priestName: priestOptions[0],
   paymentStatus: 'Pending',
@@ -231,7 +231,7 @@ const PoojaSevaPage: React.FC = () => {
   const { items, add, update, remove } = useStore<SevaBooking>(initialBookings);
   const { items: templeEvents } = useTempleEventsStore();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const todayStr = toISODate(new Date());
   const [selectedServiceDate, setSelectedServiceDate] = useState(todayStr);
 
   const eventPoojaCatalog = useMemo(

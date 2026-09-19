@@ -5,7 +5,20 @@ import { toISODate } from '@/lib/utils';
 
 const membershipTypes = ['Silver', 'Gold', 'Platinum'];
 
-export const mockDevotees = [
+const GENERATED_PLACES = [
+  { street: 'Gandhi Road', city: 'Hosur', state: 'Tamil Nadu' },
+  { street: 'Bazaar Street', city: 'Krishnagiri', state: 'Tamil Nadu' },
+  { street: 'Mount Road', city: 'Chennai', state: 'Tamil Nadu' },
+  { street: 'Race Course Road', city: 'Coimbatore', state: 'Tamil Nadu' },
+  { street: 'East Car Street', city: 'Madurai', state: 'Tamil Nadu' },
+  { street: 'Big Bazaar Street', city: 'Salem', state: 'Tamil Nadu' },
+  { street: 'Thillai Nagar', city: 'Tiruchirappalli', state: 'Tamil Nadu' },
+];
+
+// Seed records. `totalDonations` here is the intended lifetime giving; the
+// exported `mockDevotees` below replaces it with the figure actually backed by
+// the donation register, so the two can never disagree.
+const devoteeSeed = [
   { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'Platinum', familyTreeMembers: [
     { id: 'f100-1', name: 'Pachamuthu', relation: 'Father', dob: '1970-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
     { id: 'f100-2', name: 'Devi', relation: 'Mother', dob: '1988-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
@@ -31,20 +44,27 @@ export const mockDevotees = [
   { id: '7', name: 'Balaji', phone: '+91 93456 78120', email: 'kbalajikbalaji879@gmail.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16', membershipType: 'Gold' },
   { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20', membershipType: 'Silver' },
   { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11', membershipType: 'Gold' },
-  ...Array.from({ length: 21 }).map((_, i) => ({
-    id: String(i + 10),
-    name: ['Deepak Verma', 'Shelly George', 'Arun Prasath', 'Meera Krishnan', 'Suresh Mani', 'Ganesh Acharya', 'Vidya Sagar'][i % 7] + ' ' + String.fromCharCode(65 + i),
-    phone: `+91 9845${i % 10} ${Math.floor(10000 + Math.random() * 89999)}`,
-    email: `${['deepak.verma', 'shelly.george', 'arun.prasath', 'meera.krishnan', 'suresh.mani', 'ganesh.acharya', 'vidya.sagar'][i % 7]}${(i % 5) + 1}@${['gmail.com', 'outlook.com', 'yahoo.com', 'hotmail.com'][i % 4]}`,
-    address: `${i + 10}, Temple Street`,
-    city: 'City Name',
-    state: 'State',
-    country: 'India',
-    status: 'Active',
-    totalDonations: 30000 + (i * 5000),
-    lastVisit: '2026-03-20',
-    membershipType: membershipTypes[i % membershipTypes.length],
-  }))
+  { id: '31', name: 'Priya Sharma', phone: '+91 98407 55120', email: 'priya.sharma@gmail.com', address: 'Adyar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 42000, lastVisit: '2026-03-16', membershipType: 'Silver' },
+  { id: '32', name: 'Harish Rao', phone: '+91 99401 63280', email: 'harish.rao@outlook.com', address: 'Jayanagar, Bengaluru', city: 'Bengaluru', state: 'Karnataka', country: 'India', status: 'Active', totalDonations: 65000, lastVisit: '2026-04-12', membershipType: 'Gold' },
+  ...Array.from({ length: 21 }).map((_, i) => {
+    const place = GENERATED_PLACES[i % GENERATED_PLACES.length];
+    return {
+      id: String(i + 10),
+      name: ['Deepak Verma', 'Shelly George', 'Arun Prasath', 'Meera Krishnan', 'Suresh Mani', 'Ganesh Acharya', 'Vidya Sagar'][i % 7] + ' ' + String.fromCharCode(65 + i),
+      // Deterministic: Math.random() here meant every reload produced different
+      // phone numbers, which the membership register then copied.
+      phone: `+91 9845${i % 10} ${String(10000 + i * 4327).slice(0, 5)}`,
+      email: `${['deepak.verma', 'shelly.george', 'arun.prasath', 'meera.krishnan', 'suresh.mani', 'ganesh.acharya', 'vidya.sagar'][i % 7]}${(i % 5) + 1}@${['gmail.com', 'outlook.com', 'yahoo.com', 'hotmail.com'][i % 4]}`,
+      address: `${i + 10}, ${place.street}`,
+      city: place.city,
+      state: place.state,
+      country: 'India',
+      status: 'Active',
+      totalDonations: 30000 + (i * 5000),
+      lastVisit: '2026-03-20',
+      membershipType: membershipTypes[i % membershipTypes.length],
+    };
+  })
 ];
 
 export const mockStaffMembers = Array.from({ length: 48 }).map((_, i) => ({
@@ -118,7 +138,7 @@ export const mockBookings = [
   { id: 'BK040', devoteeName: 'Santhosh Kumar', serviceName: 'Navagraha Shanti', date: '2026-04-27', time: '09:40 AM', paymentStatus: 'Paid', bookingStatus: 'Confirmed' },
 ];
 
-export const mockDonations = [
+const baseDonations = [
   { id: '1', donationCode: 'DN001', donorName: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', amount: 155000, category: 'Annadanam', channel: 'Online', paymentMethod: 'UPI', gateway: 'PhonePe', transactionRef: 'TXN-982136', paymentStatus: 'Success', receiptNumber: 'RC-0001', date: '2026-03-22', notes: 'Monthly patron contribution.' },
   { id: '2', donationCode: 'DN002', donorName: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', amount: 120000, category: 'General', channel: 'Online', paymentMethod: 'Card', gateway: 'Razorpay', transactionRef: 'TXN-876231', paymentStatus: 'Success', receiptNumber: 'RC-0002', date: '2026-03-18', notes: 'Special Seva donation.' },
   { id: '3', donationCode: 'DN003', donorName: 'Rajan naveen', phone: '+91 87654 32109', email: 'rajan.naveen@gwcdata.ai', amount: 68000, category: 'Temple Renovation', channel: 'Counter', paymentMethod: 'Cash', gateway: 'Temple POS', transactionRef: '-', paymentStatus: 'Success', receiptNumber: 'RC-0003', date: '2026-03-10', notes: '' },
@@ -129,9 +149,58 @@ export const mockDonations = [
   { id: '8', donationCode: 'DN008', donorName: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', amount: 35000, category: 'Education', channel: 'Online', paymentMethod: 'UPI', gateway: 'PhonePe', transactionRef: 'TXN-554433', paymentStatus: 'Success', receiptNumber: 'RC-0008', date: '2026-04-02', notes: 'Vidyadhanam Seva.' },
   { id: '9', donationCode: 'DN009', donorName: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', amount: 50000, category: 'Annadanam', channel: 'Online', paymentMethod: 'UPI', gateway: 'PhonePe', transactionRef: 'TXN-221100', paymentStatus: 'Success', receiptNumber: 'RC-0009', date: '2026-04-05', notes: '' },
   { id: '10', donationCode: 'DN010', donorName: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', amount: 95000, category: 'General', channel: 'Online', paymentMethod: 'Card', gateway: 'Razorpay', transactionRef: 'TXN-776655', paymentStatus: 'Success', receiptNumber: 'RC-0010', date: '2026-04-03', notes: '' },
-  { id: '11', donationCode: 'DN011', donorName: 'Shelly George', phone: '+91 98451 12345', email: 'shelly.george@gmail.com', amount: 15000, category: 'General', channel: 'Hundi', paymentMethod: 'Cash', gateway: 'Temple POS', transactionRef: '-', paymentStatus: 'Success', receiptNumber: 'RC-0011', date: '2026-03-25', notes: 'Hundi donation.' },
+  { id: '11', donationCode: 'DN011', donorName: 'Shelly George B', phone: '+91 98451 14327', email: 'shelly.george2@outlook.com', amount: 15000, category: 'General', channel: 'Hundi', paymentMethod: 'Cash', gateway: 'Temple POS', transactionRef: '-', paymentStatus: 'Success', receiptNumber: 'RC-0011', date: '2026-03-25', notes: 'Hundi donation.' },
   { id: '12', donationCode: 'DN012', donorName: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', amount: 12000, category: 'General', channel: 'Online', paymentMethod: 'UPI', gateway: 'PhonePe', transactionRef: 'TXN-009988', paymentStatus: 'Success', receiptNumber: 'RC-0012', date: '2025-12-10', notes: 'Inactive donor seed.' },
 ];
+
+// Historical donations that back the lifetime giving figure on each devotee.
+// Without these the devotee drawer showed a total no donation record supported.
+const DONATION_CATEGORIES = [
+  'General',
+  'Annadanam',
+  'Temple Renovation',
+  'Festival Fund',
+  'Medical Aid',
+  'Education',
+];
+
+const topUpDonations = devoteeSeed.flatMap((devotee, index) => {
+  const recorded = baseDonations
+    .filter(d => d.phone === devotee.phone && d.paymentStatus === 'Success')
+    .reduce((sum, d) => sum + d.amount, 0);
+  const gap = devotee.totalDonations - recorded;
+  if (gap <= 0) return [];
+
+  const sequence = baseDonations.length + index + 1;
+  return [{
+    id: `h${devotee.id}`,
+    donationCode: `DN${String(sequence).padStart(3, '0')}`,
+    donorName: devotee.name,
+    phone: devotee.phone,
+    email: devotee.email,
+    amount: gap,
+    // Spread across the categories actually in use so the category split stays
+    // meaningful rather than collapsing into one slice.
+    category: DONATION_CATEGORIES[index % DONATION_CATEGORIES.length],
+    channel: (['Counter', 'Online', 'Hundi'] as const)[index % 3],
+    paymentMethod: (['Cash', 'UPI', 'Card'] as const)[index % 3],
+    gateway: 'Temple POS',
+    transactionRef: '-',
+    paymentStatus: 'Success',
+    receiptNumber: `RC-${String(sequence).padStart(4, '0')}`,
+    date: '2025-11-18',
+    notes: 'Consolidated earlier contributions carried into the new register.',
+  }];
+});
+
+export const mockDonations = [...baseDonations, ...topUpDonations];
+
+export const mockDevotees = devoteeSeed.map(devotee => ({
+  ...devotee,
+  totalDonations: mockDonations
+    .filter(d => d.phone === devotee.phone && d.paymentStatus === 'Success')
+    .reduce((sum, d) => sum + d.amount, 0),
+}));
 
 export const mockEvents = [
   { id: '1', name: 'Maha Shivaratri', description: 'Grand celebration of Lord Shiva', date: '2026-03-20', time: '06:00 AM', location: 'Main Temple Hall', organizer: 'Head Priest', status: 'Scheduled' },
@@ -342,30 +411,47 @@ export const donationTrendData = [
   { month: 'May', amount: 615000 },
 ];
 
-export const donationCategoryData = [
-  { name: 'General', value: 45, color: 'hsl(1, 76%, 52%)' },
-  { name: 'Annadanam', value: 25, color: 'hsl(233, 53%, 35%)' },
-  { name: 'Renovation', value: 15, color: 'hsl(270, 43%, 32%)' },
-  { name: 'Festival Fund', value: 15, color: 'hsl(40, 70%, 50%)' },
+// ─── Dashboard chart data ─────────────────────────────────────────────────────
+// Derived from the registers above. These used to be hand-written and had
+// drifted: they referenced a service, two inventory items and a donation
+// category that do not exist anywhere in the app.
+const CHART_COLORS = [
+  'hsl(1, 76%, 52%)',
+  'hsl(233, 53%, 35%)',
+  'hsl(270, 43%, 32%)',
+  'hsl(40, 70%, 50%)',
+  'hsl(152, 60%, 40%)',
+  'hsl(205, 60%, 45%)',
 ];
 
-export const serviceBookingData = [
-  { service: 'Archana', bookings: 120 },
-  { service: 'Abhishekam', bookings: 85 },
-  { service: 'Homam', bookings: 45 },
-  { service: 'Ganesh Pooja', bookings: 65 },
-  { service: 'Satyanarayan', bookings: 55 },
-  { service: 'Rudrabhishekam', bookings: 42 },
-  { service: 'Navagraha Shanti', bookings: 38 },
-];
+const successfulDonations = mockDonations.filter(d => d.paymentStatus === 'Success');
+const donationTotal = successfulDonations.reduce((sum, d) => sum + d.amount, 0);
 
-export const inventoryUsageData = [
-  { item: 'Camphor', used: 40, remaining: 50 },
-  { item: 'Ghee', used: 15, remaining: 5 },
-  { item: 'Flowers', used: 150, remaining: 200 },
-  { item: 'Incense', used: 12, remaining: 8 },
-  { item: 'Coconuts', used: 9, remaining: 3 },
-  { item: 'Sesame Oil', used: 8, remaining: 9 },
-  { item: 'Rice', used: 85, remaining: 100 },
-  { item: 'Jaggery', used: 12, remaining: 25 },
-];
+export const donationCategoryData = Object.entries(
+  successfulDonations.reduce<Record<string, number>>((acc, donation) => {
+    acc[donation.category] = (acc[donation.category] || 0) + donation.amount;
+    return acc;
+  }, {}),
+)
+  .sort((a, b) => b[1] - a[1])
+  .map(([name, amount], index) => ({
+    name,
+    value: donationTotal ? Math.round((amount / donationTotal) * 100) : 0,
+    amount,
+    color: CHART_COLORS[index % CHART_COLORS.length],
+  }));
+
+export const serviceBookingData = mockServices
+  .map(service => ({
+    service: service.name,
+    bookings: mockBookings.filter(booking => booking.serviceName === service.name).length,
+  }))
+  .filter(row => row.bookings > 0)
+  .sort((a, b) => b.bookings - a.bookings);
+
+export const inventoryUsageData = mockInventory.map((item, index) => ({
+  item: item.name,
+  // Deterministic stand-in for consumption history until usage is tracked.
+  used: Math.max(1, Math.round(item.quantity * (0.3 + ((index % 4) * 0.15)))),
+  remaining: item.quantity,
+}));

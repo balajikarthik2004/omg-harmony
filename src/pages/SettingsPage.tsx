@@ -5,6 +5,7 @@ import { User, ShieldCheck, UserPlus, ShieldAlert, Pencil, Trash2, Mail, BadgeCh
 import Modal from '@/components/Modal';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
+import { toISODate } from '@/lib/utils';
 
 const initialMembers = [
    { id: 'M-001', name: 'Karthik Balaji', email: 'admin@temple.org', role: 'Admin', status: 'Active', joined: '2024-01-12' },
@@ -24,7 +25,7 @@ const SettingsPage: React.FC = () => {
          id: `M-00${members.length + 1}`,
          ...form,
          status: 'Active',
-         joined: new Date().toISOString().split('T')[0]
+         joined: toISODate(new Date())
       };
       setMembers([newMember, ...members]);
       setModalOpen(false);
