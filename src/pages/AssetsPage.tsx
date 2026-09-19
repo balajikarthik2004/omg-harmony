@@ -8,11 +8,12 @@ import { AssetForm, type AssetFormValues } from '@/components/assets/AssetForm';
 import { mockAssets, type Asset } from '@/data/mockData';
 import { useStore } from '@/hooks/useStore';
 import { useAuth } from '@/contexts/AuthContext';
+import { toISODate } from '@/lib/utils';
 
 const emptyForm: AssetFormValues = {
   name: '',
   category: '',
-  purchaseDate: new Date().toISOString().split('T')[0],
+  purchaseDate: toISODate(new Date()),
   cost: '',
   condition: '',
   maintenanceStatus: '',

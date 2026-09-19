@@ -13,6 +13,7 @@ import {
   Users,
   UtensilsCrossed,
   Briefcase,
+  BadgeCheck,
   BarChart3,
   type LucideIcon,
 } from 'lucide-react';
@@ -30,6 +31,7 @@ export interface NavigationLink {
 const adminLinks: NavigationLink[] = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, module: 'admin' },
   { to: '/devotees', label: 'Devotees', icon: Users, module: 'devotees' },
+  { to: '/membership', label: 'Membership', icon: BadgeCheck, module: 'membership' },
   { to: '/pooja-seva', label: 'Pooja & Seva', icon: CalendarDays, module: 'pooja' },
   { to: '/annadhanam', label: 'Annadhanam', icon: UtensilsCrossed, module: 'annadhanam' },
   { to: '/hr', label: 'HR', icon: Briefcase, module: 'hr' },

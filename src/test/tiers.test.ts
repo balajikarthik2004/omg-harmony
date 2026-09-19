@@ -21,6 +21,7 @@ describe('tier navigation', () => {
 
     foundation.forEach(label => expect(growth).toContain(label));
     expect(growth).toContain('HR');
+    expect(growth).toContain('Membership');
     expect(growth).toContain('Rental Venue');
     expect(growth).toContain('Inventory');
     expect(growth).not.toContain('Assets');
@@ -35,6 +36,7 @@ describe('tier navigation', () => {
     expect(enterprise).toContain('Campaigns');
     expect(enterprise).toContain('Documents');
     expect(enterprise).toContain('Parking');
+    expect(enterprise).toContain('Membership');
     expect(enterprise.length).toBeGreaterThan(labels('admin', 'growth').length);
   });
 });

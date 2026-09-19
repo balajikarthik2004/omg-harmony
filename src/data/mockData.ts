@@ -1,41 +1,35 @@
 // Mock data for all modules
+import { MEMBERSHIP_TYPES, type Membership as MembershipRecord } from '@/lib/membership';
+import { toISODate } from '@/lib/utils';
 
-const membershipTypes = [
-  'Trust Member',
-  'Committee Member',
-  'Volunteer',
-  'Donor',
-  'VIP Devotee',
-  'Regular Devotee',
-  'Staff Member',
-];
+const membershipTypes = ['Silver', 'Gold', 'Platinum'];
 
 export const mockDevotees = [
-  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'Trust Member', familyTreeMembers: [
+  { id: '100', name: 'Naveen Kumar', phone: '+91 95914 33122', email: 'naveen.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 78000, lastVisit: '2026-04-18', dob: '1988-09-12', rasi: 'Kanni', nakshatra: 'Uththarai', membershipType: 'Platinum', familyTreeMembers: [
     { id: 'f100-1', name: 'Pachamuthu', relation: 'Father', dob: '1970-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
     { id: 'f100-2', name: 'Devi', relation: 'Mother', dob: '1988-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
     { id: 'f100-3', name: 'Mamtha', relation: 'Wife', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f100-4', name: 'Kaniyan', relation: 'Son', gender: 'Male', rasi: 'Vrichikam', nakshatra: 'Anusham' }
   ] },
-  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17', membershipType: 'Committee Member', familyTreeMembers: [
+  { id: '101', name: 'Santhosh Kumar', phone: '+91 87548 08098', email: 'santhosh.kumar@gwcdata.ai', address: 'Hosur Main Road', city: 'Hosur', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 70000, lastVisit: '2026-04-17', membershipType: 'Gold', familyTreeMembers: [
     { id: 'f101-1', name: 'Anbalagan', relation: 'Father', dob: '1960-05-15', gender: 'Male', rasi: 'Mesham', nakshatra: 'Ashwini' },
     { id: 'f101-2', name: 'Kala', relation: 'Mother', dob: '1965-08-10', gender: 'Female', rasi: 'Rishabam', nakshatra: 'Rohini' },
     { id: 'f101-3', name: 'Mamtha', relation: 'Sister', dob: '1993-06-15', gender: 'Female', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f101-4', name: 'Naveen Kumar', relation: 'Brother', dob: '1988-09-12', gender: 'Male', rasi: 'Kanni', nakshatra: 'Uththarai' }
   ] },
-  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'krishnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12', membershipType: 'Volunteer', familyTreeMembers: [
+  { id: '1', name: 'Balaji Krishnan', phone: '+91 98765 43210', email: 'balaji.krishnan@gwcdata.ai', address: 'salem Road, Krishnagiri', city: 'krishnagiri', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 245000, lastVisit: '2026-03-12', membershipType: 'Silver', familyTreeMembers: [
     { id: 'f1-1', name: 'Krishnan', relation: 'Father', rasi: 'Kanni', nakshatra: 'Uthiram' },
     { id: 'f1-2', name: 'Aruna', relation: 'Mother', rasi: 'Simmam', nakshatra: 'Magam' },
     { id: 'f1-3', name: 'Karthik Krishnan', relation: 'Brother', rasi: 'Dhanusu', nakshatra: 'Moolam' }
   ] },
-  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'rajan.naveen@gwcdata.ai', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10', membershipType: 'Donor', familyMembers: 'Spouse: Meenakshi, Son: Rahul' },
-  { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14', membershipType: 'VIP Devotee', familyMembers: 'Spouse: Sunita, Daughter: Ananya' },
-  { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita.reddy.hyd@outlook.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15', membershipType: 'Regular Devotee' },
-  { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram.singh.delhi@yahoo.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13', membershipType: 'Staff Member' },
-  { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha.nair27@gmail.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18', membershipType: 'Trust Member' },
-  { id: '7', name: 'Balaji', phone: '+91 93456 78120', email: 'kbalajikbalaji879@gmail.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16', membershipType: 'Committee Member' },
-  { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20', membershipType: 'Volunteer' },
-  { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11', membershipType: 'Donor' },
+  { id: '2', name: 'Rajan naveen', phone: '+91 87654 32109', email: 'rajan.naveen@gwcdata.ai', address: 'Anna Nagar, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 168000, lastVisit: '2026-03-10', membershipType: 'Gold', familyMembers: 'Spouse: Meenakshi, Son: Rahul' },
+  { id: '3', name: 'Amit Patel', phone: '+91 76543 21098', email: 'amit.patel84@gmail.com', address: 'SG Highway, Ahmedabad', city: 'Ahmedabad', state: 'Gujarat', country: 'India', status: 'Active', totalDonations: 420000, lastVisit: '2026-03-14', membershipType: 'Gold', familyMembers: 'Spouse: Sunita, Daughter: Ananya' },
+  { id: '4', name: 'Sunita Reddy', phone: '+91 65432 10987', email: 'sunita.reddy.hyd@outlook.com', address: 'Banjara Hills, Hyderabad', city: 'Hyderabad', state: 'Telangana', country: 'India', status: 'Inactive', totalDonations: 132000, lastVisit: '2026-01-15', membershipType: 'Silver' },
+  { id: '5', name: 'Vikram Singh', phone: '+91 54321 09876', email: 'vikram.singh.delhi@yahoo.com', address: 'Connaught Place, Delhi', city: 'Delhi', state: 'Delhi', country: 'India', status: 'Active', totalDonations: 286000, lastVisit: '2026-03-13', membershipType: 'Silver' },
+  { id: '6', name: 'Kavitha Nair', phone: '+91 91234 56780', email: 'kavitha.nair27@gmail.com', address: 'Panampilly Nagar, Kochi', city: 'Kochi', state: 'Kerala', country: 'India', status: 'Active', totalDonations: 164000, lastVisit: '2026-03-18', membershipType: 'Platinum' },
+  { id: '7', name: 'Balaji', phone: '+91 93456 78120', email: 'kbalajikbalaji879@gmail.com', address: 'MVP Colony, Visakhapatnam', city: 'Visakhapatnam', state: 'Andhra Pradesh', country: 'India', status: 'Active', totalDonations: 121000, lastVisit: '2026-03-16', membershipType: 'Gold' },
+  { id: '8', name: 'Lalitha Iyer', phone: '+91 99887 66554', email: 'lalitha.iyer.chennai@gmail.com', address: 'Mylapore, Chennai', city: 'Chennai', state: 'Tamil Nadu', country: 'India', status: 'Active', totalDonations: 385000, lastVisit: '2026-03-20', membershipType: 'Silver' },
+  { id: '9', name: 'Nitin Joshi', phone: '+91 90123 45098', email: 'nitin.joshi.pune@yahoo.com', address: 'Kothrud, Pune', city: 'Pune', state: 'Maharashtra', country: 'India', status: 'Inactive', totalDonations: 98000, lastVisit: '2025-12-11', membershipType: 'Gold' },
   ...Array.from({ length: 21 }).map((_, i) => ({
     id: String(i + 10),
     name: ['Deepak Verma', 'Shelly George', 'Arun Prasath', 'Meera Krishnan', 'Suresh Mani', 'Ganesh Acharya', 'Vidya Sagar'][i % 7] + ' ' + String.fromCharCode(65 + i),
@@ -192,6 +186,83 @@ export const mockAssets: Asset[] = [
   { id: '11', name: 'Pandal Frames', category: 'Infrastructure', purchaseDate: '2020-07-09', condition: 'Poor', maintenanceStatus: 'Overdue', cost: 175000, notes: 'Galvanised frames showing rust at the joints. Inspect before the next festival.' },
   { id: '12', name: 'Treasury Safe', category: 'Treasury', purchaseDate: '2017-12-01', condition: 'Good', maintenanceStatus: 'Up to Date', cost: 310000, notes: 'Dual-key hundi safe. Combination reset every six months by the trust board.' },
 ];
+
+// ─── Memberships ──────────────────────────────────────────────────────────────
+// Derived from mockDevotees rather than written out by hand, so the two
+// registers can never drift apart: one membership per devotee, carrying that
+// devotee's name, phone, email and membershipType verbatim. Fees come from the
+// module's own category catalogue.
+export type { Membership } from '@/lib/membership';
+
+/** Days from today until expiry, cycled so every status shows up in the demo. */
+const EXPIRY_OFFSET_DAYS = [214, 96, 12, 301, 158, 21, 260, 74, 187, 340, 9, 128];
+
+const PAID_MODES = ['UPI', 'Card', 'Cheque', 'Bank Transfer', 'Cash'];
+
+const shiftDays = (days: number): string => {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return toISODate(date);
+};
+
+const shiftMonthsBefore = (isoDate: string, months: number): string => {
+  const date = new Date(`${isoDate}T00:00:00`);
+  date.setMonth(date.getMonth() - months);
+  return toISODate(date);
+};
+
+const CATEGORY_NOTES: Record<string, string> = {
+  Silver: 'Annual membership. Darshan priority on regular days.',
+  Gold: 'Two-year membership. Reserved seating at festivals.',
+  Platinum: 'Lifetime membership. No renewal required.',
+};
+
+const buildMembership = (devotee: (typeof mockDevotees)[number], index: number): MembershipRecord => {
+  const category =
+    MEMBERSHIP_TYPES.find(type => type.id === devotee.membershipType) ?? MEMBERSHIP_TYPES[0];
+
+  const base = {
+    id: `mem-${devotee.id}`,
+    devoteeId: devotee.id,
+    membershipNo: `OMG-MEM-${String(index + 1).padStart(4, '0')}`,
+    name: devotee.name,
+    phone: devotee.phone,
+    email: devotee.email,
+    membershipType: category.id,
+    fee: category.fee,
+    paymentMode: category.fee === 0 ? 'Not Applicable' : PAID_MODES[index % PAID_MODES.length],
+    notes: CATEGORY_NOTES[category.id],
+  };
+
+  // Lifetime categories never expire, so they only carry a joining date.
+  if (category.durationMonths === null) {
+    return {
+      ...base,
+      startDate: shiftDays(-(900 + index * 37)),
+      expiryDate: '',
+    };
+  }
+
+  // An inactive devotee must read as a lapsed member, not an active one.
+  const offset =
+    devotee.status === 'Inactive'
+      ? -(21 + (index % 90))
+      : EXPIRY_OFFSET_DAYS[index % EXPIRY_OFFSET_DAYS.length];
+
+  const expiryDate = shiftDays(offset);
+
+  return {
+    ...base,
+    startDate: shiftMonthsBefore(expiryDate, category.durationMonths),
+    expiryDate,
+    notes:
+      offset < 0
+        ? `${base.notes} Renewal lapsed - follow up pending.`
+        : base.notes,
+  };
+};
+
+export const mockMemberships: MembershipRecord[] = mockDevotees.map(buildMembership);
 
 export const donationTrendData = [
   { month: 'Oct', amount: 320000 },

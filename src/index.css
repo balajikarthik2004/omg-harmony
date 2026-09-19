@@ -2048,17 +2048,21 @@ html {
   }
 
   .assets-stat-card,
-  .assets-main-panel {
+  .assets-main-panel,
+  .membership-stat-card,
+  .membership-main-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
     background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
-  .assets-stat-card {
+  .assets-stat-card,
+  .membership-stat-card {
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   }
 
-  .assets-stat-card:hover {
+  .assets-stat-card:hover,
+  .membership-stat-card:hover {
     transform: translateY(-3px);
     border-color: hsla(210, 58%, 38%, 0.5) !important;
     box-shadow: 0 28px 38px -24px rgba(15, 23, 42, 0.62);
@@ -2498,6 +2502,7 @@ html {
   .hr-header,
   .campaign-header,
   .inventory-header,
+  .membership-header,
   .assets-header,
   .docs-header,
   .hall-booking-header,
@@ -2527,6 +2532,8 @@ html {
   .campaign-header p,
   .inventory-header h1,
   .inventory-header p,
+  .membership-header h1,
+  .membership-header p,
   .assets-header h1,
   .assets-header p,
   .docs-header h1,
@@ -2542,6 +2549,7 @@ html {
   .annadhanam-cta,
   .campaign-send-btn,
   .inventory-cta,
+  .membership-cta,
   .assets-cta,
   .docs-cta,
   .docs-sync-btn,
@@ -2559,6 +2567,7 @@ html {
   .annadhanam-cta:hover,
   .campaign-send-btn:hover,
   .inventory-cta:hover,
+  .membership-cta:hover,
   .assets-cta:hover,
   .docs-cta:hover,
   .docs-sync-btn:hover,
@@ -2575,6 +2584,7 @@ html {
   .page-header-banner .annadhanam-cta,
   .devotees-header .devotees-cta,
   .page-header-banner .inventory-cta,
+  .page-header-banner .membership-cta,
   .page-header-banner .assets-cta,
   .page-header-banner .docs-cta,
   .page-header-banner .docs-sync-btn,
@@ -2591,6 +2601,7 @@ html {
   .page-header-banner .annadhanam-cta:hover,
   .devotees-header .devotees-cta:hover,
   .page-header-banner .inventory-cta:hover,
+  .page-header-banner .membership-cta:hover,
   .page-header-banner .assets-cta:hover,
   .page-header-banner .docs-cta:hover,
   .page-header-banner .docs-sync-btn:hover,
@@ -3501,6 +3512,7 @@ html {
 .hr-header,
 .campaign-header,
 .inventory-header,
+.membership-header,
 .assets-header,
 .docs-header,
 .hall-booking-header,
@@ -3736,6 +3748,7 @@ html.dark .annadhanam-stat-card,
 html.dark .hr-stat-card,
 html.dark .campaign-stat-card,
 html.dark .assets-stat-card,
+html.dark .membership-stat-card,
 html.dark .inventory-stat-card {
   border-color: hsl(var(--border)) !important;
 }

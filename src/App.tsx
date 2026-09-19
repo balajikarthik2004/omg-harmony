@@ -11,6 +11,7 @@ import AppLayout from "@/components/AppLayout";
 import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/DashboardPage";
 import DevoteesPage from "@/pages/DevoteesPage";
+import MembershipPage from "@/pages/MembershipPage";
 import PoojaSevaPage from "@/pages/PoojaSevaPage";
 import DonationsPage from "@/pages/DonationsPage";
 import EventsPage from "@/pages/EventsPage";
@@ -52,6 +53,7 @@ const App = () => (
               <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                 <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['admin', 'manager']} module="admin"><DashboardPage /></ProtectedRoute>} />
                 <Route path="/devotees" element={<ProtectedRoute allowedRoles={['admin', 'manager']} module="devotees"><DevoteesPage /></ProtectedRoute>} />
+                <Route path="/membership" element={<ProtectedRoute allowedRoles={['admin', 'manager']} module="membership"><MembershipPage /></ProtectedRoute>} />
                 <Route path="/pooja-seva" element={<ProtectedRoute module="pooja"><PoojaSevaPage /></ProtectedRoute>} />
                 <Route path="/annadhanam" element={<ProtectedRoute allowedRoles={['admin', 'manager']} module="annadhanam"><AnnadhanamPage /></ProtectedRoute>} />
                 <Route path="/services" element={<Navigate to="/pooja-seva" replace />} />
