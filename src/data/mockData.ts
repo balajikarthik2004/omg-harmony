@@ -1,5 +1,6 @@
 // Mock data for all modules
 import { MEMBERSHIP_TYPES, type Membership as MembershipRecord } from '@/lib/membership';
+import { sortByDateAscending, type LedgerEntry } from '@/lib/finance';
 import { toISODate } from '@/lib/utils';
 
 const membershipTypes = ['Silver', 'Gold', 'Platinum'];
@@ -67,6 +68,11 @@ export const mockServices = [
   { id: '3', name: 'Abhishekam', description: 'Sacred milk and water abhishekam', price: 500, duration: '30 mins', status: 'Active' },
   { id: '4', name: 'Homam', description: 'Fire ritual with sacred mantras', price: 5000, duration: '3 hours', status: 'Active' },
   { id: '5', name: 'Archana', description: 'Name-specific archana with flowers', price: 100, duration: '15 mins', status: 'Active' },
+  { id: '6', name: 'Lakshmi Homam', description: 'Homam invoking Goddess Lakshmi for prosperity', price: 6500, duration: '2 hours', status: 'Active' },
+  { id: '7', name: 'Rudrabhishekam', description: 'Abhishekam with Rudram chanting', price: 3500, duration: '90 mins', status: 'Active' },
+  { id: '8', name: 'Navagraha Shanti', description: 'Remedial pooja for the nine planets', price: 4500, duration: '2 hours', status: 'Active' },
+  { id: '9', name: 'Chandi Homam', description: 'Elaborate homam with Durga Saptashati recitation', price: 11000, duration: '5 hours', status: 'Active' },
+  { id: '10', name: 'Ganapathi Homam', description: 'Fire ritual to Lord Ganapathi before new beginnings', price: 5500, duration: '2 hours', status: 'Active' },
 ];
 
 export const mockBookings = [
@@ -263,6 +269,67 @@ const buildMembership = (devotee: (typeof mockDevotees)[number], index: number):
 };
 
 export const mockMemberships: MembershipRecord[] = mockDevotees.map(buildMembership);
+
+// ─── Finance ledger ───────────────────────────────────────────────────────────
+// Income is derived from the registers that already hold the money - donations
+// and paid pooja bookings - so the ledger can never contradict those pages.
+// Expenses are recorded here because no other module captures them.
+export type { LedgerEntry } from '@/lib/finance';
+
+const EXPENSE_ENTRIES: Omit<LedgerEntry, 'voucherNo'>[] = [
+  { id: 'exp-1', date: '2026-01-31', direction: 'Expense', category: 'Salaries & Honorarium', particulars: 'January staff salaries and priest honorarium', amount: 145000, paymentMode: 'Bank Transfer', reference: 'PAY-2601', notes: '48 staff on roll.' },
+  { id: 'exp-2', date: '2026-02-04', direction: 'Expense', category: 'Utilities', particulars: 'Electricity board bill - January', amount: 22400, paymentMode: 'Bank Transfer', reference: 'EB-88213' },
+  { id: 'exp-3', date: '2026-02-12', direction: 'Expense', category: 'Annadhanam Provisions', particulars: 'Rice, dal and provisions for annadhanam hall', amount: 38500, paymentMode: 'Cheque', reference: 'INV-4471' },
+  { id: 'exp-4', date: '2026-02-20', direction: 'Expense', category: 'Maintenance & Repairs', particulars: 'Gopuram lighting repair and rewiring', amount: 18600, paymentMode: 'UPI', reference: 'INV-4488' },
+  { id: 'exp-5', date: '2026-02-28', direction: 'Expense', category: 'Salaries & Honorarium', particulars: 'February staff salaries and priest honorarium', amount: 145000, paymentMode: 'Bank Transfer', reference: 'PAY-2602' },
+  { id: 'exp-6', date: '2026-03-05', direction: 'Expense', category: 'Utilities', particulars: 'Electricity board bill - February', amount: 24300, paymentMode: 'Bank Transfer', reference: 'EB-88407' },
+  { id: 'exp-7', date: '2026-03-09', direction: 'Expense', category: 'Procurement', particulars: 'Camphor, oil and archanai consumables', amount: 16200, paymentMode: 'Cash', reference: 'INV-4502' },
+  { id: 'exp-8', date: '2026-03-14', direction: 'Expense', category: 'Festival Expenses', particulars: 'Panguni Uthiram pandal and decoration', amount: 64500, paymentMode: 'Cheque', reference: 'INV-4519' },
+  { id: 'exp-9', date: '2026-03-22', direction: 'Expense', category: 'Annadhanam Provisions', particulars: 'Festival annadhanam provisions', amount: 52800, paymentMode: 'Cheque', reference: 'INV-4527' },
+  { id: 'exp-10', date: '2026-03-31', direction: 'Expense', category: 'Salaries & Honorarium', particulars: 'March staff salaries and priest honorarium', amount: 148000, paymentMode: 'Bank Transfer', reference: 'PAY-2603', notes: 'Includes festival duty allowance.' },
+  { id: 'exp-11', date: '2026-04-04', direction: 'Expense', category: 'Utilities', particulars: 'Water tanker supply and drainage upkeep', amount: 11500, paymentMode: 'UPI', reference: 'INV-4540' },
+  { id: 'exp-12', date: '2026-04-08', direction: 'Expense', category: 'Maintenance & Repairs', particulars: 'Generator servicing and oil change', amount: 8250, paymentMode: 'Cash', reference: 'INV-4551', notes: 'Asset: Generator 5KVA.' },
+];
+
+const donationLedgerEntries: Omit<LedgerEntry, 'voucherNo'>[] = mockDonations
+  .filter(donation => donation.paymentStatus === 'Success')
+  .map(donation => ({
+    id: `don-${donation.id}`,
+    date: donation.date,
+    direction: 'Income' as const,
+    category: donation.channel === 'Hundi' ? 'Hundi Collection' : 'Donation',
+    particulars: `${donation.category} donation - ${donation.donorName}`,
+    amount: donation.amount,
+    paymentMode: donation.paymentMethod,
+    reference: donation.receiptNumber,
+    sourceModule: 'Donations' as const,
+  }));
+
+const bookingLedgerEntries: Omit<LedgerEntry, 'voucherNo'>[] = mockBookings
+  .filter(
+    booking =>
+      booking.paymentStatus === 'Paid' &&
+      (mockServices.find(service => service.name === booking.serviceName)?.price ?? 0) > 0,
+  )
+  .map(booking => ({
+    id: `bkg-${booking.id}`,
+    date: booking.date,
+    direction: 'Income' as const,
+    category: 'Pooja & Seva',
+    particulars: `${booking.serviceName} - ${booking.devoteeName}`,
+    amount: mockServices.find(service => service.name === booking.serviceName)?.price ?? 0,
+    paymentMode: 'Cash',
+    reference: booking.id,
+    sourceModule: 'Pooja & Seva' as const,
+  }));
+
+// Voucher numbers are issued in posting order, so the ledger reads sequentially.
+export const mockLedgerEntries: LedgerEntry[] = sortByDateAscending(
+  [...donationLedgerEntries, ...bookingLedgerEntries, ...EXPENSE_ENTRIES].map(entry => ({
+    ...entry,
+    voucherNo: '',
+  })),
+).map((entry, index) => ({ ...entry, voucherNo: `VCH-${String(index + 1).padStart(4, '0')}` }));
 
 export const donationTrendData = [
   { month: 'Oct', amount: 320000 },

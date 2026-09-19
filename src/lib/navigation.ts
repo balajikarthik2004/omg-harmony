@@ -14,6 +14,7 @@ import {
   UtensilsCrossed,
   Briefcase,
   BadgeCheck,
+  BookOpenCheck,
   BarChart3,
   type LucideIcon,
 } from 'lucide-react';
@@ -42,11 +43,14 @@ const adminLinks: NavigationLink[] = [
   { to: '/inventory', label: 'Inventory', icon: Package, module: 'inventory' },
   { to: '/assets', label: 'Assets', icon: Building2, module: 'asset' },
   { to: '/parking', label: 'Parking', icon: Car, module: 'parking' },
+  { to: '/finance', label: 'Finance Ledger', icon: BookOpenCheck, module: 'finance' },
   { to: '/reports', label: 'Documents', icon: BarChart3, module: 'documents' },
   { to: '/settings', label: 'Settings', icon: Settings, module: 'admin' },
 ];
 
-const managerLinks = adminLinks.filter(link => !['/reports', '/settings', '/assets'].includes(link.to));
+const managerLinks = adminLinks.filter(
+  link => !['/reports', '/settings', '/assets', '/finance'].includes(link.to),
+);
 
 const devoteeLinks: NavigationLink[] = [
   { to: '/pooja-seva', label: 'Pooja & Seva Desk', icon: CalendarDays, module: 'pooja' },

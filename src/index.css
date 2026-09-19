@@ -2063,19 +2063,23 @@ html {
   .assets-stat-card,
   .assets-main-panel,
   .membership-stat-card,
-  .membership-main-panel {
+  .membership-main-panel,
+  .finance-stat-card,
+  .finance-main-panel {
     border-color: hsla(210, 22%, 74%, 0.86) !important;
     background: linear-gradient(180deg, hsl(var(--card) / 0.99) 0%, hsl(var(--muted) / 0.95) 62%, hsl(var(--background) / 0.92) 100%) !important;
     box-shadow: 0 24px 36px -28px rgba(15, 23, 42, 0.58);
   }
 
   .assets-stat-card,
-  .membership-stat-card {
+  .membership-stat-card,
+  .finance-stat-card {
     transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   }
 
   .assets-stat-card:hover,
-  .membership-stat-card:hover {
+  .membership-stat-card:hover,
+  .finance-stat-card:hover {
     transform: translateY(-3px);
     border-color: hsla(210, 58%, 38%, 0.5) !important;
     box-shadow: 0 28px 38px -24px rgba(15, 23, 42, 0.62);
@@ -2516,6 +2520,7 @@ html {
   .campaign-header,
   .inventory-header,
   .membership-header,
+  .finance-header,
   .assets-header,
   .docs-header,
   .hall-booking-header,
@@ -2547,6 +2552,8 @@ html {
   .inventory-header p,
   .membership-header h1,
   .membership-header p,
+  .finance-header h1,
+  .finance-header p,
   .assets-header h1,
   .assets-header p,
   .docs-header h1,
@@ -2563,6 +2570,7 @@ html {
   .campaign-send-btn,
   .inventory-cta,
   .membership-cta,
+  .finance-cta,
   .assets-cta,
   .docs-cta,
   .docs-sync-btn,
@@ -2581,6 +2589,7 @@ html {
   .campaign-send-btn:hover,
   .inventory-cta:hover,
   .membership-cta:hover,
+  .finance-cta:hover,
   .assets-cta:hover,
   .docs-cta:hover,
   .docs-sync-btn:hover,
@@ -2598,6 +2607,7 @@ html {
   .devotees-header .devotees-cta,
   .page-header-banner .inventory-cta,
   .page-header-banner .membership-cta,
+  .page-header-banner .finance-cta,
   .page-header-banner .assets-cta,
   .page-header-banner .docs-cta,
   .page-header-banner .docs-sync-btn,
@@ -2615,6 +2625,7 @@ html {
   .devotees-header .devotees-cta:hover,
   .page-header-banner .inventory-cta:hover,
   .page-header-banner .membership-cta:hover,
+  .page-header-banner .finance-cta:hover,
   .page-header-banner .assets-cta:hover,
   .page-header-banner .docs-cta:hover,
   .page-header-banner .docs-sync-btn:hover,
@@ -3526,6 +3537,7 @@ html {
 .campaign-header,
 .inventory-header,
 .membership-header,
+.finance-header,
 .assets-header,
 .docs-header,
 .hall-booking-header,
@@ -3762,6 +3774,7 @@ html.dark .hr-stat-card,
 html.dark .campaign-stat-card,
 html.dark .assets-stat-card,
 html.dark .membership-stat-card,
+html.dark .finance-stat-card,
 html.dark .inventory-stat-card {
   border-color: hsl(var(--border)) !important;
 }

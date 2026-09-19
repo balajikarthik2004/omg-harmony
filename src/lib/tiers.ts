@@ -10,9 +10,9 @@
  *    line-up (Annadhanam, Events, Tasks, Documents, Parking). They're gated per
  *    tier the same way, they just don't count toward the 4 / 9 / 12 headline.
  *
- * NOTE: `priest` and `finance` are real modules in the tier line-up but have no
- * page in this app yet, so they carry no routes. They stay listed here (the
- * counts stay honest) and simply contribute no navigation.
+ * NOTE: `priest` is a real module in the tier line-up but has no page in this
+ * app yet, so it carries no routes. It stays listed here (the counts stay
+ * honest) and simply contributes no navigation.
  */
 
 export type TierId = 'foundation' | 'growth' | 'enterprise';
@@ -55,7 +55,7 @@ export const MODULES: ModuleDefinition[] = [
   { id: 'membership', label: 'Membership', routes: ['/membership'] },
   { id: 'asset', label: 'Asset Management', routes: ['/assets'] },
   { id: 'campaigns', label: 'Campaigns', routes: ['/campaign'] },
-  { id: 'finance', label: 'Finance Ledger Management', routes: [] },
+  { id: 'finance', label: 'Finance Ledger Management', routes: ['/finance'] },
 ];
 
 /** Supporting pages, gated per tier but outside the headline module count. */

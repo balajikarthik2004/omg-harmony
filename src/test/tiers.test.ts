@@ -27,6 +27,7 @@ describe('tier navigation', () => {
     expect(growth).not.toContain('Assets');
     expect(growth).not.toContain('Campaigns');
     expect(growth).not.toContain('Parking');
+    expect(growth).not.toContain('Finance Ledger');
   });
 
   it('opens everything on Enterprise', () => {
@@ -37,6 +38,7 @@ describe('tier navigation', () => {
     expect(enterprise).toContain('Documents');
     expect(enterprise).toContain('Parking');
     expect(enterprise).toContain('Membership');
+    expect(enterprise).toContain('Finance Ledger');
     expect(enterprise.length).toBeGreaterThan(labels('admin', 'growth').length);
   });
 });

@@ -20,6 +20,7 @@ import TasksPage from "@/pages/TasksPage";
 import InventoryPage from "@/pages/InventoryPage";
 import AssetsPage from "@/pages/AssetsPage";
 import ReportsPage from "@/pages/ReportsPage";
+import FinanceLedgerPage from "@/pages/FinanceLedgerPage";
 import SettingsPage from "@/pages/SettingsPage";
 import DonatePage from "@/pages/DonatePage";
 import NotFound from "@/pages/NotFound";
@@ -65,6 +66,7 @@ const App = () => (
                 <Route path="/procurement" element={<ProtectedRoute allowedRoles={['admin', 'manager']} module="inventory"><ProcurementPage /></ProtectedRoute>} />
                 <Route path="/inventory" element={<ProtectedRoute allowedRoles={['admin', 'manager']} module="inventory"><InventoryPage /></ProtectedRoute>} />
                 <Route path="/assets" element={<ProtectedRoute allowedRoles={['admin']} module="asset"><AssetsPage /></ProtectedRoute>} />
+                <Route path="/finance" element={<ProtectedRoute allowedRoles={['admin']} module="finance"><FinanceLedgerPage /></ProtectedRoute>} />
                 <Route path="/reports" element={<ProtectedRoute allowedRoles={['admin']} module="documents"><ReportsPage /></ProtectedRoute>} />
                 <Route path="/settings" element={<ProtectedRoute allowedRoles={['admin']} module="admin"><SettingsPage /></ProtectedRoute>} />
                 <Route path="/theme-studio" element={<ProtectedRoute module="admin"><ThemeStudioPage /></ProtectedRoute>} />
