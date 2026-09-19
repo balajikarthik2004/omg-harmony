@@ -17,10 +17,11 @@ export const AssetsHeader: React.FC<AssetsHeaderProps> = ({ canWrite, onOpenAdd 
       <p className="text-sm text-muted-foreground mt-1">
         Manage buildings, land, valuable items, and track their maintenance cycle.
       </p>
-      <span className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-muted-foreground">
-        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+      {/* <p>, not <span> - the banner's CSS only recolors h1/p/svg for the dark gradient */}
+      <p className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold tracking-wide text-muted-foreground">
+        <ShieldCheck className="w-3.5 h-3.5" />
         Registry entries are audited by the trust board
-      </span>
+      </p>
     </div>
 
     {canWrite && (

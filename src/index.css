@@ -4,6 +4,38 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ---------------------------------------------------------------------------
+   Global UI density.
+   Renders the app at 90% so it reads the way it does at Chrome's 90% zoom,
+   without the user changing their browser zoom. Applied to the root so viewport
+   units (h-screen, 100vh) and fixed overlays scale along with it.
+   Override per-environment with --app-zoom on :root.
+--------------------------------------------------------------------------- */
+html {
+  zoom: var(--app-zoom, 0.9);
+}
+
+/* Viewport units are NOT scaled by the root zoom, so anything sized against the
+   viewport has to divide it back out - otherwise 100vh renders 10% short and
+   leaves a strip of empty page under the app shell. */
+.h-screen {
+  height: calc(100vh / var(--app-zoom, 0.9));
+}
+
+.min-h-screen {
+  min-height: calc(100vh / var(--app-zoom, 0.9));
+}
+
+.max-h-screen {
+  max-height: calc(100vh / var(--app-zoom, 0.9));
+}
+
+.fixed.inset-0,
+.modal-overlay {
+  width: calc(100vw / var(--app-zoom, 0.9));
+  height: calc(100vh / var(--app-zoom, 0.9));
+}
+
 @layer base {
   :root {
     --background: 230 30% 98%;
