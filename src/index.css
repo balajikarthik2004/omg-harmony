@@ -36,6 +36,19 @@ html {
   height: calc(100vh / var(--app-zoom, 0.9));
 }
 
+/* Arbitrary viewport-unit utilities need the same treatment as h-screen. */
+.h-\[100vh\] {
+  height: calc(100vh / var(--app-zoom, 0.9));
+}
+
+.min-h-\[100vh\] {
+  min-height: calc(100vh / var(--app-zoom, 0.9));
+}
+
+.w-\[100vw\] {
+  width: calc(100vw / var(--app-zoom, 0.9));
+}
+
 @layer base {
   :root {
     --background: 230 30% 98%;

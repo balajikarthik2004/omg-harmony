@@ -280,11 +280,14 @@ function deriveDevoteeProfile(devotee: Devotee, donations: Donation[], bookings:
   return { dateOfBirth, memberSince: fmtDate(memberSince), preferredSeva, offeringSummary };
 }
 
+// Giving tier, earned from lifetime donations - NOT the membership tier, which
+// is stored on the devotee as `membershipType`. Both use the words Silver /
+// Gold / Platinum, so every label here says "Donor" to keep the two apart.
 function getDonationTier(total: number) {
-  if (total >= 100000) return { label: 'Platinum', icon: Crown, color: 'text-primary bg-primary/10 border-primary/20', fill: 'fill-primary/20' };
-  if (total >= 50000) return { label: 'Gold', icon: Award, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20', fill: 'fill-amber-500/20' };
-  if (total >= 10000) return { label: 'Silver', icon: Medal, color: 'text-muted-foreground bg-muted border-border', fill: 'fill-muted-foreground/20' };
-  return { label: 'Devotee', icon: HeartHandshake, color: 'text-success bg-success/15 border-success/25', fill: 'fill-success/20' };
+  if (total >= 100000) return { label: 'Platinum Donor', icon: Crown, color: 'text-primary bg-primary/10 border-primary/20', fill: 'fill-primary/20' };
+  if (total >= 50000) return { label: 'Gold Donor', icon: Award, color: 'text-amber-600 bg-amber-500/10 border-amber-500/20', fill: 'fill-amber-500/20' };
+  if (total >= 10000) return { label: 'Silver Donor', icon: Medal, color: 'text-muted-foreground bg-muted border-border', fill: 'fill-muted-foreground/20' };
+  return { label: 'New Devotee', icon: HeartHandshake, color: 'text-success bg-success/15 border-success/25', fill: 'fill-success/20' };
 }
 
 const profileMetaIconClass = 'w-4 h-4 text-foreground/80';
@@ -998,7 +1001,7 @@ const DevoteesPage: React.FC = () => {
       {drawerOpen && createPortal(
         <div className="fixed inset-0 z-[90] flex items-center justify-end" onClick={() => setDrawerOpen(false)}>
           <div className="devotees-drawer-overlay absolute inset-0 bg-black/50 backdrop-blur-[2px] transition-opacity" />
-          <div className="devotees-drawer relative h-[100vh] w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
+          <div className="devotees-drawer relative h-screen w-full max-w-[600px] bg-background shadow-[0_0_60px_rgba(0,0,0,0.3)] flex flex-col animate-slide-in-right overflow-hidden" onClick={e => e.stopPropagation()}>
 
             {/* Header / Profile Hero */}
             <div className="devotees-drawer-hero px-6 py-8 border-b border-border/80 flex-shrink-0 relative">
@@ -1027,7 +1030,7 @@ const DevoteesPage: React.FC = () => {
                     <StatusBadge status={selectedDevotee?.status || 'Active'} />
                     <span className="text-[10px] font-bold uppercase tracking-widest text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20 shadow-sm flex items-center gap-1">
                       <ShieldCheck className="w-3 h-3" />
-                      {selectedDevotee?.membershipType || 'Silver'}
+                      {selectedDevotee?.membershipType || 'Silver'} Member
                     </span>
                   </div>
                 </div>
