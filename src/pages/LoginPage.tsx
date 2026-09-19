@@ -1,232 +1,143 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth, UserRole } from '@/contexts/AuthContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Heart, Lock, Mail, ArrowRight } from 'lucide-react';
-import bg from '@/assets/img/temple.webp';
+import { useState } from 'react';
+import { AlignCenter, Columns, Layout } from 'lucide-react';
+import { LoginForm } from '@/components/auth/LoginForm';
 import logo from '@/assets/img/logo1.png';
+import templeBg from '@/assets/img/temple.webp';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
-const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState<UserRole>('admin');
-  const { login } = useAuth();
-  const { logoUrl } = useTheme();
-  const navigate = useNavigate();
+const BRAND_NAME = 'OMG Temple';
+
+function LoginPage() {
+  const [viewMode, setViewMode] = useState<'full' | 'compact'>('full');
+  const [formSide, setFormSide] = useState<'left' | 'right'>('left');
   const [isLogoBroken, setIsLogoBroken] = useState(false);
+  const { logoUrl } = useTheme();
+  const { user } = useAuth();
 
-  React.useEffect(() => {
-    setIsLogoBroken(false);
-  }, [logoUrl]);
-
-  const loginLogoSrc = !isLogoBroken && logoUrl ? logoUrl : logo;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Always attempt login regardless of field values
-    const success = login(email, password, role);
-    if (success) {
-      navigate(role === 'devotee' ? '/donate' : '/dashboard');
-    }
-  };
+  const customLogo = !isLogoBroken && logoUrl ? logoUrl : null;
+  const isAdmin = user?.role === 'admin';
 
   return (
-    <div className="min-h-screen flex bg-background relative overflow-hidden">
-      <div className="absolute inset-0 lg:hidden">
+    <div className="min-h-screen flex items-center justify-center font-sans transition-all duration-700 p-3 sm:p-6 relative overflow-hidden bg-background">
+      {/* Backdrop - photo on mobile, soft gradient wash on desktop */}
+      <div className="md:hidden absolute inset-0 z-0">
+        <img src={templeBg} alt="" aria-hidden className="w-full h-full object-cover scale-105" />
+        <div className="absolute inset-0 login-image-overlay opacity-[0.72] backdrop-blur-[3px]" />
+      </div>
+      <div className="hidden md:block pointer-events-none absolute inset-0 z-0">
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${bg})` }}
+          className="login-floating-orb animate-float"
+          style={{ width: 420, height: 420, background: 'hsl(var(--primary))', top: '-12%', left: '-6%' }}
         />
-        <div className="absolute inset-0 login-image-overlay " />
-        <div className="absolute inset-0 bg-background/30 backdrop-blur-[0.5px]" />
+        <div
+          className="login-floating-orb animate-float"
+          style={{
+            width: 320,
+            height: 320,
+            background: 'hsl(var(--secondary))',
+            bottom: '-10%',
+            right: '-4%',
+            animationDelay: '1.5s',
+          }}
+        />
       </div>
 
-      {/* Decorative background orbs for right panel */}
       <div
-        className="login-floating-orb animate-float hidden lg:block"
-        style={{ width: 300, height: 300, background: 'hsl(var(--primary))', top: '-5%', right: '5%' }}
-      />
-      <div
-        className="login-floating-orb hidden lg:block"
-        style={{
-          width: 200,
-          height: 200,
-          background: 'hsl(var(--secondary))',
-          bottom: '10%',
-          right: '20%',
-          animationDelay: '1.5s',
-          animation: 'float 4s ease-in-out infinite',
-        }}
-      />
-
-      {/* Left side with image + overlay branding */}
-      <div className="hidden lg:flex lg:w-[55%] relative">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${bg})` }}
-        />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 login-image-overlay " />
-
-        {/* Branding content on image */}
-        <div className="relative z-10 flex flex-col justify-between p-10 w-full">
-          {/* Top: Logo */}
-          {/* <div className="animate-fade-in rounded-2xl border border-white/25 bg-white/85 backdrop-blur-sm p-3 w-fit shadow-sm">
-            <img
-              src={loginLogoSrc}
-              alt="OMG Temple"
-              className="h-14 object-contain"
-              onError={() => setIsLogoBroken(true)}
-            />
-          </div> */}
-
-          {/* Bottom: Welcome copy */}
-          {/* <div className="animate-fade-in max-w-md space-y-4" style={{ animationDelay: '0.2s' }}>
-            <h2 className="text-3xl font-display font-bold text-white/95 leading-tight">
-              Managing Sacred Spaces,<br />
-              <span className="text-white/70">Effortlessly.</span>
-            </h2>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Streamline temple operations with our comprehensive management platform — 
-              from devotee records to financial tracking, all in one place.
-            </p>
-            // Feature badges 
-            <div className="flex gap-3 pt-2">
-              {['Operations', 'Finance', 'Reports'].map((tag) => (
-                <span
-                  key={tag}
-                  className="text-xs font-medium text-white/70 bg-white/10 backdrop-blur-sm rounded-full px-3.5 py-1.5 border border-white/10 transition-colors duration-300 hover:bg-white/15 hover:text-white/90"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div> */}
-        </div>
-      </div>
-
-      {/* Right login form */}
-      <div className="flex-1 flex items-center justify-center p-6 sm:p-10 relative z-10">
-        <div className="w-full max-w-[400px] animate-slide-in-right">
-          {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2.5 mb-8">
-            <div className="w-10 h-10 rounded-lg bg-white/90 dark:bg-card/90 border border-border/50 p-1.5 flex items-center justify-center shadow-sm">
+        className={cn(
+          'w-full overflow-hidden flex flex-col relative z-10 animate-scale-in transition-all duration-500',
+          'shadow-[0_28px_70px_-24px_rgba(15,23,42,0.45)] ring-1 ring-black/[0.04]',
+          'border border-white/25 md:border-border/50',
+          'bg-card/95 md:bg-card backdrop-blur-xl md:backdrop-blur-none',
+          'min-h-[420px] md:min-h-[520px] lg:min-h-[560px]',
+          viewMode === 'full' ? 'max-w-4xl lg:max-w-5xl' : 'max-w-[380px] md:max-w-md',
+          viewMode === 'full' && formSide === 'left' ? 'md:flex-row' : '',
+          viewMode === 'full' && formSide === 'right' ? 'md:flex-row-reverse' : ''
+        )}
+        style={{ borderRadius: 'calc(var(--radius) + 0.75rem)' }}
+      >
+        {/* Form side */}
+        <div className="flex-1 p-5 sm:p-8 md:p-9 lg:p-12 flex flex-col justify-center items-center bg-transparent md:bg-card relative z-20">
+          <div className="flex items-center gap-3 mb-6 md:mb-8">
+            <div className="w-11 h-11 rounded-xl bg-card border border-border/60 flex items-center justify-center shadow-sm overflow-hidden p-1.5">
               <img
-                src={loginLogoSrc}
-                alt="OMG Temple"
-                className="max-h-full max-w-full object-contain"
+                src={customLogo || logo}
+                alt="Brand Logo"
+                className="w-full h-full object-contain"
                 onError={() => setIsLogoBroken(true)}
               />
             </div>
-            <span className="text-lg font-display font-bold text-foreground">OMG Temple</span>
-          </div>
-
-          {/* Login card */}
-          <div className="login-glass-card">
-            {/* Header */}
-            <div className="mb-7">
-              <h1 className="text-2xl font-display font-bold text-foreground tracking-tight">
-                Welcome back
-              </h1>
-              <p className="text-muted-foreground mt-1.5 text-sm">
-               Sign in to get started
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Role</Label>
-                <select
-                  value={role}
-                  onChange={e => setRole(e.target.value as UserRole)}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring transition-colors"
-                >
-                  <option value="admin">Admin</option>
-                  <option value="manager">Temple Manager</option>
-                  <option value="devotee">Devotee</option>
-                </select>
-              </div> */}
-
-              {/* Email field */}
-              <div className="space-y-2">
-                <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                  Email
-                </Label>
-                <div className="relative group">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 transition-colors duration-300 group-focus-within:text-primary" />
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="pl-10 h-11 login-input-enhanced bg-background/60 border-border/80 hover:border-border focus:border-primary"
-                  />
-                </div>
-              </div>
-
-              {/* Password field */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                    Password
-                  </Label>
-                  <button
-                    type="button"
-                    className="text-xs text-primary/80 hover:text-primary transition-colors duration-200 font-medium"
-                  >
-                    Forgot password?
-                  </button>
-                </div>
-                <div className="relative group">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 transition-colors duration-300 group-focus-within:text-primary" />
-                  <Input
-                    type="password"
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="pl-10 h-11 login-input-enhanced bg-background/60 border-border/80 hover:border-border focus:border-primary"
-                  />
-                </div>
-              </div>
-
-              {/* Submit button */}
-              <Button
-                type="submit"
-                className="w-full h-11 login-btn-premium login-btn-shimmer text-primary-foreground rounded-lg mt-1 group"
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  Sign In
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
-                </span>
-              </Button>
-            </form>
-
-            {/* Divider */}
-            <div className="login-divider mt-6 mb-4">
-              <span>secure login</span>
-            </div>
-
-            {/* Footer note */}
-            {/* <p className="text-center text-xs text-muted-foreground/70">
-              Protected by enterprise-grade encryption
-            </p> */}
-          </div>
-
-          {/* Bottom branding for desktop */}
-          <div className="hidden lg:flex items-center justify-center mt-6 gap-1.5">
-            <span className="text-xs text-muted-foreground/50">Powered by</span>
-            <span className="text-xs font-display font-semibold text-muted-foreground/70">
-              OMG Temple Governance System
+            <span className="text-base font-display font-bold capitalize tracking-tight text-foreground">
+              {BRAND_NAME}
             </span>
           </div>
+
+          <LoginForm isCustomized={!!customLogo} />
+
+          <div className="w-full mt-5 md:mt-6 pt-4 md:pt-6 border-t border-border/40 flex flex-wrap items-center justify-center gap-3 lg:gap-4">
+            {isAdmin && <div className="w-px h-4 bg-border hidden md:block" />}
+
+            <div className="hidden md:flex items-center gap-2">
+              <button
+                onClick={() => setViewMode(prev => (prev === 'full' ? 'compact' : 'full'))}
+                className="group flex items-center gap-2 rounded-full border border-transparent px-2.5 py-1.5 text-[9px] font-bold text-muted-foreground capitalize tracking-widest transition-all duration-300 hover:border-border/60 hover:bg-muted/40 hover:text-foreground"
+              >
+                <span className="w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center transition-colors group-hover:bg-background">
+                  {viewMode === 'full' ? <AlignCenter className="w-3 h-3" /> : <Columns className="w-3 h-3" />}
+                </span>
+                {viewMode === 'full' ? 'Compact' : 'Full'}
+              </button>
+
+              {viewMode === 'full' && (
+                <button
+                  onClick={() => setFormSide(prev => (prev === 'left' ? 'right' : 'left'))}
+                  className="group flex items-center gap-2 rounded-full border border-transparent px-2.5 py-1.5 text-[9px] font-bold text-muted-foreground capitalize tracking-widest transition-all duration-300 hover:border-border/60 hover:bg-muted/40 hover:text-foreground"
+                >
+                  <span className="w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center transition-colors group-hover:bg-background">
+                    <Layout className="w-3 h-3" />
+                  </span>
+                  Swap
+                </button>
+              )}
+            </div>
+          </div>
         </div>
+
+        {/* Showcase side */}
+        {viewMode === 'full' && (
+          <div className="hidden md:block md:w-[50%] relative overflow-hidden transition-all duration-500 group animate-slide-in-right">
+            <img
+              src={templeBg}
+              alt="Temple Sanctuary"
+              className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-[1200ms] ease-out group-hover:scale-105"
+            />
+            <div className="absolute inset-0 login-image-overlay opacity-[0.88] transition-opacity duration-700 group-hover:opacity-95" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20" />
+
+            <div className="relative z-30 flex h-full flex-col justify-between p-8 lg:p-10">
+              <p className="animate-fade-in text-white/70 text-[10px] font-bold uppercase tracking-[0.22em]">
+                Temple Governance System
+              </p>
+
+              <div className="animate-fade-in">
+                <p className="text-white/80 text-xs lg:text-sm font-medium capitalize tracking-[0.2em] drop-shadow-md">
+                  Divine Governance &bull; {BRAND_NAME}
+                </p>
+                <h2 className="text-white text-xl lg:text-3xl font-display font-semibold capitalize tracking-tight drop-shadow-lg mt-1.5 lg:mt-2">
+                  Unified Temple ERP
+                </h2>
+                <div
+                  className="mt-4 h-[3px] w-14 rounded-full"
+                  style={{ background: 'var(--sidebar-highlight)' }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
+}
 
 export default LoginPage;

@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ChevronsLeft, ChevronsRight, LogOut } from 'lucide-react';
 import { getNavigationLinks } from '@/lib/navigation';
+import { useTier } from '@/contexts/TierContext';
 
 import logo from '@/assets/img/logo.png'; 
 import logo1 from '@/assets/img/logo1.png';
@@ -24,7 +25,8 @@ const AppSidebar: React.FC<AppSidebarProps> = ({ position, isCollapsed, onToggle
     setIsLogoBroken(false);
   }, [logoUrl, isCollapsed]);
 
-  const links = getNavigationLinks(user?.role);
+  const { tier } = useTier();
+  const links = getNavigationLinks(user?.role, tier);
 
   const handleLogout = () => {
     logout();

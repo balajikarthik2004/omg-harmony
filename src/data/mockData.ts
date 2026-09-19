@@ -167,15 +167,30 @@ export const mockInventory = [
   { id: '10', name: 'Jaggery', category: 'Kitchen', quantity: 25, unit: 'kg', stockStatus: 'In Stock', supplier: 'Sweet Source' },
 ];
 
-export const mockAssets = [
-  { id: '1', name: 'Main Temple Bell', category: 'Temple Fixtures', purchaseDate: '2020-01-15', condition: 'Good', maintenanceStatus: 'Up to Date' },
-  { id: '2', name: 'Sound System', category: 'Electronics', purchaseDate: '2023-06-20', condition: 'Excellent', maintenanceStatus: 'Up to Date' },
-  { id: '3', name: 'Generator 5KVA', category: 'Electrical', purchaseDate: '2022-03-10', condition: 'Good', maintenanceStatus: 'Due Soon' },
-  { id: '4', name: 'CCTV Camera Set', category: 'Security', purchaseDate: '2024-01-05', condition: 'Excellent', maintenanceStatus: 'Up to Date' },
-  { id: '5', name: 'Kitchen Equipment', category: 'Kitchen', purchaseDate: '2021-08-15', condition: 'Fair', maintenanceStatus: 'Overdue' },
-  { id: '6', name: 'Temple Van', category: 'Vehicle', purchaseDate: '2022-11-20', condition: 'Good', maintenanceStatus: 'Due Soon' },
-  { id: '7', name: 'Silver Deepam Set', category: 'Temple Fixtures', purchaseDate: '2019-09-12', condition: 'Excellent', maintenanceStatus: 'Up to Date' },
-  { id: '8', name: 'Farmland Parcel A', category: 'Land', purchaseDate: '2015-02-18', condition: 'Good', maintenanceStatus: 'Up to Date' },
+export interface Asset {
+  id: string;
+  name: string;
+  category: string;
+  purchaseDate: string;
+  condition: string;
+  maintenanceStatus: string;
+  cost: number;
+  notes?: string;
+}
+
+export const mockAssets: Asset[] = [
+  { id: '1', name: 'Main Temple Bell', category: 'Temple Fixtures', purchaseDate: '2020-01-15', condition: 'Good', maintenanceStatus: 'Up to Date', cost: 450000, notes: 'Cast bronze bell at the east gopuram. Annual polishing due every Chithirai.' },
+  { id: '2', name: 'Sound System', category: 'Electronics', purchaseDate: '2023-06-20', condition: 'Excellent', maintenanceStatus: 'Up to Date', cost: 185000, notes: '8-channel mixer with 12 ceiling speakers across the prakaram.' },
+  { id: '3', name: 'Generator 5KVA', category: 'Electrical', purchaseDate: '2022-03-10', condition: 'Good', maintenanceStatus: 'Due Soon', cost: 260000, notes: 'Backup supply for the sanctum. Oil change pending, last serviced 8 months ago.' },
+  { id: '4', name: 'CCTV Camera Set', category: 'Security', purchaseDate: '2024-01-05', condition: 'Excellent', maintenanceStatus: 'Up to Date', cost: 142000, notes: '16 dome cameras with 30-day NVR retention in the admin office.' },
+  { id: '5', name: 'Kitchen Equipment', category: 'Kitchen', purchaseDate: '2021-08-15', condition: 'Fair', maintenanceStatus: 'Overdue', cost: 320000, notes: 'Annadhanam hall steam vessels and industrial mixer. Burner replacement overdue.' },
+  { id: '6', name: 'Temple Van', category: 'Vehicle', purchaseDate: '2022-11-20', condition: 'Good', maintenanceStatus: 'Due Soon', cost: 980000, notes: 'Registration TN-XX-1234. Insurance renewal and service both due next quarter.' },
+  { id: '7', name: 'Silver Deepam Set', category: 'Temple Fixtures', purchaseDate: '2019-09-12', condition: 'Excellent', maintenanceStatus: 'Up to Date', cost: 675000, notes: 'Set of 24 silver lamps held in the strong room, issued only for festival days.' },
+  { id: '8', name: 'Farmland Parcel A', category: 'Land', purchaseDate: '2015-02-18', condition: 'Good', maintenanceStatus: 'Up to Date', cost: 4200000, notes: '3.2 acres under paddy lease. Patta records filed with the trust office.' },
+  { id: '9', name: 'Gold Kavacham', category: 'Gold', purchaseDate: '2018-04-22', condition: 'Excellent', maintenanceStatus: 'Up to Date', cost: 8500000, notes: 'Presented by devotee trust. Audited twice a year in the presence of trustees.' },
+  { id: '10', name: 'Nadaswaram Set', category: 'Musical Instruments', purchaseDate: '2021-01-30', condition: 'Fair', maintenanceStatus: 'Due Soon', cost: 95000, notes: 'Used for daily kala poojas. Reeds need replacing before Brahmotsavam.' },
+  { id: '11', name: 'Pandal Frames', category: 'Infrastructure', purchaseDate: '2020-07-09', condition: 'Poor', maintenanceStatus: 'Overdue', cost: 175000, notes: 'Galvanised frames showing rust at the joints. Inspect before the next festival.' },
+  { id: '12', name: 'Treasury Safe', category: 'Treasury', purchaseDate: '2017-12-01', condition: 'Good', maintenanceStatus: 'Up to Date', cost: 310000, notes: 'Dual-key hundi safe. Combination reset every six months by the trust board.' },
 ];
 
 export const donationTrendData = [

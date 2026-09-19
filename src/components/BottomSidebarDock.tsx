@@ -2,6 +2,7 @@ import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { getNavigationLinks } from '@/lib/navigation';
+import { useTier } from '@/contexts/TierContext';
 import { cn } from '@/lib/utils';
 
 interface BottomSidebarDockProps {
@@ -105,7 +106,8 @@ const DockItem: React.FC<DockItemProps> = ({ link, mouseX, itemRef, index }) => 
 // Main Component
 const BottomSidebarDock: React.FC<BottomSidebarDockProps> = ({ showOnDesktop = false }) => {
   const { user } = useAuth();
-  const links = React.useMemo(() => getNavigationLinks(user?.role), [user?.role]);
+  const { tier } = useTier();
+  const links = React.useMemo(() => getNavigationLinks(user?.role, tier), [user?.role, tier]);
   const [mouseX, setMouseX] = useState<number | null>(null);
   const [isDockHidden, setIsDockHidden] = useState(false);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
