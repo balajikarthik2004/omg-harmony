@@ -1,252 +1,228 @@
 import React, { useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import {
+  AlertTriangle, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, BarChart3, CalendarClock, ChevronDown, ClipboardCheck,
+  ClipboardList, Gift, IndianRupee, Layers, Package, PackagePlus, RotateCcw, Scale, ScrollText, ShoppingCart, Trash2, Truck, X,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash2, Search, AlertTriangle, Package, Layers, Droplets } from 'lucide-react';
-import { mockInventory } from '@/data/mockData';
-import { useStore } from '@/hooks/useStore';
-import Modal from '@/components/Modal';
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import ConfirmDialog from '@/components/ConfirmDialog';
-import FormField from '@/components/FormField';
-import StatusBadge from '@/components/StatusBadge';
-import ProcurementPage from '@/pages/ProcurementPage';
+import { useInventoryStore } from '@/hooks/useInventoryStore';
+import { OPEN_PO_STATUSES, RECEIVABLE_PO_STATUSES, useProcurementStore } from '@/hooks/useProcurementStore';
+import { InventoryItem, StoreId, fmtMoney, matchPOLineItem, needsReorder, receivedAgainstPO, round3 } from '@/lib/inventory';
+import { toISODate } from '@/lib/utils';
+import { useInventoryRole } from '@/components/inventory/shared';
+import StockRegisterTab, { RegisterFilter } from '@/components/inventory/StockRegisterTab';
+import LedgerTab from '@/components/inventory/LedgerTab';
+import PurchaseOrdersTab from '@/components/inventory/PurchaseOrdersTab';
+import PlanningTab from '@/components/inventory/PlanningTab';
+import StockCountTab from '@/components/inventory/StockCountTab';
+import ReportsTab from '@/components/inventory/ReportsTab';
+import ItemDetailSheet, { ItemAction } from '@/components/inventory/ItemDetailSheet';
+import ItemFormModal from '@/components/inventory/ItemFormModal';
+import CreatePOModal, { POSuggestion } from '@/components/inventory/CreatePOModal';
+import { AdjustModal, IssueModal, ReceiveModal, TransferModal } from '@/components/inventory/TransactionModals';
 
-const emptyForm = { name: '', category: '', quantity: 0, unit: '', stockStatus: 'In Stock', supplier: '' };
+type Tab = 'stock' | 'orders' | 'history' | 'planning' | 'check' | 'reports';
 
-const MAX_QUANTITY: Record<string, number> = {
-  default: 100,
-};
+const TABS: { key: Tab; label: string; Icon: React.ElementType }[] = [
+  { key: 'stock', label: 'Stock', Icon: Layers },
+  { key: 'orders', label: 'Purchase Orders', Icon: Truck },
+  { key: 'history', label: 'History', Icon: ScrollText },
+  { key: 'planning', label: 'Seva Planning', Icon: ClipboardList },
+  { key: 'check', label: 'Stock Check', Icon: ClipboardCheck },
+  { key: 'reports', label: 'Reports', Icon: BarChart3 },
+];
 
-function getStockPercent(quantity: number, name: string): number {
-  const max = MAX_QUANTITY[name] ?? MAX_QUANTITY.default;
-  return Math.min(100, Math.round((quantity / max) * 100));
-}
+type ReceivePreset = { itemId?: string; poId?: string; mode?: 'RECEIPT' | 'PO' | 'DONATION' };
+type AdjustPreset = { itemId?: string; store?: StoreId; type?: 'ADJUSTMENT' | 'WASTAGE'; batchNo?: string };
+type IssuePreset = { itemId?: string; store?: StoreId; templateId?: string; count?: number };
 
-function getProgressColor(pct: number): string {
-  if (pct === 0) return 'bg-destructive';
-  if (pct < 30) return 'bg-amber-500';
-  return 'bg-primary';
-}
+const listNames = (items: InventoryItem[], max = 3) =>
+  items.length <= max ? items.map(i => i.name).join(', ') : `${items.slice(0, max).map(i => i.name).join(', ')} and ${items.length - max} more`;
 
 const InventoryPage: React.FC = () => {
-  const { items, add, update, remove } = useStore(mockInventory);
-  const [activeSection, setActiveSection] = useState<'inventory' | 'procurement'>('inventory');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [form, setForm] = useState(emptyForm);
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('All');
+  const { state, summaries, actions } = useInventoryStore();
+  const { items: pos } = useProcurementStore();
+  const { isAdmin, canAdjust } = useInventoryRole();
 
-  const openAdd = () => { setForm(emptyForm); setEditId(null); setModalOpen(true); };
-  const openEdit = (item: typeof mockInventory[0]) => {
-    setForm({ name: item.name, category: item.category, quantity: item.quantity, unit: item.unit, stockStatus: item.stockStatus, supplier: item.supplier });
-    setEditId(item.id); setModalOpen(true);
-  };
-  const handleSave = () => {
-    if (editId) update(editId, { ...form, quantity: Number(form.quantity) });
-    else add({ ...form, quantity: Number(form.quantity) } as any);
-    setModalOpen(false);
-  };
-  const set = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: key === 'quantity' ? Number(val) : val }));
+  const [tab, setTab] = useState<Tab>('stock');
+  const [filter, setFilter] = useState<RegisterFilter>('all');
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const [dismissed, setDismissed] = useState<Set<string>>(new Set());
 
-  const categories = useMemo(() => ['All', ...Array.from(new Set(items.map(i => i.category)))], [items]);
+  const [receive, setReceive] = useState<ReceivePreset | null>(null);
+  const [issue, setIssue] = useState<IssuePreset | null>(null);
+  const [transfer, setTransfer] = useState<{ itemId?: string } | null>(null);
+  const [adjust, setAdjust] = useState<AdjustPreset | null>(null);
+  const [itemForm, setItemForm] = useState<{ item: InventoryItem | null } | null>(null);
+  const [poSuggestions, setPoSuggestions] = useState<POSuggestion[] | null>(null);
+  const [resetOpen, setResetOpen] = useState(false);
 
-  const filteredItems = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return items.filter(item => {
-      const matchesSearch = !query ||
-        item.name.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query) ||
-        item.supplier.toLowerCase().includes(query);
-      const matchesCategory = categoryFilter === 'All' || item.category === categoryFilter;
-      return matchesSearch && matchesCategory;
+  /* Quantity still due on open purchase orders, per item. */
+  const { onOrder, receivablePOs, pendingValue, overduePOs } = useMemo(() => {
+    const map: Record<string, number> = {};
+    const today = toISODate(new Date());
+    let value = 0;
+    const receivable = pos.filter(p => RECEIVABLE_PO_STATUSES.includes(p.status));
+    pos.filter(p => OPEN_PO_STATUSES.includes(p.status)).forEach(po => {
+      const received = receivedAgainstPO(state, po.id);
+      po.items.forEach(line => {
+        const itemId = matchPOLineItem(state.items, line);
+        if (!itemId) return;
+        const due = Math.max(0, round3(line.quantity - (received[itemId] ?? 0)));
+        map[itemId] = round3((map[itemId] ?? 0) + due);
+        if (RECEIVABLE_PO_STATUSES.includes(po.status)) value += due * line.price;
+      });
     });
-  }, [items, search, categoryFilter]);
+    return { onOrder: map, receivablePOs: receivable, pendingValue: value, overduePOs: receivable.filter(p => p.expectedDate && p.expectedDate < today) };
+  }, [pos, state]);
 
-  const poojaMaterialsCount = items.filter(i => i.category.toLowerCase().includes('pooja')).length;
-  const prasadamStockCount = items.filter(i => ['kitchen', 'prasadam'].some(k => i.category.toLowerCase().includes(k))).length;
-  const lowStockItems = items.filter(i => i.stockStatus !== 'In Stock');
-  const inStockCount = items.filter(i => i.stockStatus === 'In Stock').length;
+  const kpi = useMemo(() => {
+    const active = state.items.filter(i => i.active);
+    return {
+      active,
+      value: active.reduce((s, i) => s + summaries[i.id].value, 0),
+      reorder: active.filter(i => needsReorder(summaries[i.id].status)),
+      urgent: active.filter(i => summaries[i.id].status === 'Out of Stock' || summaries[i.id].status === 'Critical'),
+      expiring: active.filter(i => summaries[i.id].expiringQty > 0),
+      expired: active.filter(i => summaries[i.id].expiredQty > 0),
+    };
+  }, [state.items, summaries]);
+
+  const toOrder = kpi.reorder.filter(i => !(onOrder[i.id] > 0));
+  const orderLowItems = () => setPoSuggestions(toOrder.map(i => ({ itemId: i.id })));
+  const showFilter = (f: RegisterFilter) => { setTab('stock'); setFilter(f); };
+
+  const handleAction = (action: ItemAction, itemId: string, extra?: { store?: StoreId; batchNo?: string }) => {
+    switch (action) {
+      case 'receive': setReceive({ itemId }); break;
+      case 'issue': setIssue({ itemId }); break;
+      case 'transfer': setTransfer({ itemId }); break;
+      case 'adjust': setAdjust({ itemId, type: 'ADJUSTMENT' }); break;
+      case 'wastage': setAdjust({ itemId, type: 'WASTAGE', ...extra }); break;
+      case 'edit': setItemForm({ item: state.items.find(i => i.id === itemId) ?? null }); break;
+      case 'po': setPoSuggestions([{ itemId }]); break;
+    }
+  };
+
+  type Alert = { id: string; tone: 'danger' | 'warn'; text: string; action: string; run: () => void };
+  const alerts: Alert[] = [];
+  const urgentToOrder = kpi.urgent.filter(i => !(onOrder[i.id] > 0));
+  if (urgentToOrder.length) {
+    alerts.push({ id: 'urgent', tone: 'danger', text: `Running out: ${listNames(urgentToOrder)}. No order has been placed yet.`, action: 'Order now', run: orderLowItems });
+  }
+  if (kpi.expired.length) {
+    alerts.push({ id: 'expired', tone: 'danger', text: `Expired stock found in ${listNames(kpi.expired)}. Write it off so it is not used.`, action: 'Review', run: () => showFilter('expiring') });
+  }
+  if (kpi.expiring.length) {
+    alerts.push({ id: 'expiring', tone: 'warn', text: `Use soon: ${listNames(kpi.expiring)} will expire within 15 days.`, action: 'View', run: () => showFilter('expiring') });
+  }
+  if (overduePOs.length) {
+    alerts.push({ id: 'overdue', tone: 'warn', text: `Delivery late: ${overduePOs.map(p => `${p.poNumber} from ${p.vendor}`).join(', ')}.`, action: 'Receive', run: () => setReceive({ mode: 'PO', poId: overduePOs[0].id }) });
+  }
+  const visibleAlerts = alerts.filter(a => !dismissed.has(a.id));
+
+  const cards = [
+    { label: 'Stock value', value: fmtMoney(kpi.value), sub: `${kpi.active.length} items across 3 stores`, Icon: IndianRupee, tone: 'text-primary', onClick: () => setTab('reports') },
+    { label: 'Needs reorder', value: String(kpi.reorder.length), sub: kpi.reorder.length ? `${kpi.reorder.length - toOrder.length} already ordered` : 'All items well stocked', Icon: AlertTriangle, tone: kpi.reorder.length ? 'text-destructive' : 'text-emerald-600', onClick: () => showFilter('reorder') },
+    { label: 'Expiring soon', value: String(kpi.expiring.length + kpi.expired.length), sub: 'Items to use within 15 days', Icon: CalendarClock, tone: kpi.expiring.length + kpi.expired.length ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600', onClick: () => showFilter('expiring') },
+    { label: 'Deliveries due', value: String(receivablePOs.length), sub: receivablePOs.length ? `${fmtMoney(pendingValue)} of approved orders` : 'Nothing awaiting delivery', Icon: Truck, tone: 'text-foreground', onClick: () => setTab('orders') },
+  ];
 
   return (
     <div className="inventory-premium space-y-6 max-w-[1500px] mx-auto animate-fade-in">
-      <div className="page-header-banner inventory-header">
+      <div className="page-header-banner inventory-header flex-wrap gap-4">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Package className="w-5 h-5 text-primary" /> Inventory & Material Central</h1>
-          <p className="text-sm text-muted-foreground mt-1">Manage pooja items, food stock, and see what needs to be ordered.</p>
+          <h1 className="text-2xl font-display font-bold text-foreground flex items-center gap-2"><Package className="w-5 h-5 text-primary" /> Inventory</h1>
+          <p className="text-sm text-muted-foreground mt-1">Track pooja materials, flowers and kitchen provisions. Receive deliveries, issue stock and reorder on time.</p>
         </div>
-        {activeSection === 'inventory' && <Button onClick={openAdd} className="inventory-cta shadow-md hover:shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground"><Plus className="h-4 w-4 mr-2" />Add New Item</Button>}
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => setReceive({})} className="inventory-cta"><ArrowDownLeft className="h-4 w-4 mr-1.5" />Receive stock</Button>
+          <Button variant="secondary" onClick={() => setIssue({})}><ArrowUpRight className="h-4 w-4 mr-1.5" />Issue stock</Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary">More <ChevronDown className="h-4 w-4 ml-1" /></Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-60">
+              <DropdownMenuItem onClick={() => setItemForm({ item: null })}><PackagePlus className="h-4 w-4 mr-2" />Add new item</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setReceive({ mode: 'DONATION' })}><Gift className="h-4 w-4 mr-2" />Record donated items</DropdownMenuItem>
+              <DropdownMenuItem disabled={!toOrder.length} onClick={orderLowItems}><ShoppingCart className="h-4 w-4 mr-2" />Order all low items{toOrder.length ? ` (${toOrder.length})` : ''}</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setTransfer({})}><ArrowLeftRight className="h-4 w-4 mr-2" />Move stock between stores</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setAdjust({ type: 'WASTAGE' })}><Trash2 className="h-4 w-4 mr-2" />Write off damaged / expired</DropdownMenuItem>
+              {canAdjust && <DropdownMenuItem onClick={() => setAdjust({ type: 'ADJUSTMENT' })}><Scale className="h-4 w-4 mr-2" />Correct a stock quantity</DropdownMenuItem>}
+              {isAdmin && <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem className="text-muted-foreground" onClick={() => setResetOpen(true)}><RotateCcw className="h-4 w-4 mr-2" />Reset sample data</DropdownMenuItem>
+              </>}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
 
-      <div className="inventory-tabbar rounded-xl border border-border bg-card shadow-sm p-1.5 flex w-full max-w-sm mx-auto md:mx-0">
-        {([
-          ['inventory', 'Inventory Ledger', Layers],
-          ['procurement', 'Procurement & Orders', Package],
-        ] as Array<['inventory' | 'procurement', string, React.ElementType]>).map(([key, label, Icon]) => (
-          <button
-            key={key}
-            onClick={() => setActiveSection(key)}
-            className={`inventory-tab-btn flex-1 flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm transition-all duration-300 font-bold ${activeSection === key ? 'bg-primary text-primary-foreground shadow-md scale-[1.02]' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 border border-transparent'}`}
-          >
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map(c => (
+          <button key={c.label} onClick={c.onClick} className="stat-card inventory-stat-card text-left flex flex-col gap-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+            <span className="flex items-center justify-between text-xs font-semibold text-muted-foreground">
+              {c.label} <c.Icon className={`h-4 w-4 ${c.tone}`} aria-hidden />
+            </span>
+            <span className={`text-2xl font-display font-bold tabular-nums ${c.tone}`}>{c.value}</span>
+            <span className="text-xs text-muted-foreground">{c.sub}</span>
+          </button>
+        ))}
+      </div>
+
+      {visibleAlerts.length > 0 && (
+        <div className="rounded-xl border border-border bg-card shadow-sm divide-y divide-border" role="region" aria-label="Needs attention">
+          {visibleAlerts.map(a => (
+            <div key={a.id} className="flex items-center gap-3 px-4 py-2.5">
+              <span className={`h-2 w-2 rounded-full shrink-0 ${a.tone === 'danger' ? 'bg-destructive' : 'bg-amber-500'}`} aria-hidden />
+              <p className="text-sm flex-1">{a.text}</p>
+              <Button size="sm" variant="outline" className="h-7 text-xs shrink-0" onClick={a.run}>{a.action}</Button>
+              <button className="text-muted-foreground hover:text-foreground shrink-0" onClick={() => setDismissed(prev => new Set(prev).add(a.id))} aria-label="Dismiss"><X className="h-4 w-4" /></button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="inventory-tabbar rounded-xl border border-border bg-card shadow-sm p-1.5 flex gap-1 overflow-x-auto" role="tablist">
+        {TABS.map(({ key, label, Icon }) => (
+          <button key={key} role="tab" aria-selected={tab === key} onClick={() => setTab(key)}
+            className={`inventory-tab-btn flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold whitespace-nowrap transition-all ${tab === key ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'}`}>
             <Icon className="w-4 h-4" /> {label}
           </button>
         ))}
       </div>
 
-      {activeSection === 'procurement' && <ProcurementPage />}
+      <div className="animate-slide-up">
+        {tab === 'stock' && (
+          <StockRegisterTab filter={filter} onFilter={setFilter} onOrder={onOrder} onOpen={setDetailId} onAction={handleAction}
+            onBulkPO={ids => setPoSuggestions(ids.map(itemId => ({ itemId })))} />
+        )}
+        {tab === 'orders' && <PurchaseOrdersTab onReceive={poId => setReceive({ mode: 'PO', poId })} onNewOrder={() => setPoSuggestions([])} />}
+        {tab === 'history' && <LedgerTab onOpenItem={setDetailId} />}
+        {tab === 'planning' && (
+          <PlanningTab onOrder={onOrder} onIssueTemplate={(templateId, count) => setIssue({ templateId, count })} onRaisePO={lines => setPoSuggestions(lines)} />
+        )}
+        {tab === 'check' && <StockCountTab />}
+        {tab === 'reports' && <ReportsTab onOpenItem={setDetailId} />}
+      </div>
 
-      {activeSection === 'inventory' && (
-        <div className="animate-slide-up space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative">
-              <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-muted/30 group-hover:scale-110 transition-transform" />
-              <p className="text-[11px] uppercase tracking-widest font-bold text-muted-foreground">Total Items</p>
-              <p className="text-3xl font-display font-bold mt-2 text-foreground relative z-10">{items.length}</p>
-            </div>
-            <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-secondary/20 bg-secondary/5">
-              <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-secondary/10 group-hover:scale-110 transition-transform" />
-              <p className="text-[11px] uppercase tracking-widest font-bold text-amber-500">Pooja Items</p>
-              <p className="text-3xl font-display font-bold mt-2 text-amber-500 relative z-10">{poojaMaterialsCount}</p>
-            </div>
-            <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-primary/20 bg-primary/5">
-              <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-primary/10 group-hover:scale-110 transition-transform" />
-              <p className="text-[11px] uppercase tracking-widest font-bold text-primary">Food Stock</p>
-              <p className="text-3xl font-display font-bold mt-2 text-primary relative z-10">{prasadamStockCount}</p>
-            </div>
-            <div className="stat-card inventory-stat-card flex flex-col justify-between group overflow-hidden relative border-destructive/20 bg-destructive/5">
-              <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-destructive/10 group-hover:scale-110 transition-transform" />
-              <p className="text-[11px] uppercase tracking-widest font-bold text-destructive flex items-center gap-1.5"><AlertTriangle className="w-3.5 h-3.5" /> Low Stock Warning</p>
-              <p className="text-3xl font-display font-bold mt-2 text-destructive relative z-10">{lowStockItems.length}</p>
-            </div>
-          </div>
-
-          {lowStockItems.length > 0 && (
-            <div className="inventory-alert rounded-xl border border-destructive/20 bg-destructive/5 p-5 flex items-start gap-4 shadow-sm animate-pulse-slow">
-              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0 border border-destructive/20">
-                <AlertTriangle className="w-6 h-6 text-destructive" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-destructive tracking-wide uppercase">Refill Needed Immediately</p>
-                <p className="text-sm text-foreground/80 mt-1 leading-relaxed">
-                  The following items are running very low and need to be ordered: <span className="font-bold bg-destructive/10 text-destructive px-1.5 rounded">{lowStockItems.map(i => i.name).join(', ')}</span>.
-                </p>
-              </div>
-            </div>
-          )}
-
-          <div className="section-panel inventory-main-panel shadow-sm">
-            <div className="section-panel-header gap-4 py-4 border-b border-border/60">
-              <h2 className="text-sm font-semibold flex items-center gap-2"><Layers className="w-4 h-4 text-primary" /> Main Stock List</h2>
-              <div className="flex items-center gap-3 w-full md:w-auto mt-2 md:mt-0 flex-wrap">
-                <div className="relative flex-1 min-w-[250px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search items, suppliers..."
-                    className="inventory-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background/60 text-sm transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 outline-none shadow-sm"
-                  />
-                </div>
-                <select
-                  value={categoryFilter}
-                  onChange={e => setCategoryFilter(e.target.value)}
-                  className="inventory-field h-10 rounded-lg border border-input bg-background/60 px-3 text-sm text-foreground transition-all focus:border-primary hover:border-border outline-none min-w-[140px] shadow-sm font-medium"
-                >
-                  {categories.map(c => <option key={c}>{c}</option>)}
-                </select>
-              </div>
-            </div>
-
-            <div className="table-container border-0 rounded-none shadow-none"><div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-muted/40">
-                  <tr className="border-b border-border">
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Item Name</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Category</th>
-                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Current Stock</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Unit</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Status</th>
-                    <th className="text-left p-4 font-medium text-muted-foreground whitespace-nowrap">Stock Level</th>
-                    <th className="text-right p-4 font-medium text-muted-foreground whitespace-nowrap">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-background">
-                  {filteredItems.map(i => {
-                    const pct = getStockPercent(i.quantity, i.name);
-                    const barColor = getProgressColor(pct);
-                    return (
-                      <tr key={i.id} className="inventory-row border-b border-border hover:bg-muted/30 transition-colors">
-                        <td className="p-4 font-bold text-foreground">
-                          <p>{i.name}</p>
-                          {i.supplier && <p className="text-[10px] text-muted-foreground font-medium mt-0.5" title="Primary Supplier">{i.supplier}</p>}
-                        </td>
-                        <td className="p-4">
-                          <span className="text-primary text-[11px] font-bold tracking-wider uppercase italic">{i.category}</span>
-                        </td>
-                        <td className="p-4 text-right font-display font-bold text-xl text-foreground tracking-tight">{i.quantity}</td>
-                        <td className="p-4 text-muted-foreground font-semibold"><Droplets className="w-3.5 h-3.5 inline mr-1 opacity-50" />{i.unit}</td>
-                        <td className="p-4">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-1.5 h-1.5 rounded-full ${i.stockStatus === 'In Stock' ? 'bg-primary' : 'bg-destructive'}`} />
-                            <span className="font-semibold text-xs text-foreground/80">{i.stockStatus}</span>
-                          </div>
-                        </td>
-                        <td className="p-4 min-w-[200px]">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-1 h-2.5 rounded-full bg-muted/60 border border-border/40 overflow-hidden shadow-inner flex items-center">
-                              <div
-                                className={`h-full rounded-full transition-all duration-[800ms] ease-bounce ${barColor}`}
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                            <span className="text-[11px] font-bold text-muted-foreground w-10 text-right">{pct}%</span>
-                          </div>
-                        </td>
-                        <td className="p-4 text-right whitespace-nowrap">
-                          <div className="flex gap-1.5 justify-end">
-                            <Button variant="ghost" size="icon" onClick={() => openEdit(i)} title="Modify Stock"><Pencil className="h-4 w-4" /></Button>
-                            <Button variant="ghost" size="icon" onClick={() => setDeleteId(i.id)} className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground" title="Delete Register"><Trash2 className="h-4 w-4" /></Button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                  {filteredItems.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="p-12 text-center text-sm font-medium text-muted-foreground border-b border-border">No items found in stock list.</td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div></div>
-          </div>
-
-          <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editId ? 'Edit Item Details' : 'Add New Item'}>
-            <div className="inventory-form-shell space-y-5 px-1 py-2">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField label="Item Name" value={form.name} onChange={v => set('name', v)} required placeholder="E.g., Turmeric Powder" />
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Category</label>
-                  <input value={form.category} onChange={e => set('category', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-background/80 hover:border-border px-3 text-sm text-foreground transition-all focus:ring-2 focus:ring-primary/20 outline-none shadow-sm font-medium" placeholder="E.g., Pooja Items" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Quantity</label>
-                  <input type="number" value={String(form.quantity)} onChange={e => set('quantity', e.target.value)} className="w-full h-11 rounded-lg border border-input bg-card hover:border-primary/50 px-3 text-lg transition-all focus:border-primary font-display font-bold outline-none focus:ring-2 focus:ring-primary/10 shadow-sm" />
-                </div>
-                <FormField label="Unit (kg/ltr/pkt)" value={form.unit} onChange={v => set('unit', v)} placeholder="e.g. Kg, Ltr, Pkt" />
-              </div>
-              <FormField label="Supplier Name" value={form.supplier} onChange={v => set('supplier', v)} placeholder="Where do we buy this from?" />
-
-              <div className="flex gap-3 pt-5 border-t border-border/60">
-                <Button variant="outline" onClick={() => setModalOpen(false)} className="flex-1 py-5">Cancel</Button>
-                <Button onClick={handleSave} className="flex-1 py-5 shadow-md bg-primary hover:bg-primary/90 text-primary-foreground">Save Item</Button>
-              </div>
-            </div>
-          </Modal>
-          <ConfirmDialog open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={() => deleteId && remove(deleteId)} title="Delete Item" message="Are you sure you want to delete this item from the stock list? This cannot be undone." />
-        </div>
-      )}
+      <ItemDetailSheet itemId={detailId} onClose={() => setDetailId(null)} onOrder={onOrder}
+        onAction={(a, id, extra) => { setDetailId(null); handleAction(a, id, extra); }} />
+      <ReceiveModal open={!!receive} onClose={() => setReceive(null)} preset={receive ?? undefined} />
+      <IssueModal open={!!issue} onClose={() => setIssue(null)} preset={issue ?? undefined} />
+      <TransferModal open={!!transfer} onClose={() => setTransfer(null)} preset={transfer ?? undefined} />
+      <AdjustModal open={!!adjust} onClose={() => setAdjust(null)} preset={adjust ?? undefined} />
+      <ItemFormModal open={!!itemForm} onClose={() => setItemForm(null)} item={itemForm?.item ?? null} items={state.items} />
+      <CreatePOModal open={!!poSuggestions} onClose={() => setPoSuggestions(null)} suggestions={poSuggestions ?? []} onOrder={onOrder}
+        onCreated={() => setTab('orders')} />
+      <ConfirmDialog open={resetOpen} onClose={() => setResetOpen(false)} title="Reset sample data" confirmLabel="Reset"
+        message="This replaces all items, stock history, stock checks and templates with fresh sample data. Purchase orders are kept."
+        onConfirm={() => { actions.resetDemoData(); toast.success('Sample data restored'); }} />
     </div>
   );
 };

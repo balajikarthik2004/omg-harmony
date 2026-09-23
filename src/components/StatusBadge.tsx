@@ -23,6 +23,11 @@ const statusConfig: Record<string, { bg: string; text: string; hover: string; do
   'Fair': { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-400', hover: 'hover:bg-amber-100 dark:hover:bg-amber-950/60', dot: 'bg-amber-500' },
   'Up to Date': { bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-400', hover: 'hover:bg-emerald-100 dark:hover:bg-emerald-950/60', dot: 'bg-emerald-500' },
   'Due Soon': { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-400', hover: 'hover:bg-amber-100 dark:hover:bg-amber-950/60', dot: 'bg-amber-500' },
+  'Approved': { bg: 'bg-emerald-50 dark:bg-emerald-950/40', text: 'text-emerald-700 dark:text-emerald-400', hover: 'hover:bg-emerald-100 dark:hover:bg-emerald-950/60', dot: 'bg-emerald-500' },
+  'Rejected': { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', hover: 'hover:bg-red-100 dark:hover:bg-red-950/60', dot: 'bg-red-500' },
+  'Received': { bg: 'bg-blue-50 dark:bg-blue-950/40', text: 'text-blue-700 dark:text-blue-400', hover: 'hover:bg-blue-100 dark:hover:bg-blue-950/60', dot: 'bg-blue-500' },
+  'Partially Received': { bg: 'bg-sky-50 dark:bg-sky-950/40', text: 'text-sky-700 dark:text-sky-400', hover: 'hover:bg-sky-100 dark:hover:bg-sky-950/60', dot: 'bg-sky-500' },
+  'Submitted': { bg: 'bg-amber-50 dark:bg-amber-950/40', text: 'text-amber-700 dark:text-amber-400', hover: 'hover:bg-amber-100 dark:hover:bg-amber-950/60', dot: 'bg-amber-500' },
   'Overdue': { bg: 'bg-red-50 dark:bg-red-950/40', text: 'text-red-700 dark:text-red-400', hover: 'hover:bg-red-100 dark:hover:bg-red-950/60', dot: 'bg-red-500' },
 };
 

@@ -8,9 +8,10 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   title: string;
   message: string;
+  confirmLabel?: string;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, onClose, onConfirm, title, message }) => {
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, onClose, onConfirm, title, message, confirmLabel = 'Delete' }) => {
   if (!open) return null;
 
   return (
@@ -25,7 +26,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ open, onClose, onConfirm,
         </div>
         <div className="flex gap-3 px-6 pb-6 justify-end">
           <Button variant="outline" onClick={onClose} className="flex-1">Cancel</Button>
-          <Button variant="destructive" onClick={() => { onConfirm(); onClose(); }} className="flex-1">Delete</Button>
+          <Button variant="destructive" onClick={() => { onConfirm(); onClose(); }} className="flex-1">{confirmLabel}</Button>
         </div>
       </div>
     </div>

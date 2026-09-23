@@ -1,6 +1,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface ModalProps {
   open: boolean;
@@ -17,7 +18,7 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, container
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className={`bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto border border-border/50 ${containerClassName}`}
+        className={cn('bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto border border-border/50', containerClassName)}
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-6 border-b border-border/70 bg-card">

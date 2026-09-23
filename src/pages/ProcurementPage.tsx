@@ -1,99 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, Pencil, Trash2, Search, Eye, CheckCircle, XCircle, FileClock, IndianRupee, Truck, Calendar, DollarSign, PackageOpen, LayoutGrid, AlertCircle, BrainCircuit, ShieldCheck, Mail, Send } from 'lucide-react';
-import { useStore } from '@/hooks/useStore';
+import { useProcurementStore, type ProcurementRecord } from '@/hooks/useProcurementStore';
 import Modal from '@/components/Modal';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import FormField from '@/components/FormField';
 import StatusBadge from '@/components/StatusBadge';
 
-// Mock data based on the image
-const mockProcurements = [
-  { 
-    id: '1', 
-    poNumber: 'PO-1042', 
-    vendor: 'Sri Pooja Supplies', 
-    amount: 45000, 
-    date: 'Feb 20, 2026', 
-    status: 'Approved',
-    items: [
-      { name: 'Incense Sticks', quantity: 50, price: 500 },
-      { name: 'Camphor', quantity: 20, price: 800 }
-    ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: 'admin1',
-    approvedByName: 'Admin User',
-    approvedDate: 'Feb 21, 2026',
-    rejectedBy: null,
-    rejectedDate: null,
-    rejectionReason: ''
-  },
-  { 
-    id: '2', 
-    poNumber: 'PO-1043', 
-    vendor: 'Kitchen World', 
-    amount: 120000, 
-    date: 'Feb 22, 2026', 
-    status: 'Pending',
-    items: [
-      { name: 'Rice (50kg)', quantity: 10, price: 5000 },
-      { name: 'Toor Dal (10kg)', quantity: 5, price: 3000 },
-      { name: 'Cooking Oil (15L)', quantity: 2, price: 4000 }
-    ],
-    submittedBy: 'manager2',
-    submittedByName: 'Suresh Yadav',
-    approvedBy: null,
-    approvedByName: null,
-    approvedDate: null,
-    rejectedBy: null,
-    rejectedDate: null,
-    rejectionReason: ''
-  },
-  { 
-    id: '3', 
-    poNumber: 'PO-1041', 
-    vendor: 'Electrical Corp', 
-    amount: 88000, 
-    date: 'Feb 18, 2026', 
-    status: 'Rejected',
-    items: [
-      { name: 'LED Lights - 20W', quantity: 20, price: 40000 },
-      { name: 'Copper Wires (100m)', quantity: 5, price: 8000 },
-      { name: 'Switches', quantity: 15, price: 3000 }
-    ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: null,
-    approvedByName: null,
-    approvedDate: null,
-    rejectedBy: 'admin1',
-    rejectedByName: 'Admin User',
-    rejectedDate: 'Feb 19, 2026',
-    rejectionReason: 'Budget constraints, please reduce quantity'
-  },
-  { 
-    id: '4', 
-    poNumber: 'PO-1044', 
-    vendor: 'Flower Mandapam', 
-    amount: 35000, 
-    date: 'Feb 23, 2026', 
-    status: 'Pending',
-    items: [
-      { name: 'Fresh Roses', quantity: 100, price: 5000 },
-      { name: 'Marigold', quantity: 200, price: 8000 },
-      { name: 'Jasmine', quantity: 50, price: 4000 }
-    ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: null,
-    approvedByName: null,
-    approvedDate: null,
-    rejectedBy: null,
-    rejectedDate: null,
-    rejectionReason: ''
-  },
-];
 
 // Mock current user (this would come from your auth context)
 const currentUser = {
@@ -187,12 +100,11 @@ const defaultVendors: AgentVendor[] = [
   { vendor_id: 'V-104', vendor_name: 'Legacy Traders', unit_price: 2800, delivery_eta_days: 6, reliability_score: 60, emergency_support: false, contract_status: 'Blacklisted' },
 ];
 
-type ProcurementRecord = typeof mockProcurements[number];
 type BannerTone = 'success' | 'info';
 type BannerMessage = { id: number; tone: BannerTone; title: string; detail: string };
 
 const ProcurementPage: React.FC = () => {
-  const { items, add, update, remove } = useStore(mockProcurements);
+  const { items, add, update, remove } = useProcurementStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -400,7 +312,7 @@ const ProcurementPage: React.FC = () => {
     setModalOpen(true); 
   };
 
-  const openEdit = (item: typeof mockProcurements[0]) => {
+  const openEdit = (item: ProcurementRecord) => {
     setForm({
       poNumber: item.poNumber,
       vendor: item.vendor,
@@ -419,7 +331,7 @@ const ProcurementPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const openView = (item: typeof mockProcurements[0]) => {
+  const openView = (item: ProcurementRecord) => {
     setForm({
       poNumber: item.poNumber,
       vendor: item.vendor,
@@ -748,7 +660,8 @@ const ProcurementPage: React.FC = () => {
                <option value="pending">Pending Auth</option>
                <option value="approved">Approved</option>
                <option value="rejected">Rejected</option>
-               <option value="delivered">Delivered</option>
+               <option value="partially received">Partially Received</option>
+               <option value="received">Received</option>
              </select>
              <Button onClick={openAdd} className="shadow-md hover:shadow-lg w-full sm:w-auto"><Plus className="h-4 w-4 mr-2" />New Request</Button>
           </div>

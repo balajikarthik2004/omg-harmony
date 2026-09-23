@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Heart, CalendarDays, Users, TrendingUp, CalendarCheck,
   LayoutDashboard, Search, Activity, Package, AlertTriangle, PieChart as PieChartIcon
@@ -10,10 +10,11 @@ import {
 
 import {
   donationTrendData, donationCategoryData, serviceBookingData,
-  inventoryUsageData, mockBookings, mockDevotees, mockDonations, mockEvents,
+  mockBookings, mockDevotees, mockDonations, mockEvents,
   mockInventory, mockLedgerEntries
 } from '@/data/mockData';
 import { getLedgerTotals, formatRupees } from '@/lib/finance';
+import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { formatDateDDMMYYYY, toISODate } from '@/lib/utils';
 
 // Every figure below is derived from the registers. These were hard-coded and
@@ -74,6 +75,14 @@ const sectionIconClassName = 'w-4 h-4 text-foreground/85';
 
 
 const DashboardPage: React.FC = () => {
+  // Live from the inventory ledger: the eight most-used items over the last 30 days.
+  const { state: inventory, summaries } = useInventoryStore();
+  const inventoryUsage = useMemo(() => inventory.items
+    .filter(i => i.active && summaries[i.id].used30 > 0)
+    .sort((a, b) => summaries[b.id].used30 * summaries[b.id].avgCost - summaries[a.id].used30 * summaries[a.id].avgCost)
+    .slice(0, 8)
+    .map(i => ({ item: i.name, used: Math.round(summaries[i.id].used30 * 10) / 10, remaining: Math.round(summaries[i.id].onHand * 10) / 10 })),
+  [inventory.items, summaries]);
   const donationCategoryPalette = [
     dashboardColors.chartAccentA,
     dashboardColors.chartAccentB,
@@ -207,7 +216,7 @@ const DashboardPage: React.FC = () => {
           </div>
           <div className="p-5">
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={inventoryUsageData} barGap={4}>
+              <BarChart data={inventoryUsage} barGap={4}>
                 <CartesianGrid strokeDasharray="3 3" stroke={dashboardColors.lineGrid} vertical={false} />
                 <XAxis dataKey="item" fontSize={11} tickLine={false} axisLine={false} dy={10} />
                 <YAxis fontSize={11} tickLine={false} axisLine={false} dx={-10} />
