@@ -6,6 +6,7 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { ISSUE_PURPOSES, STORES, SevaTemplate, StoreId, WHOLE_UNITS, addDays, daysBetween, fmtMoney, fmtQty, round3, storeName } from '@/lib/inventory';
+import { toISODate } from '@/lib/utils';
 import { ErrorNote, Field, ItemSelect, inputCls, parseNum, selectCls, tdCls, thCls, useInventoryRole } from './shared';
 import { DatePicker } from '@/components/ui/date-picker';
 import { ThemeSelect } from '@/components/ui/theme-select';
