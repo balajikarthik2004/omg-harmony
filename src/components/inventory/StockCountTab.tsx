@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { STORES, StockCount, StoreId, fmtDateTime, fmtMoney, fmtQty, printDocument, round3, storeName } from '@/lib/inventory';
 import { EmptyRow, Field, inputCls, selectCls, tdCls, thCls, useInventoryRole } from './shared';
+import { ThemeSelect } from '@/components/ui/theme-select';
 
 const StockCountTab: React.FC = () => {
   const { state, summaries, actions } = useInventoryStore();
@@ -156,9 +157,7 @@ const StockCountTab: React.FC = () => {
       <Modal open={newOpen} onClose={() => setNewOpen(false)} title="Start a Stock Check">
         <div className="inventory-form-shell space-y-4">
           <Field label="Which store?" required>
-            <select className={selectCls} value={newStore} onChange={e => setNewStore(e.target.value as StoreId)}>
-              {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <ThemeSelect value={newStore} onChange={v => setNewStore(v as StoreId)} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
           </Field>
           <Field label="Notes"><input className={inputCls} value={newNotes} onChange={e => setNewNotes(e.target.value)} placeholder="e.g. Monthly check" /></Field>
           <p className="text-xs text-muted-foreground">Print the count sheet, count what is on the shelves, then enter the numbers here. Differences are corrected once an admin approves.</p>

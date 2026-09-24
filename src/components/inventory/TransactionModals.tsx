@@ -11,6 +11,9 @@ import {
 } from '@/lib/inventory';
 import { toISODate } from '@/lib/utils';
 import { ErrorNote, Field, ItemSelect, inputCls, parseNum, selectCls, useInventoryRole } from './shared';
+import { DatePicker } from '@/components/ui/date-picker';
+import { ThemeSelect } from '@/components/ui/theme-select';
+import { triggerStockNotification } from './StockNotificationToast';
 
 const newKey = () => Math.random().toString(36).slice(2);
 
@@ -131,7 +134,22 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
         lines: valid.map(l => ({ itemId: l.itemId, qty: parseNum(l.qty), unitCost: parseNum(l.unitCost), batchNo: l.batchNo, expiryDate: l.expiryDate || null })),
       });
       if (po) updatePOStatus(po, valid);
-      toast.success(mode === 'DONATION' ? 'Donation recorded' : 'Stock received', { description: `${valid.length} item(s) added to ${storeName(store)} · ${fmtMoney(total)} · Ref ${refNo}` });
+      triggerStockNotification({
+        poNumber: po?.poNumber,
+        refNo,
+        storeName: storeName(store),
+        party: party.trim(),
+        totalValue: total,
+        items: valid.map(l => {
+          const itm = state.items.find(i => i.id === l.itemId);
+          return {
+            name: itm?.name || 'Item',
+            qty: parseNum(l.qty),
+            unit: itm?.unit,
+          };
+        }),
+        duration: 5500,
+      });
       onClose();
     } catch (e) {
       setError((e as Error).message);
@@ -167,21 +185,20 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
 
         {mode === 'PO' && (
           <Field label="Which order?" required>
-            <select className={selectCls} value={poId} onChange={e => loadPO(e.target.value)}>
-              <option value="">{receivablePOs.length ? 'Select an order' : 'No orders are waiting for delivery'}</option>
-              {receivablePOs.map(p => <option key={p.id} value={p.id}>{p.poNumber} · {p.vendor} · {fmtMoney(p.amount)} · {p.status}</option>)}
-            </select>
+            <ThemeSelect
+              value={poId}
+              onChange={loadPO}
+              options={[{ value: '', label: receivablePOs.length ? 'Select an order' : 'No orders are waiting for delivery' }, ...receivablePOs.map(p => ({ value: p.id, label: `${p.poNumber} · ${p.vendor} · ${fmtMoney(p.amount)} · ${p.status}` }))]}
+            />
           </Field>
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
           <Field label="Store" required>
-            <select className={selectCls} value={store} onChange={e => setStore(e.target.value as StoreId)}>
-              {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <ThemeSelect value={store} onChange={v => setStore(v as StoreId)} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
           </Field>
           <Field label="Date" required>
-            <input type="date" className={inputCls} value={date} max={toISODate(new Date())} onChange={e => setDate(e.target.value)} />
+            <DatePicker value={date} maxDate={new Date()} onChange={setDate} />
           </Field>
           {mode === 'DONATION' ? (
             <>
@@ -226,7 +243,7 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
                       {mode === 'PO' && <td className="px-3 py-2 text-right tabular-nums text-muted-foreground whitespace-nowrap">{fmtQty(Math.max(0, (l.ordered ?? 0) - (l.received ?? 0)))} / {fmtQty(l.ordered ?? 0)}</td>}
                       <td className="px-3 py-2"><input type="number" min={0} step={item && WHOLE_UNITS.has(item.unit) ? 1 : 'any'} className={`${inputCls} text-right`} value={l.qty} onChange={e => updateLine(l.key, { qty: e.target.value })} aria-label="Quantity" /></td>
                       <td className="px-3 py-2"><input type="number" min={0} step="any" className={`${inputCls} text-right`} value={l.unitCost} onChange={e => updateLine(l.key, { unitCost: e.target.value })} aria-label="Rate" /></td>
-                      {showExpiry && <td className="px-3 py-2">{item?.perishable ? <input type="date" className={inputCls} value={l.expiryDate} onChange={e => updateLine(l.key, { expiryDate: e.target.value })} aria-label="Expiry" /> : <span className="text-xs text-muted-foreground">Not needed</span>}</td>}
+                      {showExpiry && <td className="px-3 py-2">{item?.perishable ? <DatePicker value={l.expiryDate} onChange={val => updateLine(l.key, { expiryDate: val })} placeholder="Expiry date" /> : <span className="text-xs text-muted-foreground">Not needed</span>}</td>}
                       <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{fmtMoney(parseNum(l.qty) * parseNum(l.unitCost))}</td>
                       <td className="px-2 py-2">
                         {mode !== 'PO' && lines.length > 1 && (
@@ -329,10 +346,11 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
         <ErrorNote message={error} />
         <div className="rounded-xl border border-dashed border-border p-3 grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3 bg-muted/20">
           <Field label="Use a seva template (optional)" hint="Fills in the materials needed automatically.">
-            <select className={selectCls} value={templateId} onChange={e => e.target.value ? applyTemplate(e.target.value, parseNum(count) || 1) : setTemplateId('')}>
-              <option value="">No template - choose items myself</option>
-              {state.templates.map(t => <option key={t.id} value={t.id}>{t.name} (per {t.basisQty} {t.basisLabel})</option>)}
-            </select>
+            <ThemeSelect
+              value={templateId}
+              onChange={val => val ? applyTemplate(val, parseNum(count) || 1) : setTemplateId('')}
+              options={[{ value: '', label: 'No template - choose items myself' }, ...state.templates.map(t => ({ value: t.id, label: `${t.name} (per ${t.basisQty} ${t.basisLabel})` }))]}
+            />
           </Field>
           <Field label={template ? `How many ${template.basisLabel}?` : 'How many?'}>
             <input type="number" min={1} className={inputCls} value={count} disabled={!template}
@@ -341,14 +359,10 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <Field label="From store" required>
-            <select className={selectCls} value={store} onChange={e => setStore(e.target.value as StoreId)}>
-              {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <ThemeSelect value={store} onChange={v => setStore(v as StoreId)} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
           </Field>
           <Field label="Purpose" required>
-            <select className={selectCls} value={purpose} onChange={e => setPurpose(e.target.value)}>
-              {ISSUE_PURPOSES.map(p => <option key={p}>{p}</option>)}
-            </select>
+            <ThemeSelect value={purpose} onChange={setPurpose} options={ISSUE_PURPOSES.map(p => ({ value: p, label: p }))} />
           </Field>
           <Field label="Issued to" required>
             <input className={inputCls} list="inv-issued-to" value={party} onChange={e => setParty(e.target.value)} placeholder="Department / person" />
@@ -443,14 +457,10 @@ export const TransferModal: React.FC<{ open: boolean; onClose: () => void; prese
         <ErrorNote message={error} />
         <div className="grid grid-cols-2 gap-3">
           <Field label="From store" required>
-            <select className={selectCls} value={from} onChange={e => setFrom(e.target.value as StoreId)}>
-              {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <ThemeSelect value={from} onChange={v => setFrom(v as StoreId)} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
           </Field>
           <Field label="To store" required>
-            <select className={selectCls} value={to} onChange={e => setTo(e.target.value as StoreId)}>
-              {STORES.filter(s => s.id !== from).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <ThemeSelect value={to} onChange={v => setTo(v as StoreId)} options={STORES.filter(s => s.id !== from).map(s => ({ value: s.id, label: s.name }))} />
           </Field>
         </div>
         <div className="rounded-xl border border-border overflow-hidden">
@@ -567,9 +577,7 @@ export const AdjustModal: React.FC<{ open: boolean; onClose: () => void; preset?
             <ItemSelect items={state.items.filter(i => i.active)} summaries={summaries} store={store} value={itemId} onChange={id => { setItemId(id); setBatchNo(''); }} />
           </Field>
           <Field label="Store" required>
-            <select className={selectCls} value={store} onChange={e => { setStore(e.target.value as StoreId); setBatchNo(''); }}>
-              {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-            </select>
+            <ThemeSelect value={store} onChange={v => { setStore(v as StoreId); setBatchNo(''); }} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
           </Field>
         </div>
         <div className="rounded-lg bg-muted/40 border border-border px-3 py-2 text-sm flex justify-between">
@@ -588,10 +596,11 @@ export const AdjustModal: React.FC<{ open: boolean; onClose: () => void; preset?
         ) : (
           <div className="grid grid-cols-2 gap-3">
             <Field label="Which stock?">
-              <select className={selectCls} value={batchNo} onChange={e => { setBatchNo(e.target.value); const b = batches.find(x => x.batchNo === e.target.value); if (b) setWasteQty(String(b.qty)); }}>
-                <option value="">Oldest expiry first</option>
-                {batches.map(b => <option key={b.batchNo} value={b.batchNo}>{b.batchNo} · {fmtQty(b.qty)} {item?.unit}{b.expiryDate ? ` · exp ${fmtDate(b.expiryDate)}` : ''}</option>)}
-              </select>
+              <ThemeSelect
+                value={batchNo}
+                onChange={v => { setBatchNo(v); const b = batches.find(x => x.batchNo === v); if (b) setWasteQty(String(b.qty)); }}
+                options={[{ value: '', label: 'Oldest expiry first' }, ...batches.map(b => ({ value: b.batchNo, label: `${b.batchNo} · ${fmtQty(b.qty)} ${item?.unit}${b.expiryDate ? ` · exp ${fmtDate(b.expiryDate)}` : ''}` }))]}
+              />
             </Field>
             <Field label="Quantity to write off" required>
               <input type="number" min={0} step="any" className={inputCls} value={wasteQty} onChange={e => setWasteQty(e.target.value)} />
@@ -599,9 +608,7 @@ export const AdjustModal: React.FC<{ open: boolean; onClose: () => void; preset?
           </div>
         )}
         <Field label="Reason" required>
-          <select className={selectCls} value={reason} onChange={e => setReason(e.target.value)}>
-            {(type === 'WASTAGE' ? WASTAGE_REASONS : ADJUST_REASONS).map(r => <option key={r}>{r}</option>)}
-          </select>
+          <ThemeSelect value={reason} onChange={setReason} options={(type === 'WASTAGE' ? WASTAGE_REASONS : ADJUST_REASONS).map(r => ({ value: r, label: r }))} />
         </Field>
         <Field label={type === 'ADJUSTMENT' ? 'Why is it different?' : 'Notes (optional)'}>
           <textarea className={`${inputCls} h-20 py-2 resize-none`} value={notes} onChange={e => setNotes(e.target.value)} placeholder={type === 'ADJUSTMENT' ? 'Required for the audit record' : 'e.g. rats damaged 2 packets'} />

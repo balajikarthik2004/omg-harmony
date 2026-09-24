@@ -9,6 +9,7 @@ import { formatPODate, nextPONumber, procurementActions, useProcurementStore } f
 import { addDays, fmtMoney, fmtQty, suggestedOrderQty } from '@/lib/inventory';
 import { toISODate } from '@/lib/utils';
 import { ErrorNote, Field, ItemSelect, inputCls, parseNum, useInventoryRole } from './shared';
+import { DatePicker } from '@/components/ui/date-picker';
 
 export interface POSuggestion { itemId: string; qty?: number }
 
@@ -144,7 +145,7 @@ const CreatePOModal: React.FC<{
           <ItemSelect items={state.items.filter(i => i.active && !lines.some(l => l.itemId === i.id))} summaries={summaries} value="" onChange={addItem} placeholder="+ Add an item to this order" />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-          <Field label="Expected delivery"><input type="date" className={inputCls} value={expected} onChange={e => setExpected(e.target.value)} /></Field>
+          <Field label="Expected delivery"><DatePicker value={expected} onChange={setExpected} /></Field>
           <Field label="Notes to supplier" className="sm:col-span-2"><input className={inputCls} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Delivery to temple stores, 6 AM - 10 AM" /></Field>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-muted/40 border border-border px-4 py-3">

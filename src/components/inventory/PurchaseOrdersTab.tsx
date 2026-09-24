@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ChevronDown, ChevronRight, ExternalLink, PackageCheck, Plus } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ChevronDown, ChevronRight, Edit3, ExternalLink, PackageCheck, Plus } from 'lucide-react';
 import StatusBadge from '@/components/StatusBadge';
 import { Button } from '@/components/ui/button';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
@@ -18,7 +19,11 @@ const FILTERS = [
   { key: 'all', label: 'All', statuses: [] as string[] },
 ];
 
-const PurchaseOrdersTab: React.FC<{ onReceive: (poId: string) => void; onNewOrder: () => void }> = ({ onReceive, onNewOrder }) => {
+const PurchaseOrdersTab: React.FC<{
+  onReceive: (poId: string) => void;
+  onCustomReceive?: (poId: string) => void;
+  onNewOrder: () => void;
+}> = ({ onReceive, onCustomReceive, onNewOrder }) => {
   const { state } = useInventoryStore();
   const { items: pos } = useProcurementStore();
   const { isAdmin, userName } = useInventoryRole();
@@ -90,7 +95,31 @@ const PurchaseOrdersTab: React.FC<{ onReceive: (poId: string) => void; onNewOrde
                     <td className={tdCls}><StatusBadge status={po.status} /></td>
                     <td className={cn(tdCls, 'text-right whitespace-nowrap')} onClick={e => e.stopPropagation()}>
                       {RECEIVABLE_PO_STATUSES.includes(po.status) && (
-                        <Button size="sm" variant="outline" onClick={() => onReceive(po.id)}><PackageCheck className="h-4 w-4 mr-1.5" />Receive</Button>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 gap-1.5 font-medium border-primary/30 text-primary hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all shadow-xs"
+                            onClick={() => onReceive(po.id)}
+                          >
+                            <PackageCheck className="h-4 w-4" />
+                            Receive
+                          </Button>
+                          {onCustomReceive && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button size="sm" variant="ghost" className="h-8 w-7 p-0 text-muted-foreground hover:text-foreground">
+                                  <ChevronDown className="h-3.5 w-3.5" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuItem onClick={() => onCustomReceive(po.id)}>
+                                  <Edit3 className="h-4 w-4 mr-2" /> Custom / Partial Receive...
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </div>
                       )}
                       {po.status === 'Pending' && isAdmin && (
                         <div className="flex justify-end gap-1.5">

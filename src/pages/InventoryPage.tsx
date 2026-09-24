@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
-import { OPEN_PO_STATUSES, RECEIVABLE_PO_STATUSES, useProcurementStore } from '@/hooks/useProcurementStore';
-import { InventoryItem, StoreId, fmtMoney, matchPOLineItem, needsReorder, receivedAgainstPO, round3 } from '@/lib/inventory';
+import { OPEN_PO_STATUSES, RECEIVABLE_PO_STATUSES, formatPODate, procurementActions, useProcurementStore } from '@/hooks/useProcurementStore';
+import { InventoryItem, StoreId, fmtMoney, fmtQty, matchPOLineItem, needsReorder, receivedAgainstPO, round3 } from '@/lib/inventory';
 import { toISODate } from '@/lib/utils';
 import { useInventoryRole } from '@/components/inventory/shared';
 import StockRegisterTab, { RegisterFilter } from '@/components/inventory/StockRegisterTab';
@@ -23,6 +23,7 @@ import ReportsTab from '@/components/inventory/ReportsTab';
 import ItemDetailSheet, { ItemAction } from '@/components/inventory/ItemDetailSheet';
 import ItemFormModal from '@/components/inventory/ItemFormModal';
 import CreatePOModal, { POSuggestion } from '@/components/inventory/CreatePOModal';
+import { triggerStockNotification } from '@/components/inventory/StockNotificationToast';
 import { AdjustModal, IssueModal, ReceiveModal, TransferModal } from '@/components/inventory/TransactionModals';
 
 type Tab = 'stock' | 'orders' | 'history' | 'planning' | 'check' | 'reports';
@@ -46,7 +47,7 @@ const listNames = (items: InventoryItem[], max = 3) =>
 const InventoryPage: React.FC = () => {
   const { state, summaries, actions } = useInventoryStore();
   const { items: pos } = useProcurementStore();
-  const { isAdmin, canAdjust } = useInventoryRole();
+  const { isAdmin, canAdjust, userName } = useInventoryRole();
 
   const [tab, setTab] = useState<Tab>('stock');
   const [filter, setFilter] = useState<RegisterFilter>('all');
@@ -108,6 +109,128 @@ const InventoryPage: React.FC = () => {
     }
   };
 
+  const handleDirectReceivePO = (poId: string) => {
+    const po = pos.find(p => p.id === poId);
+    if (!po) {
+      toast.error('Purchase order not found');
+      return;
+    }
+
+    try {
+      const received = receivedAgainstPO(state, po.id);
+      const itemsToReceive: { itemId: string; name: string; qty: number; unitCost: number; store: StoreId; unit?: string }[] = [];
+
+      let currentItems = [...state.items];
+
+      for (const line of po.items) {
+        let itemId = matchPOLineItem(currentItems, line);
+        let item = currentItems.find(i => i.id === itemId);
+
+        if (!item) {
+          const guessCategory = (name: string) => {
+            const n = name.toLowerCase();
+            if (n.includes('flower') || n.includes('rose') || n.includes('marigold') || n.includes('jasmine') || n.includes('garland')) return 'Flowers & Garlands';
+            if (n.includes('rice') || n.includes('dal') || n.includes('oil') || n.includes('sugar') || n.includes('ghee') || n.includes('kitchen') || n.includes('provisions')) return 'Kitchen & Prasadam';
+            if (n.includes('milk') || n.includes('curd') || n.includes('honey') || n.includes('panchamrit') || n.includes('abhishekam')) return 'Abhishekam';
+            if (n.includes('lamp') || n.includes('wick') || n.includes('deepam')) return 'Lamps & Oil';
+            if (n.includes('clean') || n.includes('soap') || n.includes('light') || n.includes('wire') || n.includes('switch') || n.includes('maintenance')) return 'Cleaning & Maintenance';
+            return 'Pooja Items';
+          };
+
+          item = actions.addItem({
+            name: line.name,
+            localName: '',
+            category: guessCategory(line.name),
+            unit: line.unit || 'pkt',
+            minStock: 5,
+            reorderLevel: 10,
+            maxStock: Math.max(50, line.quantity * 2),
+            unitCost: line.price,
+            defaultStore: 'MAIN',
+            supplier: po.vendor,
+            leadTimeDays: 3,
+            perishable: false,
+            shelfLifeDays: null,
+            notes: `Auto-created from ${po.poNumber}`,
+          });
+          itemId = item.id;
+          currentItems = [...currentItems, item];
+        }
+
+        const done = itemId ? received[itemId] ?? 0 : 0;
+        const due = Math.max(0, round3(line.quantity - done));
+        const qtyToTake = due > 0 ? due : line.quantity;
+
+        if (qtyToTake > 0) {
+          itemsToReceive.push({
+            itemId: item.id,
+            name: item.name,
+            qty: qtyToTake,
+            unitCost: line.price,
+            store: item.defaultStore || 'MAIN',
+            unit: item.unit,
+          });
+        }
+      }
+
+      if (!itemsToReceive.length) {
+        toast.info(`All items for ${po.poNumber} are already marked as received.`);
+        return;
+      }
+
+      // Group by store and execute receive movements
+      const byStore = new Map<StoreId, typeof itemsToReceive>();
+      itemsToReceive.forEach(it => {
+        const list = byStore.get(it.store) ?? [];
+        list.push(it);
+        byStore.set(it.store, list);
+      });
+
+      byStore.forEach((lines, store) => {
+        actions.receive({
+          type: 'RECEIPT',
+          store,
+          party: po.vendor,
+          poId: po.id,
+          poNumber: po.poNumber,
+          user: userName || 'Admin User',
+          notes: `Goods received against ${po.poNumber}`,
+          lines: lines.map(l => ({
+            itemId: l.itemId,
+            qty: l.qty,
+            unitCost: l.unitCost,
+          })),
+        });
+      });
+
+      // Update PO status to Received
+      procurementActions.update(po.id, {
+        status: 'Received',
+        receivedDate: formatPODate(),
+        items: po.items.map(l => ({
+          ...l,
+          itemId: l.itemId ?? (matchPOLineItem(state.items, l) || undefined),
+        })),
+      });
+
+      // Show notification in top right corner with green highlight and progress bar
+      triggerStockNotification({
+        poNumber: po.poNumber,
+        party: po.vendor,
+        totalValue: po.amount,
+        items: itemsToReceive.map(i => ({
+          name: i.name,
+          qty: i.qty,
+          unit: i.unit,
+        })),
+        onViewStock: () => setTab('stock'),
+        duration: 5500,
+      });
+    } catch (err) {
+      toast.error('Failed to receive stock', { description: (err as Error).message });
+    }
+  };
+
   type Alert = { id: string; tone: 'danger' | 'warn'; text: string; action: string; run: () => void };
   const alerts: Alert[] = [];
   const urgentToOrder = kpi.urgent.filter(i => !(onOrder[i.id] > 0));
@@ -121,7 +244,7 @@ const InventoryPage: React.FC = () => {
     alerts.push({ id: 'expiring', tone: 'warn', text: `Use soon: ${listNames(kpi.expiring)} will expire within 15 days.`, action: 'View', run: () => showFilter('expiring') });
   }
   if (overduePOs.length) {
-    alerts.push({ id: 'overdue', tone: 'warn', text: `Delivery late: ${overduePOs.map(p => `${p.poNumber} from ${p.vendor}`).join(', ')}.`, action: 'Receive', run: () => setReceive({ mode: 'PO', poId: overduePOs[0].id }) });
+    alerts.push({ id: 'overdue', tone: 'warn', text: `Delivery late: ${overduePOs.map(p => `${p.poNumber} from ${p.vendor}`).join(', ')}.`, action: 'Receive', run: () => handleDirectReceivePO(overduePOs[0].id) });
   }
   const visibleAlerts = alerts.filter(a => !dismissed.has(a.id));
 
@@ -202,7 +325,13 @@ const InventoryPage: React.FC = () => {
           <StockRegisterTab filter={filter} onFilter={setFilter} onOrder={onOrder} onOpen={setDetailId} onAction={handleAction}
             onBulkPO={ids => setPoSuggestions(ids.map(itemId => ({ itemId })))} />
         )}
-        {tab === 'orders' && <PurchaseOrdersTab onReceive={poId => setReceive({ mode: 'PO', poId })} onNewOrder={() => setPoSuggestions([])} />}
+        {tab === 'orders' && (
+          <PurchaseOrdersTab
+            onReceive={handleDirectReceivePO}
+            onCustomReceive={poId => setReceive({ mode: 'PO', poId })}
+            onNewOrder={() => setPoSuggestions([])}
+          />
+        )}
         {tab === 'history' && <LedgerTab onOpenItem={setDetailId} />}
         {tab === 'planning' && (
           <PlanningTab onOrder={onOrder} onIssueTemplate={(templateId, count) => setIssue({ templateId, count })} onRaisePO={lines => setPoSuggestions(lines)} />

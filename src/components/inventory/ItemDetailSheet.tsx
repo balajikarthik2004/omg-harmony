@@ -131,9 +131,22 @@ const ItemDetailSheet: React.FC<{
                   {history.map(m => (
                     <li key={m.id} className="flex items-start justify-between gap-3 px-3 py-2.5">
                       <div className="space-y-1 min-w-0">
-                        <div className="flex items-center gap-2"><MovementBadge type={m.type} /><span className="text-xs text-muted-foreground">{fmtDateTime(m.date)}</span></div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <MovementBadge type={m.type} />
+                          <span className="text-xs text-muted-foreground">{fmtDateTime(m.date)}</span>
+                          {m.poNumber && (
+                            <span className="text-[11px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded border border-primary/20">
+                              PO #{m.poNumber}
+                            </span>
+                          )}
+                          {m.refNo && (
+                            <span className="text-[11px] font-mono text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                              {m.refNo}
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground truncate">
-                          {[m.purpose, m.reason, m.party].filter(Boolean).join(' · ') || STORES.find(x => x.id === m.store)?.name} · by {m.user}
+                          {[m.party, m.purpose, m.reason].filter(Boolean).join(' · ') || STORES.find(x => x.id === m.store)?.name} · by {m.user}
                         </p>
                       </div>
                       <span className={`text-sm font-semibold tabular-nums whitespace-nowrap ${m.qty > 0 ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>{m.qty > 0 ? '+' : ''}{fmtQty(m.qty)} {item.unit}</span>

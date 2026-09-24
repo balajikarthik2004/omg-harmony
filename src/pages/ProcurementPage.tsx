@@ -614,6 +614,7 @@ const ProcurementPage: React.FC = () => {
         </div>
       )}
 
+      {/* 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-up">
         <div className="stat-card flex flex-col justify-between group overflow-hidden relative border-amber-500/20 bg-amber-500/5">
           <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-amber-500/10 group-hover:scale-110 transition-transform" />
@@ -636,6 +637,7 @@ const ProcurementPage: React.FC = () => {
           <p className="text-3xl font-display font-bold mt-2 text-secondary relative z-10">{todayRequests}</p>
         </div>
       </div>
+      */}
 
       <div className="section-panel shadow-sm border-l-4" style={{ borderLeftColor: 'var(--primary)' }}>
         {/* Search and Actions */}
@@ -663,7 +665,7 @@ const ProcurementPage: React.FC = () => {
                <option value="partially received">Partially Received</option>
                <option value="received">Received</option>
              </select>
-             <Button onClick={openAdd} className="shadow-md hover:shadow-lg w-full sm:w-auto"><Plus className="h-4 w-4 mr-2" />New Request</Button>
+             {/* <Button onClick={openAdd} className="shadow-md hover:shadow-lg w-full sm:w-auto"><Plus className="h-4 w-4 mr-2" />New Request</Button> */}
           </div>
         </div>
 
