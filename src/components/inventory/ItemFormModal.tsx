@@ -70,7 +70,7 @@ const ItemFormModal: React.FC<Props> = ({ open, onClose, item, items }) => {
 
   return (
     <Modal open={open} onClose={onClose} title={item ? `Edit ${item.name}` : 'Add New Item'} containerClassName="max-w-2xl">
-      <div className="inventory-form-shell space-y-6">
+      <div className="inventory-form-shell space-y-3.5 sm:space-y-4">
         <ErrorNote message={error} />
         <FormSection title="Basic details">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

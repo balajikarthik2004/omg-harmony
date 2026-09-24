@@ -1035,7 +1035,7 @@ const PoojaSevaPage: React.FC = () => {
         open={!!receiptItem}
         onClose={() => setReceiptItem(null)}
         title="Temple E-Seva Pass"
-        bodyClassName="pooja-receipt-context p-6"
+        bodyClassName="pooja-receipt-context p-4 sm:p-5 pt-2 sm:pt-3"
       >
         {receiptItem && (
           <div className="space-y-5 px-1 pb-1">

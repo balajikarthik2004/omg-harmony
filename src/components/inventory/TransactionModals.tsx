@@ -172,7 +172,7 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
 
   return (
     <Modal open={open} onClose={onClose} title="Receive Stock" containerClassName="max-w-4xl">
-      <div className="inventory-form-shell space-y-5">
+      <div className="inventory-form-shell space-y-3 sm:space-y-3.5">
         <div className="inline-flex rounded-lg border border-border bg-muted/50 p-1 text-sm" role="tablist">
           {([['RECEIPT', 'Purchase'], ['PO', 'From an order'], ['DONATION', 'Donation']] as [ReceiveMode, string][]).map(([m, label]) => (
             <button key={m} role="tab" aria-selected={mode === m} onClick={() => switchMode(m)}
@@ -342,7 +342,7 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
 
   return (
     <Modal open={open} onClose={onClose} title="Issue Stock" containerClassName="max-w-2xl">
-      <div className="inventory-form-shell space-y-5">
+      <div className="inventory-form-shell space-y-3 sm:space-y-3.5">
         <ErrorNote message={error} />
         <div className="rounded-xl border border-dashed border-border p-3 grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3 bg-muted/20">
           <Field label="Use a seva template (optional)" hint="Fills in the materials needed automatically.">
@@ -453,7 +453,7 @@ export const TransferModal: React.FC<{ open: boolean; onClose: () => void; prese
 
   return (
     <Modal open={open} onClose={onClose} title="Move Stock Between Stores" containerClassName="max-w-2xl">
-      <div className="inventory-form-shell space-y-5">
+      <div className="inventory-form-shell space-y-3 sm:space-y-3.5">
         <ErrorNote message={error} />
         <div className="grid grid-cols-2 gap-3">
           <Field label="From store" required>

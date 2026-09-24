@@ -765,7 +765,7 @@ const DonationsPage: React.FC = () => {
         </div>
       </Modal>
 
-      <Modal open={receiptOpen} onClose={() => setReceiptOpen(false)} title="Official Tax Receipt" bodyClassName="donations-receipt-context p-6">
+      <Modal open={receiptOpen} onClose={() => setReceiptOpen(false)} title="Official Tax Receipt" bodyClassName="donations-receipt-context p-4 sm:p-5 pt-2 sm:pt-3">
         {selectedReceipt && (
           <div className="space-y-5 animate-fade-in px-1 pb-1">
             <div className="rounded-2xl border-2 border-border p-6 bg-card relative overflow-hidden shadow-[inset_0_4px_24px_-8px_rgba(0,0,0,0.05)] pt-7">

@@ -749,8 +749,8 @@ const ProcurementPage: React.FC = () => {
         onClose={() => { setModalOpen(false); setViewId(null); setEditId(null); }} 
         title={viewId ? 'Procurement Dossier' : (editId ? 'Amend Purchase Order' : 'Initiate Procurement')}
       >
-        <div className="grid grid-cols-2 gap-4 px-1 pb-2">
-          <div className="space-y-1.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-1 pb-2">
+          <div className="space-y-1">
             <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Order Number</label>
             <input value={form.poNumber} disabled className="w-full h-11 rounded-lg border border-input bg-muted/30 px-3 text-sm font-mono font-bold" />
           </div>
