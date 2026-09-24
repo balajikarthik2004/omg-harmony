@@ -6,8 +6,9 @@ import ConfirmDialog from '@/components/ConfirmDialog';
 import { Button } from '@/components/ui/button';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { ISSUE_PURPOSES, STORES, SevaTemplate, StoreId, WHOLE_UNITS, addDays, daysBetween, fmtMoney, fmtQty, round3, storeName } from '@/lib/inventory';
-import { toISODate } from '@/lib/utils';
 import { ErrorNote, Field, ItemSelect, inputCls, parseNum, selectCls, tdCls, thCls, useInventoryRole } from './shared';
+import { DatePicker } from '@/components/ui/date-picker';
+import { ThemeSelect } from '@/components/ui/theme-select';
 import type { POSuggestion } from './CreatePOModal';
 
 interface PlanLine { key: string; templateId: string; count: string }
@@ -101,7 +102,7 @@ const PlanningTab: React.FC<{
           <p className="text-sm text-muted-foreground">Add the sevas and meals you are planning. You will see straight away whether there is enough stock, and can order anything missing.</p>
           <div className="grid grid-cols-1 sm:grid-cols-[1fr_180px] gap-3">
             <Field label="Event name"><input className={inputCls} value={planName} onChange={e => setPlanName(e.target.value)} /></Field>
-            <Field label="Event date" hint={`In ${leadDays} day${leadDays === 1 ? '' : 's'}`}><input type="date" className={inputCls} value={planDate} min={toISODate(new Date())} onChange={e => setPlanDate(e.target.value)} /></Field>
+            <Field label="Event date" hint={`In ${leadDays} day${leadDays === 1 ? '' : 's'}`}><DatePicker value={planDate} minDate={new Date()} onChange={setPlanDate} /></Field>
           </div>
 
           <div className="rounded-xl border border-border overflow-hidden">
@@ -113,10 +114,11 @@ const PlanningTab: React.FC<{
                   return (
                     <tr key={p.key} className="border-t border-border">
                       <td className="px-3 py-2">
-                        <select className={selectCls} value={p.templateId} onChange={e => updatePlan(p.key, { templateId: e.target.value })}>
-                          <option value="">Select template</option>
-                          {state.templates.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
-                        </select>
+                        <ThemeSelect
+                          value={p.templateId}
+                          onChange={val => updatePlan(p.key, { templateId: val })}
+                          options={[{ value: '', label: 'Select template' }, ...state.templates.map(x => ({ value: x.id, label: x.name }))]}
+                        />
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-2">
@@ -212,23 +214,17 @@ const TemplateEditor: React.FC<{ template: SevaTemplate | 'new' | null; onClose:
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Field label="Name" required><input className={inputCls} value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Rudrabhishekam" /></Field>
           <Field label="Type">
-            <select className={selectCls} value={form.kind} onChange={e => setForm(f => ({ ...f, kind: e.target.value as SevaTemplate['kind'] }))}>
-              {['Seva', 'Annadhanam', 'Prasadam'].map(k => <option key={k}>{k}</option>)}
-            </select>
+            <ThemeSelect value={form.kind} onChange={val => setForm(f => ({ ...f, kind: val as SevaTemplate['kind'] }))} options={['Seva', 'Annadhanam', 'Prasadam']} />
           </Field>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <Field label="Quantities are for" required><input type="number" min={1} className={inputCls} value={form.basisQty} onChange={e => setForm(f => ({ ...f, basisQty: parseNum(e.target.value) }))} /></Field>
           <Field label="Unit (seva, meals...)"><input className={inputCls} value={form.basisLabel} onChange={e => setForm(f => ({ ...f, basisLabel: e.target.value }))} placeholder="seva / meals" /></Field>
           <Field label="Issue purpose">
-            <select className={selectCls} value={form.purpose} onChange={e => setForm(f => ({ ...f, purpose: e.target.value }))}>
-              {ISSUE_PURPOSES.map(p => <option key={p}>{p}</option>)}
-            </select>
+            <ThemeSelect value={form.purpose} onChange={val => setForm(f => ({ ...f, purpose: val }))} options={ISSUE_PURPOSES} />
           </Field>
           <Field label="Issue from">
-            <select className={selectCls} value={form.store} onChange={e => setForm(f => ({ ...f, store: e.target.value as StoreId }))}>
-              {STORES.map(s => <option key={s.id} value={s.id}>{s.short}</option>)}
-            </select>
+            <ThemeSelect value={form.store} onChange={val => setForm(f => ({ ...f, store: val as StoreId }))} options={STORES.map(s => ({ value: s.id, label: s.short }))} />
           </Field>
         </div>
         <div className="rounded-xl border border-border overflow-hidden">

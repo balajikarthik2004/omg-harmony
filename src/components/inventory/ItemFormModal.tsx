@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { inventoryActions } from '@/hooks/useInventoryStore';
 import { CATEGORIES, InventoryItem, STORES, StoreId, UNITS, nextItemCode } from '@/lib/inventory';
 import { ErrorNote, Field, FormSection, inputCls, parseNum, selectCls, useInventoryRole } from './shared';
+import { ThemeSelect } from '@/components/ui/theme-select';
 
 interface Props {
   open: boolean;
@@ -85,14 +86,19 @@ const ItemFormModal: React.FC<Props> = ({ open, onClose, item, items }) => {
               <input className={inputCls} value={form.localName} onChange={e => set('localName', e.target.value)} placeholder="e.g. Nei" />
             </Field>
             <Field label="Category" required>
-              <select className={selectCls} value={form.category} onChange={e => set('category', e.target.value)} disabled={!!item}>
-                {CATEGORIES.map(c => <option key={c.name}>{c.name}</option>)}
-              </select>
+              <ThemeSelect
+                value={form.category}
+                onChange={val => set('category', val)}
+                disabled={!!item}
+                options={CATEGORIES.map(c => ({ value: c.name, label: c.name }))}
+              />
             </Field>
             <Field label="Measured in" required>
-              <select className={selectCls} value={form.unit} onChange={e => set('unit', e.target.value)}>
-                {UNITS.map(u => <option key={u}>{u}</option>)}
-              </select>
+              <ThemeSelect
+                value={form.unit}
+                onChange={val => set('unit', val)}
+                options={UNITS.map(u => ({ value: u, label: u }))}
+              />
             </Field>
           </div>
         </FormSection>
@@ -114,9 +120,11 @@ const ItemFormModal: React.FC<Props> = ({ open, onClose, item, items }) => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Usually kept in">
-              <select className={selectCls} value={form.defaultStore} onChange={e => set('defaultStore', e.target.value as StoreId)}>
-                {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-              </select>
+              <ThemeSelect
+                value={form.defaultStore}
+                onChange={val => set('defaultStore', val as StoreId)}
+                options={STORES.map(s => ({ value: s.id, label: s.name }))}
+              />
             </Field>
             <Field label="Preferred supplier">
               <input className={inputCls} list="inv-suppliers" value={form.supplier} onChange={e => set('supplier', e.target.value)} placeholder="Select or type a supplier" />

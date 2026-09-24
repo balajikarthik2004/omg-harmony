@@ -13,6 +13,7 @@ import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { CATEGORIES, STATUS_ORDER, STORES, StockStatus, StoreId, downloadCSV, fmtDate, fmtMoney, fmtQty, needsReorder } from '@/lib/inventory';
 import { cn } from '@/lib/utils';
 import { EmptyRow, Pager, STATUS_LABEL, StockBar, StockStatusBadge, selectCls, tdCls, thCls, useInventoryRole } from './shared';
+import { ThemeSelect } from '@/components/ui/theme-select';
 import type { ItemAction } from './ItemDetailSheet';
 
 export type RegisterFilter = 'all' | 'reorder' | 'expiring' | 'archived' | StockStatus;
@@ -46,6 +47,29 @@ const StockRegisterTab: React.FC<{
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => setPage(1), [search, category, store, filter, pageSize]);
+
+  const latestReceipts = useMemo(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const map: Record<string, { qty: number; source: string; date: string; refNo: string }> = {};
+    const sorted = [...state.movements].sort((a, b) => b.date.localeCompare(a.date));
+    for (const m of sorted) {
+      if (map[m.itemId] || m.qty <= 0) continue;
+      const isTodayOrRecent = m.date.slice(0, 10) >= today;
+      const isPO = Boolean(m.poNumber);
+      const isReceipt = m.type === 'RECEIPT' || m.type === 'DONATION';
+
+      if ((isPO || isTodayOrRecent) && isReceipt) {
+        const source = m.poNumber ? `PO #${m.poNumber}` : m.refNo || (m.party ? m.party : 'Receipt');
+        map[m.itemId] = {
+          qty: m.qty,
+          source,
+          date: m.date,
+          refNo: m.refNo,
+        };
+      }
+    }
+    return map;
+  }, [state.movements]);
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -124,14 +148,20 @@ const StockRegisterTab: React.FC<{
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by item name, code or supplier"
               className="inventory-search-input w-full h-10 pl-9 pr-3 rounded-lg border border-input bg-background text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
           </div>
-          <select className={cn(selectCls, 'inventory-field w-auto min-w-[170px]')} value={category} onChange={e => setCategory(e.target.value)} aria-label="Category">
-            <option value="All">All categories</option>
-            {CATEGORIES.map(c => <option key={c.name}>{c.name}</option>)}
-          </select>
-          <select className={cn(selectCls, 'inventory-field w-auto min-w-[150px]')} value={store} onChange={e => setStore(e.target.value as 'ALL' | StoreId)} aria-label="Store">
-            <option value="ALL">All stores</option>
-            {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
+          <ThemeSelect
+            className="w-auto min-w-[170px]"
+            value={category}
+            onChange={setCategory}
+            options={[{ value: 'All', label: 'All categories' }, ...CATEGORIES.map(c => ({ value: c.name, label: c.name }))]}
+            aria-label="Category"
+          />
+          <ThemeSelect
+            className="w-auto min-w-[150px]"
+            value={store}
+            onChange={v => setStore(v as 'ALL' | StoreId)}
+            options={[{ value: 'ALL', label: 'All stores' }, ...STORES.map(s => ({ value: s.id, label: s.name }))]}
+            aria-label="Store"
+          />
           <Button variant="outline" size="sm" className="h-10" onClick={exportCSV}><Download className="h-4 w-4 mr-1.5" />Download</Button>
         </div>
         <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter">
@@ -180,6 +210,7 @@ const StockRegisterTab: React.FC<{
               const s = summaries[item.id];
               const qty = store === 'ALL' ? s.onHand : s.byStore[store];
               const ordered = onOrder[item.id] ?? 0;
+              const recent = latestReceipts[item.id];
               return (
                 <tr key={item.id} className="inventory-row border-b border-border hover:bg-muted/30 cursor-pointer" onClick={() => onOpen(item.id)}>
                   <td className={tdCls} onClick={e => e.stopPropagation()}>
@@ -191,7 +222,15 @@ const StockRegisterTab: React.FC<{
                   </td>
                   <td className={cn(tdCls, 'text-right whitespace-nowrap')}>
                     <p className="font-semibold tabular-nums text-base">{fmtQty(qty)} <span className="text-xs font-normal text-muted-foreground">{item.unit}</span></p>
-                    {ordered > 0 && <p className="text-[11px] text-primary font-medium">+{fmtQty(ordered)} ordered</p>}
+                    {recent && qty > 0 && (
+                      <div
+                        className="inline-flex items-center gap-1 mt-0.5 px-1.5 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/70 dark:border-emerald-800/70"
+                        title={`Received on ${fmtDate(recent.date)} · ${recent.source}`}
+                      >
+                        +{fmtQty(recent.qty)} received
+                      </div>
+                    )}
+                    {ordered > 0 && <p className="text-[11px] text-primary font-medium mt-0.5">+{fmtQty(ordered)} ordered</p>}
                   </td>
                   <td className={cn(tdCls, 'min-w-[160px]')}>
                     <StockBar item={item} onHand={s.onHand} status={s.status} />

@@ -6,6 +6,8 @@ import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { MOVEMENT_META, MovementType, STORES, StoreId, addDays, downloadCSV, fmtDateTime, fmtQty, storeName } from '@/lib/inventory';
 import { cn, toISODate } from '@/lib/utils';
 import { EmptyRow, MovementBadge, Pager, inputCls, selectCls, tdCls, thCls } from './shared';
+import { ThemeSelect } from '@/components/ui/theme-select';
+import { DatePicker } from '@/components/ui/date-picker';
 
 const TYPE_GROUPS: { key: string; label: string; types: MovementType[] }[] = [
   { key: 'all', label: 'All activity', types: [] },
@@ -76,16 +78,27 @@ const LedgerTab: React.FC<{ onOpenItem: (itemId: string) => void }> = ({ onOpenI
               className="inventory-search-input w-full h-10 pl-9 pr-8 rounded-lg border border-input bg-background text-sm outline-none focus:border-primary" />
             {search && <button className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground" onClick={() => setSearch('')} aria-label="Clear search"><X className="h-4 w-4" /></button>}
           </div>
-          <select className={cn(selectCls, 'inventory-field w-auto')} value={group} onChange={e => setGroup(e.target.value)} aria-label="Movement type">
-            {TYPE_GROUPS.map(g => <option key={g.key} value={g.key}>{g.label}</option>)}
-          </select>
-          <select className={cn(selectCls, 'inventory-field w-auto')} value={store} onChange={e => setStore(e.target.value as 'ALL' | StoreId)} aria-label="Store">
-            <option value="ALL">All stores</option>
-            {STORES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-          <input type="date" className={cn(inputCls, 'inventory-field w-auto')} value={from} onChange={e => setFrom(e.target.value)} aria-label="From date" />
+          <ThemeSelect
+            className="w-auto min-w-[160px]"
+            value={group}
+            onChange={setGroup}
+            options={TYPE_GROUPS.map(g => ({ value: g.key, label: g.label }))}
+            aria-label="Movement type"
+          />
+          <ThemeSelect
+            className="w-auto min-w-[140px]"
+            value={store}
+            onChange={v => setStore(v as 'ALL' | StoreId)}
+            options={[{ value: 'ALL', label: 'All stores' }, ...STORES.map(s => ({ value: s.id, label: s.name }))]}
+            aria-label="Store"
+          />
+          <div className="w-[140px]">
+            <DatePicker value={from} onChange={setFrom} placeholder="From date" />
+          </div>
           <span className="text-xs text-muted-foreground pb-3">to</span>
-          <input type="date" className={cn(inputCls, 'inventory-field w-auto')} value={to} onChange={e => setTo(e.target.value)} aria-label="To date" />
+          <div className="w-[140px]">
+            <DatePicker value={to} onChange={setTo} placeholder="To date" />
+          </div>
           <Button variant="outline" size="sm" className="h-10" onClick={exportCSV}><Download className="h-4 w-4 mr-1.5" />Download</Button>
         </div>
       </div>
