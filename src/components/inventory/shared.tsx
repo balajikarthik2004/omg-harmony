@@ -1,6 +1,7 @@
 import React from 'react';
 import { AlertOctagon, AlertTriangle, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CheckCircle2, Gift, PackageX, Scale, Trash2, TrendingUp, Warehouse } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { ThemeSelect } from '@/components/ui/theme-select';
 import {
   InventoryItem, ItemSummary, MOVEMENT_META, MovementType, StockStatus, StoreId, fmtQty,
 } from '@/lib/inventory';
@@ -134,15 +135,27 @@ export const ItemSelect: React.FC<{
   store?: StoreId;
   placeholder?: string;
   disabled?: boolean;
-}> = ({ items, summaries, value, onChange, store, placeholder = 'Select item', disabled }) => (
-  <select className={selectCls} value={value} onChange={e => onChange(e.target.value)} disabled={disabled}>
-    <option value="">{placeholder}</option>
-    {items.map(i => {
-      const qty = store ? summaries[i.id]?.byStore[store] ?? 0 : summaries[i.id]?.onHand ?? 0;
-      return <option key={i.id} value={i.id}>{i.name} - {fmtQty(qty)} {i.unit} available</option>;
-    })}
-  </select>
-);
+}> = ({ items, summaries, value, onChange, store, placeholder = 'Select item', disabled }) => {
+  const options = items.map(i => {
+    const qty = store ? summaries[i.id]?.byStore[store] ?? 0 : summaries[i.id]?.onHand ?? 0;
+    return {
+      value: i.id,
+      label: `${i.name} - ${fmtQty(qty)} ${i.unit} available`,
+    };
+  });
+
+  return (
+    <ThemeSelect
+      value={value}
+      onChange={onChange}
+      options={options}
+      placeholder={placeholder}
+      disabled={disabled}
+      className="w-full text-sm font-medium"
+      contentClassName="max-h-[225px] overflow-y-auto"
+    />
+  );
+};
 
 export const EmptyRow: React.FC<{ colSpan: number; message: string }> = ({ colSpan, message }) => (
   <tr><td colSpan={colSpan} className="p-10 text-center text-sm text-muted-foreground">{message}</td></tr>

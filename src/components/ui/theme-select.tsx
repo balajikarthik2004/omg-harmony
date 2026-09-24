@@ -19,6 +19,7 @@ export interface ThemeSelectProps {
   options: (ThemeSelectOption | string)[];
   placeholder?: string;
   className?: string;
+  contentClassName?: string;
   disabled?: boolean;
   "aria-label"?: string;
 }
@@ -31,6 +32,7 @@ export function ThemeSelect({
   options,
   placeholder = "Select...",
   className,
+  contentClassName,
   disabled = false,
   "aria-label": ariaLabel,
 }: ThemeSelectProps) {
@@ -61,7 +63,12 @@ export function ThemeSelect({
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent className="rounded-xl border-border bg-popover/95 backdrop-blur-md shadow-xl max-h-72">
+      <SelectContent
+        className={cn(
+          "rounded-xl border-border bg-popover/95 backdrop-blur-md shadow-xl max-h-[225px] overflow-y-auto z-50",
+          contentClassName
+        )}
+      >
         {normalizedOptions.map((opt) => (
           <SelectItem
             key={opt.value}
