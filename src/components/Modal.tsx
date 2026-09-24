@@ -10,9 +10,10 @@ interface ModalProps {
   children: React.ReactNode;
   containerClassName?: string;
   bodyClassName?: string;
+  headerClassName?: string;
 }
 
-const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, containerClassName = '', bodyClassName = 'p-6' }) => {
+const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, containerClassName = '', bodyClassName = 'p-5', headerClassName = '' }) => {
   if (!open) return null;
 
   return (
@@ -21,13 +22,13 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children, container
         className={cn('bg-card rounded-2xl shadow-2xl w-full max-w-lg mx-4 animate-slide-up max-h-[90vh] overflow-y-auto border border-border/50', containerClassName)}
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-6 border-b border-border/70 bg-card">
-          <h2 className="text-lg font-display font-semibold text-foreground">{title}</h2>
+        <div className={cn('flex items-center justify-between px-5 py-3 border-b border-border/70 bg-card', headerClassName)}>
+          <h2 className="text-base font-display font-semibold text-foreground">{title}</h2>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={onClose}
-            className="rounded-full hover:bg-muted/80 text-foreground transition-all duration-200 hover:rotate-90"
+            className="h-8 w-8 rounded-full hover:bg-muted/80 text-foreground transition-all duration-200 hover:rotate-90"
           >
             <X className="h-4 w-4" />
           </Button>

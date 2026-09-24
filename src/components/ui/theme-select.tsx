@@ -46,14 +46,14 @@ export function ThemeSelect({
     });
   }, [options]);
 
-  const internalValue = value === "" ? (normalizedOptions.some(o => o.value === EMPTY_VALUE) ? EMPTY_VALUE : undefined) : value;
+  const internalValue = value === "" ? undefined : value;
 
   const handleValueChange = (val: string) => {
     onChange(val === EMPTY_VALUE ? "" : val);
   };
 
   return (
-    <Select value={internalValue} onValueChange={handleValueChange} disabled={disabled}>
+    <Select value={internalValue ?? ""} onValueChange={handleValueChange} disabled={disabled}>
       <SelectTrigger
         className={cn(
           "h-10 rounded-lg border-border/80 bg-background/80 hover:bg-muted/40 transition-colors focus:ring-2 focus:ring-primary/20",
