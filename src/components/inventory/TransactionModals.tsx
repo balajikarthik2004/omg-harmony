@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Trash2 } from 'lucide-react';
+import { Info, Plus, Trash2 } from 'lucide-react';
 import Modal from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { RECEIVABLE_PO_STATUSES, ProcurementRecord, formatPODate, procurementActions, useProcurementStore } from '@/hooks/useProcurementStore';
 import {
   ADJUST_REASONS, ISSUE_PURPOSES, InventoryItem, STORES, matchPOLineItem, receivedAgainstPO, StoreId, WASTAGE_REASONS, WHOLE_UNITS,
-  addDays, fmtDate, fmtMoney, fmtQty, round3, storeName,
+  addDays, fmtDate, fmtMoney, fmtQty, round3, storeName, suggestedStore,
 } from '@/lib/inventory';
 import { toISODate } from '@/lib/utils';
-import { ErrorNote, Field, ItemSelect, inputCls, parseNum, selectCls, useInventoryRole } from './shared';
+import { ErrorNote, Field, ItemSelect, StoreBadge, inputCls, parseNum, selectCls, useInventoryRole } from './shared';
 import { DatePicker } from '@/components/ui/date-picker';
 import { ThemeSelect } from '@/components/ui/theme-select';
 import { triggerStockNotification } from './StockNotificationToast';
@@ -28,7 +28,7 @@ function dateToISO(day: string) {
 /* ================================================================== */
 
 type ReceiveMode = 'RECEIPT' | 'PO' | 'DONATION';
-interface ReceiveLineState { key: string; itemId: string; qty: string; unitCost: string; batchNo: string; expiryDate: string; ordered?: number; received?: number }
+interface ReceiveLineState { key: string; itemId: string; qty: string; unitCost: string; batchNo: string; expiryDate: string; ordered?: number; received?: number; store?: StoreId; lineIdx?: number; poName?: string }
 
 export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset?: { itemId?: string; poId?: string; mode?: ReceiveMode } }> = ({ open, onClose, preset }) => {
   const { state, summaries, actions } = useInventoryStore();
@@ -60,17 +60,15 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
     const po = pos.find(p => p.id === id);
     if (!po) { setLines([]); return; }
     const received = receivedAgainstPO(state, po.id);
-    const next = po.items.map(l => {
+    const next = po.items.map((l, lineIdx) => {
       const itemId = matchPOLineItem(state.items, l);
       const item = state.items.find(i => i.id === itemId);
       const done = itemId ? received[itemId] ?? 0 : 0;
       const outstanding = Math.max(0, round3(l.quantity - done));
-      return { ...lineFor(item), itemId, qty: outstanding ? String(outstanding) : '', unitCost: String(l.price), ordered: l.quantity, received: done };
+      return { ...lineFor(item), itemId, qty: outstanding ? String(outstanding) : '', unitCost: String(l.price), ordered: l.quantity, received: done, store: suggestedStore(state.items, l), lineIdx, poName: l.name };
     });
     setLines(next);
     setParty(po.vendor);
-    const first = state.items.find(i => i.id === next.find(l => l.itemId)?.itemId);
-    if (first) setStore(first.defaultStore);
   };
 
   useEffect(() => {
@@ -98,7 +96,15 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
   const pickItem = (key: string, itemId: string) => {
     const item = state.items.find(i => i.id === itemId);
     const fresh = lineFor(item);
-    updateLine(key, { itemId, unitCost: mode === 'PO' ? lines.find(l => l.key === key)?.unitCost ?? fresh.unitCost : fresh.unitCost, expiryDate: fresh.expiryDate });
+    const current = lines.find(l => l.key === key);
+    if (mode === 'PO' && current?.ordered !== undefined) {
+      // Re-mapping an order line: pending quantity depends on what was already received for that item.
+      const done = itemId ? receivedAgainstPO(state, poId)[itemId] ?? 0 : 0;
+      const outstanding = Math.max(0, round3(current.ordered - done));
+      updateLine(key, { itemId, received: done, qty: outstanding ? String(outstanding) : '', expiryDate: fresh.expiryDate });
+      return;
+    }
+    updateLine(key, { itemId, unitCost: mode === 'PO' ? current?.unitCost ?? fresh.unitCost : fresh.unitCost, expiryDate: fresh.expiryDate });
     if (item && mode === 'RECEIPT' && !party) setParty(item.supplier);
     if (item && lines.length === 1) setStore(item.defaultStore);
   };
@@ -115,6 +121,8 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
       if (mode === 'DONATION' && !party.trim()) throw new Error('Donor name is required.');
       if (mode === 'PO') {
         if (!poId) throw new Error('Select the order you are receiving.');
+        const unmapped = lines.find(l => !l.itemId && parseNum(l.qty) > 0);
+        if (unmapped) throw new Error(`"${unmapped.poName}" is not linked to an inventory item. Choose the item it should go into.`);
         for (const l of valid) {
           const outstanding = round3((l.ordered ?? 0) - (l.received ?? 0));
           if (l.ordered !== undefined && parseNum(l.qty) > outstanding + 0.0001) {
@@ -124,20 +132,27 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
         }
       }
       const po = pos.find(p => p.id === poId);
-      const refNo = actions.receive({
+      // Order lines go to the store the approver chose; everything else goes to the one store picked above.
+      const byStore = new Map<StoreId, ReceiveLineState[]>();
+      valid.forEach(l => {
+        const s = mode === 'PO' ? l.store ?? store : store;
+        byStore.set(s, [...(byStore.get(s) ?? []), l]);
+      });
+      const refNos = [...byStore].map(([s, group]) => actions.receive({
         type: mode === 'DONATION' ? 'DONATION' : 'RECEIPT',
-        store, date: dateToISO(date), party: party.trim(), user: userName, notes: notes.trim() || undefined,
+        store: s, date: dateToISO(date), party: party.trim(), user: userName, notes: notes.trim() || undefined,
         invoiceNo: mode !== 'DONATION' ? invoiceNo.trim() || undefined : undefined,
         donorPhone: mode === 'DONATION' ? donorPhone.trim() || undefined : undefined,
         receiptNo: mode === 'DONATION' ? receiptNo.trim() || undefined : undefined,
         poId: po?.id, poNumber: po?.poNumber,
-        lines: valid.map(l => ({ itemId: l.itemId, qty: parseNum(l.qty), unitCost: parseNum(l.unitCost), batchNo: l.batchNo, expiryDate: l.expiryDate || null })),
-      });
+        lines: group.map(l => ({ itemId: l.itemId, qty: parseNum(l.qty), unitCost: parseNum(l.unitCost), batchNo: l.batchNo, expiryDate: l.expiryDate || null })),
+      }));
+      const refNo = refNos.join(', ');
       if (po) updatePOStatus(po, valid);
       triggerStockNotification({
         poNumber: po?.poNumber,
         refNo,
-        storeName: storeName(store),
+        storeName: [...byStore.keys()].map(storeName).join(', '),
         party: party.trim(),
         totalValue: total,
         items: valid.map(l => {
@@ -156,18 +171,16 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
     }
   };
 
+  /* Saves the item each order line was mapped to, and works out the status from those links. */
   const updatePOStatus = (po: ProcurementRecord, received: ReceiveLineState[]) => {
     const already = receivedAgainstPO(state, po.id);
     received.forEach(l => { already[l.itemId] = round3((already[l.itemId] ?? 0) + parseNum(l.qty)); });
-    const complete = po.items.every(line => {
-      const id = matchPOLineItem(state.items, line);
-      return id && (already[id] ?? 0) + 0.0001 >= line.quantity;
+    const items = po.items.map((line, idx) => {
+      const form = lines.find(l => l.lineIdx === idx);
+      return { ...line, itemId: form?.itemId || matchPOLineItem(state.items, line) || undefined, store: form?.store ?? line.store };
     });
-    procurementActions.update(po.id, {
-      status: complete ? 'Received' : 'Partially Received',
-      receivedDate: formatPODate(),
-      items: po.items.map(line => ({ ...line, itemId: line.itemId ?? (matchPOLineItem(state.items, line) || undefined) })),
-    });
+    const complete = items.every(line => line.itemId && (already[line.itemId] ?? 0) + 0.0001 >= line.quantity);
+    procurementActions.update(po.id, { status: complete ? 'Received' : 'Partially Received', receivedDate: formatPODate(), items });
   };
 
   return (
@@ -194,9 +207,18 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-          <Field label="Store" required>
-            <ThemeSelect value={store} onChange={v => setStore(v as StoreId)} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
-          </Field>
+          {mode === 'PO' ? (
+            <Field label="Stores" hint="Set per item below, as approved on the order.">
+              <div className="flex flex-wrap gap-1 min-h-10 items-center">
+                {[...new Set(lines.map(l => l.store).filter(Boolean) as StoreId[])].map(s => <StoreBadge key={s} store={s} />)}
+                {!lines.some(l => l.store) && <span className="text-xs text-muted-foreground">Select an order</span>}
+              </div>
+            </Field>
+          ) : (
+            <Field label="Store" required>
+              <ThemeSelect value={store} onChange={v => setStore(v as StoreId)} options={STORES.map(s => ({ value: s.id, label: s.name }))} />
+            </Field>
+          )}
           <Field label="Date" required>
             <DatePicker value={date} maxDate={new Date()} onChange={setDate} />
           </Field>
@@ -220,10 +242,11 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
 
         <div className="rounded-xl border border-border overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-sm">
+            <table className={`w-full ${mode === 'PO' ? 'min-w-[860px]' : 'min-w-[720px]'} text-sm`}>
               <thead className="bg-muted/50">
                 <tr className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   <th className="text-left px-3 py-2 min-w-[240px]">Item</th>
+                  {mode === 'PO' && <th className="text-left px-3 py-2 w-36">Into store</th>}
                   {mode === 'PO' && <th className="text-right px-3 py-2">Pending</th>}
                   <th className="text-right px-3 py-2 w-28">Qty</th>
                   <th className="text-right px-3 py-2 w-28">{mode === 'DONATION' ? 'Approx. value (₹)' : 'Rate (₹)'}</th>
@@ -238,8 +261,14 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
                   return (
                     <tr key={l.key} className="border-t border-border">
                       <td className="px-3 py-2">
+                        {mode === 'PO' && l.poName && <p className="text-[11px] text-muted-foreground mb-1">On order: <span className="font-medium text-foreground">{l.poName}</span></p>}
                         <ItemSelect items={activeItems} summaries={summaries} value={l.itemId} onChange={id => pickItem(l.key, id)} placeholder={mode === 'PO' ? 'Map to inventory item' : 'Select item'} />
                       </td>
+                      {mode === 'PO' && (
+                        <td className="px-3 py-2">
+                          <ThemeSelect value={l.store ?? store} onChange={v => updateLine(l.key, { store: v as StoreId })} options={STORES.map(s => ({ value: s.id, label: s.short }))} aria-label="Receive into store" />
+                        </td>
+                      )}
                       {mode === 'PO' && <td className="px-3 py-2 text-right tabular-nums text-muted-foreground whitespace-nowrap">{fmtQty(Math.max(0, (l.ordered ?? 0) - (l.received ?? 0)))} / {fmtQty(l.ordered ?? 0)}</td>}
                       <td className="px-3 py-2"><input type="number" min={0} step={item && WHOLE_UNITS.has(item.unit) ? 1 : 'any'} className={`${inputCls} text-right`} value={l.qty} onChange={e => updateLine(l.key, { qty: e.target.value })} aria-label="Quantity" /></td>
                       <td className="px-3 py-2"><input type="number" min={0} step="any" className={`${inputCls} text-right`} value={l.unitCost} onChange={e => updateLine(l.key, { unitCost: e.target.value })} aria-label="Rate" /></td>
@@ -281,9 +310,14 @@ export const ReceiveModal: React.FC<{ open: boolean; onClose: () => void; preset
 
 interface QtyLine { key: string; itemId: string; qty: string }
 
-export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?: { itemId?: string; store?: StoreId; templateId?: string; count?: number } }> = ({ open, onClose, preset }) => {
+export const IssueModal: React.FC<{
+  open: boolean;
+  onClose: () => void;
+  preset?: { itemId?: string; store?: StoreId; templateId?: string; count?: number };
+  onRequested?: (requestId: string) => void;
+}> = ({ open, onClose, preset, onRequested }) => {
   const { state, summaries, actions } = useInventoryStore();
-  const { userName } = useInventoryRole();
+  const { userName, canApprove } = useInventoryRole();
   const activeItems = useMemo(() => state.items.filter(i => i.active), [state.items]);
   const [store, setStore] = useState<StoreId>('SANCTUM');
   const [purpose, setPurpose] = useState(ISSUE_PURPOSES[0]);
@@ -329,11 +363,16 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
     try {
       setError(null);
       if (!party.trim()) throw new Error('Enter who the stock is issued to.');
-      const refNo = actions.issue({
+      const input = {
         store, purpose, party: party.trim(), notes: notes.trim() || undefined, user: userName, templateId: templateId || undefined,
         lines: lines.filter(l => l.itemId).map(l => ({ itemId: l.itemId, qty: parseNum(l.qty) })),
+      };
+      // Every issue starts as a pending request; stock only moves when it is approved under Stock Usage.
+      const { refNo, requestId } = actions.requestIssue(input);
+      toast.success('Sent for approval', {
+        description: `${refNo} · ${storeName(store)} · ${canApprove ? 'review and approve it to release the stock' : 'stock is released once admin approves'}`,
       });
-      toast.success('Stock issued', { description: `${purpose} · from ${storeName(store)} · Ref ${refNo}` });
+      onRequested?.(requestId);
       onClose();
     } catch (e) {
       setError((e as Error).message);
@@ -341,9 +380,17 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
   };
 
   return (
-    <Modal open={open} onClose={onClose} title="Issue Stock" containerClassName="max-w-2xl">
+    <Modal open={open} onClose={onClose} title="Request Stock" containerClassName="max-w-2xl">
       <div className="inventory-form-shell space-y-3 sm:space-y-3.5">
         <ErrorNote message={error} />
+        <div className="flex items-start gap-2 rounded-lg border border-amber-300/60 bg-amber-50 dark:bg-amber-950/30 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
+          <Info className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>
+            {canApprove
+              ? 'This is saved as a pending request. Approve it under Stock Usage to take the stock out of the store.'
+              : 'Stock usage needs admin approval. Nothing is taken from the store until your request is approved.'}
+          </span>
+        </div>
         <div className="rounded-xl border border-dashed border-border p-3 grid grid-cols-1 sm:grid-cols-[1fr_140px] gap-3 bg-muted/20">
           <Field label="Use a seva template (optional)" hint="Fills in the materials needed automatically.">
             <ThemeSelect
@@ -385,7 +432,7 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
             <tbody>
               {lines.map(l => {
                 const item = state.items.find(i => i.id === l.itemId);
-                const available = summaries[l.itemId]?.byStore[store] ?? 0;
+                const available = summaries[l.itemId]?.usableByStore[store] ?? 0;
                 const short = parseNum(l.qty) > available + 0.0001;
                 return (
                   <tr key={l.key} className="border-t border-border">
@@ -406,7 +453,7 @@ export const IssueModal: React.FC<{ open: boolean; onClose: () => void; preset?:
         <Field label="Notes (optional)"><input className={inputCls} value={notes} onChange={e => setNotes(e.target.value)} placeholder="e.g. Pradosham evening seva" /></Field>
         <div className="flex justify-end gap-2 pt-4 border-t border-border">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={submit}>Issue stock</Button>
+          <Button onClick={submit}>Submit for approval</Button>
         </div>
       </div>
     </Modal>

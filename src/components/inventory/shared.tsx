@@ -1,9 +1,9 @@
 import React from 'react';
-import { AlertOctagon, AlertTriangle, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CheckCircle2, Gift, PackageX, Scale, Trash2, TrendingUp, Warehouse } from 'lucide-react';
+import { AlertOctagon, AlertTriangle, ArrowDownLeft, ArrowLeftRight, ArrowUpRight, CheckCircle2, CookingPot, Flame, Gift, PackageX, Scale, Trash2, TrendingUp, Warehouse } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeSelect } from '@/components/ui/theme-select';
 import {
-  InventoryItem, ItemSummary, MOVEMENT_META, MovementType, StockStatus, StoreId, fmtQty,
+  InventoryItem, ItemSummary, MOVEMENT_META, MovementType, STORES, STORE_PURPOSE, StockStatus, StoreId, fmtQty,
 } from '@/lib/inventory';
 import { cn } from '@/lib/utils';
 
@@ -156,6 +156,45 @@ export const ItemSelect: React.FC<{
     />
   );
 };
+
+const STORE_TONE: Record<StoreId, string> = {
+  MAIN: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/60 dark:text-slate-300 dark:border-slate-700',
+  KITCHEN: 'bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-900',
+  SANCTUM: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-300 dark:border-violet-900',
+};
+
+export const STORE_ICON: Record<StoreId, React.ElementType> = { MAIN: Warehouse, KITCHEN: CookingPot, SANCTUM: Flame };
+
+export const StoreBadge: React.FC<{ store: StoreId; className?: string }> = ({ store, className }) => {
+  const Icon = STORE_ICON[store];
+  return (
+    <span className={cn('inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 text-[11px] font-semibold whitespace-nowrap', STORE_TONE[store], className)}>
+      <Icon className="h-3 w-3" aria-hidden /> {STORES.find(s => s.id === store)?.short ?? store}
+    </span>
+  );
+};
+
+/** Three-way store choice with what each store is for, so the approver picks deliberately. */
+export const StorePicker: React.FC<{ value: StoreId; onChange: (s: StoreId) => void; note?: (s: StoreId) => React.ReactNode }> = ({ value, onChange, note }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label="Store">
+    {STORES.map(s => {
+      const Icon = STORE_ICON[s.id];
+      const active = value === s.id;
+      return (
+        <button key={s.id} type="button" role="radio" aria-checked={active} onClick={() => onChange(s.id)}
+          className={cn('flex items-start gap-2.5 rounded-xl border p-3 text-left transition-all',
+            active ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-border bg-background hover:border-primary/40')}>
+          <span className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border', STORE_TONE[s.id])}><Icon className="h-4 w-4" /></span>
+          <span className="min-w-0">
+            <span className="block text-sm font-semibold text-foreground">{s.name}</span>
+            <span className="block text-[11px] text-muted-foreground">{STORE_PURPOSE[s.id]}</span>
+            {note && <span className="block text-[11px] mt-1">{note(s.id)}</span>}
+          </span>
+        </button>
+      );
+    })}
+  </div>
+);
 
 export const EmptyRow: React.FC<{ colSpan: number; message: string }> = ({ colSpan, message }) => (
   <tr><td colSpan={colSpan} className="p-10 text-center text-sm text-muted-foreground">{message}</td></tr>

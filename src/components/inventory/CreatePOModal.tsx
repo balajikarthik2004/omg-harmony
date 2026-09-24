@@ -6,14 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useInventoryStore } from '@/hooks/useInventoryStore';
 import { formatPODate, nextPONumber, procurementActions, useProcurementStore } from '@/hooks/useProcurementStore';
-import { addDays, fmtMoney, fmtQty, suggestedOrderQty } from '@/lib/inventory';
+import { STORES, StoreId, addDays, fmtMoney, fmtQty, suggestedOrderQty } from '@/lib/inventory';
 import { toISODate } from '@/lib/utils';
 import { ErrorNote, Field, ItemSelect, inputCls, parseNum, useInventoryRole } from './shared';
 import { DatePicker } from '@/components/ui/date-picker';
+import { ThemeSelect } from '@/components/ui/theme-select';
 
 export interface POSuggestion { itemId: string; qty?: number }
 
-interface Line { itemId: string; qty: string; price: string; supplier: string }
+interface Line { itemId: string; qty: string; price: string; supplier: string; store: StoreId }
 
 const CreatePOModal: React.FC<{
   open: boolean;
@@ -40,7 +41,7 @@ const CreatePOModal: React.FC<{
       if (!item) return null;
       maxLead = Math.max(maxLead, item.leadTimeDays);
       const qty = s.qty ?? suggestedOrderQty(item, summaries[item.id]?.onHand ?? 0, onOrder[item.id] ?? 0);
-      return { itemId: item.id, qty: String(qty || ''), price: String(item.unitCost), supplier: item.supplier || 'Unassigned supplier' };
+      return { itemId: item.id, qty: String(qty || ''), price: String(item.unitCost), supplier: item.supplier || 'Unassigned supplier', store: item.defaultStore };
     }).filter(Boolean) as Line[]);
     setExpected(toISODate(addDays(new Date(), maxLead)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -61,7 +62,7 @@ const CreatePOModal: React.FC<{
     const item = state.items.find(i => i.id === itemId);
     if (!item || lines.some(l => l.itemId === itemId)) return;
     const qty = suggestedOrderQty(item, summaries[item.id]?.onHand ?? 0, onOrder[item.id] ?? 0);
-    setLines(prev => [...prev, { itemId, qty: String(qty || ''), price: String(item.unitCost), supplier: item.supplier || 'Unassigned supplier' }]);
+    setLines(prev => [...prev, { itemId, qty: String(qty || ''), price: String(item.unitCost), supplier: item.supplier || 'Unassigned supplier', store: item.defaultStore }]);
   };
 
   const total = lines.reduce((s, l) => s + parseNum(l.qty) * parseNum(l.price), 0);
@@ -85,7 +86,7 @@ const CreatePOModal: React.FC<{
           status: approveNow ? 'Approved' : 'Pending',
           items: group.map(l => {
             const item = state.items.find(i => i.id === l.itemId)!;
-            return { name: item.name, quantity: parseNum(l.qty), price: parseNum(l.price), itemId: item.id, unit: item.unit };
+            return { name: item.name, quantity: parseNum(l.qty), price: parseNum(l.price), itemId: item.id, unit: item.unit, store: l.store };
           }),
           submittedBy: userName, submittedByName: userName,
           approvedBy: approveNow ? userName : null, approvedByName: approveNow ? userName : null, approvedDate: approveNow ? today : null,
@@ -228,12 +229,13 @@ const CreatePOModal: React.FC<{
             {/* Spacious Fixed-Height Items Table Preview */}
             <div className="rounded-xl border border-border overflow-hidden shadow-2xs bg-card">
               <div className="h-[250px] sm:h-[275px] overflow-y-auto overflow-x-auto">
-                <table className="w-full text-xs min-w-[560px]">
+                <table className="w-full text-xs min-w-[660px]">
                   <thead className="bg-muted/75 sticky top-0 z-10 border-b border-border shadow-2xs">
                     <tr className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">
                       <th className="text-left px-3 py-2.5">Item</th>
                       <th className="text-right px-2.5 py-2.5">In Stock</th>
                       <th className="text-left px-2.5 py-2.5 w-36">Supplier</th>
+                      <th className="text-left px-2 py-2.5 w-28">Deliver to</th>
                       <th className="text-right px-2 py-2.5 w-20">Qty</th>
                       <th className="text-right px-2 py-2.5 w-22">Rate (₹)</th>
                       <th className="text-right px-3 py-2.5 w-26">Amount</th>
@@ -243,7 +245,7 @@ const CreatePOModal: React.FC<{
                   <tbody className="divide-y divide-border/60">
                     {lines.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="py-16 text-center text-muted-foreground">
+                        <td colSpan={8} className="py-16 text-center text-muted-foreground">
                           <div className="flex flex-col items-center justify-center gap-2">
                             <PackagePlus className="h-8 w-8 text-muted-foreground/35" />
                             <p className="font-semibold text-sm text-foreground">No items added yet</p>
@@ -280,6 +282,15 @@ const CreatePOModal: React.FC<{
                               onChange={e => update(l.itemId, { supplier: e.target.value })}
                               placeholder="Supplier"
                               aria-label="Supplier"
+                            />
+                          </td>
+                          <td className="px-2 py-2">
+                            <ThemeSelect
+                              value={l.store}
+                              onChange={v => update(l.itemId, { store: v as StoreId })}
+                              options={STORES.map(s => ({ value: s.id, label: s.short }))}
+                              className="h-8 text-xs"
+                              aria-label="Deliver to store"
                             />
                           </td>
                           <td className="px-2 py-2">

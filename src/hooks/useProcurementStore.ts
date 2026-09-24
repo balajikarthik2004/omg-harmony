@@ -13,6 +13,8 @@ export const RECEIVABLE_PO_STATUSES = ['Approved', 'Partially Received'];
 export const OPEN_PO_STATUSES = ['Pending', 'Approved', 'Partially Received'];
 
 const STORAGE_KEY = 'omg_procurement_v1';
+/** Pristine seed orders, captured before anything is loaded over them. */
+const SEED = mockProcurements.map(p => ({ ...p, items: p.items.map(l => ({ ...l })) }));
 
 function syncMockData(records: ProcurementRecord[]) {
   mockProcurements.length = 0;
@@ -70,6 +72,9 @@ export function nextPONumber(items: ProcurementRecord[] = getSnapshot()) {
   return `PO-${last + 1}`;
 }
 
+/** Current orders, for code outside React (e.g. inventory rules). */
+export const getProcurements = () => getSnapshot();
+
 export const procurementActions = {
   add(item: ProcurementRecord) {
     const created = { ...item, id: item.id || `po-${Date.now()}-${Math.floor(Math.random() * 1000)}` };
@@ -81,6 +86,9 @@ export const procurementActions = {
   },
   remove(id: string) {
     commit(getSnapshot().filter(i => i.id !== id));
+  },
+  resetToSample() {
+    commit(SEED.map(p => ({ ...p, items: p.items.map(l => ({ ...l })) })));
   },
 };
 

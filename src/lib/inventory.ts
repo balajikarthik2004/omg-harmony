@@ -14,6 +14,13 @@ export const STORES: { id: StoreId; name: string; short: string }[] = [
 
 export const storeName = (id: string) => STORES.find(s => s.id === id)?.name ?? id;
 
+/** Who each store serves - shown wherever an approver has to pick one. */
+export const STORE_PURPOSE: Record<StoreId, string> = {
+  MAIN: 'Bulk & general stock',
+  KITCHEN: 'Madapalli, prasadam & annadhanam',
+  SANCTUM: 'Pooja, abhishekam & alankaram',
+};
+
 export const CATEGORIES: { name: string; prefix: string }[] = [
   { name: 'Pooja Items', prefix: 'PJ' },
   { name: 'Lamps & Oil', prefix: 'LO' },
@@ -148,12 +155,42 @@ export interface SevaTemplate {
   lines: SevaTemplateLine[];
 }
 
+export type StockRequestStatus = 'Pending' | 'Approved' | 'Rejected';
+
+export interface StockRequestLine {
+  itemId: string;
+  qty: number;
+}
+
+/** A request to use stock. Nothing leaves the store until an admin approves it. */
+export interface StockRequest {
+  id: string;
+  refNo: string;
+  status: StockRequestStatus;
+  store: StoreId;
+  purpose: string;
+  party: string;
+  templateId?: string;
+  notes?: string;
+  lines: StockRequestLine[];
+  requestedAt: string;
+  requestedBy: string;
+  decidedAt?: string;
+  decidedBy?: string;
+  decisionNote?: string;
+  /** What was actually issued, set only when the approver changed the request. */
+  approvedStore?: StoreId;
+  approvedLines?: StockRequestLine[];
+  issueRef?: string;
+}
+
 export interface InventoryState {
   version: number;
   items: InventoryItem[];
   movements: StockMovement[];
   counts: StockCount[];
   templates: SevaTemplate[];
+  requests: StockRequest[];
   counters: Record<string, number>;
 }
 
@@ -261,6 +298,8 @@ export interface BatchBalance {
 export interface ItemSummary {
   onHand: number;
   byStore: Record<StoreId, number>;
+  /** Stock that can be issued: on hand minus expired batches. */
+  usableByStore: Record<StoreId, number>;
   batches: BatchBalance[];
   avgCost: number;
   value: number;
@@ -315,12 +354,14 @@ export function computeSummaries(state: InventoryState, now = new Date()): Recor
   for (const item of state.items) {
     const batches = (byItem.get(item.id) ?? []).sort(fefoCompare);
     const byStore = { MAIN: 0, KITCHEN: 0, SANCTUM: 0 } as Record<StoreId, number>;
+    const usableByStore = { MAIN: 0, KITCHEN: 0, SANCTUM: 0 } as Record<StoreId, number>;
     let expiredQty = 0;
     let expiringQty = 0;
     let nearestExpiry: string | null = null;
     const trackExpiry = item.perishable && (item.shelfLifeDays ?? 0) >= FRESH_SHELF_DAYS;
     for (const b of batches) {
       byStore[b.store] = round3(byStore[b.store] + b.qty);
+      if (!b.expiryDate || b.expiryDate >= today) usableByStore[b.store] = round3(usableByStore[b.store] + b.qty);
       if (b.expiryDate) {
         if (b.expiryDate < today) expiredQty += b.qty;
         else if (trackExpiry && b.expiryDate <= warnUntil) expiringQty += b.qty;
@@ -335,6 +376,7 @@ export function computeSummaries(state: InventoryState, now = new Date()): Recor
     result[item.id] = {
       onHand,
       byStore,
+      usableByStore,
       batches,
       avgCost,
       value: onHand * avgCost,
@@ -359,11 +401,15 @@ function fefoCompare(a: BatchBalance, b: BatchBalance) {
 }
 
 /** First-expiry-first-out allocation of `qty` across a store's batches. Throws if short. */
-export function allocateFEFO(batches: BatchBalance[], store: StoreId, qty: number, itemName = 'item') {
-  const pool = batches.filter(b => b.store === store && b.qty > 0).sort(fefoCompare);
+/** Picks batches first-expiry-first. Expired batches are never issued; only a write-off may take them. */
+export function allocateFEFO(batches: BatchBalance[], store: StoreId, qty: number, itemName = 'item', includeExpired = false) {
+  const today = toISODate(new Date());
+  const pool = batches
+    .filter(b => b.store === store && b.qty > 0 && (includeExpired || !b.expiryDate || b.expiryDate >= today))
+    .sort(fefoCompare);
   const available = round3(pool.reduce((s, b) => s + b.qty, 0));
   if (qty > available + 0.0001) {
-    throw new Error(`Only ${fmtQty(available)} of ${itemName} available in ${storeName(store)}; ${fmtQty(qty)} requested.`);
+    throw new Error(`Only ${fmtQty(available)} of ${itemName} available in ${storeName(store)}${includeExpired ? '' : ' (expired stock excluded)'}; ${fmtQty(qty)} requested.`);
   }
   const picks: { batch: BatchBalance; qty: number }[] = [];
   let remaining = qty;
@@ -390,17 +436,44 @@ export function receivedAgainstPO(state: InventoryState, poId: string) {
   return map;
 }
 
+/** The inventory item a PO line refers to: its linked id, else an active item with exactly the same name. */
 export function matchPOLineItem(items: InventoryItem[], line: { name: string; itemId?: string }) {
   if (line.itemId && items.some(i => i.id === line.itemId)) return line.itemId;
   const n = line.name.trim().toLowerCase();
-  const hit = items.find(i => i.name.toLowerCase() === n)
-    ?? items.find(i => i.name.toLowerCase().startsWith(n) || n.startsWith(i.name.toLowerCase()));
-  return hit?.id ?? '';
+  if (!n) return '';
+  return items.find(i => i.active && i.name.trim().toLowerCase() === n)?.id ?? '';
 }
 
 /* ------------------------------------------------------------------ */
 /* Transactions - pure reducers; each returns the next state           */
 /* ------------------------------------------------------------------ */
+
+/** Best-guess category for a PO line that is not yet in the item master. */
+export function guessCategory(name: string) {
+  const n = name.toLowerCase();
+  if (/flower|rose|marigold|jasmine|garland/.test(n)) return 'Flowers & Garlands';
+  if (/rice|dal|oil|sugar|ghee|kitchen|provisions|jaggery|vegetable/.test(n)) return 'Kitchen & Prasadam';
+  if (/milk|curd|honey|panchamrit|abhishekam/.test(n)) return 'Abhishekam';
+  if (/lamp|wick|deepam/.test(n)) return 'Lamps & Oil';
+  if (/clean|soap|light|wire|switch|maintenance|broom|phenyl/.test(n)) return 'Cleaning & Maintenance';
+  return 'Pooja Items';
+}
+
+const CATEGORY_STORE: Record<string, StoreId> = {
+  'Kitchen & Prasadam': 'KITCHEN',
+  'Pooja Items': 'SANCTUM',
+  Abhishekam: 'SANCTUM',
+  'Flowers & Garlands': 'SANCTUM',
+  'Lamps & Oil': 'MAIN',
+  'Cleaning & Maintenance': 'MAIN',
+};
+
+/** The store a PO line goes to: the approved choice, else the item's home store, else a guess from its name. */
+export function suggestedStore(items: InventoryItem[], line: { name: string; itemId?: string; store?: StoreId }): StoreId {
+  if (line.store) return line.store;
+  const item = items.find(i => i.id === matchPOLineItem(items, line));
+  return item?.defaultStore ?? CATEGORY_STORE[guessCategory(line.name)] ?? 'MAIN';
+}
 
 type Result = { state: InventoryState; refNo: string };
 
@@ -493,7 +566,9 @@ export interface TransferInput {
 
 export function transferStock(state: InventoryState, input: TransferInput): Result {
   if (input.from === input.to) throw new Error('Choose two different stores.');
-  const lines = input.lines.filter(l => l.qty > 0);
+  const merged = new Map<string, number>();
+  input.lines.filter(l => l.qty > 0).forEach(l => merged.set(l.itemId, round3((merged.get(l.itemId) ?? 0) + l.qty)));
+  const lines = [...merged].map(([itemId, qty]) => ({ itemId, qty }));
   if (!lines.length) throw new Error('Add at least one line with a quantity.');
   const summaries = computeSummaries(state);
   const date = new Date().toISOString();
@@ -539,7 +614,7 @@ function adjustmentRows(state: InventoryState, summaries: Record<string, ItemSum
         if (!b || b.qty + 0.0001 < -delta) throw new Error(`Batch ${input.batchNo} holds only ${fmtQty(b?.qty ?? 0)} ${item.unit}.`);
         return [{ batch: b, qty: -delta }];
       })()
-    : allocateFEFO(batches, input.store, -delta, item.name);
+    : allocateFEFO(batches, input.store, -delta, item.name, true);
   return picks.map(p => ({ ...base, id: uid('mv'), qty: -p.qty, unitCost: p.batch.unitCost, batchNo: p.batch.batchNo, expiryDate: p.batch.expiryDate }));
 }
 
@@ -549,6 +624,77 @@ export function adjustStock(state: InventoryState, input: AdjustInput): Result {
   const { refNo, counters } = nextRef(state.counters, MOVEMENT_META[input.type].prefix);
   const rows = adjustmentRows(state, computeSummaries(state), input, refNo, date);
   return { state: { ...state, counters, movements: [...state.movements, ...rows] }, refNo };
+}
+
+/* Stock usage requests ---------------------------------------------- */
+
+export interface StockRequestInput {
+  store: StoreId;
+  purpose: string;
+  party: string;
+  lines: StockRequestLine[];
+  templateId?: string;
+  notes?: string;
+  user: string;
+}
+
+function cleanLines(state: InventoryState, lines: StockRequestLine[]) {
+  const merged = new Map<string, number>();
+  lines.filter(l => l.itemId && l.qty > 0).forEach(l => merged.set(l.itemId, round3((merged.get(l.itemId) ?? 0) + l.qty)));
+  if (!merged.size) throw new Error('Add at least one item with a quantity.');
+  return [...merged].map(([itemId, qty]) => ({ itemId: itemOf(state, itemId).id, qty }));
+}
+
+export function createStockRequest(state: InventoryState, input: StockRequestInput): Result {
+  if (!input.party.trim()) throw new Error('Enter who the stock is for.');
+  const lines = cleanLines(state, input.lines);
+  const date = new Date().toISOString();
+  const { refNo, counters } = nextRef(state.counters, 'REQ');
+  const request: StockRequest = {
+    id: uid('req'), refNo, status: 'Pending', store: input.store, purpose: input.purpose, party: input.party.trim(),
+    templateId: input.templateId, notes: input.notes, lines, requestedAt: date, requestedBy: input.user,
+  };
+  return { state: { ...state, counters, requests: [request, ...state.requests] }, refNo };
+}
+
+export interface StockRequestDecision {
+  store: StoreId;
+  purpose: string;
+  party: string;
+  lines: StockRequestLine[];
+  note?: string;
+  user: string;
+}
+
+/** Approving posts the issue, using the approver's store and quantities rather than the requester's. */
+export function approveStockRequest(state: InventoryState, requestId: string, decision: StockRequestDecision): Result {
+  const request = state.requests.find(r => r.id === requestId);
+  if (!request) throw new Error('Request not found.');
+  if (request.status !== 'Pending') throw new Error(`${request.refNo} has already been ${request.status.toLowerCase()}.`);
+  const lines = cleanLines(state, decision.lines);
+  const party = decision.party.trim() || request.party;
+  const issued = issueStock(state, {
+    store: decision.store, purpose: decision.purpose, party, lines, templateId: request.templateId, user: decision.user,
+    notes: [`Request ${request.refNo} by ${request.requestedBy}`, decision.note?.trim()].filter(Boolean).join(' · '),
+  });
+  const changed = decision.store !== request.store || JSON.stringify(lines) !== JSON.stringify(request.lines);
+  const requests = issued.state.requests.map(r => r.id === requestId ? {
+    ...r, status: 'Approved' as const, decidedAt: new Date().toISOString(), decidedBy: decision.user,
+    decisionNote: decision.note?.trim() || undefined, issueRef: issued.refNo, purpose: decision.purpose, party,
+    approvedStore: changed ? decision.store : undefined, approvedLines: changed ? lines : undefined,
+  } : r);
+  return { state: { ...issued.state, requests }, refNo: issued.refNo };
+}
+
+export function rejectStockRequest(state: InventoryState, requestId: string, reason: string, user: string): Result {
+  const request = state.requests.find(r => r.id === requestId);
+  if (!request) throw new Error('Request not found.');
+  if (request.status !== 'Pending') throw new Error(`${request.refNo} has already been ${request.status.toLowerCase()}.`);
+  if (!reason.trim()) throw new Error('Give a reason so the requester knows what to change.');
+  const requests = state.requests.map(r => r.id === requestId
+    ? { ...r, status: 'Rejected' as const, decidedAt: new Date().toISOString(), decidedBy: user, decisionNote: reason.trim() }
+    : r);
+  return { state: { ...state, requests }, refNo: request.refNo };
 }
 
 /* Stock counts ------------------------------------------------------ */
@@ -571,7 +717,9 @@ export function approveStockCount(state: InventoryState, countId: string, user: 
   if (count.status !== 'Submitted') throw new Error('Only submitted counts can be approved.');
   const summaries = computeSummaries(state);
   const date = new Date().toISOString();
-  const variances = count.lines.filter(l => l.countedQty !== null && round3(l.countedQty - l.systemQty) !== 0);
+  // Compare with stock now, not at the start of the count, so movements during the count are not undone.
+  const current = (itemId: string) => summaries[itemId]?.byStore[count.store] ?? 0;
+  const variances = count.lines.filter(l => l.countedQty !== null && round3(l.countedQty - current(l.itemId)) !== 0);
   let counters = state.counters;
   let refNo = '';
   const rows: StockMovement[] = [];
@@ -579,7 +727,7 @@ export function approveStockCount(state: InventoryState, countId: string, user: 
     ({ refNo, counters } = nextRef(state.counters, 'ADJ'));
     for (const line of variances) {
       rows.push(...adjustmentRows(state, summaries, {
-        type: 'ADJUSTMENT', store: count.store, itemId: line.itemId, delta: round3((line.countedQty as number) - line.systemQty),
+        type: 'ADJUSTMENT', store: count.store, itemId: line.itemId, delta: round3((line.countedQty as number) - current(line.itemId)),
         reason: 'Physical count correction', countId: count.id, notes: `Physical verification ${count.refNo}`, user,
       }, refNo, date));
     }
@@ -851,7 +999,23 @@ export function buildSeedState(now = new Date()): InventoryState {
     ] },
   ];
 
-  return { version: STATE_VERSION, items, movements, counts, templates, counters };
+  /* Two usage requests waiting on the admin, so a fresh demo has something in the approval queue. */
+  const requests: StockRequest[] = [
+    {
+      id: 'req-seed-kitchen', refNo: ref('REQ', at(DAYS, 7, 45)), status: 'Pending', store: 'KITCHEN', purpose: 'Annadhanam',
+      party: 'Annadhanam Hall', templateId: 'tpl-annadhanam', notes: 'Saturday annadhanam - 200 meals expected',
+      lines: [{ itemId: 'itm-KT-001', qty: 24 }, { itemId: 'itm-KT-002', qty: 4 }, { itemId: 'itm-KT-007', qty: 3 }, { itemId: 'itm-KT-003', qty: 3 }],
+      requestedAt: at(DAYS, 7, 45).toISOString(), requestedBy: SEED_USERS.store,
+    },
+    {
+      id: 'req-seed-sanctum', refNo: ref('REQ', at(DAYS, 8, 10)), status: 'Pending', store: 'SANCTUM', purpose: 'Abhishekam',
+      party: 'Archakar - Sanctum', templateId: 'tpl-abhishekam', notes: 'Pradosham maha abhishekam',
+      lines: [{ itemId: 'itm-AB-001', qty: 5 }, { itemId: 'itm-AB-002', qty: 1 }, { itemId: 'itm-PJ-006', qty: 3 }, { itemId: 'itm-PJ-004', qty: 0.1 }],
+      requestedAt: at(DAYS, 8, 10).toISOString(), requestedBy: SEED_USERS.manager,
+    },
+  ];
+
+  return { version: STATE_VERSION, items, movements, counts, templates, requests, counters };
 }
 
 /* ------------------------------------------------------------------ */

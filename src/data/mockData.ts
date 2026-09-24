@@ -255,6 +255,8 @@ export interface ProcurementLine {
   /** Set when the line was raised from, or linked to, an inventory item. */
   itemId?: string;
   unit?: string;
+  /** Store the goods are delivered into; confirmed by the approver. */
+  store?: 'MAIN' | 'KITCHEN' | 'SANCTUM';
 }
 
 export interface ProcurementRecord {
@@ -278,118 +280,95 @@ export interface ProcurementRecord {
   expectedDate?: string;
   notes?: string;
   receivedDate?: string;
+  /** Left by the approver, with whether they changed the order while approving. */
+  approvalNote?: string;
+  revisedOnApproval?: boolean;
 }
 
+/* Purchase orders dated relative to today, using the inventory's own items, suppliers and usual rates. */
+const poDay = (offset: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d;
+};
+const poDate = (offset: number) => poDay(offset).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const poISO = (offset: number) => toISODate(poDay(offset));
+
+type SeedPO = Omit<ProcurementRecord, 'amount' | 'approvedBy' | 'approvedByName' | 'approvedDate' | 'rejectedBy' | 'rejectedByName' | 'rejectedDate' | 'rejectionReason'>
+  & Partial<Pick<ProcurementRecord, 'approvedByName' | 'approvedDate' | 'rejectedByName' | 'rejectedDate' | 'rejectionReason'>>;
+
+const seedPO = (po: SeedPO): ProcurementRecord => ({
+  ...po,
+  amount: Math.round(po.items.reduce((sum, l) => sum + l.quantity * l.price, 0)),
+  approvedBy: po.approvedByName ? 'admin' : null,
+  approvedByName: po.approvedByName ?? null,
+  approvedDate: po.approvedDate ?? null,
+  rejectedBy: po.rejectedByName ? 'admin' : null,
+  rejectedByName: po.rejectedByName ?? null,
+  rejectedDate: po.rejectedDate ?? null,
+  rejectionReason: po.rejectionReason ?? '',
+});
+
 export const mockProcurements: ProcurementRecord[] = [
-  { 
-    id: '1', 
-    poNumber: 'PO-1042', 
-    vendor: 'Sri Pooja Supplies', 
-    amount: 45000, 
-    date: 'Feb 20, 2026', 
-    status: 'Received',
+  seedPO({
+    id: 'po-seed-1046', poNumber: 'PO-1046', vendor: 'Dairy Fresh', date: poDate(0), status: 'Pending',
+    items: [{ name: 'Pure Cow Ghee', quantity: 20, price: 735, itemId: 'itm-LO-001', unit: 'L' }],
+    submittedBy: 'manager', submittedByName: 'Temple Manager', source: 'manual', expectedDate: poISO(3),
+    notes: 'Supplier quoted a higher rate this week - festival demand',
+  }),
+  seedPO({
+    id: 'po-seed-1044', poNumber: 'PO-1044', vendor: 'Garden Fresh', date: poDate(0), status: 'Pending',
     items: [
-      { name: 'Incense Sticks', quantity: 50, price: 500, itemId: 'itm-PJ-002' },
-      { name: 'Camphor', quantity: 20, price: 800, itemId: 'itm-PJ-001' }
+      { name: 'Marigold Flowers', quantity: 40, price: 125, itemId: 'itm-FL-001', unit: 'kg', store: 'SANCTUM' },
+      { name: 'Jasmine Strings', quantity: 60, price: 95, itemId: 'itm-FL-002', unit: 'bundle', store: 'SANCTUM' },
     ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: 'admin1',
-    approvedByName: 'Admin User',
-    approvedDate: 'Feb 21, 2026',
-    rejectedBy: null,
-    rejectedByName: null,
-    rejectedDate: null,
-    rejectionReason: ''
-  },
-  { 
-    id: '2', 
-    poNumber: 'PO-1043', 
-    vendor: 'Kitchen World', 
-    amount: 120000, 
-    date: 'Feb 22, 2026', 
-    status: 'Pending',
+    submittedBy: 'store', submittedByName: 'Murugan (Store Keeper)', source: 'inventory', expectedDate: poISO(1),
+    notes: 'Navarathri alankaram - deliver before 6 AM',
+  }),
+  seedPO({
+    id: 'po-seed-1043', poNumber: 'PO-1043', vendor: 'Grain Mart', date: poDate(-1), status: 'Pending',
     items: [
-      { name: 'Rice (50kg)', quantity: 10, price: 5000 },
-      { name: 'Toor Dal (10kg)', quantity: 5, price: 3000 },
-      { name: 'Cooking Oil (15L)', quantity: 2, price: 4000 }
+      { name: 'Raw Rice (Ponni)', quantity: 250, price: 58, itemId: 'itm-KT-001', unit: 'kg', store: 'KITCHEN' },
+      { name: 'Toor Dal', quantity: 40, price: 150, itemId: 'itm-KT-002', unit: 'kg', store: 'KITCHEN' },
+      { name: 'Groundnut Oil', quantity: 30, price: 190, itemId: 'itm-KT-007', unit: 'L', store: 'KITCHEN' },
     ],
-    submittedBy: 'manager2',
-    submittedByName: 'Suresh Yadav',
-    approvedBy: null,
-    approvedByName: null,
-    approvedDate: null,
-    rejectedBy: null,
-    rejectedByName: null,
-    rejectedDate: null,
-    rejectionReason: ''
-  },
-  { 
-    id: '3', 
-    poNumber: 'PO-1041', 
-    vendor: 'Electrical Corp', 
-    amount: 88000, 
-    date: 'Feb 18, 2026', 
-    status: 'Rejected',
+    submittedBy: 'store', submittedByName: 'Murugan (Store Keeper)', source: 'inventory', expectedDate: poISO(3),
+    notes: 'Navarathri annadhanam - three extra days of lunch',
+  }),
+  seedPO({
+    id: 'po-seed-1045', poNumber: 'PO-1045', vendor: 'Shree Suppliers', date: poDate(-5), status: 'Approved',
+    items: [{ name: 'Camphor', quantity: 60, price: 45, itemId: 'itm-PJ-001', unit: 'pkt', store: 'MAIN' }],
+    submittedBy: 'store', submittedByName: 'Murugan (Store Keeper)', source: 'inventory', expectedDate: poISO(0),
+    approvedByName: 'Admin', approvedDate: poDate(-4), notes: 'Camphor running low',
+  }),
+  seedPO({
+    id: 'po-seed-1042', poNumber: 'PO-1042', vendor: 'CleanCare Distributors', date: poDate(-9), status: 'Rejected',
     items: [
-      { name: 'LED Lights - 20W', quantity: 20, price: 40000 },
-      { name: 'Copper Wires (100m)', quantity: 5, price: 8000 },
-      { name: 'Switches', quantity: 15, price: 3000 }
+      { name: 'Floor Cleaner', quantity: 80, price: 118, itemId: 'itm-CM-001', unit: 'L', store: 'MAIN' },
+      { name: 'Brass Polish', quantity: 30, price: 95, itemId: 'itm-CM-002', unit: 'pkt', store: 'MAIN' },
     ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: null,
-    approvedByName: null,
-    approvedDate: null,
-    rejectedBy: 'admin1',
-    rejectedByName: 'Admin User',
-    rejectedDate: 'Feb 19, 2026',
-    rejectionReason: 'Budget constraints, please reduce quantity'
-  },
-  { 
-    id: '4', 
-    poNumber: 'PO-1044', 
-    vendor: 'Flower Mandapam', 
-    amount: 35000, 
-    date: 'Feb 23, 2026', 
-    status: 'Pending',
+    submittedBy: 'store', submittedByName: 'Murugan (Store Keeper)', source: 'inventory', expectedDate: poISO(-4),
+    rejectedByName: 'Admin', rejectedDate: poDate(-8), rejectionReason: 'Main store still holds about two months of cleaner. Reorder next month.',
+  }),
+  seedPO({
+    id: 'po-seed-1041', poNumber: 'PO-1041', vendor: 'Ayyappa Oils', date: poDate(-16), status: 'Received',
     items: [
-      { name: 'Fresh Roses', quantity: 100, price: 5000 },
-      { name: 'Marigold', quantity: 200, price: 8000 },
-      { name: 'Jasmine', quantity: 50, price: 4000 }
+      { name: 'Sesame Oil', quantity: 40, price: 278, itemId: 'itm-LO-002', unit: 'L', store: 'MAIN' },
+      { name: 'Lamp Oil', quantity: 60, price: 158, itemId: 'itm-LO-003', unit: 'L', store: 'SANCTUM' },
     ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: null,
-    approvedByName: null,
-    approvedDate: null,
-    rejectedBy: null,
-    rejectedByName: null,
-    rejectedDate: null,
-    rejectionReason: ''
-  },
-  {
-    id: '5',
-    poNumber: 'PO-1045',
-    vendor: 'Shree Suppliers',
-    amount: 2700,
-    date: 'Sep 19, 2026',
-    status: 'Approved',
+    submittedBy: 'store', submittedByName: 'Murugan (Store Keeper)', source: 'inventory', expectedDate: poISO(-12),
+    approvedByName: 'Admin', approvedDate: poDate(-15), receivedDate: poDate(-10),
+  }),
+  seedPO({
+    id: 'po-seed-1040', poNumber: 'PO-1040', vendor: 'Grain Mart', date: poDate(-21), status: 'Received',
     items: [
-      { name: 'Camphor', quantity: 60, price: 45, itemId: 'itm-PJ-001' }
+      { name: 'Raw Rice (Ponni)', quantity: 300, price: 57, itemId: 'itm-KT-001', unit: 'kg', store: 'KITCHEN' },
+      { name: 'Toor Dal', quantity: 50, price: 148, itemId: 'itm-KT-002', unit: 'kg', store: 'KITCHEN' },
+      { name: 'Moong Dal', quantity: 20, price: 128, itemId: 'itm-KT-004', unit: 'kg', store: 'KITCHEN' },
     ],
-    submittedBy: 'manager1',
-    submittedByName: 'Ramesh Kumar',
-    approvedBy: 'admin1',
-    approvedByName: 'Admin User',
-    approvedDate: 'Sep 20, 2026',
-    rejectedBy: null,
-    rejectedByName: null,
-    rejectedDate: null,
-    rejectionReason: '',
-    source: 'inventory',
-    expectedDate: '2026-09-24'
-  },
+    submittedBy: 'store', submittedByName: 'Murugan (Store Keeper)', source: 'inventory', expectedDate: poISO(-18),
+    approvedByName: 'Admin', approvedDate: poDate(-20), receivedDate: poDate(-18),
+  }),
 ];
 
 export const mockAssets: Asset[] = [

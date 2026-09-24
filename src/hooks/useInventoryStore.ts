@@ -1,9 +1,11 @@
 import { useMemo, useSyncExternalStore } from 'react';
+import { OPEN_PO_STATUSES, getProcurements } from '@/hooks/useProcurementStore';
 import {
   InventoryItem, InventoryState, SevaTemplate, StockCount, StoreId, STATE_VERSION,
-  adjustStock, approveStockCount, buildSeedState, computeSummaries, createStockCount, issueStock,
-  nextItemCode, receiveStock, transferStock, uid,
-  type AdjustInput, type IssueInput, type ItemSummary, type ReceiveInput, type TransferInput,
+  adjustStock, approveStockCount, approveStockRequest, buildSeedState, computeSummaries, createStockCount, createStockRequest,
+  matchPOLineItem, nextItemCode, receiveStock, rejectStockRequest, transferStock, uid,
+  type AdjustInput, type ItemSummary, type ReceiveInput, type StockRequestDecision, type StockRequestInput,
+  type TransferInput,
 } from '@/lib/inventory';
 
 const STORAGE_KEY = 'omg_inventory_v1';
@@ -13,7 +15,8 @@ function load(): InventoryState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as InventoryState;
-      if (parsed?.version === STATE_VERSION && Array.isArray(parsed.items)) return parsed;
+      // Data saved before usage approvals existed has no request list.
+      if (parsed?.version === STATE_VERSION && Array.isArray(parsed.items)) return { ...parsed, requests: parsed.requests ?? [] };
     }
   } catch {
     // Storage blocked or corrupt - fall back to seed data.
@@ -111,17 +114,17 @@ export const inventoryActions = {
     if (!active && (getSummaries(s)[id]?.onHand ?? 0) > 0) {
       throw new Error('Issue, transfer or write off the remaining stock before archiving this item.');
     }
+    if (!active) {
+      const po = getProcurements().find(p => OPEN_PO_STATUSES.includes(p.status) && p.items.some(l => matchPOLineItem(s.items, l) === id));
+      if (po) throw new Error(`${po.poNumber} still includes this item. Receive or reject that order before archiving.`);
+      const req = s.requests.find(r => r.status === 'Pending' && r.lines.some(l => l.itemId === id));
+      if (req) throw new Error(`Stock request ${req.refNo} is waiting on this item. Approve or reject it before archiving.`);
+    }
     setState({ ...s, items: s.items.map(i => (i.id === id ? { ...i, active } : i)) });
   },
 
   receive(input: ReceiveInput) {
     const r = receiveStock(getState(), input);
-    setState(r.state);
-    return r.refNo;
-  },
-
-  issue(input: IssueInput) {
-    const r = issueStock(getState(), input);
     setState(r.state);
     return r.refNo;
   },
@@ -134,6 +137,24 @@ export const inventoryActions = {
 
   adjust(input: AdjustInput) {
     const r = adjustStock(getState(), input);
+    setState(r.state);
+    return r.refNo;
+  },
+
+  requestIssue(input: StockRequestInput) {
+    const r = createStockRequest(getState(), input);
+    setState(r.state);
+    return { refNo: r.refNo, requestId: r.state.requests[0].id };
+  },
+
+  approveRequest(id: string, decision: StockRequestDecision) {
+    const r = approveStockRequest(getState(), id, decision);
+    setState(r.state);
+    return r.refNo;
+  },
+
+  rejectRequest(id: string, reason: string, user: string) {
+    const r = rejectStockRequest(getState(), id, reason, user);
     setState(r.state);
     return r.refNo;
   },

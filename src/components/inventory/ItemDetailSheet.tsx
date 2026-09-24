@@ -47,7 +47,7 @@ const ItemDetailSheet: React.FC<{
               {item.active && (
                 <div className="flex flex-wrap gap-2 pt-2">
                   <Button size="sm" onClick={() => onAction('receive', item.id)}><ArrowDownLeft className="h-4 w-4 mr-1" />Receive</Button>
-                  <Button size="sm" variant="outline" onClick={() => onAction('issue', item.id)} disabled={s.onHand <= 0}><ArrowUpRight className="h-4 w-4 mr-1" />Issue</Button>
+                  <Button size="sm" variant="outline" onClick={() => onAction('issue', item.id)} disabled={s.onHand <= 0}><ArrowUpRight className="h-4 w-4 mr-1" />Request</Button>
                   <Button size="sm" variant="outline" onClick={() => onAction('po', item.id)}><ShoppingCart className="h-4 w-4 mr-1" />Order</Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

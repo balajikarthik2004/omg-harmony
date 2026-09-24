@@ -44,15 +44,16 @@ const PlanningTab: React.FC<{
       const n = parseNum(p.count);
       t.lines.forEach(l => need.set(l.itemId, round3((need.get(l.itemId) ?? 0) + (l.qty * n) / t.basisQty)));
     });
-    return [...need.entries()].map(([itemId, planned]) => {
-      const item = state.items.find(i => i.id === itemId)!;
+    return [...need.entries()].flatMap(([itemId, planned]) => {
+      const item = state.items.find(i => i.id === itemId);
       const s = summaries[itemId];
+      if (!item || !s) return []; // template still lists an item that was removed
       const regular = includeRegular ? round3(s.avgDaily * leadDays) : 0;
       const available = round3(s.onHand + (onOrder[itemId] ?? 0));
       const total = round3(planned + regular);
       const rawShort = Math.max(0, round3(total - available));
       const shortfall = WHOLE_UNITS.has(item.unit) ? Math.ceil(rawShort) : Math.ceil(rawShort * 10) / 10;
-      return { item, planned, regular, onHand: s.onHand, onOrder: onOrder[itemId] ?? 0, total, shortfall, cost: shortfall * item.unitCost };
+      return [{ item, planned, regular, onHand: s.onHand, onOrder: onOrder[itemId] ?? 0, total, shortfall, cost: shortfall * item.unitCost }];
     }).filter(r => r.item).sort((a, b) => b.shortfall * b.item.unitCost - a.shortfall * a.item.unitCost);
   }, [plan, state.templates, state.items, summaries, onOrder, includeRegular, leadDays]);
 
@@ -68,7 +69,7 @@ const PlanningTab: React.FC<{
           <Button size="sm" variant="outline" onClick={() => setEditing('new')}><Plus className="h-4 w-4 mr-1" />New</Button>
         </div>
         <div className="p-4 space-y-3">
-          <p className="text-xs text-muted-foreground">The materials each seva or meal batch needs. Issue everything for a seva in one click.</p>
+          <p className="text-xs text-muted-foreground">The materials each seva or meal batch needs. Request everything a seva needs in one step; stock is released once approved.</p>
           {state.templates.map(t => {
             const cost = t.lines.reduce((s, l) => s + l.qty * (summaries[l.itemId]?.avgCost ?? 0), 0);
             return (

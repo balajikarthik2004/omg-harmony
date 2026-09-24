@@ -252,7 +252,7 @@ const StockRegisterTab: React.FC<{
                       <DropdownMenuContent align="end" className="w-52">
                         {item.active ? <>
                           <DropdownMenuItem onClick={() => onAction('receive', item.id)}><ArrowDownLeft className="h-4 w-4 mr-2" />Receive stock</DropdownMenuItem>
-                          <DropdownMenuItem disabled={s.onHand <= 0} onClick={() => onAction('issue', item.id)}><ArrowUpRight className="h-4 w-4 mr-2" />Issue stock</DropdownMenuItem>
+                          <DropdownMenuItem disabled={s.onHand <= 0} onClick={() => onAction('issue', item.id)}><ArrowUpRight className="h-4 w-4 mr-2" />Request stock</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => onAction('po', item.id)}><ShoppingCart className="h-4 w-4 mr-2" />Order from supplier</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem disabled={s.onHand <= 0} onClick={() => onAction('transfer', item.id)}><ArrowLeftRight className="h-4 w-4 mr-2" />Move to another store</DropdownMenuItem>
