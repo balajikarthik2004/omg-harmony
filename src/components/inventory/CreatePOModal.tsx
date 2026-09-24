@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { Building2, Calendar, FileText, Info, PackagePlus, Plus, Sparkles, Trash2, Truck } from 'lucide-react';
+import { Building2, Info, PackageOpen, PackagePlus, Trash2 } from 'lucide-react';
 import Modal from '@/components/Modal';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -110,195 +110,269 @@ const CreatePOModal: React.FC<{
       open={open}
       onClose={onClose}
       title="Order from Supplier"
-      containerClassName="max-w-4xl max-h-[92vh] overflow-y-auto"
-      bodyClassName="p-5"
+      containerClassName="max-w-6xl w-full"
+      bodyClassName="px-4 py-3 sm:px-6 sm:py-4"
     >
-      <div className="inventory-form-shell space-y-3">
-        {/* Compact Info Banner */}
-        <div className="flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-3 py-1.5 text-[11px] text-muted-foreground">
-          <Info className="h-3.5 w-3.5 text-primary shrink-0" />
-          <span>Quantities are pre-filled to maximum capacity. One purchase order is created per supplier.</span>
-        </div>
-
+      <div className="inventory-form-shell space-y-4">
         <ErrorNote message={error} />
 
-        {/* Fixed Height Items Table Area with internal Scrollbar */}
-        <div className="rounded-xl border border-border overflow-hidden shadow-2xs bg-card">
-          <div className="h-[170px] overflow-y-auto">
-            <table className="w-full text-xs">
-              <thead className="bg-muted/75 sticky top-0 z-10 border-b border-border shadow-2xs">
-                <tr className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">
-                  <th className="text-left px-3 py-2">Item</th>
-                  <th className="text-right px-3 py-2">In Stock</th>
-                  <th className="text-left px-3 py-2 w-44">Supplier</th>
-                  <th className="text-right px-3 py-2 w-24">Qty</th>
-                  <th className="text-right px-3 py-2 w-24">Rate (₹)</th>
-                  <th className="text-right px-3 py-2 w-28">Amount</th>
-                  <th className="w-8" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {lines.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                      <div className="flex flex-col items-center justify-center gap-1">
-                        <PackagePlus className="h-6 w-6 text-muted-foreground/40" />
-                        <p className="font-medium text-xs text-foreground">No items added yet</p>
-                        <p className="text-[11px] text-muted-foreground">Select an item below to add it to this purchase order.</p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
-                {lines.map(l => {
-                  const item = state.items.find(i => i.id === l.itemId)!;
-                  const itemQty = parseNum(l.qty);
-                  const itemPrice = parseNum(l.price);
-                  return (
-                    <tr key={l.itemId} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-3 py-1.5 whitespace-nowrap">
-                        <span className="font-semibold text-foreground text-xs">{item.name}</span>
-                        <span className="text-[10.5px] text-muted-foreground ml-1.5">
-                          (Max {fmtQty(item.maxStock)} {item.unit})
-                        </span>
-                      </td>
-                      <td className="px-3 py-1.5 text-right tabular-nums whitespace-nowrap">
-                        <span className="font-medium text-foreground text-xs">
-                          {fmtQty(summaries[item.id]?.onHand ?? 0)} {item.unit}
-                        </span>
-                        {(onOrder[item.id] ?? 0) > 0 && (
-                          <span className="text-[10px] text-primary font-medium ml-1">
-                            (+{fmtQty(onOrder[item.id])})
+        {/* 2-Column Spacious Grid Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          
+          {/* LEFT SIDE: Order Details & Fixed-Height PO Generation Plan */}
+          <div className="lg:col-span-5 space-y-3">
+            {/* Info Notice */}
+            <div className="flex items-center gap-2 rounded-lg border border-primary/15 bg-primary/5 px-3.5 py-2 text-[11.5px] text-muted-foreground">
+              <Info className="h-4 w-4 text-primary shrink-0" />
+              <span>Quantities are pre-filled to maximum capacity. One PO is generated per supplier.</span>
+            </div>
+
+            {/* Add Item Field */}
+            <Field label="Add Item to Order" hint={`${availableItems.length} available`}>
+              <ItemSelect
+                items={availableItems}
+                summaries={summaries}
+                value=""
+                onChange={addItem}
+                placeholder="+ Select an item to add..."
+                disabled={availableItems.length === 0}
+              />
+            </Field>
+
+            {/* Delivery Date & Notes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Field label="Expected Delivery Date">
+                <DatePicker value={expected} onChange={setExpected} />
+              </Field>
+              <Field label="Notes to Supplier">
+                <input
+                  className={`${inputCls} h-10 text-xs`}
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  placeholder="e.g. 6 AM - 10 AM"
+                />
+              </Field>
+            </div>
+
+            {/* Fixed-Height Generated POs Plan Section (Maintains Constant Size for 0, 1, 2, or more POs) */}
+            <div className="rounded-xl border border-border bg-card/60 p-3.5 shadow-2xs h-[182px] flex flex-col justify-between">
+              <div className="flex items-center justify-between border-b border-border/60 pb-2 shrink-0">
+                <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4 text-primary" />
+                  Generated POs Plan ({groups.length})
+                </span>
+                <span className="text-[11px] font-semibold text-muted-foreground">
+                  {lines.length} Line Item{lines.length === 1 ? '' : 's'}
+                </span>
+              </div>
+
+              {groups.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground py-2">
+                  <Building2 className="h-5 w-5 text-muted-foreground/30 mb-1" />
+                  <p className="text-xs font-medium text-foreground">No POs generated yet</p>
+                  <p className="text-[11px] text-muted-foreground">Add items above to see supplier PO breakdown</p>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-y-auto pr-1 space-y-2 pt-2 min-h-0">
+                  {groups.map(([vendor, itemsInGroup], idx) => {
+                    const groupTotal = itemsInGroup.reduce((s, l) => s + parseNum(l.qty) * parseNum(l.price), 0);
+                    return (
+                      <div
+                        key={vendor}
+                        className="flex items-center justify-between p-2.5 rounded-lg border border-border/80 bg-background/80 hover:bg-background hover:border-primary/30 transition-colors shadow-2xs"
+                      >
+                        <div className="min-w-0 pr-2">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-mono">
+                              PO #{idx + 1}
+                            </span>
+                            <span className="text-xs font-bold text-foreground truncate max-w-[170px]" title={vendor}>
+                              {vendor}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-muted-foreground block truncate mt-0.5 max-w-[210px]">
+                            {itemsInGroup.map(l => {
+                              const item = state.items.find(i => i.id === l.itemId);
+                              return `${item?.name || 'Item'} (${l.qty})`;
+                            }).join(', ')}
                           </span>
-                        )}
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <input
-                          className={`${inputCls} h-7.5 px-2 text-xs`}
-                          value={l.supplier}
-                          onChange={e => update(l.itemId, { supplier: e.target.value })}
-                          placeholder="Vendor name"
-                          aria-label="Supplier"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <input
-                          type="number"
-                          min={0}
-                          step="any"
-                          className={`${inputCls} h-7.5 px-2 text-right text-xs font-medium`}
-                          value={l.qty}
-                          onChange={e => update(l.itemId, { qty: e.target.value })}
-                          placeholder="0"
-                          aria-label="Order quantity"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5">
-                        <input
-                          type="number"
-                          min={0}
-                          step="any"
-                          className={`${inputCls} h-7.5 px-2 text-right text-xs font-medium`}
-                          value={l.price}
-                          onChange={e => update(l.itemId, { price: e.target.value })}
-                          placeholder="0"
-                          aria-label="Rate"
-                        />
-                      </td>
-                      <td className="px-3 py-1.5 text-right tabular-nums whitespace-nowrap font-bold text-foreground text-xs">
-                        {fmtMoney(itemQty * itemPrice)}
-                      </td>
-                      <td className="px-1.5 py-1.5 text-center">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                          onClick={() => setLines(prev => prev.filter(x => x.itemId !== l.itemId))}
-                          aria-label="Remove item"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <span className="text-xs font-bold text-primary tabular-nums">
+                            {fmtMoney(groupTotal)}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground block">
+                            {itemsInGroup.length} item{itemsInGroup.length === 1 ? '' : 's'}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Add Item Dropdown Section - Always Fully Visible */}
-        <div className="w-full">
-          <ItemSelect
-            items={availableItems}
-            summaries={summaries}
-            value=""
-            onChange={addItem}
-            placeholder="+ Add an item to this order..."
-            disabled={availableItems.length === 0}
-          />
-        </div>
-
-        {/* Delivery Details & Notes */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-          <Field label="Expected Delivery Date">
-            <DatePicker value={expected} onChange={setExpected} />
-          </Field>
-          <Field label="Notes to Supplier" className="sm:col-span-2">
-            <input
-              className={`${inputCls} h-10 text-xs`}
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-              placeholder="Delivery to temple stores, 6 AM - 10 AM"
-            />
-          </Field>
-        </div>
-
-        {/* Order Summary Breakdown Card with compact scroll for multi-vendor badges */}
-        <div className="rounded-xl bg-muted/40 border border-border p-3 space-y-1.5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-1.5 flex-wrap text-xs max-h-[58px] overflow-y-auto pr-1">
-              <span className="font-bold text-foreground shrink-0">
-                {groups.length} PO{groups.length === 1 ? '' : 's'}:
+          {/* RIGHT SIDE: Selected Order Preview & Total Valuation */}
+          <div className="lg:col-span-7 space-y-3 flex flex-col">
+            <div className="flex items-center justify-between px-0.5">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <PackageOpen className="w-4 h-4 text-primary" />
+                Selected Order Items Preview
               </span>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {groups.map(([v, itemsInGroup]) => (
-                  <span
-                    key={v}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-background border border-border shadow-2xs text-foreground"
-                  >
-                    <Building2 className="w-3 h-3 text-primary" />
-                    {v}: <span className="text-primary font-bold">{fmtMoney(itemsInGroup.reduce((s, l) => s + parseNum(l.qty) * parseNum(l.price), 0))}</span>
-                  </span>
-                ))}
+              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
+                {lines.length} item{lines.length === 1 ? '' : 's'} selected
+              </span>
+            </div>
+
+            {/* Spacious Fixed-Height Items Table Preview */}
+            <div className="rounded-xl border border-border overflow-hidden shadow-2xs bg-card">
+              <div className="h-[250px] sm:h-[275px] overflow-y-auto overflow-x-auto">
+                <table className="w-full text-xs min-w-[560px]">
+                  <thead className="bg-muted/75 sticky top-0 z-10 border-b border-border shadow-2xs">
+                    <tr className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">
+                      <th className="text-left px-3 py-2.5">Item</th>
+                      <th className="text-right px-2.5 py-2.5">In Stock</th>
+                      <th className="text-left px-2.5 py-2.5 w-36">Supplier</th>
+                      <th className="text-right px-2 py-2.5 w-20">Qty</th>
+                      <th className="text-right px-2 py-2.5 w-22">Rate (₹)</th>
+                      <th className="text-right px-3 py-2.5 w-26">Amount</th>
+                      <th className="w-8" />
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {lines.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="py-16 text-center text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <PackagePlus className="h-8 w-8 text-muted-foreground/35" />
+                            <p className="font-semibold text-sm text-foreground">No items added yet</p>
+                            <p className="text-xs text-muted-foreground max-w-xs">
+                              Select items from the dropdown on the left to populate this order preview.
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {lines.map(l => {
+                      const item = state.items.find(i => i.id === l.itemId)!;
+                      const itemQty = parseNum(l.qty);
+                      const itemPrice = parseNum(l.price);
+                      return (
+                        <tr key={l.itemId} className="hover:bg-muted/30 transition-colors">
+                          <td className="px-3 py-2 whitespace-nowrap">
+                            <span className="font-semibold text-foreground text-xs block truncate max-w-[150px]" title={item.name}>
+                              {item.name}
+                            </span>
+                            <span className="text-[10.5px] text-muted-foreground">
+                              Max {fmtQty(item.maxStock)} {item.unit}
+                            </span>
+                          </td>
+                          <td className="px-2.5 py-2 text-right tabular-nums whitespace-nowrap">
+                            <span className="font-medium text-foreground text-xs">
+                              {fmtQty(summaries[item.id]?.onHand ?? 0)}
+                            </span>
+                          </td>
+                          <td className="px-2.5 py-2">
+                            <input
+                              className={`${inputCls} h-8 px-2 text-xs`}
+                              value={l.supplier}
+                              onChange={e => update(l.itemId, { supplier: e.target.value })}
+                              placeholder="Supplier"
+                              aria-label="Supplier"
+                            />
+                          </td>
+                          <td className="px-2 py-2">
+                            <input
+                              type="number"
+                              min={0}
+                              step="any"
+                              className={`${inputCls} h-8 px-2 text-right text-xs font-medium`}
+                              value={l.qty}
+                              onChange={e => update(l.itemId, { qty: e.target.value })}
+                              placeholder="0"
+                              aria-label="Order quantity"
+                            />
+                          </td>
+                          <td className="px-2 py-2">
+                            <input
+                              type="number"
+                              min={0}
+                              step="any"
+                              className={`${inputCls} h-8 px-2 text-right text-xs font-medium`}
+                              value={l.price}
+                              onChange={e => update(l.itemId, { price: e.target.value })}
+                              placeholder="0"
+                              aria-label="Rate"
+                            />
+                          </td>
+                          <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap font-bold text-foreground text-xs">
+                            {fmtMoney(itemQty * itemPrice)}
+                          </td>
+                          <td className="px-1.5 py-2 text-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                              onClick={() => setLines(prev => prev.filter(x => x.itemId !== l.itemId))}
+                              aria-label="Remove item"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 shrink-0">
-              <span className="text-xs text-muted-foreground">Total:</span>
-              <span className="text-base font-bold text-foreground font-display tabular-nums">
-                {fmtMoney(total)}
-              </span>
+            {/* Total Valuation Card */}
+            <div className="rounded-xl bg-gradient-to-r from-primary/5 via-muted/35 to-background border border-primary/20 px-4 py-3 flex items-center justify-between shadow-2xs">
+              <div>
+                <span className="text-[10.5px] uppercase tracking-wider font-bold text-muted-foreground block">
+                  Total Order Valuation
+                </span>
+                <span className="text-xs text-foreground font-medium">
+                  {groups.length} Purchase Order{groups.length === 1 ? '' : 's'} to be generated · {lines.length} Line Item{lines.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl sm:text-3xl font-extrabold text-primary font-display tabular-nums tracking-tight">
+                  {fmtMoney(total)}
+                </span>
+              </div>
             </div>
           </div>
 
-          {isAdmin && (
-            <div className="pt-1.5 border-t border-border/40 flex items-center justify-between">
-              <label className="flex items-center gap-2 text-[11.5px] font-medium text-foreground cursor-pointer select-none">
+        </div>
+
+        {/* Modal Footer: Auto-approve checkbox & Prominent Action Buttons */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border">
+          <div>
+            {isAdmin && (
+              <label className="flex items-center gap-2 text-xs font-medium text-foreground cursor-pointer select-none">
                 <Checkbox checked={approveNow} onCheckedChange={v => setApproveNow(v === true)} />
                 <span>Auto-approve immediately (skip pending approval)</span>
               </label>
-            </div>
-          )}
-        </div>
-
-        {/* Modal Footer Buttons */}
-        <div className="flex justify-end gap-2 pt-2 border-t border-border">
-          <Button variant="outline" size="sm" onClick={onClose} className="h-9 px-4">
-            Cancel
-          </Button>
-          <Button size="sm" onClick={submit} className="inventory-cta h-9 px-5 font-semibold">
-            {approveNow ? 'Place Order' : 'Send for Approval'}
-          </Button>
+            )}
+          </div>
+          <div className="flex items-center justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="h-11 px-6 text-sm font-semibold rounded-xl border-border/80 hover:bg-muted/80 shadow-2xs transition-all"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={submit}
+              className="inventory-cta h-11 px-8 text-sm font-bold tracking-wide rounded-xl shadow-md active:scale-98 transition-all"
+            >
+              {approveNow ? 'Place Order' : 'Send for Approval'}
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

@@ -4870,4 +4870,38 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   animation: bounce-short 1.5s ease-in-out infinite;
 }
 
+/* ---------------------------------------------------------------------------
+   Responsive Form and Modal Screen Adaptations (15" Lap, 14" Lap, Tablet, Mobile)
+--------------------------------------------------------------------------- */
+.modal-overlay {
+  transition: opacity 0.2s ease-in-out;
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 0.5rem !important;
+  }
+  .modal-overlay > div {
+    max-height: 94vh !important;
+    border-radius: 1rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .modal-overlay {
+    padding: 1rem !important;
+  }
+  .modal-overlay > div {
+    max-height: 90vh !important;
+  }
+}
+
+@media (max-height: 820px) {
+  /* 14-inch laptops and compact viewport heights */
+  .modal-overlay > div {
+    max-height: 92vh !important;
+  }
+}
+
+
 

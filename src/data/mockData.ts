@@ -247,6 +247,151 @@ export interface Asset {
   notes?: string;
 }
 
+export interface ProcurementLine {
+  name: string;
+  quantity: number;
+  /** Unit price. */
+  price: number;
+  /** Set when the line was raised from, or linked to, an inventory item. */
+  itemId?: string;
+  unit?: string;
+}
+
+export interface ProcurementRecord {
+  id: string;
+  poNumber: string;
+  vendor: string;
+  amount: number;
+  date: string;
+  status: string;
+  items: ProcurementLine[];
+  submittedBy: string;
+  submittedByName: string;
+  approvedBy: string | null;
+  approvedByName?: string | null;
+  approvedDate: string | null;
+  rejectedBy: string | null;
+  rejectedByName?: string | null;
+  rejectedDate: string | null;
+  rejectionReason: string;
+  source?: 'inventory' | 'manual' | 'agent';
+  expectedDate?: string;
+  notes?: string;
+  receivedDate?: string;
+}
+
+export const mockProcurements: ProcurementRecord[] = [
+  { 
+    id: '1', 
+    poNumber: 'PO-1042', 
+    vendor: 'Sri Pooja Supplies', 
+    amount: 45000, 
+    date: 'Feb 20, 2026', 
+    status: 'Received',
+    items: [
+      { name: 'Incense Sticks', quantity: 50, price: 500, itemId: 'itm-PJ-002' },
+      { name: 'Camphor', quantity: 20, price: 800, itemId: 'itm-PJ-001' }
+    ],
+    submittedBy: 'manager1',
+    submittedByName: 'Ramesh Kumar',
+    approvedBy: 'admin1',
+    approvedByName: 'Admin User',
+    approvedDate: 'Feb 21, 2026',
+    rejectedBy: null,
+    rejectedByName: null,
+    rejectedDate: null,
+    rejectionReason: ''
+  },
+  { 
+    id: '2', 
+    poNumber: 'PO-1043', 
+    vendor: 'Kitchen World', 
+    amount: 120000, 
+    date: 'Feb 22, 2026', 
+    status: 'Pending',
+    items: [
+      { name: 'Rice (50kg)', quantity: 10, price: 5000 },
+      { name: 'Toor Dal (10kg)', quantity: 5, price: 3000 },
+      { name: 'Cooking Oil (15L)', quantity: 2, price: 4000 }
+    ],
+    submittedBy: 'manager2',
+    submittedByName: 'Suresh Yadav',
+    approvedBy: null,
+    approvedByName: null,
+    approvedDate: null,
+    rejectedBy: null,
+    rejectedByName: null,
+    rejectedDate: null,
+    rejectionReason: ''
+  },
+  { 
+    id: '3', 
+    poNumber: 'PO-1041', 
+    vendor: 'Electrical Corp', 
+    amount: 88000, 
+    date: 'Feb 18, 2026', 
+    status: 'Rejected',
+    items: [
+      { name: 'LED Lights - 20W', quantity: 20, price: 40000 },
+      { name: 'Copper Wires (100m)', quantity: 5, price: 8000 },
+      { name: 'Switches', quantity: 15, price: 3000 }
+    ],
+    submittedBy: 'manager1',
+    submittedByName: 'Ramesh Kumar',
+    approvedBy: null,
+    approvedByName: null,
+    approvedDate: null,
+    rejectedBy: 'admin1',
+    rejectedByName: 'Admin User',
+    rejectedDate: 'Feb 19, 2026',
+    rejectionReason: 'Budget constraints, please reduce quantity'
+  },
+  { 
+    id: '4', 
+    poNumber: 'PO-1044', 
+    vendor: 'Flower Mandapam', 
+    amount: 35000, 
+    date: 'Feb 23, 2026', 
+    status: 'Pending',
+    items: [
+      { name: 'Fresh Roses', quantity: 100, price: 5000 },
+      { name: 'Marigold', quantity: 200, price: 8000 },
+      { name: 'Jasmine', quantity: 50, price: 4000 }
+    ],
+    submittedBy: 'manager1',
+    submittedByName: 'Ramesh Kumar',
+    approvedBy: null,
+    approvedByName: null,
+    approvedDate: null,
+    rejectedBy: null,
+    rejectedByName: null,
+    rejectedDate: null,
+    rejectionReason: ''
+  },
+  {
+    id: '5',
+    poNumber: 'PO-1045',
+    vendor: 'Shree Suppliers',
+    amount: 2700,
+    date: 'Sep 19, 2026',
+    status: 'Approved',
+    items: [
+      { name: 'Camphor', quantity: 60, price: 45, itemId: 'itm-PJ-001' }
+    ],
+    submittedBy: 'manager1',
+    submittedByName: 'Ramesh Kumar',
+    approvedBy: 'admin1',
+    approvedByName: 'Admin User',
+    approvedDate: 'Sep 20, 2026',
+    rejectedBy: null,
+    rejectedByName: null,
+    rejectedDate: null,
+    rejectionReason: '',
+    source: 'inventory',
+    expectedDate: '2026-09-24'
+  },
+];
+
 export const mockAssets: Asset[] = [
   { id: '1', name: 'Main Temple Bell', category: 'Temple Fixtures', purchaseDate: '2020-01-15', condition: 'Good', maintenanceStatus: 'Up to Date', cost: 450000, notes: 'Cast bronze bell at the east gopuram. Annual polishing due every Chithirai.' },
   { id: '2', name: 'Sound System', category: 'Electronics', purchaseDate: '2023-06-20', condition: 'Excellent', maintenanceStatus: 'Up to Date', cost: 185000, notes: '8-channel mixer with 12 ceiling speakers across the prakaram.' },

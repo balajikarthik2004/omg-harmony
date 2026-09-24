@@ -8,6 +8,7 @@ import {
   mockDonations,
   mockEvents,
   mockInventory,
+  mockProcurements,
   mockServices,
   serviceBookingData,
 } from '@/data/mockData';
@@ -129,6 +130,17 @@ describe('catalogues', () => {
 
   it('dates every event', () => {
     mockEvents.forEach(e => expect(isIsoDate(e.date), e.name).toBe(true));
+  });
+
+  it('maintains valid procurement records and PO numbers', () => {
+    expect(mockProcurements.length).toBeGreaterThan(0);
+    expect(duplicatesOf(mockProcurements, po => po.poNumber)).toEqual([]);
+    mockProcurements.forEach(po => {
+      expect(po.vendor).toBeTruthy();
+      expect(po.amount).toBeGreaterThan(0);
+      expect(po.items.length).toBeGreaterThan(0);
+      expect(['Pending', 'Approved', 'Rejected', 'Received', 'Partially Received']).toContain(po.status);
+    });
   });
 });
 
